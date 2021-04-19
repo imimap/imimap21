@@ -1,0 +1,8 @@
+{
+  "name": "imimap2",
+  "template": "Default",
+  "isConfigured": {
+    "client": false,
+    "server": false
+  }
+}
