@@ -5,6 +5,9 @@ const express = require('express');
 // parse env variables
 require('dotenv').config();
 
+// load database
+require('./database');
+
 // Configuring port
 const port = process.env.PORT || 9000;
 
