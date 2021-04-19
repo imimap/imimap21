@@ -5,8 +5,6 @@
     try {
         await mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
         console.log(`Connection to database at ${mongoDB} successfully established.`);
-
-        require('./helpers/mockdata');
     } catch(error) {
         console.error(`Connection to database at ${mongoDB} failed.`, error);
     }
