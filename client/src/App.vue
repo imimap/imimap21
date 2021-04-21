@@ -1,6 +1,6 @@
 <template>
   <header>
-    <h1>IMIMAP2</h1>
+    <h1>IMIMAP21</h1>
   </header>
   <main>
     <router-view></router-view>
@@ -8,14 +8,12 @@
   <footer></footer>
 </template>
 
-<script>
-// import HelloWorld from './components/HelloWorld.vue';
+<script lang="ts">
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'App',
-  components: {
-  },
-};
+});
 </script>
 
 <style lang="scss">
