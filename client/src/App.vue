@@ -2,9 +2,52 @@
   <header class="container-fluid imimap-header">
     <div class="row">
       <div class="col-2">
-        <img src="/assets/logo.png" alt="">
+        <a href="" class="navbar-brand imi-map-logo">
+          <img src="/assets/plane.gif" alt="">
+        </a>
       </div>
-      <div class="col-10">NAV</div>
+      <div class="col-10">
+        <div class="container">
+          <div class="row">
+            <div class="col-12"></div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <nav class="mt-4 ml-3 pb-3 navbar navbar-expand-md navbar-dark">
+                <button class="navbar-toggler imi-map-toggler"
+                        type="button" data-toggle="collapse"
+                        data-target="#imi-map-navbar-core"
+                        aria-controls="imi-map-navbar-core"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation"
+                >
+                  <span class="navbar-toggler-icon"></span>
+                </button>
+                <div
+                  class="collapse navbar-collapse navbar-expand-lg pr-3"
+                  id="imi-map-navbar-core"
+                >
+                  <ul class="navbar-nav ">
+                    <li class="nav-item im-nav-itemactive">
+                      <a class="nav-link im-nav-link imi-map-navlink" href="#">Start</a>
+                    </li>
+                    <li class="nav-item im-nav-item">
+                      <a class="nav-link im-nav-link imi-map-navlink" href="#">
+                        Praktikumssuche
+                      </a>
+                    </li>
+                    <li class="nav-item im-nav-item">
+                      <a class="nav-link im-nav-link imi-map-navlink" href="#">
+                        Mein Praktikum
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </header>
   <main>
@@ -40,6 +83,8 @@ export default {
 </script>
 
 <style lang="scss">
+$screen-md: 768px;
+
 .imimap-header {
   background: url('/assets/topbar-background.png'),#292929;
   background-repeat: no-repeat;
@@ -50,5 +95,44 @@ export default {
   text-align: center;
   overflow: visible;
   margin-bottom: 20px;
+}
+
+.navbar-brand {
+  display: inline-block;
+  padding-top: 0.3125rem;
+  padding-bottom: 0.3125rem;
+  margin-right: 1rem;
+  font-size: 1.25rem;
+  line-height: inherit;
+  white-space: nowrap;
+}
+
+.imi-map-logo {
+  background: url('/assets/logo.png') no-repeat;
+  background-size: 100%;
+  margin-top: -20px;
+  width: 130px;
+  height: 130px;
+  margin-top: 8px;
+
+  img {
+    height: 130px;
+    width: 130px;
+  }
+}
+
+.navbar-dark .navbar-toggler {
+  color: rgba(255,255,255,0.5);
+  border-color: rgba(255,255,255,0.1);
+}
+
+@media (min-width: $screen-md) {
+  .navbar-expand-md .navbar-toggler {
+    display: none;
+  }
+}
+
+.bg-dark.navbar-dark {
+  background-color: transparent !important;
 }
 </style>
