@@ -476,15 +476,13 @@
     </div>
     <router-view></router-view>
   </main>
-
   <footer></footer>
 </template>
 
-<script>
-// import HelloWorld from './components/HelloWorld.vue';
-import HeaderComponent from './components/HeaderComponent.vue';
+<script lang="ts">
+import { headerComponent } from './components/HeaderComponent.vue';
 
-export default {
+export default defineComponent({
   name: 'App',
   components: {
     HeaderComponent,
