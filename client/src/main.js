@@ -5,7 +5,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import App from './App.vue';
-import router from './router';
+import router from './router/index';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -14,7 +14,4 @@ library.add(faUser);
 library.add(faCog);
 library.add(faSignOutAlt);
 
-createApp(App)
-  .use(router)
-  .component('font-awesome-icon', FontAwesomeIcon)
-  .mount('#app');
+createApp(App).use(router).component('font-awesome-icon', FontAwesomeIcon).mount('#app');
