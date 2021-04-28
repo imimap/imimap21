@@ -123,7 +123,7 @@
                 <option value="BN Utrecht">BN Utrecht</option>
                 <option value="Bad Soden /Zagreb">Bad Soden /Zagreb</option>
                 <option value="Bahar ic-Caghaq">Bahar ic-Caghaq</option>
-                <option value="Bali ">Bali </option>
+                <option value="Bali ">Bali</option>
                 <option value="Balzan">Balzan</option>
                 <option value="Bangkok">Bangkok</option>
                 <option value="Barcelona">Barcelona</option>
@@ -134,7 +134,7 @@
                 <option value="Bergen">Bergen</option>
                 <option value="Berlgrad">Berlgrad</option>
                 <option value="Berlin">Berlin</option>
-                <option value="Berlin ">Berlin </option>
+                <option value="Berlin ">Berlin</option>
                 <option value="Berlin/Dona-Lusail">Berlin/Dona-Lusail</option>
                 <option value="Bern">Bern</option>
                 <option value="Betzdorf">Betzdorf</option>
@@ -231,7 +231,7 @@
                 <option value="Lennox Head">Lennox Head</option>
                 <option value="Liebefeld">Liebefeld</option>
                 <option value="Lima">Lima</option>
-                <option value="Limoges ">Limoges </option>
+                <option value="Limoges ">Limoges</option>
                 <option value="Lisboa">Lisboa</option>
                 <option value="Lissabon">Lissabon</option>
                 <option value="Lodndon">Lodndon</option>
@@ -315,7 +315,7 @@
                 <option value="Solna">Solna</option>
                 <option value="St. Andre">St. Andre</option>
                 <option value="St. Georgen im Schwarzwald">St. Georgen im Schwarzwald</option>
-                <option value="St. Julian's ">St. Julian's </option>
+                <option value="St. Julian's ">St. Julian's</option>
                 <option value="Staines-upon-Thames">Staines-upon-Thames</option>
                 <option value="Stavanger">Stavanger</option>
                 <option value="Stockholm">Stockholm</option>
@@ -333,7 +333,7 @@
                 <option value="Tijarafe">Tijarafe</option>
                 <option value="Tiruchirapalli">Tiruchirapalli</option>
                 <option value="Tokyo">Tokyo</option>
-                <option value="Tokyo ">Tokyo </option>
+                <option value="Tokyo ">Tokyo</option>
                 <option value="Toulouse">Toulouse</option>
                 <option value="Tromso">Tromso</option>
                 <option value="Tromsø">Tromsø</option>
@@ -448,7 +448,8 @@
                 <option value="53">JScript.NET</option>
                 <option value="54">Swift</option>
                 <option value="55">Go</option>
-                <option value="57">Kotlin</option></select></div>
+                <option value="57">Kotlin</option>
+              </select></div>
           </div>
           <div class="btn-group" role="group">
             <div class="field me-2">
@@ -480,14 +481,15 @@
 </template>
 
 <script lang="ts">
-import { headerComponent } from './components/HeaderComponent.vue';
+import { defineComponent } from 'vue';
+import HeaderComponent from '@/components/HeaderComponent.vue';
 
 export default defineComponent({
   name: 'App',
   components: {
     HeaderComponent,
   },
-};
+});
 </script>
 
 <style lang="scss">
@@ -495,7 +497,7 @@ html {
   font-family: sans-serif;
   line-height: 1.15;
   -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: rgba(0,0,0,0)
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0)
 }
 
 body {
@@ -532,7 +534,7 @@ body {
   box-shadow: 4px 6px 1px 0px rgb(0 0 0 / 30%);
 }
 
-#search_options>* {
+#search_options > * {
   width: auto;
 }
 </style>
