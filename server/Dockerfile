@@ -1,8 +1,16 @@
-FROM node:12.16.0-buster
-
+FROM node:fermium-alpine AS build
 WORKDIR /app
-
 COPY package*.json ./
+RUN apk add git && npm install
+COPY ./ ./
+RUN npm run build-ts
+EXPOSE 9000
+ENTRYPOINT ["npm", "run", "watch"]
 
-COPY . .
-
+FROM node:fermium-alpine
+WORKDIR /server
+COPY --from=build /app/package*.json ./
+RUN apk add git && npm ci --only=production
+COPY --from=build /app/dist/ ./dist/
+EXPOSE 9000
+ENTRYPOINT ["npm", "run", "serve"]
