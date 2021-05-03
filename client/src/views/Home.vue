@@ -2,7 +2,7 @@
   <h2>Home View</h2>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
