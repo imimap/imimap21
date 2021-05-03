@@ -1,0 +1,21 @@
+version: "3.7"
+
+services:
+
+  client:
+    build:
+      target: build
+    ports:
+    - "8080:8080"
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+  server:
+    build:
+      target: build
+    volumes:
+      - /app/node_modules
+      - ./server:/app
