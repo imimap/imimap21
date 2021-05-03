@@ -10,6 +10,6 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style lang="scss">
 
 </style>

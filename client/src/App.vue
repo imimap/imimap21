@@ -3,16 +3,19 @@
   <main class="margin_bottom_10">
     <router-view></router-view>
   </main>
+  <footer-component></footer-component>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import HeaderComponent from '@/components/HeaderComponent.vue';
+import FooterComponent from '@/components/FooterComponent.vue';
 
 export default defineComponent({
   name: 'App',
   components: {
     HeaderComponent,
+    FooterComponent,
   },
 });
 </script>
@@ -35,7 +38,7 @@ body {
   background-color: #fff;
 }
 
-@media (min-width: $screen-md) {
+@include media-breakpoint-up(md) {
   html, body {
     min-height: 100%;
     height: 100%;
@@ -44,22 +47,18 @@ body {
   body {
     font-family: 'Merriweather Sans', sans-serif;
     background: url('/assets/bg.gif');
-    color: #000;
+    color: $black;
   }
 }
 
-#form-block4 {
-  background-color: #FFFFFF;
-  color: #000000;
-  font-weight: 100;
-  height: 96%;
-  margin-bottom: 30px;
-  margin-top: 50px;
-  padding: 30px 50px;
-  box-shadow: 4px 6px 1px 0px rgb(0 0 0 / 30%);
+a {
+  color: $htw-green-color !important;
+  text-decoration: none !important;
+  background-color: transparent;
 }
 
-#search_options > * {
-  width: auto;
+#app {
+  height: 100%;
+  min-height: 100%;
 }
 </style>

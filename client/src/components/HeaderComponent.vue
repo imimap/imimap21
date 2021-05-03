@@ -100,7 +100,7 @@ export default defineComponent({
 
 <style lang="scss">
 .imimap-header {
-  background: url('/assets/topbar-background.png'),#292929;
+  background: url('/assets/topbar-background.png'), $htw-gray-color;
   background-repeat: no-repeat;
   background-size: 100%;
   width: 100%;
@@ -167,7 +167,7 @@ img {
   border-color: rgba(255,255,255,0.1);
 }
 
-@media (min-width: $screen-md) {
+@include media-breakpoint-up(md) {
   .navbar-expand-md .navbar-toggler {
     display: none;
   }
