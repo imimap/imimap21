@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import HomeView from '@/views/Home.vue';
+import SearchView from '@/views/Search.vue';
 
 const routes: Array<RouteRecordRaw> = [
   /*
@@ -8,6 +10,14 @@ const routes: Array<RouteRecordRaw> = [
     props: true,
   },
    */
+  {
+    path: '/',
+    component: HomeView,
+  },
+  {
+    path: '/search',
+    component: SearchView,
+  },
 ];
 
 const router = createRouter({
