@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import Admin from '@/views/Admin.vue';
 
 const routes: Array<RouteRecordRaw> = [
   /*
@@ -8,6 +9,11 @@ const routes: Array<RouteRecordRaw> = [
     props: true,
   },
    */
+  {
+    path: '/admin',
+    component: Admin,
+    props: true,
+  },
 ];
 
 const router = createRouter({
