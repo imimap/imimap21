@@ -44,15 +44,30 @@
       </div>
     </div>
   </div>
+  <admin-list :table-heads="usersTableHeads"></admin-list>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import AdminList from '@/components/admin/AdminList.vue';
 
 export default defineComponent({
   name: 'Admin',
+  components: {
+    AdminList,
+  },
   data() {
     return {
+      usersTableHeads: [
+        'Matrikel Nr.',
+        'First Name',
+        'Last Name',
+        'Role',
+        'internshipsSeen',
+        'companiesSeen',
+        '',
+        '',
+      ],
       users: [{
         firstName: 'Mark',
         lastName: 'Otto',

@@ -12,18 +12,17 @@
         <table class="table table-sm table-striped table-hover">
           <thead>
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">First</th>
-            <th scope="col">Last</th>
-            <th scope="col">Handle</th>
+            <th v-for="head in tableHeads" v-bind:key="head" scope="col">
+              {{ head }}
+            </th>
           </tr>
           </thead>
           <tbody>
-            <tr v-for="(user, index) in users" v-bind:key="index" >
-              <th scope="row">{{ index + 1 }}</th>
-              <td>{{ user.name }}</td>
-              <td>{{ user.lastname }}</td>
-              <td>{{ user.handle }}</td>
+            <tr>
+              <th scope="row"></th>
+              <td>qwertyu</td>
+              <td>qwertyu</td>
+              <td>qwertyu</td>
             </tr>
           </tbody>
         </table>
@@ -36,26 +35,13 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'Admin',
+  name: 'AdminList',
   data() {
-    return {
-      users: [{
-        name: 'Mark',
-        lastname: 'Otto',
-        handle: '@qwerty',
-      },
-      {
-        name: 'Mark',
-        lastname: 'Otto',
-        handle: '@qwerty',
-      },
-      {
-        name: 'Mark',
-        lastname: 'Otto',
-        handle: '@qwerty',
-      },
-      ],
-    };
+    return {};
+  },
+  props: {
+    tableHeads: Array,
+    tableContent: Array,
   },
 });
 </script>
