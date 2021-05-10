@@ -2,13 +2,6 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Admin from '@/views/Admin.vue';
 
 const routes: Array<RouteRecordRaw> = [
-  /*
-  {
-    path: '/internship/:id',
-    component: A_View,
-    props: true,
-  },
-   */
   {
     path: '/admin',
     component: Admin,
