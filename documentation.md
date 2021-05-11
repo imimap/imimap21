@@ -28,3 +28,15 @@ Es gibt Klärungsbedarf zum Ablauf des Praktikumsprozesses (soll mit Prof. Strip
 
 Termin mit Prof. Strippgen:
 Ein Treffen mit Fragen zur Anforderung wird zeitnah angesetzt.
+
+**Notizen vom 05.05.2021**
+
+
+Besprechung des aktuellen Arbeitsstandes (States & Aläufe) mit aktuellem Praktikumsbeauftragten
+
+Wünsche:
+- mehr Automatisierung wenn möglich (ECTS automatisch überprüfen lassen, unterschriebene Dokumente aus Mail in die IMImap hochladen)
+- alle Files in der IMImap speichern und einsehen können
+
+Fazit:
+hauptsache einfach und benutzbar, alle anderen weiterführenden Features kommen später!
