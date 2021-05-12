@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "strict": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./dist",
+    "sourceMap": true
+  },
+  "include": [
+  "src/**/*.ts",
+  "src/**/*.tsx",
+  "tests/**/*.ts",
+  "tests/**/*.tsx"
+],
+  "exclude": [
+    "node_modules"
+  ]
+}
