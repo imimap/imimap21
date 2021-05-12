@@ -40,3 +40,18 @@ Wünsche:
 
 Fazit:
 hauptsache einfach und benutzbar, alle anderen weiterführenden Features kommen später!
+
+
+**Notizen vom 12.05.2021**
+
+Datenbank:
+- Zur Vereinfachung werden Company branches als verschiedene Companies definiert -> Nur noch Companies-Collection, keine Branches-Collection mehr
+- Event Logging anstatt Event Sourcing -> State wird im Document gespeichert und beim Erstellen eines neuen Events direkt mit geupdated
+
+Planning:
+- User Stories als Milestones im GitHub-Repo
+- Für Stories werden Issues erstellt, die diese genauer beschreiben und in Sub-Tasks unterteilen; Labels für Frontend und Backend
+
+Sonstiges:
+- Kurzer Design Sprint zur Konzeption des Admin-Interfaces am Freitag, den 14.05. um 10 Uhr
+- Dev-Server läuft, CD-Pipeline muss noch eingerichtet werden -> Wo sollen Secrets gespeichert werden: Auf dem Server oder im Repo? Sollen die Docker Images auf dem Server gebaut werden oder auf GitHub (in der Action) gebaut und über Docker Hub deployed werden?
