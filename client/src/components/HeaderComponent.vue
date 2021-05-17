@@ -67,12 +67,14 @@
                 >
                   <ul class="navbar-nav ">
                     <li class="nav-item im-nav-itemactive">
-                      <a class="nav-link im-nav-link imi-map-navlink" href="/">Start</a>
+                      <router-link class="nav-link im-nav-link imi-map-navlink" to="/">
+                        Start
+                      </router-link>
                     </li>
                     <li class="nav-item im-nav-item">
-                      <a class="nav-link im-nav-link imi-map-navlink" href="/search">
+                      <router-link class="nav-link im-nav-link imi-map-navlink" to="/search">
                         Praktikumssuche
-                      </a>
+                      </router-link>
                     </li>
                     <li class="nav-item im-nav-item">
                       <a class="nav-link im-nav-link imi-map-navlink" href="#">
