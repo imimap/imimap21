@@ -1,4 +1,5 @@
 <template>
+  <!-- Search Form -->
   <div id="form-block4" class="text-left mt-5 mx-3">
     <h4 class="mb-3">Praktikumssuche</h4>
     <div class="card text-white bg-success mt-2 mb-4 ms-3">
@@ -472,6 +473,86 @@
       </form>
     </div>
   </div>
+
+  <!-- Search Results -->
+  <div id="form-block4" class="mx-3 my-3">
+    <div class="text-center">
+      <button
+        type="button"
+        class="btn btn-success text-white mb-3"
+        v-on:click="cardToggle = !cardToggle"
+      >
+        Karte zeigen
+      </button>
+    </div>
+    <div id="search-results" class="search_results" v-if="!cardToggle">
+      <div class="container" style="max-width: 100vw;">
+        <p class="text-center p-1">Es wurden {{ resultCount }} Treffer gefunden</p>
+        <table class="table table-striped table-sm table-borderless text-left">
+          <tbody>
+          <tr>
+            <td class="font-weight-bold">Firma</td>
+            <td class="font-weight-bold">Ort</td>
+            <td class="font-weight-bold">Bereich</td>
+            <td class="font-weight-bold"></td>
+          </tr>
+          <!-- Result Loop -->
+          <template
+            v-for="(searchResult, index) in searchResults"
+            v-bind:key="searchResult.id"
+            v-bind:index="index"
+          >
+            <tr>
+              <td>{{ searchResult.company }}</td>
+              <td> {{ searchResult.location }}</td>
+              <td>
+                <button
+                  class="btn btn-outline-success float-right"
+                  data-bs-toggle="collapse"
+                  :data-bs-target="'#collapseResult' + searchResult.id"
+                  aria-expanded="false"
+                  :aria-controls="'#collapseResult' + searchResult.id"
+                >
+                  Details
+                </button>
+              </td>
+            </tr>
+            <tr class="collapse" :id="'collapseResult' + searchResult.id">
+              <td colspan="7">
+                <p class="pl-3">
+                  <strong>Fand statt im: </strong>
+                  {{ searchResult.semester }}
+                </p>
+                <p class="pl-3">
+                  <strong>Programmiersprachen: </strong>
+                  {{ searchResult.skills }}
+                </p>
+                <p class="pl-3">
+                  <strong>Webseite: </strong>
+                  <a :href="searchResult.website" target="_blank">
+                    {{ searchResult.website }}
+                  </a>
+                </p>
+                <p class="pl-3">
+                  <strong>Aufgaben: </strong>
+                  {{ searchResult.tasks }}
+                </p>
+                <p class="pl-3">
+                  <strong>Kontakt: </strong>
+                  {{ searchResult.contact }}
+                </p>
+              </td>
+            </tr>
+          </template>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+    <div id="map-results" v-if="cardToggle">
+     Hier kommt die Map
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -479,6 +560,43 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'Search',
+  data() {
+    return {
+      searchResults: [
+        {
+          id: 1,
+          company: 'Testfirma #1',
+          location: 'Friedrichstraßen 17, 10961 Berlin',
+          department: 'Javascript, Html, Css',
+          tasks: 'Testung / Front-End Entwicklung Epikur Version 5',
+          skills: 'Java',
+          semester: 'WS 19/20',
+          website: ' www.epikur.de',
+          contact: 'Krister Helbing, khelbing@epikur.de',
+        },
+        {
+          id: 2,
+          company: 'Testfirma #2',
+          location: 'Friedrichstraßen 17, 10961 Berlin',
+          department: 'Python, C##, Java',
+          tasks: 'Hier stehen noch mehr aufgaben',
+          skills: 'Java und mehr',
+          semester: 'WS 18/19',
+          website: ' www.google.de',
+          contact: 'Ronny Rüpel, Ronny@rüpel.to',
+        },
+      ],
+      cardToggle: false,
+    };
+  },
+  computed: {
+    resultCount(): string {
+      return this.searchResults.length.toString();
+    },
+  },
+  methods: {
+
+  },
 });
 </script>
 
