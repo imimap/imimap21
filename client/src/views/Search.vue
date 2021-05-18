@@ -505,6 +505,7 @@
             <tr>
               <td>{{ searchResult.company }}</td>
               <td> {{ searchResult.location }}</td>
+              <td> {{ searchResult.department }}</td>
               <td>
                 <button
                   class="btn btn-outline-success float-right"
