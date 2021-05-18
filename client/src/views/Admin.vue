@@ -1,63 +1,40 @@
 <template>
-  <div class="container">
-    <div class="row my-5 table-nav">
-      <div class="col-12">
-        <button type="button" class="btn btn-primary">Users</button>
-        <button type="button" class="btn btn-primary">Internships</button>
-        <button type="button" class="btn btn-primary">Companies</button>
-      </div>
-    </div>
+
+  <div v-if="showSingle"  class="container mt-5">
     <div class="row">
       <div class="col-12">
-        <table class="table table-striped table-hover">
-          <thead>
-          <tr>
-            <th scope="col">Matrikel Nr.</th>
-            <th scope="col">First Name</th>
-            <th scope="col">Last Name</th>
-            <th scope="col">Role</th>
-            <th scope="col">internshipsSeen</th>
-            <th scope="col">companiesSeen</th>
-            <th scope="col"></th>
-            <th scope="col"></th>
-          </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(user, index) in users" v-bind:key="index" >
-              <th scope="row">{{ user.matrikelNr }}</th>
-              <td>{{ user.firstName }}</td>
-              <td>{{ user.lastName }}</td>
-              <td>{{ user.role }}</td>
-              <td>{{ user.internshipsSeen }}</td>
-              <td>{{ user.companiesSeen }}</td>
-              <td>
-                <button type="button" class="btn btn-secondary mx-3">
-                  <font-awesome-icon icon="edit" />
-                </button>
-                <button type="button" class="btn btn-danger">
-                  <font-awesome-icon icon="trash-alt" />
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <admin-single id="1"></admin-single>
       </div>
     </div>
   </div>
-  <admin-list :table-heads="usersTableHeads"></admin-list>
+
+  <div v-else class="container mt-5">
+    <div class="row my-5 table-nav">
+      <div class="col-12">
+        <button type="button" class="btn btn-success">Users</button>
+        <button type="button" class="btn btn-success">Internships</button>
+        <button type="button" class="btn btn-success">Companies</button>
+      </div>
+    </div>
+    <admin-list :table-heads="usersTableHeads" :table-content="users"></admin-list>
+  </div>
+
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import AdminList from '@/components/admin/AdminList.vue';
+import AdminSingle from '@/components/admin/AdminSingle.vue';
 
 export default defineComponent({
   name: 'Admin',
   components: {
     AdminList,
+    AdminSingle,
   },
   data() {
     return {
+      showSingle: false,
       usersTableHeads: [
         'Matrikel Nr.',
         'First Name',

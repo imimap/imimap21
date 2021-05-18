@@ -1,12 +1,5 @@
 <template>
   <div class="container">
-    <div class="row my-5 table-nav">
-      <div class="col-12">
-        <button type="button" class="btn btn-primary">Users</button>
-        <button type="button" class="btn btn-primary">Internships</button>
-        <button type="button" class="btn btn-primary">Companies</button>
-      </div>
-    </div>
     <div class="row">
       <div class="col-12">
         <table class="table table-sm table-striped table-hover">
@@ -18,12 +11,22 @@
           </tr>
           </thead>
           <tbody>
-            <tr>
-              <th scope="row"></th>
-              <td>qwertyu</td>
-              <td>qwertyu</td>
-              <td>qwertyu</td>
-            </tr>
+          <tr v-for="(row, index) in tableContent" v-bind:key="index" >
+            <th scope="row">{{ row.matrikelNr }}</th>
+            <td>{{ row.firstName }}</td>
+            <td>{{ row.lastName }}</td>
+            <td>{{ row.role }}</td>
+            <td>{{ row.internshipsSeen }}</td>
+            <td>{{ row.companiesSeen }}</td>
+            <td>
+              <button type="button" class="btn btn-secondary mx-3">
+                <font-awesome-icon icon="edit" /> Edit
+              </button>
+              <button type="button" class="btn btn-danger">
+                <font-awesome-icon icon="trash-alt" /> Delete
+              </button>
+            </td>
+          </tr>
           </tbody>
         </table>
       </div>
