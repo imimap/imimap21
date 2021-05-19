@@ -2,7 +2,7 @@ import { ObjectId, Schema } from "mongoose";
 
 export interface IStudentProfile {
   studentId: string;
-  internshipsSeen: [ObjectId];
+  internshipsSeen: ObjectId[];
   internship: ObjectId;
 }
 
