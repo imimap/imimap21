@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import {normalizeEmail} from "../helpers/emailAddressHelper";
+import { normalizeEmail } from "../helpers/emailAddressHelper";
 
 const key = process.env.GoogleAPIkey; // todo: get key
 
@@ -13,44 +13,47 @@ export interface IAddress {
   coordinates: {
     altitude: number,
     longitude: number,
-  },
+  };
 }
 
-export const AddressSchema = new Schema({
-  street: {
-    required: false,
-    type: String,
-  },
-  streetNumber: {
-    required: false,
-    type: String,
-  },
-  additionalLines: {
-    required: false,
-    type: String,
-  },
-  zip: {
-    required: true,
-    type: String,
-  },
-  city: {
-    required: true,
-    type: String,
-  },
-  country: {
-    required: true,
-    type: String,
-  },
-  coordinates: {
-    latitude: {
-      type: Number,
+export const AddressSchema = new Schema(
+  {
+    street: {
+      required: false,
+      type: String,
     },
-    longitude: {
-      type: Number,
+    streetNumber: {
+      required: false,
+      type: String,
     },
-    default: getCoordinates, // upon creation, the default coordinates value is calculated.
+    additionalLines: {
+      required: false,
+      type: String,
+    },
+    zip: {
+      required: true,
+      type: String,
+    },
+    city: {
+      required: true,
+      type: String,
+    },
+    country: {
+      required: true,
+      type: String,
+    },
+    coordinates: {
+      latitude: {
+        type: Number,
+      },
+      longitude: {
+        type: Number,
+      },
+      default: getCoordinates, // upon creation, the default coordinates value is calculated.
+    },
   },
-});
+  { _id: false }
+);
 
 AddressSchema.pre("save", function () {
   if (!this.modifiedPaths().includes("coordinates")) {
@@ -83,5 +86,3 @@ async function getCoordinates(document: IAddress) {
     longitude: coordinates.lng,
   };
 }
-
-
