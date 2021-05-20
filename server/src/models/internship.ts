@@ -1,30 +1,37 @@
 import { Document, model, Model, ObjectId, Schema } from "mongoose";
+import { ISupervisor, SupervisorSchema } from "./supervisor";
+import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
 
-export interface IInternshipPart extends Document {
+export interface IInternship extends Document {
   startDate: Date,
   endDate: Date,
-  companyBranch: ObjectId,
+  company: ObjectId,
   description: string,
   tasks: string,
   operationalArea: string,
-  programmingLanguages: [string], //should be an enum/ or so
+  programmingLanguages: string[],
   livingCosts: number,
   salary: number,
   paymentType: [string], //should be an enum or so
   workingHoursPerWeek: number,
-  // supervisor: Supervisor,
-  // documents: Documents,
+  supervisor: ISupervisor,
+  requestPdf: IPdfDocument,
+  lsfEctsProofPdf: IPdfDocument,
+  locationJustificationPdf: IPdfDocument,
+  contractPdf: IPdfDocument,
+  bvgTicketExemptionPdf: IPdfDocument,
+  certificatePdf: IPdfDocument,
   // events: InternshipPartEvents
 }
 
-export const InternshipPartSchema = new Schema({
+export const InternshipSchema = new Schema({
   startDate: {
     type: Date,
   },
   endDate: {
     type: Date,
   },
-  companyBranch: {
+  company: {
     ref: "CompanyBranch",
     type: Schema.Types.ObjectId,
   },
@@ -43,20 +50,33 @@ export const InternshipPartSchema = new Schema({
     },
   ],
   livingCosts: {
+    min: 0,
     type: Number,
   },
   salary: {
+    default: 0,
+    min: 0,
     type: Number,
   },
   paymentType: [
     {
-      type: String, //should be an enum or so
+      default: "uncharted",
+      enum: ["uncharted", "cash benefit", "noncash benefit", "no payment"],
+      type: String,
     },
   ],
   workingHoursPerWeek: {
     default: 40,
+    min: 0,
     type: Number,
   },
+  supervisor: SupervisorSchema,
+  requestPdf: PdfDocumentSchema,
+  lsfEctsProofPdf: PdfDocumentSchema,
+  locationJustificationPdf: PdfDocumentSchema,
+  contractPdf: PdfDocumentSchema,
+  bvgTicketExemptionPdf: PdfDocumentSchema,
+  certificatePdf: PdfDocumentSchema,
 });
 
-export const Internship: Model<IInternshipPart> = model("Internship", InternshipPartSchema);
+export const Internship: Model<IInternship> = model("Internship", InternshipSchema);
