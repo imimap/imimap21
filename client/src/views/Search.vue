@@ -503,8 +503,8 @@
             v-bind:index="index"
           >
             <tr>
-              <td>{{ searchResult.company }}</td>
-              <td> {{ searchResult.location }}</td>
+              <td>{{ searchResult.company.name }}</td>
+              <td> {{ searchResult.company.companyAddress.address }}</td>
               <td> {{ searchResult.department }}</td>
               <td>
                 <button
@@ -566,8 +566,14 @@ export default defineComponent({
       searchResults: [
         {
           id: 1,
-          company: 'Testfirma #1',
-          location: 'Friedrichstraßen 17, 10961 Berlin',
+          company: {
+            name: 'Testfirma #1',
+            companyAddress: {
+              address: 'Friedrichstraßen 17, 10961 Berlin',
+              long: 13.391799,
+              alt: 52.498605,
+            },
+          },
           department: 'Javascript, Html, Css',
           tasks: 'Testung / Front-End Entwicklung Epikur Version 5',
           skills: 'Java',
@@ -577,8 +583,14 @@ export default defineComponent({
         },
         {
           id: 2,
-          company: 'Testfirma #2',
-          location: 'Friedrichstraßen 17, 10961 Berlin',
+          company: {
+            name: 'Testfirma #2',
+            companyAddress: {
+              address: 'Treskowallee 29, 10318 Berlin',
+              long: 13.530516,
+              alt: 52.475594,
+            },
+          },
           department: 'Python, C##, Java',
           tasks: 'Hier stehen noch mehr aufgaben',
           skills: 'Java und mehr',
