@@ -67,19 +67,28 @@
                 >
                   <ul class="navbar-nav ">
                     <li class="nav-item im-nav-itemactive">
-                      <router-link class="nav-link im-nav-link imi-map-navlink" to="/">
+                      <router-link
+                        class="nav-link im-nav-link imi-map-navlink"
+                        :to="{ name: 'Home' }"
+                      >
                         Start
                       </router-link>
                     </li>
                     <li class="nav-item im-nav-item">
-                      <router-link class="nav-link im-nav-link imi-map-navlink" to="/search">
+                      <router-link
+                        class="nav-link im-nav-link imi-map-navlink"
+                        :to="{ name: 'Search' }"
+                      >
                         Praktikumssuche
                       </router-link>
                     </li>
                     <li class="nav-item im-nav-item">
-                      <a class="nav-link im-nav-link imi-map-navlink" href="#">
+                      <router-link
+                        class="nav-link im-nav-link imi-map-navlink"
+                        :to="{ name: 'CompleteInternship' }"
+                      >
                         Mein Praktikum
-                      </a>
+                      </router-link>
                     </li>
                   </ul>
                 </div>
