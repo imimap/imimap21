@@ -31,12 +31,15 @@
                     <font-awesome-icon icon="cog" />
                   </a>
                   <ul class="dropdown-menu" role="menu" aria-labelledby="drop3">
-                    <li class="locale-de dropdown-item">
-                      <a href="/de">de</a>
-                    </li>
-                    <li class="locale-en dropdown-item">
-                      <a href="/en">en</a>
-                    </li>
+                      <li
+                        class="locale-de dropdown-item"
+                        v-for="(locale, i) in $i18n.availableLocales"
+                        :key="`lang-${i}`"
+                        :value="locale"
+                        v-on:click="switchLocale(locale)"
+                      >
+                        {{ locale }}
+                      </li>
                   </ul>
                 </li>
                 <li class="imimap-nav-right-li">
@@ -69,7 +72,7 @@
                     <li class="nav-item im-nav-itemactive">
                       <router-link
                         class="nav-link im-nav-link imi-map-navlink"
-                        :to="{ name: 'Home' }"
+                        :to="{name: 'Home', params: { locale: $route.params.locale }}"
                       >
                         Start
                       </router-link>
@@ -77,17 +80,17 @@
                     <li class="nav-item im-nav-item">
                       <router-link
                         class="nav-link im-nav-link imi-map-navlink"
-                        :to="{ name: 'Search' }"
+                        :to="{name: 'Search', params: { locale: $route.params.locale }}"
                       >
-                        Praktikumssuche
+                        {{ $t("header.headerLinks.internshipSearch") }}
                       </router-link>
                     </li>
                     <li class="nav-item im-nav-item">
                       <router-link
                         class="nav-link im-nav-link imi-map-navlink"
-                        :to="{ name: 'CompleteInternship' }"
+                        :to="{name: 'CompleteInternship', params: { locale: $route.params.locale }}"
                       >
-                        Mein Praktikum
+                        {{ $t("header.headerLinks.myInternship") }}
                       </router-link>
                     </li>
                   </ul>
@@ -106,6 +109,12 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'HeaderComponent',
+  methods: {
+    switchLocale(locale: string) {
+      this.$i18n.locale = locale;
+      this.$router.push({ params: { locale } });
+    },
+  },
 });
 </script>
 
