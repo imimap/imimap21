@@ -1,5 +1,5 @@
-import header from '@/locales/en/header/header';
-import search from '@/locales/en/search/search';
+import header from '@/locales/en/header';
+import search from '@/locales/en/search';
 
 const en = {
   header,

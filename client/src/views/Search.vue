@@ -481,12 +481,17 @@
         class="btn btn-success text-white mb-3"
         v-on:click="cardToggle = !cardToggle"
       >
-        Karte zeigen
+        {{ $t("search.showMap") }}
       </button>
     </div>
     <div id="search-results" class="search_results" v-if="!cardToggle">
       <div class="container" style="max-width: 100vw;">
-        <p class="text-center p-1">Es wurden {{ resultCount }} Treffer gefunden</p>
+        <p class="text-center p-1">
+          {{ $tc("search.results.resultCount", resultCount) }}
+        </p>
+        <p class="text-center p-1">
+          {{ $tc("search.results.previousResultCount", resultCount) }}
+        </p>
         <table class="table table-striped table-sm table-borderless text-left">
           <tbody>
           <tr>
@@ -602,8 +607,8 @@ export default defineComponent({
     };
   },
   computed: {
-    resultCount(): string {
-      return this.searchResults.length.toString();
+    resultCount(): number {
+      return this.searchResults.length;
     },
   },
   methods: {

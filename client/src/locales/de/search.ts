@@ -26,6 +26,11 @@ const search = {
     info: 'Ich suche nach {payment} Praktika in {location} im Bereich {orientation} '
   + 'mit \n der Programmiersprache {programmingLanguage} ',
   },
+  results: {
+    resultCount: 'Es wurden 0 Treffer gefunden | Es wurde 1 Treffer gefunden | Es wurden {n} Treffer gefunden',
+    previousResultCount: '0 Ergebnisse vorheriger Suchen | 1 Ergebnis vorheriger Suchen | {n} Ergebnisse vorheriger Suchen',
+  },
+  showMap: 'Karte zeigen',
 };
 
 export default search;

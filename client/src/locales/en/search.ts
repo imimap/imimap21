@@ -25,6 +25,11 @@ const search = {
     info: 'I am searching for {payment} internships in {location}, working in {orientation} '
       + '\n with the programming language {programmingLanguage} ',
   },
+  results: {
+    resultCount: 'There were 0 results | There was 1 result | There were {n} results',
+    previousResultCount: '0 results of previous searches | 1 result of previous searches | {n} results of previous searches',
+  },
+  showMap: 'Show map',
 };
 
 export default search;
