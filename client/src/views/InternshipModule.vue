@@ -9,11 +9,11 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import NoCompleteInternshipComponent from '@/components/complete-internships/NoCompleteInternshipComponent.vue';
-import CompleteInternshipComponent from '@/components/complete-internships/CompleteInternshipComponent.vue';
+import NoCompleteInternshipComponent from '@/components/internship-module/NoInternshipModuleComponent.vue';
+import CompleteInternshipComponent from '@/components/internship-module/InternshipModuleComponent.vue';
 
 export default defineComponent({
-  name: 'CompleteInternship',
+  name: 'InternshipModule',
   components: {
     NoCompleteInternshipComponent,
     CompleteInternshipComponent,

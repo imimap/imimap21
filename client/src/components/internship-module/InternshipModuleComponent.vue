@@ -1,27 +1,16 @@
 <template>
   <div id="form-block4" class="text-left">
     <h4>Onur Stoll's Praktikum im SS 21 (4. Fachsemester)</h4>
-    <br>
-
-    <div class="mb-5">
-    </div>
+    <div class="mb-5"></div>
 
     <div class="card mt-3 mb-3">
       <div class="card-body">
-        <p class="card-text">
-
-        </p>
         <table class="table table-sm table-borderless">
           <thead>
           <tr>
             <th scope="col" colspan="2">Modulnummer</th>
             <th scope="col">Modulname</th>
             <th scope="col">Status</th>
-          </tr>
-          </thead>
-          <thead>
-          <tr>
-            <th scope="col" colspan="4"></th>
           </tr>
           </thead>
           <tbody>
@@ -46,32 +35,29 @@
           </tr>
           </tbody>
         </table>
-
-        <p></p>
       </div>
     </div>
 
     <div class="card-deck">
-      <InternshipPartComponent></InternshipPartComponent>
+      <InternshipComponent></InternshipComponent>
     </div>
-    <!--<strong></strong>-->
-    <br>
-    <a href="/de/internships/new">Weiteres Teilpraktikum eintragen.</a>
-    <br><br><br>
-    <a href="/de/complete_internships/80/edit">Bearbeiten</a>
-    |
-    <a href="javascript:history.back()">Zurück</a>
+    <div class="mt-3 mb-5"><a href="/de/internships/new">Weiteres Teilpraktikum eintragen.</a></div>
+    <div>
+      <a href="/de/complete_internships/80/edit">Bearbeiten</a>
+      |
+      <a href="javascript:history.back()">Zurück</a>
+    </div>
   </div>
 </template>
 
 <script  lang="ts">
 import { defineComponent } from 'vue';
-import InternshipPartComponent from '@/components/complete-internships/InternshipPartComponent.vue';
+import InternshipComponent from '@/components/internship-module/InternshipComponent.vue';
 
 export default defineComponent({
-  name: 'CompleteInternshipComponent',
+  name: 'InternshipModuleComponent',
   components: {
-    InternshipPartComponent,
+    InternshipComponent,
   },
 });
 </script>

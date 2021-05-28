@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/views/Home.vue';
 import Search from '@/views/Search.vue';
-import CompleteInternship from '@/views/CompleteInternship.vue';
+import CompleteInternship from '@/views/InternshipModule.vue';
 import Layout from '@/views/Layout.vue';
 
 const routes: Array<RouteRecordRaw> = [
@@ -31,8 +31,8 @@ const routes: Array<RouteRecordRaw> = [
         component: Search,
       },
       {
-        path: 'complete_internship',
-        name: 'CompleteInternship',
+        path: 'internship-module',
+        name: 'InternshipModule',
         component: CompleteInternship,
       },
     ],

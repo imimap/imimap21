@@ -1,13 +1,10 @@
 <template>
   <div class="card border-success">
     <div class="card-header">
-    </div>
-    <div class="card-body">
       <h5 class="card-title " id="h5_block">Praktikum @
         Hasse UG</h5>
-      <p class="card-text">
-        <br><br>
-      </p>
+    </div>
+    <div class="card-body">
       <div class="card mb-3 p-0">
         <div class="card-body pt-3 pb-0">
           <p class="card-text">
@@ -72,7 +69,7 @@
       <div class="card mb-3 p-0">
         <div class="card-body pt-3 pb-0">
           <p class="card-text">
-            <strong> Status Übersicht </strong>
+            <strong> Statusübersicht </strong>
           </p>
           <table class="table table-striped table-sm table-borderless">
             <tbody>
@@ -81,11 +78,7 @@
                 Status der Anmeldung
               </td>
               <td>
-                    <span
-                      class="translation_missing"
-                      title="translation missing: de.internships.registration_state.13"
-                    >13
-                    </span>
+                 13
               </td>
             </tr>
             <tr>
@@ -93,12 +86,7 @@
                 Status des Vertrags
               </td>
               <td>
-                    <span
-                      class="translation_missing"
-                      title="translation missing: de.internships.contract_state.6"
-                    >
-                      6
-                    </span>
+                 6
               </td>
             </tr>
             <tr>
@@ -114,12 +102,7 @@
                 Status des Zertifikats
               </td>
               <td>
-                    <span
-                      class="translation_missing"
-                      title="translation missing: de.internships.certificate_state.7"
-                    >
-                      7
-                    </span>
+                7
               </td>
             </tr>
             <tr>
@@ -127,11 +110,7 @@
                 Status des Praktikums
               </td>
               <td>
-                    <span
-                      class="translation_missing"
-                      title="translation missing: de.internships.internship_state.6">
-                      6
-                    </span>
+                 6
               </td>
             </tr>
             <tr>
@@ -146,7 +125,6 @@
           </table>
         </div>
       </div>
-      <p></p>
     </div>
   </div>
 </template>
@@ -155,7 +133,7 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'InternshipPartComponent',
+  name: 'InternshipComponent',
 });
 </script>
 
