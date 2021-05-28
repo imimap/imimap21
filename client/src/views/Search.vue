@@ -22,10 +22,10 @@
         <div id="search_options" class="row ps-3 row-cols-lg-auto g-3 align-items-center">
           <i18n-t keypath="search.form.info"
                   tag="div"
-                  style="display: flex; flex-direction: row; flex-wrap: wrap; align-items: center;"
+                  class="form-inline search-option-text"
           >
             <template #payment>
-                <select class="form-control form-select mx-2 my-2 w-auto h-auto"
+                <select class="form-select mx-2 my-2 w-auto h-auto"
                         name="search[paid]"
                         id="search_paid"
                 >
@@ -38,7 +38,7 @@
                 <label class="sr-only" for="search_location">
                   {{ $t("search.form.location") }}
                 </label>
-                <select class="form-control form-select mx-2 my-2 w-auto h-auto"
+                <select class="form-select mx-2 my-2 w-auto h-auto"
                         name="search[location]"
                         id="search_location"
                 >
@@ -366,7 +366,7 @@
               <label class="sr-only" for="search_orientation_id">
                 {{ $t("search.form.orientation") }}
               </label>
-              <select class="form-control form-select mx-2 my-2 w-auto h-auto"
+              <select class="form-select mx-2 my-2 w-auto h-auto"
                       name="search[orientation_id]"
                       id="search_orientation_id"
               >
@@ -388,7 +388,7 @@
               <label class="sr-only" for="search_programming_language_id">
                 {{ $t("search.form.programmingLanguage") }}
               </label>
-              <select class="form-control form-select mx-2 my-2 w-auto h-auto"
+              <select class="form-select mx-2 my-2 w-auto h-auto"
                       name="search[programming_language_id]"
                       id="search_programming_language_id"
               >
@@ -495,9 +495,9 @@
         <table class="table table-striped table-sm table-borderless text-left">
           <tbody>
           <tr>
-            <td class="font-weight-bold">Firma</td>
-            <td class="font-weight-bold">Ort</td>
-            <td class="font-weight-bold">Bereich</td>
+            <td class="font-weight-bold">{{ $t("search.company") }}</td>
+            <td class="font-weight-bold">{{ $t("search.location") }}</td>
+            <td class="font-weight-bold">{{ $t("search.orientation") }}</td>
             <td class="font-weight-bold"></td>
           </tr>
           <!-- Result Loop -->
@@ -525,25 +525,25 @@
             <tr class="collapse" :id="'collapseResult' + searchResult.id">
               <td colspan="7">
                 <p class="pl-3">
-                  <strong>Fand statt im: </strong>
+                  <strong>{{ $t("search.tookPlace") }}</strong>
                   {{ searchResult.semester }}
                 </p>
                 <p class="pl-3">
-                  <strong>Programmiersprachen: </strong>
+                  <strong>{{ $t("search.programmingLanguages") }}</strong>
                   {{ searchResult.skills }}
                 </p>
                 <p class="pl-3">
-                  <strong>Webseite: </strong>
+                  <strong>{{ $t("search.website") }}</strong>
                   <a :href="searchResult.website" target="_blank">
                     {{ searchResult.website }}
                   </a>
                 </p>
                 <p class="pl-3">
-                  <strong>Aufgaben: </strong>
+                  <strong>{{ $t("search.tasks") }}</strong>
                   {{ searchResult.tasks }}
                 </p>
                 <p class="pl-3">
-                  <strong>Kontakt: </strong>
+                  <strong>{{ $t("search.contact") }}</strong>
                   {{ searchResult.contact }}
                 </p>
               </td>
@@ -631,5 +631,9 @@ export default defineComponent({
 
 #search_options > * {
   width: auto;
+}
+
+.search-option-text > * {
+  display: inline !important;
 }
 </style>

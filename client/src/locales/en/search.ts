@@ -30,6 +30,15 @@ const search = {
     previousResultCount: '0 results of previous searches | 1 result of previous searches | {n} results of previous searches',
   },
   showMap: 'Show map',
+  company: 'Company',
+  location: 'Location',
+  orientation: 'Orientation',
+  tookPlace: 'Took place in: ',
+  payment: 'Payment: ',
+  website: 'Website: ',
+  tasks: 'Tasks: ',
+  contact: 'Contact: ',
+  programmingLanguages: 'Programming languages: ',
 };
 
 export default search;

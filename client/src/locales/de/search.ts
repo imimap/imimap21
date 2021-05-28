@@ -31,6 +31,15 @@ const search = {
     previousResultCount: '0 Ergebnisse vorheriger Suchen | 1 Ergebnis vorheriger Suchen | {n} Ergebnisse vorheriger Suchen',
   },
   showMap: 'Karte zeigen',
+  company: 'Firma',
+  location: 'Ort',
+  orientation: 'Bereich',
+  tookPlace: 'Fand statt in: ',
+  payment: 'Bezahlung: ',
+  website: 'Website',
+  tasks: 'Aufgaben',
+  contact: 'Kontakt',
+  programmingLanguages: 'Programmiersprachen: ',
 };
 
 export default search;
