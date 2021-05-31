@@ -12,6 +12,7 @@ Prozesse dokumentiert.
 * [Notizen vom 05.05.2021](#notizen-vom-05052021)
 * [Notizen vom 12.05.2021](#notizen-vom-12052021)
 * [Notizen vom 19.05.2021](#notizen-vom-19052021)
+* [Notizen vom 26.05.2021](#notizen-vom-26052021)
 
 ### Notizen vom 24.04.2021
 
@@ -91,3 +92,23 @@ Sonstiges:
   - Bericht für Teilpraktikum oder ganzes Modul?
   - Stempel auf Zertifikaten?
   - Kommentarfunktion IMI-öffentlich oder intern?
+
+### Notizen vom 26.05.2021
+
+**Entscheidungen:**
+
+- API-Keys: Neue Accounts über neue IMI-Map-Mailadresse registrieren -> Antrag Mailadresse abwarten
+- Internship ratings -> Werden beim IMI Jour Fixe besprochen
+  - Idee: 1-5 Sterne in verschiedenen Kategorien (Lerneffekt, Aufgabenattraktivität, Arbeitsklima, Location) +
+    Freitext-Feld
+  - Offene Fragen: Öffentlich? Moderiert? Falls ja, wer liest gegen?
+- Company branches werden aus Datenmodell entfernt -> Companies sind bei Bedarf Branches
+- Praktikumsberichte veröffentlichen, falls Studi und Unternehmen einverstanden? -> Wird bei IMI Jour Fixe besprochen
+- Website braucht Disclaimer: IN DEVELOPMENT
+- Einfache Datenmigration per JavaScript-Migrationsskript
+- Finale Version wieder über imi-map.f4... erreichbar, um gewohnte URL beizubehalten
+
+Offene Frage: CI/CD umbauen, damit Images nur einmal insgesamt gebaut werden müssen und nicht für jeden Schritt (
+Testing, Deployment) extra?
+
+**Fokus Migration, nicht Funktionserweiterung!**
