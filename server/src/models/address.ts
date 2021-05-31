@@ -1,5 +1,6 @@
 import { Schema } from "mongoose";
 import { normalizeEmail } from "../helpers/emailAddressHelper";
+import { CoordinatesSchema, getCoordinates, ICoordinates} from "./coordinates";
 
 const key = process.env.GoogleAPIkey; // todo: get key
 
@@ -10,10 +11,7 @@ export interface IAddress {
   zip: string,
   city: string,
   country: string,
-  coordinates: {
-    altitude: number,
-    longitude: number,
-  };
+  coordinates: ICoordinates,
 }
 
 export const AddressSchema = new Schema(
@@ -43,12 +41,7 @@ export const AddressSchema = new Schema(
       type: String,
     },
     coordinates: {
-      latitude: {
-        type: Number,
-      },
-      longitude: {
-        type: Number,
-      },
+      type: CoordinatesSchema,
       default: getCoordinates, // upon creation, the default coordinates value is calculated.
     },
   },
@@ -61,28 +54,4 @@ AddressSchema.pre("save", function () {
   }
 });
 
-async function getCoordinates(document: IAddress) {
-  const addressString =
-    (document.streetNumber + " " || "") +
-    " " +
-    (document.street + " " || "") +
-    " " +
-    +(document.additionalLines + " " || "") +
-    document.zip +
-    " " +
-    document.country;
-  const url =
-    "https://maps.googleapis.com/maps/api/geocode/json?address=" + addressString + "&key=" + key;
 
-  const res = await fetch(url);
-  const data = await res.json();
-  let coordinates;
-
-  if (data.status !== "OK") throw data.status + ". Could not get coordinates for " + addressString;
-  else coordinates = data.results.geometry.location;
-
-  return {
-    latitude: coordinates.lat,
-    longitude: coordinates.lng,
-  };
-}
