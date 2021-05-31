@@ -1,12 +1,11 @@
 import { ICompany, Company } from "../company";
 import * as dbHandler from "./database";
-import { companySizes } from "../../helpers/companySizes";
 
 beforeAll(async () => {
   await dbHandler.connect();
 });
 
-afterEach(async () => {
+beforeEach(async () => {
   await dbHandler.clearDatabase();
 });
 
@@ -14,39 +13,14 @@ afterAll(async () => {
   await dbHandler.closeDatabase();
 });
 
-/*
-describe('post test', () => {
-  it('can be created correctly', async () => {
-    // expect that two assertios will be made
-    expect.assertions(2)
-    // create new post model instance
-    const post: IPost = new Post()
-    // set some test properties
-    post.title = 'Test title'
-    post.content = 'Test content'
-    // save test post to in-memory db
-    await post.save()
-    // find inserted post by title
-    const postInDb = await Post.findOne({title: 'Test title'}).exec()
-    console.log('Post document from memory-db', postInDb)
-    // check that title is expected
-    expect(postInDb.title).toEqual('Test title')
-    // check that content is expected
-    expect(postInDb.content).toEqual('Test content')
-  });
-});
-*/
-
 describe("Company model", () => {
   it("can be created from valid data", async () => {
-    expect.assertions(1);
-
     const properties = {
       companyName: "HTW Berlin",
       branchName: "Rechenzentrum",
       /* leave out address */
       industry: "Systemadministration",
-      size: companySizes.small,
+      size: "small",
       comment: "It was really nice",
     };
     const company = new Company(properties);
@@ -54,26 +28,36 @@ describe("Company model", () => {
     await company.save();
     const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
 
+    expect(savedCompany).not.toBe(null);
     if (savedCompany) expect(savedCompany.companyName).toEqual("HTW Berlin");
   });
-  /*
-  it("can normalize email and website url", async () => {
-    expect.assertions(2);
-
+  it("can normalize email", async () => {
     const properties = {
       companyName: "HTW Berlin",
-      emailAddress: "rechenzentrum@HTW-Berlin.de ",
-      website: "rz.htw-berlin.de",
+      emailAddress: "Rechenzentrum@HTW-Berlin.de ",
     };
     const company: ICompany = new Company(properties);
 
     await company.save();
     const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
 
-    expect(savedCompany.emailAddress).toEqual("rechenzentrum@htw-berlin.de");
-    expect(savedCompany.website).toEqual("https://rz.htw-berlin.de/");
+    expect(savedCompany).not.toBe(null);
+    if (savedCompany) expect(savedCompany.emailAddress).toEqual("rechenzentrum@htw-berlin.de");
   });
-  it("will not accept anything but iso codes for mainLanguage", async () => {
+  it("can normalize website url", async () => {
+    const properties = {
+      companyName: "HTW Berlin",
+      website: "rz.HTW-Berlin.de ",
+    };
+    const company: ICompany = new Company(properties);
+
+    await company.save();
+    const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
+
+    expect(savedCompany).not.toBe(null);
+    if (savedCompany) expect(savedCompany.website).toEqual("http://rz.htw-berlin.de/");
+  });
+  it("will not accept something different than iso codes for mainLanguage", async () => {
     expect.assertions(1);
 
     const properties = {
@@ -82,14 +66,9 @@ describe("Company model", () => {
     };
     const company: ICompany = new Company(properties);
 
-    await company.save();
-    const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
-
-    expect(savedCompany.mainLanguage).toEqual("en");
+    await expect(company.save()).rejects.toThrow();
   });
   it("will accept an iso code for mainLanguage", async () => {
-    expect.assertions(1);
-
     const properties = {
       companyName: "HTW Berlin",
       mainLanguage: "de",
@@ -99,7 +78,7 @@ describe("Company model", () => {
     await company.save();
     const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
 
-    expect(savedCompany.mainLanguage).toEqual("de");
+    expect(savedCompany).not.toBe(null);
+    if (savedCompany) expect(savedCompany.mainLanguage).toEqual("de");
   });
-   */
 });

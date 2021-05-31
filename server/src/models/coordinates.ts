@@ -19,6 +19,7 @@ export const CoordinatesSchema = new Schema(
 );
 
 export const getCoordinates = async function (document: IAddress) {
+  const key = process.env.GoogleAPIkey; // todo: get key
   const addressString =
     (document.streetNumber + " " || "") +
     " " +

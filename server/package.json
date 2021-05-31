@@ -9,7 +9,7 @@
     "watch": "tsc-watch --onSuccess \"npm run serve\"",
     "format": "prettier src/server.ts **/*.js --write",
     "lint": "eslint \"src/**\"",
-    "test-mongoose": "jest --runInBand ./test"
+    "test-mongoose": "jest --runInBand --detectOpenHandles ./test"
   },
   "jest": {
     "transform": {
@@ -21,6 +21,7 @@
     "cors": "^2.8.4",
     "dotenv": "^8.2.0",
     "express": "^4.16.3",
+    "mongod": "^2.0.0",
     "mongoose": "^5.12.4"
   },
   "devDependencies": {

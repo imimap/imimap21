@@ -5,16 +5,16 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 const mongod = new MongoMemoryServer();
 
 export const connect = async () => {
-  const mongoDB = "mongodb://db:27017";
+  const uri = await mongod.getUri();
   try {
-    await mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
-    console.log(`Connection to database at ${mongoDB} successfully established.`);
+    await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    console.log(`Connection to test database at ${uri} successfully established.`);
   } catch (error) {
-    console.error(`Connection to database at ${mongoDB} failed.`, error);
+    console.error(`Connection to test database at ${uri} failed.`, error);
   }
 
   mongoose.connection.on("error", (error) => {
-    console.error(`An error occurred with the database connection at ${mongoDB}.`, error);
+    console.error(`An error occurred with the test database connection at ${uri}.`, error);
   });
 };
 

@@ -1,8 +1,6 @@
 import { Schema } from "mongoose";
-import { normalizeEmail } from "../helpers/emailAddressHelper";
 import { CoordinatesSchema, getCoordinates, ICoordinates} from "./coordinates";
 
-const key = process.env.GoogleAPIkey; // todo: get key
 
 export interface IAddress {
   street: string,

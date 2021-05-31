@@ -61,12 +61,13 @@ const CompanySchema = new Schema({
 /*
  * Normalizes properties upon saving
  * */
-CompanySchema.pre("save", function () {
+CompanySchema.pre("validate", function () {
   if (this.modifiedPaths().includes("emailAddress")) {
     this.set("emailAddress", normalizeEmail(this.get("emailAddress")));
   }
   if (this.modifiedPaths().includes("website")) {
-    const givenUrl = this.get("website");
+    let givenUrl = this.get("website");
+    if (!/http/.test(givenUrl)) givenUrl = "http://" + givenUrl;
     this.set("website", new URL(givenUrl).href);
   }
 });
