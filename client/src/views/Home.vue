@@ -1,27 +1,35 @@
 <template>
   <h2>Home View</h2>
-  <l-map
-    v-model="zoom"
-    v-model:zoom="zoom"
-    :center="[47.41322, -1.219482]"
-    @move="log('move')"
-  >
-  </l-map>
+  <div id="map">
+    <l-map
+      v-model:zoom="zoom"
+      :center="[52.52, 13.405]"
+    >
+      <l-tile-layer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        :attribution="attribution"
+        layer-type="base"
+        name="OpenStreetMap"
+      ></l-tile-layer>
+    </l-map>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { LMap } from '@vue-leaflet/vue-leaflet';
+import { LMap, LTileLayer } from '@vue-leaflet/vue-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 export default defineComponent({
   name: 'Home',
   components: {
     LMap,
+    LTileLayer,
   },
   data() {
     return {
-      zoom: 2,
+      zoom: 11,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     };
   },
   method: {
@@ -32,6 +40,8 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
-
+<style lang="scss" scoped>
+#map {
+  height: 500px;
+}
 </style>
