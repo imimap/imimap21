@@ -88,7 +88,7 @@
                     <li class="nav-item im-nav-item">
                       <router-link
                         class="nav-link im-nav-link imi-map-navlink"
-                        :to="{name: 'CompleteInternship', params: { locale: $route.params.locale }}"
+                        :to="{name: 'InternshipModule', params: { locale: $route.params.locale }}"
                       >
                         {{ $t("header.headerLinks.myInternship") }}
                       </router-link>
