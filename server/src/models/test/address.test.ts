@@ -1,5 +1,6 @@
 import * as dbHandler from "./database";
 import { Company } from "../company";
+import {IAddress} from "../address";
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -15,7 +16,7 @@ afterAll(async () => {
 
 describe("Address", () => {
   it("can be saved for company model", async () => {
-    const address = {
+    const address: IAddress = {
       street: "Treskowallee",
       streetNumber: "8",
       zip: "10318",
@@ -34,7 +35,7 @@ describe("Address", () => {
     const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
 
     expect(savedCompany).not.toBe(null);
-    if (savedCompany) expect(savedCompany.address.city).toEqual("Berlin");
+    if (savedCompany && savedCompany.address) expect(savedCompany.address.city).toEqual("Berlin");
   });
   it("can retrieve the coordinates for an address", async () => {
     const address = {
@@ -56,7 +57,7 @@ describe("Address", () => {
     const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
 
     expect(savedCompany).not.toBe(null);
-    if (savedCompany) {
+    if (savedCompany && savedCompany.address) {
       expect(savedCompany.address.coordinates).not.toBe(null);
       if (savedCompany.address.coordinates) {
         expect(savedCompany.address.coordinates.latitude).toEqual(52.4922232);

@@ -3,8 +3,8 @@ import { isValidStudentId, normalizeStudentId } from "../helpers/studentIdHelper
 
 export interface IStudentProfile {
   studentId: string,
-  internshipsSeen: ObjectId[],
-  internship: ObjectId,
+  internshipsSeen?: string[],
+  internship?: string,
 }
 
 export const StudentProfileSchema = new Schema(

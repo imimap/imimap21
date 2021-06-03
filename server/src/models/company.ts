@@ -6,15 +6,15 @@ import { isValidEmail, normalizeEmail } from "../helpers/emailAddressHelper";
 
 export interface ICompany extends Document {
   companyName: string,
-  branchName: string,
-  address: IAddress,
-  emailAddress: string,
-  industry: string,
-  website: string,
-  mainLanguage: string,
-  size: string,
-  comment: string,
-  excludedFromSearch: boolean,
+  branchName?: string,
+  address?: IAddress,
+  emailAddress?: string,
+  industry?: string,
+  website?: string,
+  mainLanguage?: string,
+  size?: string,
+  comment?: string,
+  excludedFromSearch?: boolean,
 }
 
 const CompanySchema = new Schema({

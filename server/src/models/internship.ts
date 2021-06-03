@@ -5,7 +5,7 @@ import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
 export interface IInternship extends Document {
   startDate: Date,
   endDate: Date,
-  company: ObjectId,
+  company: string,
   description: string,
   tasks: string,
   operationalArea: string,

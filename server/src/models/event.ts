@@ -2,7 +2,7 @@ import { Document, ObjectId, Schema } from "mongoose";
 
 export interface IEvent extends Document {
   timestamp: number,
-  creator: ObjectId,
+  creator: string,
   changesProperty: string,
   newPropertyValue: string,
 }
