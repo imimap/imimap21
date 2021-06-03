@@ -35,9 +35,9 @@ describe("StudentProfile", () => {
   it("can be saved for User", async () => {
     const savedUser = await User.findOne({ firstName: "Ada" }).lean();
 
-    expect(savedUser).not.toBeNull();
+    expect(savedUser).toBeTruthy();
     if (savedUser) {
-      expect(savedUser.studentProfile).not.toBeNull();
+      expect(savedUser.studentProfile).toBeTruthy();
       if (savedUser.studentProfile) expect(savedUser.studentProfile.studentId).toEqual("s0123456");
     }
   });
@@ -59,7 +59,7 @@ describe("StudentProfile", () => {
 
     const updatedUser = await User.findOne({ firstName: "Ada" }).lean();
     if (updatedUser && updatedUser.studentProfile) {
-      expect(updatedUser.studentProfile.internshipsSeen).not.toBeNull();
+      expect(updatedUser.studentProfile.internshipsSeen).toBeTruthy();
       if (updatedUser.studentProfile.internshipsSeen) {
         expect(updatedUser.studentProfile.internshipsSeen).toContain(internshipObjectId);
       }
@@ -81,7 +81,7 @@ describe("StudentProfile", () => {
     const updatedUser = await User.findOne({ firstName: "Ada" }).lean();
 
     if (updatedUser && updatedUser.studentProfile) {
-      expect(updatedUser.studentProfile.internship).not.toBeNull();
+      expect(updatedUser.studentProfile.internship).toBeTruthy();
 
       if (updatedUser.studentProfile.internship) {
         expect(updatedUser.studentProfile.internship.toString()).toEqual(internshipObjectId);

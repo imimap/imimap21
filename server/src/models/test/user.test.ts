@@ -26,6 +26,6 @@ describe("User", () => {
 
     const savedUser = await User.findOne({ firstName: "Ada" });
 
-    expect(savedUser).not.toBe(null);
+    expect(savedUser).toBeTruthy();
   });
 });

@@ -28,7 +28,7 @@ describe("Company model", () => {
     await company.save();
     const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
 
-    expect(savedCompany).not.toBe(null);
+    expect(savedCompany).toBeTruthy();
     if (savedCompany) expect(savedCompany.companyName).toEqual("HTW Berlin");
   });
   it("can normalize email", async () => {
@@ -41,7 +41,7 @@ describe("Company model", () => {
     await company.save();
     const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
 
-    expect(savedCompany).not.toBe(null);
+    expect(savedCompany).toBeTruthy();
     if (savedCompany) expect(savedCompany.emailAddress).toEqual("rechenzentrum@htw-berlin.de");
   });
   it("can normalize website url", async () => {
@@ -54,7 +54,7 @@ describe("Company model", () => {
     await company.save();
     const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
 
-    expect(savedCompany).not.toBe(null);
+    expect(savedCompany).toBeTruthy();
     if (savedCompany) expect(savedCompany.website).toEqual("http://rz.htw-berlin.de/");
   });
   it("will not accept something different than iso codes for mainLanguage", async () => {
@@ -78,7 +78,7 @@ describe("Company model", () => {
     await company.save();
     const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
 
-    expect(savedCompany).not.toBe(null);
+    expect(savedCompany).toBeTruthy();
     if (savedCompany) expect(savedCompany.mainLanguage).toEqual("de");
   });
 });
