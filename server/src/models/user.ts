@@ -5,9 +5,9 @@ import { isValidEmail, normalizeEmail } from "../helpers/emailAddressHelper";
 export interface IUser extends Document {
   firstName: string,
   lastName: string,
-  isAdmin: boolean,
+  isAdmin?: boolean,
   emailAddress: string,
-  studentProfile: IStudentProfile,
+  studentProfile?: IStudentProfile,
 }
 
 const UserSchema = new Schema({
