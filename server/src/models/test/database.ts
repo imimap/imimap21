@@ -8,7 +8,6 @@ export const connect = async () => {
   const uri = await mongod.getUri();
   try {
     await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    console.log(`Connection to test database at ${uri} successfully established.`);
   } catch (error) {
     console.error(`Connection to test database at ${uri} failed.`, error);
   }

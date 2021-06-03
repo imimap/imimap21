@@ -3,27 +3,24 @@ import { CoordinatesSchema, getCoordinates, ICoordinates} from "./coordinates";
 
 
 export interface IAddress {
-  street: string,
-  streetNumber: string,
-  additionalLines: string, // for compatibility with world wide addresses, see https://stackoverflow.com/a/929691
+  street?: string,
+  streetNumber?: string,
+  additionalLines?: string, // for compatibility with world wide addresses, see https://stackoverflow.com/a/929691
   zip: string,
   city: string,
   country: string,
-  coordinates: ICoordinates,
+  coordinates?: ICoordinates,
 }
 
 export const AddressSchema = new Schema(
   {
     street: {
-      required: false,
       type: String,
     },
     streetNumber: {
-      required: false,
       type: String,
     },
     additionalLines: {
-      required: false,
       type: String,
     },
     zip: {
@@ -40,16 +37,19 @@ export const AddressSchema = new Schema(
     },
     coordinates: {
       type: CoordinatesSchema,
-      default: getCoordinates, // upon creation, the default coordinates value is calculated.
     },
   },
   { _id: false }
 );
 
-AddressSchema.pre("save", function () {
+AddressSchema.pre("save", async function () {
   if (!this.modifiedPaths().includes("coordinates")) {
-    this.set("coordinates", getCoordinates); // if address has been changed, update coordinates
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const object: IAddress = this.toObject();
+
+    this.set("coordinates", getCoordinates(object));
   }
 });
-
 

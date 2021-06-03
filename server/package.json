@@ -18,10 +18,10 @@
   },
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.21.1",
     "cors": "^2.8.4",
     "dotenv": "^8.2.0",
     "express": "^4.16.3",
-    "mongod": "^2.0.0",
     "mongoose": "^5.12.4"
   },
   "devDependencies": {
@@ -38,6 +38,7 @@
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-prettier": "^3.4.0",
     "jest": "^27.0.3",
+    "mongod": "^2.0.0",
     "mongodb-memory-server": "^6.9.6",
     "nodemon": "^1.18.3",
     "prettier": "^2.0.5",

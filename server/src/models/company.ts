@@ -20,6 +20,7 @@ export interface ICompany extends Document {
 const CompanySchema = new Schema({
   companyName: {
     type: String,
+    required: true,
   },
   branchName: {
     type: String,
