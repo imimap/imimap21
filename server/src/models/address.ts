@@ -1,6 +1,5 @@
 import { Schema } from "mongoose";
-import { CoordinatesSchema, getCoordinates, ICoordinates} from "./coordinates";
-
+import { CoordinatesSchema, getCoordinates, ICoordinates } from "./coordinates";
 
 export interface IAddress {
   street?: string,
@@ -42,9 +41,8 @@ export const AddressSchema = new Schema(
   { _id: false }
 );
 
-AddressSchema.pre("save", async function () {
+AddressSchema.pre("save", function () {
   if (!this.modifiedPaths().includes("coordinates")) {
-
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const object: IAddress = this.toObject();
@@ -52,4 +50,3 @@ AddressSchema.pre("save", async function () {
     this.set("coordinates", getCoordinates(object));
   }
 });
-

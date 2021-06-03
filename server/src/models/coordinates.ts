@@ -1,5 +1,5 @@
-import { AddressSchema, IAddress } from "./address";
-import { Document, LeanDocument, Schema } from "mongoose";
+import { IAddress } from "./address";
+import { Schema } from "mongoose";
 import axios from "axios";
 
 export interface ICoordinates {

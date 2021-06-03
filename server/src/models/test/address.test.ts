@@ -1,4 +1,3 @@
-import { IAddress, AddressSchema } from "../address";
 import * as dbHandler from "./database";
 import { Company } from "../company";
 
