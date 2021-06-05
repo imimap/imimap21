@@ -13,6 +13,7 @@ Prozesse dokumentiert.
 * [Notizen vom 12.05.2021](#notizen-vom-12052021)
 * [Notizen vom 19.05.2021](#notizen-vom-19052021)
 * [Notizen vom 26.05.2021](#notizen-vom-26052021)
+* [Notizen vom 02.06.2021](#notizen-vom-02062021)
 
 ### Notizen vom 24.04.2021
 
@@ -112,3 +113,14 @@ Offene Frage: CI/CD umbauen, damit Images nur einmal insgesamt gebaut werden mü
 Testing, Deployment) extra?
 
 **Fokus Migration, nicht Funktionserweiterung!**
+
+### Notizen vom 02.06.2021
+
+- Rückmeldung Internship Ratings und Veröffentlichung Praktikumsberichte: Beides ja
+  - Voraussetzung Praktikumsbericht: Studi und Firma geben ihr OK
+- Cypress Tests, die für alte und neue Website gleichermaßen funktionieren? Wäre cool
+  - Für Studi-Bereich; Admin-Bereich wird ja neu gestaltet, daher dort nicht möglich
+
+Offene Frage: Welche Dokumente müssen von Praktikumsbeauftragten unterschrieben werden und bei welchen reicht eine
+Checkbox auf der Website? -> Lotte schreibt eine Mail an Prof. Strippgen; bei bestandenem Praktikum muss eine
+Unterschrift drauf, da hier eine Prüfungsleistung gemeldet wird
