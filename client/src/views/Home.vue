@@ -12,48 +12,16 @@
     </div>
   </div>
   <div id="map">
-    <l-map
-      v-model:zoom="zoom"
-      :center="[45, 40]"
-    >
-      <l-tile-layer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        :attribution="attribution"
-        layer-type="base"
-        name="OpenStreetMap"
-      ></l-tile-layer>
 
-      <template
-        v-for="(location, index) in locations"
-        v-bind:location="location"
-        v-bind:key="index"
-      >
-        <l-marker :lat-lng="[location.lat, location.lng]">
-          <l-tooltip>
-            {{ location.city }}
-          </l-tooltip>
-        </l-marker>
-      </template>
-
-    </l-map>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import {
-  LMap, LTileLayer, LMarker, LTooltip,
-} from '@vue-leaflet/vue-leaflet';
-import 'leaflet/dist/leaflet.css';
+import L, { Icon } from 'leaflet';
 
 export default defineComponent({
   name: 'Home',
-  components: {
-    LMap,
-    LTileLayer,
-    LMarker,
-    LTooltip,
-  },
   data() {
     return {
       zoom: 3,
@@ -69,10 +37,39 @@ export default defineComponent({
       ],
     };
   },
-  method: {
+  methods: {
     log(a: string) {
       console.log(a);
     },
+    setupLeafletMap() {
+      const mapDiv = L.map('map').setView([65, 125], 2);
+      L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+          attribution:
+            'Map data (c) <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery (c) <a href="https://www.mapbox.com/">Mapbox</a>',
+          maxZoom: 18,
+          id: 'mapbox/streets-v11',
+        },
+      ).addTo(mapDiv);
+      const popup = L.popup();
+
+      function onMapClick(e) {
+        popup
+          .setLatLng(e.latlng)
+          .setContent(`You clicked the map at ${e.latlng.toString()}`)
+          .openOn(mapDiv);
+      }
+
+      mapDiv.on('click', onMapClick);
+
+      this.locations.forEach((location) => {
+        L.marker([location.lat, location.lng]).bindPopup(location.city).addTo(mapDiv);
+      });
+    },
+  },
+  mounted() {
+    this.setupLeafletMap();
   },
 });
 </script>

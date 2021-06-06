@@ -554,19 +554,59 @@
       </div>
 
     </div>
-    <div id="map-results" v-if="cardToggle">
-     Hier kommt die Map
+    <div id="map-results" :class="{ 'd-none': !cardToggle } ">
+      <l-map
+        v-model:zoom="zoom"
+        :center="[45, 40]"
+      >
+        <l-tile-layer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          :attribution="attribution"
+          layer-type="base"
+          name="OpenStreetMap"
+        ></l-tile-layer>
+
+        <template
+          v-for="(searchResult, index) in searchResults"
+          v-bind:location="searchResult"
+          v-bind:key="index"
+        >
+          <l-marker
+            :lat-lng="[
+              searchResult.company.companyAddress.lat,
+              searchResult.company.companyAddress.lng,
+            ]"
+          >
+            <l-tooltip>
+              {{ searchResult.company.companyAddress.address }}
+            </l-tooltip>
+          </l-marker>
+        </template>
+
+      </l-map>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import {
+  LMap, LTileLayer, LMarker, LTooltip,
+} from '@vue-leaflet/vue-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 export default defineComponent({
   name: 'Search',
+  components: {
+    LMap,
+    LTileLayer,
+    LMarker,
+    LTooltip,
+  },
   data() {
     return {
+      zoom: 1,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       searchResults: [
         {
           id: 1,
@@ -574,8 +614,8 @@ export default defineComponent({
             name: 'Testfirma #1',
             companyAddress: {
               address: 'Friedrichstraßen 17, 10961 Berlin',
-              long: 13.391799,
-              alt: 52.498605,
+              lng: 13.391799,
+              lat: 52.498605,
             },
           },
           department: 'Javascript, Html, Css',
@@ -591,8 +631,8 @@ export default defineComponent({
             name: 'Testfirma #2',
             companyAddress: {
               address: 'Treskowallee 29, 10318 Berlin',
-              long: 13.530516,
-              alt: 52.475594,
+              lng: 13.530516,
+              lat: 52.475594,
             },
           },
           department: 'Python, C##, Java',
