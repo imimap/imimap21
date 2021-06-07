@@ -2,11 +2,24 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Admin from '@/views/Admin.vue';
 import Home from '@/views/Home.vue';
 import Search from '@/views/Search.vue';
+import UsersList from '@/components/admin/UsersList.vue';
+import CompaniesList from '@/components/admin/CompaniesList.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/admin',
     component: Admin,
+    redirect: '/admin/users',
+    children: [
+      {
+        path: 'users',
+        component: UsersList,
+      },
+      {
+        path: 'companies',
+        component: CompaniesList,
+      },
+    ],
   },
   {
     path: '/',
