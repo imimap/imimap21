@@ -1,10 +1,10 @@
-import { ObjectId, Schema } from "mongoose";
+import { Schema, Types } from "mongoose";
 import { isValidStudentId, normalizeStudentId } from "../helpers/studentIdHelper";
 
 export interface IStudentProfile {
   studentId: string,
-  internshipsSeen?: string[],
-  internship?: string,
+  internshipsSeen?: Types.ObjectId[],
+  internship?: Types.ObjectId,
 }
 
 export const StudentProfileSchema = new Schema(

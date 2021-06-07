@@ -1,7 +1,7 @@
 import * as dbHandler from "./database";
 import { User } from "../user";
 import { IStudentProfile } from "../studentProfile";
-import * as mongoose from "mongoose";
+import { Schema, Types } from "mongoose";
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -53,7 +53,8 @@ describe("StudentProfile", () => {
       throw "createdUser or one of its properties is null.";
     }
 
-    const internshipObjectId: string = mongoose.Types.ObjectId().toString(); // mock an object id
+    const internshipObjectId: Types.ObjectId = Types.ObjectId();
+    const internshipObjectIdAsString: string = internshipObjectId.toString(); // mock an object id
     createdUser.studentProfile.internshipsSeen.push(internshipObjectId);
     await createdUser.save();
 
@@ -61,7 +62,7 @@ describe("StudentProfile", () => {
     if (updatedUser && updatedUser.studentProfile) {
       expect(updatedUser.studentProfile.internshipsSeen).toBeTruthy();
       if (updatedUser.studentProfile.internshipsSeen) {
-        expect(updatedUser.studentProfile.internshipsSeen).toContain(internshipObjectId);
+        expect(updatedUser.studentProfile.internshipsSeen).toContainEqual(internshipObjectId);
       }
     }
   });
@@ -72,7 +73,7 @@ describe("StudentProfile", () => {
       throw "createdUser or one of its properties is null.";
     }
 
-    const internshipObjectId: string = mongoose.Types.ObjectId().toString(); // mock an object id
+    const internshipObjectId: Types.ObjectId = Types.ObjectId(); // mock an object id
 
     createdUser.studentProfile.internship = internshipObjectId;
 
@@ -84,7 +85,7 @@ describe("StudentProfile", () => {
       expect(updatedUser.studentProfile.internship).toBeTruthy();
 
       if (updatedUser.studentProfile.internship) {
-        expect(updatedUser.studentProfile.internship.toString()).toEqual(internshipObjectId);
+        expect(updatedUser.studentProfile.internship).toEqual(internshipObjectId);
       }
     }
   });
