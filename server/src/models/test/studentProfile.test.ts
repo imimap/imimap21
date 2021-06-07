@@ -8,6 +8,8 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  await dbHandler.clearDatabase();
+
   const studentProfile: IStudentProfile = {
     studentId: "s0123456",
   };
@@ -21,10 +23,6 @@ beforeEach(async () => {
   const user = new User(properties);
 
   await user.save();
-});
-
-afterEach(async () => {
-  await dbHandler.clearDatabase();
 });
 
 afterAll(async () => {

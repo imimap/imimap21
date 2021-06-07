@@ -7,6 +7,8 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  await dbHandler.clearDatabase();
+
   const address: IAddress = {
     street: "Treskowallee",
     streetNumber: "8",
@@ -22,10 +24,6 @@ beforeEach(async () => {
   const company = new Company(properties);
 
   await company.save();
-});
-
-afterEach(async () => {
-  await dbHandler.clearDatabase();
 });
 
 afterAll(async () => {

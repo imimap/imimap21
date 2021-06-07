@@ -5,7 +5,7 @@ beforeAll(async () => {
   await dbHandler.connect();
 });
 
-afterEach(async () => {
+beforeEach(async () => {
   await dbHandler.clearDatabase();
 });
 
