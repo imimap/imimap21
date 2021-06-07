@@ -1,5 +1,6 @@
 import * as dbHandler from "./database";
 import { IInternshipModule, InternshipModule } from "../internshipModule";
+import { Semester } from "../../helpers/semesterHelper";
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -7,6 +8,11 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await dbHandler.clearDatabase();
+
+  const properties = {}; // everything we need is in the default values for a normal creation
+  const internshipModule: IInternshipModule = new InternshipModule(properties);
+
+  await internshipModule.save();
 });
 
 afterAll(async () => {
@@ -15,14 +21,16 @@ afterAll(async () => {
 
 describe("InternshipModule", () => {
   it("can be created from valid data", async () => {
-    const properties = {}; // everything we need is in the default values for a normal creation
-    const internshipModule: IInternshipModule = new InternshipModule(properties);
-
-    await internshipModule.save();
-    const savedInternshipModule = await InternshipModule.findOne({ aepPassed: true });
+    const savedInternshipModule = await InternshipModule.findOne({ aepPassed: false });
 
     expect(savedInternshipModule).toBeTruthy();
     if (savedInternshipModule) expect(savedInternshipModule.aepPassed).toEqual(false);
   });
-  it.todo("automatically plans the internship for the upcoming semester", () => {});
+  it("automatically plans the internship module for the upcoming semester", async () => {
+    const savedInternshipModule = await InternshipModule.findOne({ aepPassed: false });
+
+    if (savedInternshipModule) {
+      expect(savedInternshipModule.inSemester).toEqual(Semester.getUpcoming().toString());
+    }
+  });
 });
