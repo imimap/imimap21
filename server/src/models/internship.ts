@@ -1,11 +1,11 @@
-import { Document, model, Model, ObjectId, Schema } from "mongoose";
+import { Document, model, Model, Schema, Types } from "mongoose";
 import { ISupervisor, SupervisorSchema } from "./supervisor";
 import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
 
 export interface IInternship extends Document {
   startDate: Date,
   endDate: Date,
-  company: string,
+  company: Types.ObjectId,
   description: string,
   tasks: string,
   operationalArea: string,

@@ -1,8 +1,8 @@
-import { Document, ObjectId, Schema } from "mongoose";
+import { Document, Types, Schema } from "mongoose";
 
 export interface IEvent extends Document {
   timestamp: number,
-  creator: string,
+  creator: Types.ObjectId,
   changesProperty: string,
   newPropertyValue: string,
 }

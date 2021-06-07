@@ -54,7 +54,6 @@ describe("StudentProfile", () => {
     }
 
     const internshipObjectId: Types.ObjectId = Types.ObjectId();
-    const internshipObjectIdAsString: string = internshipObjectId.toString(); // mock an object id
     createdUser.studentProfile.internshipsSeen.push(internshipObjectId);
     await createdUser.save();
 
