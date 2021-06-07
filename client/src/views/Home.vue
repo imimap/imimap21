@@ -9,24 +9,21 @@
         <option value="6">WS 20/21</option>
         <option value="7">WS 19/20</option>
       </select>
+      <button class="btn btn-success" v-on:click="addLocation()">Add Location</button>
     </div>
   </div>
-  <div id="map">
-
-  </div>
+  <MapComponent :locations="this.locations"></MapComponent>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import L, { Icon } from 'leaflet';
+import MapComponent from '@/components/MapComponent.vue';
 
 export default defineComponent({
   name: 'Home',
+  components: { MapComponent },
   data() {
     return {
-      zoom: 3,
-      center: [65, 125],
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       locations: [
         { city: 'Cordesfeld, Türkei', lat: 45.710104134368976, lng: 121.99267841926189 },
         { city: 'Bad Timmberg, Irland', lat: 74.21327053768769, lng: 13.116135124688158 },
@@ -41,41 +38,9 @@ export default defineComponent({
     log(a: string) {
       console.log(a);
     },
-    setupLeafletMap() {
-      const mapDiv = L.map('map').setView([65, 125], 2);
-      L.tileLayer(
-        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        {
-          attribution:
-            'Map data (c) <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery (c) <a href="https://www.mapbox.com/">Mapbox</a>',
-          maxZoom: 18,
-          id: 'mapbox/streets-v11',
-        },
-      ).addTo(mapDiv);
-      const popup = L.popup();
-
-      function onMapClick(e) {
-        popup
-          .setLatLng(e.latlng)
-          .setContent(`You clicked the map at ${e.latlng.toString()}`)
-          .openOn(mapDiv);
-      }
-
-      mapDiv.on('click', onMapClick);
-
-      this.locations.forEach((location) => {
-        L.marker([location.lat, location.lng]).bindPopup(location.city).addTo(mapDiv);
-      });
+    addLocation() {
+      this.locations.push({ city: 'Wanfried', lat: 51.1815, lng: 10.173811 });
     },
-  },
-  mounted() {
-    this.setupLeafletMap();
   },
 });
 </script>
-
-<style lang="scss" scoped>
-#map {
-  height: 500px;
-}
-</style>
