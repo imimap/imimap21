@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { Map, Marker, TileLayer, } from 'leaflet';
+import { Map, Marker, TileLayer } from 'leaflet';
 
 export default defineComponent({
   name: 'MapComponent',
@@ -31,6 +31,7 @@ export default defineComponent({
   },
   methods: {
     setupLeafletMap() {
+      console.log(this.locations);
       this.map = new Map('mapContainer').setView([55, 0], 2);
 
       new TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
