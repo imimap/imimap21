@@ -14,9 +14,15 @@
                       v-bind:aria-controls="'company-' + row.id">
                 <div class="container">
                   <div class="row">
-                    <div class="col-6">
+                    <div class="col-4">
                       <h6 class="list-item-label">Name</h6>
                       <span class="fw-bold">{{ row.companyName }}</span>
+                    </div>
+                    <div class="col-4">
+                      <h6 class="list-item-label">Ort</h6>
+                      <span class="fw-bold">
+                        {{ row.address.city + ', ' + row.address.country }}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -27,7 +33,8 @@
                  aria-labelledby="headingOne"
                  data-bs-parent="#listAccordion">
               <div class="accordion-body">
-                <p>hallo</p>
+                <p>{{ row.industry }}</p>
+                <p>{{ row.website }}</p>
               </div>
             </div>
           </div>
