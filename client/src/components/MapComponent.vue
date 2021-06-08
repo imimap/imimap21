@@ -3,49 +3,54 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import {
-  Map, Marker, Popup, TileLayer,
-} from 'leaflet';
+import { defineComponent, PropType } from 'vue';
+import { Map, Marker, TileLayer, } from 'leaflet';
 
 export default defineComponent({
   name: 'MapComponent',
-  props: ['locations'],
+  props: {
+    locations: Array as PropType<{ lat: number; lng: number; city: string }[]>,
+  },
   data() {
     return {
-      parsedLocations: this.getLocations,
+      map: {} as Map,
+      markers: [] as Marker[],
     };
   },
   mounted() {
     this.setupLeafletMap();
   },
-  computed: {
-    getLocations(): { city: string; lat: number; lng: number }[] {
-      return JSON.parse(JSON.stringify(this.locations));
+  watch: {
+    locations: {
+      deep: true,
+      handler() {
+        this.removeLocationMarkers();
+        this.addLocationMarkers();
+      },
     },
   },
   methods: {
     setupLeafletMap() {
-      const container = new Map('mapContainer').setView([55, 0], 2);
-      console.log('setupLeafletMap executed');
+      this.map = new Map('mapContainer').setView([55, 0], 2);
 
       new TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: 'Map data (c) <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
         maxZoom: 18,
-      }).addTo(container);
-      const popup = new Popup();
+      }).addTo(this.map as Map);
 
-      function onMapClick(e) {
-        popup
-          .setLatLng(e.latlng)
-          .setContent(`You clicked the map at ${e.latlng.toString()}`)
-          .openOn(container);
-      }
-      container.on('click', onMapClick);
+      this.addLocationMarkers();
+    },
+    removeLocationMarkers() {
+      this.markers.forEach((marker) => this.map.removeLayer(marker as Marker));
+      this.markers = [];
+    },
+    addLocationMarkers() {
+      if (!this.locations) return;
       this.locations.forEach((location) => {
-        new Marker([location.lat, location.lng])
+        const marker = new Marker([location.lat, location.lng])
           .bindPopup(location.city)
-          .addTo(container);
+          .addTo(this.map as Map);
+        this.markers.push(marker);
       });
     },
   },
