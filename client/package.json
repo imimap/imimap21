@@ -12,8 +12,6 @@
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@fortawesome/vue-fontawesome": "^3.0.0-3",
     "@popperjs/core": "^2.9.2",
-    "@types/leaflet": "^1.7.1",
-    "@vue-leaflet/vue-leaflet": "^0.6.0",
     "bootstrap": "^5.0.1",
     "core-js": "^3.6.5",
     "leaflet": "^1.6.0",
