@@ -508,7 +508,7 @@
           >
             <tr>
               <td>{{ searchResult.company.name }}</td>
-              <td> {{ searchResult.company.companyAddress.address }}</td>
+              <td> {{ searchResult.company.companyLocation.city }}</td>
               <td> {{ searchResult.department }}</td>
               <td>
                 <button
@@ -554,17 +554,22 @@
       </div>
 
     </div>
-    <div id="map-results" v-if="cardToggle">
-     Hier kommt die Map
+    <div id="map-results">
+      <MapComponent v-if="cardToggle" :locations="locations"></MapComponent>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import 'leaflet/dist/leaflet.css';
+import MapComponent from '@/components/MapComponent.vue';
 
 export default defineComponent({
   name: 'Search',
+  components: {
+    MapComponent,
+  },
   data() {
     return {
       searchResults: [
@@ -572,10 +577,10 @@ export default defineComponent({
           id: 1,
           company: {
             name: 'Testfirma #1',
-            companyAddress: {
-              address: 'Friedrichstraßen 17, 10961 Berlin',
-              long: 13.391799,
-              alt: 52.498605,
+            companyLocation: {
+              city: 'Friedrichstraßen 17, 10961 Berlin',
+              lat: 52.498605,
+              lng: 13.391799,
             },
           },
           department: 'Javascript, Html, Css',
@@ -589,10 +594,10 @@ export default defineComponent({
           id: 2,
           company: {
             name: 'Testfirma #2',
-            companyAddress: {
-              address: 'Treskowallee 29, 10318 Berlin',
-              long: 13.530516,
-              alt: 52.475594,
+            companyLocation: {
+              city: 'Bad Timmberg, Irland',
+              lat: 74.21327053768769,
+              lng: 13.116135124688158,
             },
           },
           department: 'Python, C##, Java',
@@ -609,6 +614,13 @@ export default defineComponent({
   computed: {
     resultCount(): number {
       return this.searchResults.length;
+    },
+    locations(): Array<{city: string; lat: number; lng: number}> {
+      const locations: Array<{city: string; lat: number; lng: number}> = [];
+      this.searchResults.forEach((searchResult) => {
+        locations.push(searchResult.company.companyLocation);
+      });
+      return locations;
     },
   },
   methods: {
