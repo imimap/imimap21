@@ -9,7 +9,6 @@
         <option value="6">WS 20/21</option>
         <option value="7">WS 19/20</option>
       </select>
-      <button class="btn btn-success" v-on:click="addLocation()">Add Location</button>
     </div>
   </div>
   <MapComponent :locations="this.locations"></MapComponent>
@@ -37,9 +36,6 @@ export default defineComponent({
   methods: {
     log(a: string) {
       console.log(a);
-    },
-    addLocation() {
-      this.locations.push({ city: 'Wanfried', lat: 51.1815, lng: 10.173811 });
     },
   },
 });
