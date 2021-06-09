@@ -3,24 +3,24 @@ import { ISupervisor, SupervisorSchema } from "./supervisor";
 import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
 
 export interface IInternship extends Document {
-  startDate: Date,
-  endDate: Date,
-  company: Types.ObjectId,
-  description: string,
-  tasks: string,
-  operationalArea: string,
-  programmingLanguages: string[],
-  livingCosts: number,
-  salary: number,
-  paymentType: [string], //should be an enum or so
-  workingHoursPerWeek: number,
-  supervisor: ISupervisor,
-  requestPdf: IPdfDocument,
-  lsfEctsProofPdf: IPdfDocument,
-  locationJustificationPdf: IPdfDocument,
-  contractPdf: IPdfDocument,
-  bvgTicketExemptionPdf: IPdfDocument,
-  certificatePdf: IPdfDocument,
+  startDate?: Date,
+  endDate?: Date,
+  company?: Types.ObjectId,
+  description?: string,
+  tasks?: string,
+  operationalArea?: string,
+  programmingLanguages?: string[],
+  livingCosts?: number,
+  salary?: number,
+  paymentType?: [string],
+  workingHoursPerWeek?: number,
+  supervisor?: ISupervisor,
+  requestPdf?: IPdfDocument,
+  lsfEctsProofPdf?: IPdfDocument,
+  locationJustificationPdf?: IPdfDocument,
+  contractPdf?: IPdfDocument,
+  bvgTicketExemptionPdf?: IPdfDocument,
+  certificatePdf?: IPdfDocument,
   // events: InternshipPartEvents
 }
 

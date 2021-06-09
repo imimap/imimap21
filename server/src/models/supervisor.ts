@@ -1,22 +1,17 @@
 import { Schema } from "mongoose";
-import {isValidEmail, normalizeEmail} from "../helpers/emailAddressHelper";
+import { isValidEmail, normalizeEmail } from "../helpers/emailAddressHelper";
 
 export interface ISupervisor {
-  firstName: string,
-  lastName: string,
-  emailAddress: string,
+  fullName?: string,
+  emailAddress?: string,
 }
 
 export const SupervisorSchema = new Schema(
   {
-    firstName: {
-      type: String,
-    },
-    lastName: {
+    fullName: {
       type: String,
     },
     emailAddress: {
-      required: true,
       type: String,
       validate: {
         validator: isValidEmail,
