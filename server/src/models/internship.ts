@@ -1,42 +1,47 @@
 import { Document, model, Model, Schema, Types } from "mongoose";
 import { ISupervisor, SupervisorSchema } from "./supervisor";
 import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
+import { Semester } from "../helpers/semesterHelper";
+import { isValidDateRange, normalizeDate } from "../helpers/dateHelper";
 
 export interface IInternship extends Document {
-  startDate?: Date,
-  endDate?: Date,
-  company?: Types.ObjectId,
-  description?: string,
-  tasks?: string,
-  operationalArea?: string,
-  programmingLanguages?: string[],
-  livingCosts?: number,
-  salary?: number,
-  paymentType?: [string],
-  workingHoursPerWeek?: number,
-  supervisor?: ISupervisor,
-  requestPdf?: IPdfDocument,
-  lsfEctsProofPdf?: IPdfDocument,
-  locationJustificationPdf?: IPdfDocument,
-  contractPdf?: IPdfDocument,
-  bvgTicketExemptionPdf?: IPdfDocument,
-  certificatePdf?: IPdfDocument,
+  startDate?: Date;
+  endDate?: Date;
+  company?: Types.ObjectId;
+  tasks?: string;
+  operationalArea?: string;
+  programmingLanguages?: [string];
+  livingCosts?: number;
+  salary?: number;
+  paymentTypes?: [string];
+  workingHoursPerWeek?: number;
+  supervisor?: ISupervisor;
+  requestPdf?: IPdfDocument;
+  lsfEctsProofPdf?: IPdfDocument;
+  locationJustificationPdf?: IPdfDocument;
+  contractPdf?: IPdfDocument;
+  bvgTicketExemptionPdf?: IPdfDocument;
+  certificatePdf?: IPdfDocument;
   // events: InternshipPartEvents
 }
 
 export const InternshipSchema = new Schema({
   startDate: {
+    default: Semester.getUpcoming().startDate(),
     type: Date,
   },
   endDate: {
     type: Date,
+    validate: {
+      validator: (newEndDate: Date) => {
+        return isValidDateRange(this.startDate, newEndDate);
+      },
+      message: "End date is not valid. Needs to be at least 4 weeks after start date.",
+    },
   },
   company: {
     ref: "CompanyBranch",
     type: Schema.Types.ObjectId,
-  },
-  description: {
-    type: String,
   },
   tasks: {
     type: String,
@@ -58,7 +63,7 @@ export const InternshipSchema = new Schema({
     min: 0,
     type: Number,
   },
-  paymentType: [
+  paymentTypes: [
     {
       default: "uncharted",
       enum: ["uncharted", "cash benefit", "noncash benefit", "no payment"],
@@ -77,6 +82,18 @@ export const InternshipSchema = new Schema({
   contractPdf: PdfDocumentSchema,
   bvgTicketExemptionPdf: PdfDocumentSchema,
   certificatePdf: PdfDocumentSchema,
+});
+
+InternshipSchema.pre("validate", function () {
+  const modifiedPaths = this.modifiedPaths();
+  console.log(modifiedPaths);
+
+  if (this.modifiedPaths().includes("startDate")) {
+    this.set("startDate", normalizeDate(this.get("startDate")));
+  }
+  if (this.modifiedPaths().includes("endDate")) {
+    this.set("endDate", normalizeDate(this.get("endDate")));
+  }
 });
 
 export const Internship: Model<IInternship> = model("Internship", InternshipSchema);

@@ -112,4 +112,8 @@ export class Semester {
   toString() {
     return this.#season.toString();
   }
+
+  startDate() {
+    return this.#season.startDate;
+  }
 }
