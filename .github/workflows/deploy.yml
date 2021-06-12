@@ -12,6 +12,8 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
+      - uses: actions/checkout@v2
+
       - name: Deploy to Docker remote host
         uses: Kaes3kuch3n/docker-deployment-action@v3
         with:
