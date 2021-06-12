@@ -1,0 +1,25 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [ "Build" ]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Deploy to Docker remote host
+        uses: Kaes3kuch3n/docker-deployment-action@v3
+        with:
+          remote_docker_host: ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+          copy_stack_file: true
+          pull_images_first: true
+          deploy_path: ${{ secrets.SSH_DEPLOY_PATH }}
+          stack_file_name: docker-compose.yml
+          args: up -d
