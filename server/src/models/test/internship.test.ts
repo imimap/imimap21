@@ -60,4 +60,5 @@ describe("Internship", () => {
     expect(saved).toBeTruthy();
     if (saved) expect(saved.endDate).toBeFalsy();
   });
+
 });

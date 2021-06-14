@@ -1,13 +1,14 @@
-import { Document, model, Model, Schema, Types } from "mongoose";
+import {Document, model, Model, PopulatedDoc, Schema, Types} from "mongoose";
 import { ISupervisor, SupervisorSchema } from "./supervisor";
 import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
 import { Semester } from "../helpers/semesterHelper";
 import { isValidDateRange, normalizeDate } from "../helpers/dateHelper";
+import {ICompany} from "./company";
 
 export interface IInternship extends Document {
   startDate?: Date;
   endDate?: Date;
-  company?: Types.ObjectId;
+  company?: PopulatedDoc<ICompany & Document>;
   tasks?: string;
   operationalArea?: string;
   programmingLanguages?: [string];
@@ -34,7 +35,7 @@ export const InternshipSchema = new Schema({
     type: Date,
   },
   company: {
-    ref: "CompanyBranch",
+    ref: "Company",
     type: Schema.Types.ObjectId,
   },
   tasks: {
@@ -45,7 +46,7 @@ export const InternshipSchema = new Schema({
   },
   programmingLanguages: [
     {
-      type: String, //should be an enum/ or so
+      type: String,
     },
   ],
   livingCosts: {
