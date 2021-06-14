@@ -33,11 +33,151 @@
                  aria-labelledby="headingOne"
                  data-bs-parent="#listAccordion">
               <div class="accordion-body">
-                <p>{{ row.industry }}</p>
-                <p>{{ row.website }}</p>
+                <h2>{{ row.companyName }}</h2>
+                <h3>{{ row.address.city + ', ' + row.address.country }}</h3>
+                <p>
+                  <b>Industrie:</b> {{ row.industry }}<br>
+                  <b>Website:</b> <a :href="row.website" target="_blank">
+                  {{ row.website }}</a><br>
+                  <b>Sprache:</b> {{ row.mainLanguage }}<br>
+                  <b>Größe:</b> {{ row.size.toLocaleLowerCase() }}<br>
+                  <b>Adresse:</b><br>
+                  {{ row.address.street + ' ' + row.address.number }}<br>
+                  {{ row.address.zip + ' ' + row.address.city }}<br>
+                  {{ row.address.country }}<br>
+                </p>
+
+                <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#companyEditModal">Bearbeiten</button>
+
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--  Company Edit Modal-->
+  <div class="modal fade" id="companyEditModal" tabindex="-1"
+       aria-labelledby="companyEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="companyEditModalLabel">Firma bearbeiten</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"
+                  aria-label="Close">
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name"
+                   aria-describedby="name"
+                   v-bind:value="companies[currentEditCompanyIndex].companyName" />
+          </div>
+
+          <div class="mb-3">
+            <label for="branchName" class="form-label">Zweig Name</label>
+            <input type="text" class="form-control" id="branchName"
+                   aria-describedby="branchName"
+                   v-bind:value="companies[currentEditCompanyIndex].branchName" />
+          </div>
+
+          <div class="mb-3">
+            <label for="industry" class="form-label">Industrie</label>
+            <input type="text" class="form-control" id="industry"
+                   aria-describedby="industry"
+                   v-bind:value="companies[currentEditCompanyIndex].industry" />
+          </div>
+
+          <div class="mb-3">
+            <label for="mainLanguage" class="form-label">Sprache</label>
+            <input type="text" class="form-control" id="mainLanguage"
+                   aria-describedby="mainLanguage"
+                   v-bind:value="companies[currentEditCompanyIndex].mainLanguage" />
+          </div>
+
+          <div class="mb-3">
+            <label for="comment" class="form-label">Kommentar</label>
+            <textarea class="form-control"
+                      v-bind:value="companies[currentEditCompanyIndex].comment"
+                      id="comment"></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="excludedFromSearch" class="form-label">Sichtbar in Suche</label>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="excludedFromSearch"
+                     :checked="companies[currentEditCompanyIndex].excludedFromSearch">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="size" class="form-label">Größe</label>
+            <select class="form-select" aria-label="Größe" id="size">
+              <option :selected="companies[currentEditCompanyIndex].size === 'SMALL'"
+                      value="SMALL">SMALL</option>
+              <option :selected="companies[currentEditCompanyIndex].size === 'MEDIUM'"
+                      value="MEDIUM">MEDIUM</option>
+              <option :selected="companies[currentEditCompanyIndex].size === 'LARGE'"
+                      value="LARGE">LARGE</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="address" class="form-label">Adresse</label>
+            <div class="mb-2 row g-2 align-items-center">
+              <div class="col-6">
+                <input type="text" class="form-control" id="address"
+                       aria-describedby="address" placeholder="Straße"
+                       v-bind:value="companies[currentEditCompanyIndex].address.street" />
+              </div>
+
+              <div class="col-6">
+                <input type="text" class="form-control"
+                       aria-describedby="number" placeholder="Nummer"
+                       v-bind:value="companies[currentEditCompanyIndex].address.number" />
+              </div>
+            </div>
+
+            <div class="mb-2 row g-2 align-items-center">
+              <div class="col-6">
+                <input type="text" class="form-control"
+                       aria-describedby="zip" placeholder="PLZ"
+                       v-bind:value="companies[currentEditCompanyIndex].address.zip" />
+              </div>
+
+              <div class="col-6">
+                <input type="text" class="form-control"
+                       aria-describedby="city" placeholder="Ort"
+                       v-bind:value="companies[currentEditCompanyIndex].address.city" />
+              </div>
+
+              <div class="col-12">
+                <input type="text" class="form-control"
+                       aria-describedby="city" placeholder="Land"
+                       v-bind:value="companies[currentEditCompanyIndex].address.country" />
+              </div>
+
+              <div class="col-6">
+                <input type="text" class="form-control"
+                       aria-describedby="latitude" placeholder="Latitude"
+                       v-bind:value="companies[currentEditCompanyIndex].address.latitude" />
+              </div>
+
+              <div class="col-6">
+                <input type="text" class="form-control"
+                       aria-describedby="longitude" placeholder="Longitude"
+                       v-bind:value="companies[currentEditCompanyIndex].address.longitude" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary"
+                  data-bs-dismiss="modal">Schließen</button>
+          <button type="button" class="btn btn-success">Speichern</button>
         </div>
       </div>
     </div>
@@ -51,6 +191,7 @@ export default defineComponent({
   name: 'CompaniesList',
   data() {
     return {
+      currentEditCompanyIndex: 0,
       companies: [{
         id: 0,
         companyName: 'Coding B.V.',
@@ -58,11 +199,11 @@ export default defineComponent({
         industry: 'Web Development',
         website: 'https://coding.nl',
         mainLanguage: 'english',
-        comment: '',
+        comment: 'lorem ipsum',
         excludedFromSearch: false,
         size: 'LARGE',
         address: {
-          street: 'asdfghjk',
+          street: 'Pannekokenstraat',
           number: '38',
           zip: '1234',
           city: 'Amsterdam',

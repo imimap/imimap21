@@ -2,11 +2,12 @@
   <div class="container my-5">
     <ul class="nav nav-pills">
       <li class="nav-item">
-<!--        <a class="nav-link active" aria-current="page" href="#">Users</a>-->
-        <router-link class="nav-link active" to="users">Users</router-link>
+        <router-link class="nav-link" :class="{ active: isUsersRoute }"
+                     to="users">Users</router-link>
       </li>
       <li class="nav-item mx-2">
-        <router-link class="nav-link" to="companies">Companies</router-link>
+        <router-link class="nav-link" :class="{ active: isCompaniesRoute }"
+                     to="companies">Companies</router-link>
       </li>
     </ul>
   </div>
@@ -14,7 +15,6 @@
   <div class="container admin-container mt-5">
     <router-view></router-view>
   </div>
-
 </template>
 
 <script lang="ts">
@@ -24,6 +24,14 @@ export default defineComponent({
   name: 'Admin',
   data() {
     return {};
+  },
+  computed: {
+    isUsersRoute() {
+      return this.$router.currentRoute.value.path.includes('users');
+    },
+    isCompaniesRoute() {
+      return this.$router.currentRoute.value.path.includes('companies');
+    },
   },
 });
 </script>
