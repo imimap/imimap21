@@ -11,5 +11,6 @@ const MINIMUM_INTERNSHIP_DURATION_IN_MILLISECONDS = 4 * 7 * 24 * 60 * 60 * 1000;
 
 export const isValidDateRange = (startDate: Date, endDate: Date) => {
   if (!startDate) return true;
-  return endDate.getTime() - startDate.getTime() < MINIMUM_INTERNSHIP_DURATION_IN_MILLISECONDS;
+  const duration = endDate.getTime() - startDate.getTime();
+  return duration >= MINIMUM_INTERNSHIP_DURATION_IN_MILLISECONDS;
 };

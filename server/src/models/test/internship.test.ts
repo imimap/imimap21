@@ -33,7 +33,8 @@ describe("Internship", () => {
     const endDate = new Date(2010, 10, 10);
     const update = await Internship.updateOne(
       { operationalArea: "Game Design" },
-      { workingHoursPerWeek: 38 }
+      { workingHoursPerWeek: 38 },
+      { runValidators: true, context: "query" }
     );
 
     expect(update.nModified).toEqual(1);
@@ -47,11 +48,13 @@ describe("Internship", () => {
   });
   it("won't save endDate that lays before startDate", async () => {
     const endDate = new Date(2010, 10, 10);
-    const update = await Internship.updateOne(
-      { operationalArea: "Game Design" },
-      { endDate: endDate },
-      { runValidators: true }
-    );
+    const toBeUpdated = await Internship.findOne({ operationalArea: "Game Design" });
+
+    expect(toBeUpdated).toBeTruthy();
+    if (toBeUpdated) {
+      toBeUpdated.endDate = endDate;
+      await toBeUpdated.save();
+    }
 
     const saved = await Internship.findOne({ operationalArea: "Game Design" }).lean();
     expect(saved).toBeTruthy();
