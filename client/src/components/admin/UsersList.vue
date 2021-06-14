@@ -102,7 +102,11 @@
                           <button class="btn btn-success btn-sm me-2">
                             Antrag genehmigen</button>
                           <button class="btn btn-success btn-sm me-2">
-                            Als anrechenbar markieren</button>
+                            Anrechenbar markieren</button>
+                          <button class="btn btn-secondary btn-sm me-2">
+                            Details bearbeiten</button>
+                          <button class="btn btn-danger btn-sm me-2">
+                            Löschen</button>
                         </div>
                       </div>
                     </div>
@@ -117,6 +121,9 @@
                         </button>
                         <button class="btn btn-success" type="button">
                           Zertifikat-Status bearbeiten
+                        </button>
+                        <button class="btn btn-secondary" type="button">
+                          Details bearbeiten
                         </button>
                         <button class="btn btn-danger" type="button">
                           Löschen
