@@ -74,5 +74,5 @@ describe("Internship", () => {
     const saved = await Internship.findOne({ operationalArea: "Game Design" }).lean();
     expect(saved).toBeTruthy();
     if (saved) expect(saved.paymentTypes).toContain("cash benefit");
-  })
+  });
 });

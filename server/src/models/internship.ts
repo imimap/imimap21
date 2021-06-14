@@ -1,9 +1,9 @@
-import {Document, model, Model, PopulatedDoc, Schema, Types} from "mongoose";
+import { Document, model, Model, PopulatedDoc, Schema, Types } from "mongoose";
 import { ISupervisor, SupervisorSchema } from "./supervisor";
 import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
 import { Semester } from "../helpers/semesterHelper";
 import { isValidDateRange, normalizeDate } from "../helpers/dateHelper";
-import {ICompany} from "./company";
+import { ICompany } from "./company";
 
 export interface IInternship extends Document {
   startDate?: Date;
