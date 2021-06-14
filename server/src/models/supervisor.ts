@@ -22,7 +22,7 @@ export const SupervisorSchema = new Schema(
   { _id: false }
 );
 
-SupervisorSchema.pre("save", function () {
+SupervisorSchema.pre("validate", function () {
   if (this.modifiedPaths().includes("emailAddress")) {
     this.set("emailAddress", normalizeEmail(this.get("emailAddress")));
   }

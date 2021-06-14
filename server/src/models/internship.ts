@@ -79,21 +79,25 @@ export const InternshipSchema = new Schema({
   certificatePdf: PdfDocumentSchema,
 });
 
-InternshipSchema.pre("save", function () {
+InternshipSchema.pre("validate", function () {
   if (this.modifiedPaths().includes("startDate")) {
     this.set("startDate", normalizeDate(this.get("startDate")));
   }
+  if (this.modifiedPaths().includes("endDate")) {
+    this.set("endDate", normalizeDate(this.get("endDate")));
+  }
+});
+
+InternshipSchema.pre("save", function () {
   if (this.modifiedPaths().includes("endDate")) {
     const startDate = this.get("startDate");
     const endDate = this.get("endDate");
     const endDateAfterStartDate = isValidDateRange(startDate, endDate);
     if (!endDateAfterStartDate) {
-      return this.invalidate(
+      this.invalidate(
         "endDate",
         "End date is not valid. Needs to be at least 4 weeks after start date."
       );
-    } else {
-      this.set("endDate", normalizeDate(this.get("endDate")));
     }
   }
 });

@@ -75,4 +75,26 @@ describe("Internship", () => {
     expect(saved).toBeTruthy();
     if (saved) expect(saved.paymentTypes).toContain("cash benefit");
   });
+  it("can have a supervisor", async () => {
+    const toBeUpdated = await Internship.findOne({ operationalArea: "Game Design" });
+
+    expect(toBeUpdated).toBeTruthy();
+    if (toBeUpdated) {
+      toBeUpdated.supervisor = {
+        fullName: "Douglas Adams",
+        emailAddress: "d.Adams@Email.com ",
+      };
+      await toBeUpdated.save();
+    }
+
+    const saved = await Internship.findOne({ operationalArea: "Game Design" }).lean();
+    expect(saved).toBeTruthy();
+    if (saved) {
+      expect(saved.supervisor).toBeTruthy();
+      if (saved.supervisor) {
+        expect(saved.supervisor.fullName).toBe("Douglas Adams");
+        expect(saved.supervisor.emailAddress).toBe("d.adams@email.com");
+      }
+    }
+  });
 });
