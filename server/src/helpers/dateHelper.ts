@@ -1,6 +1,6 @@
 export const normalizeDate = (date: Date) => {
   const res = date;
-  res.setUTCHours(0);
+  res.setUTCHours(8);
   res.setUTCMinutes(0);
   res.setUTCSeconds(0);
   res.setMilliseconds(0);

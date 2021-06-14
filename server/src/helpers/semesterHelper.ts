@@ -3,11 +3,11 @@
 // https://github.com/imimap/imimap/blob/master/app/models/semester.rb
 class Season {
   static SUMMER = (year: number) => {
-    return new Season("SS", new Date(year, 4, 1));
+    return new Season("SS", new Date(Date.UTC(year, 4, 1)));
   };
 
   static WINTER = (year: number) => {
-    return new Season("WS", new Date(year, 10, 1));
+    return new Season("WS", new Date(Date.UTC(year, 10, 1)));
   };
 
   readonly #abbrv: string;
