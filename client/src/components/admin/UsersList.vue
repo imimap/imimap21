@@ -98,6 +98,12 @@
                             </div>
                           </div>
                         </div>
+                        <div class="card-footer">
+                          <button class="btn btn-success btn-sm me-2">
+                            Antrag genehmigen</button>
+                          <button class="btn btn-success btn-sm me-2">
+                            Als anrechenbar markieren</button>
+                        </div>
                       </div>
                     </div>
 

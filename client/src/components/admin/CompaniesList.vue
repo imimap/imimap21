@@ -48,7 +48,9 @@
                 </p>
 
                 <button type="button" class="btn btn-success" data-bs-toggle="modal"
-                        data-bs-target="#companyEditModal">Bearbeiten</button>
+                        data-bs-target="#companyEditModal"
+                        @click="changeCurrentEditCompanyIndex(row.id)">
+                  Bearbeiten</button>
 
               </div>
             </div>
@@ -74,54 +76,53 @@
             <label for="name" class="form-label">Name</label>
             <input type="text" class="form-control" id="name"
                    aria-describedby="name"
-                   v-bind:value="companies[currentEditCompanyIndex].companyName" />
+                   v-model="companies[currentEditCompanyIndex].companyName" />
           </div>
 
           <div class="mb-3">
             <label for="branchName" class="form-label">Zweig Name</label>
             <input type="text" class="form-control" id="branchName"
                    aria-describedby="branchName"
-                   v-bind:value="companies[currentEditCompanyIndex].branchName" />
+                   v-model="companies[currentEditCompanyIndex].branchName" />
           </div>
 
           <div class="mb-3">
             <label for="industry" class="form-label">Industrie</label>
             <input type="text" class="form-control" id="industry"
                    aria-describedby="industry"
-                   v-bind:value="companies[currentEditCompanyIndex].industry" />
+                   v-model="companies[currentEditCompanyIndex].industry" />
           </div>
 
           <div class="mb-3">
             <label for="mainLanguage" class="form-label">Sprache</label>
             <input type="text" class="form-control" id="mainLanguage"
                    aria-describedby="mainLanguage"
-                   v-bind:value="companies[currentEditCompanyIndex].mainLanguage" />
+                   v-model="companies[currentEditCompanyIndex].mainLanguage" />
           </div>
 
           <div class="mb-3">
             <label for="comment" class="form-label">Kommentar</label>
             <textarea class="form-control"
-                      v-bind:value="companies[currentEditCompanyIndex].comment"
+                      v-model="companies[currentEditCompanyIndex].comment"
                       id="comment"></textarea>
           </div>
 
           <div class="mb-3">
-            <label for="excludedFromSearch" class="form-label">Sichtbar in Suche</label>
+            <label for="excludedFromSearch" class="form-label">Unsichtbar in der Suche</label>
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" id="excludedFromSearch"
-                     :checked="companies[currentEditCompanyIndex].excludedFromSearch">
+                     v-model="companies[currentEditCompanyIndex].excludedFromSearch">
             </div>
           </div>
 
           <div class="mb-3">
             <label for="size" class="form-label">Größe</label>
-            <select class="form-select" aria-label="Größe" id="size">
-              <option :selected="companies[currentEditCompanyIndex].size === 'SMALL'"
-                      value="SMALL">SMALL</option>
-              <option :selected="companies[currentEditCompanyIndex].size === 'MEDIUM'"
-                      value="MEDIUM">MEDIUM</option>
-              <option :selected="companies[currentEditCompanyIndex].size === 'LARGE'"
-                      value="LARGE">LARGE</option>
+            <select
+              v-model="companies[currentEditCompanyIndex].size"
+              class="form-select" aria-label="Größe" id="size">
+              <option>SMALL</option>
+              <option>MEDIUM</option>
+              <option>LARGE</option>
             </select>
           </div>
 
@@ -131,13 +132,13 @@
               <div class="col-6">
                 <input type="text" class="form-control" id="address"
                        aria-describedby="address" placeholder="Straße"
-                       v-bind:value="companies[currentEditCompanyIndex].address.street" />
+                       v-model="companies[currentEditCompanyIndex].address.street" />
               </div>
 
               <div class="col-6">
                 <input type="text" class="form-control"
                        aria-describedby="number" placeholder="Nummer"
-                       v-bind:value="companies[currentEditCompanyIndex].address.number" />
+                       v-model="companies[currentEditCompanyIndex].address.number" />
               </div>
             </div>
 
@@ -145,31 +146,31 @@
               <div class="col-6">
                 <input type="text" class="form-control"
                        aria-describedby="zip" placeholder="PLZ"
-                       v-bind:value="companies[currentEditCompanyIndex].address.zip" />
+                       v-model="companies[currentEditCompanyIndex].address.zip" />
               </div>
 
               <div class="col-6">
                 <input type="text" class="form-control"
                        aria-describedby="city" placeholder="Ort"
-                       v-bind:value="companies[currentEditCompanyIndex].address.city" />
+                       v-model="companies[currentEditCompanyIndex].address.city" />
               </div>
 
               <div class="col-12">
                 <input type="text" class="form-control"
                        aria-describedby="city" placeholder="Land"
-                       v-bind:value="companies[currentEditCompanyIndex].address.country" />
+                       v-model="companies[currentEditCompanyIndex].address.country" />
               </div>
 
               <div class="col-6">
                 <input type="text" class="form-control"
                        aria-describedby="latitude" placeholder="Latitude"
-                       v-bind:value="companies[currentEditCompanyIndex].address.latitude" />
+                       v-model="companies[currentEditCompanyIndex].address.latitude" />
               </div>
 
               <div class="col-6">
                 <input type="text" class="form-control"
                        aria-describedby="longitude" placeholder="Longitude"
-                       v-bind:value="companies[currentEditCompanyIndex].address.longitude" />
+                       v-model="companies[currentEditCompanyIndex].address.longitude" />
               </div>
             </div>
           </div>
@@ -177,7 +178,10 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary"
                   data-bs-dismiss="modal">Schließen</button>
-          <button type="button" class="btn btn-success">Speichern</button>
+          <button type="button"
+                  class="btn btn-success"
+                  @click="updateCompany(currentEditCompanyIndex)"
+          >Speichern</button>
         </div>
       </div>
     </div>
@@ -200,7 +204,7 @@ export default defineComponent({
         website: 'https://coding.nl',
         mainLanguage: 'english',
         comment: 'lorem ipsum',
-        excludedFromSearch: false,
+        excludedFromSearch: true,
         size: 'LARGE',
         address: {
           street: 'Pannekokenstraat',
@@ -221,7 +225,7 @@ export default defineComponent({
         mainLanguage: 'german',
         comment: '',
         excludedFromSearch: false,
-        size: 'medium',
+        size: 'MEDIUM',
         address: {
           street: 'Unter den Linden',
           number: '192',
@@ -234,7 +238,17 @@ export default defineComponent({
       }],
     };
   },
-  methods: {},
+  methods: {
+    changeCurrentEditCompanyIndex(id: number) {
+      this.currentEditCompanyIndex = id;
+    },
+    updateCompany(id: number) {
+      // API POST call
+      // update this.companies[id]
+      console.log('updated ', this.companies[this.currentEditCompanyIndex].companyName);
+      return true;
+    },
+  },
 });
 </script>
 
