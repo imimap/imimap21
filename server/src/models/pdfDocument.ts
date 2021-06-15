@@ -1,33 +1,40 @@
 import { Document, model, Model, Schema } from "mongoose";
-import { EventSchema, IEvent } from "./event";
-
-function isValidPdf(path: string) {
-  return /http:\/\/localhost:9000\/pdfs\/s0[0-9]{6}\/[0-9a-f]{24}\/[0-9a-f]{24}\.pdf$/.test(path); //example: http://localhost:9000/pdfs/s0555949/507f1f77bcf86cd799439011/requestPdf-01.pdf
-}
-
-const validatePdf = {
-  validator: isValidPdf,
-  message:
-    "Path is foreign or has invalid name. PDF needs to be saved on own server and be saved under a student id and document object id, as well as the version.",
-};
+import { IPdfEvent, PdfEventSchema } from "./eventModels/pdfEvent";
 
 export interface IPdfDocument extends Document {
-  path: string,
-  //events: IEvent[],
+  events: [IPdfEvent];
+  path?: string;
 }
 
-export const PdfDocumentSchema = new Schema({
-  path: {
-    type: String,
-    validate: validatePdf,
+export const PdfDocumentSchema = new Schema<IPdfDocument>(
+  {
+    events: [
+      {
+        type: PdfEventSchema,
+      },
+    ],
   },
-  /*
-  events: [
-    {
-      type: EventSchema,
-    },
-  ],
-   */
+  {
+    toJSON: { virtuals: true },
+  }
+);
+
+PdfDocumentSchema.virtual("path").get(function () {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return this.events.slice(-1)[0].newPath;
+});
+
+PdfDocumentSchema.virtual("status").get(async function () {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const allEvents = this.events;
+  const mostRecentEvent = allEvents.slice(-1)[0];
+
+  if (allEvents.length < 1) return "unknown";
+  else if (!mostRecentEvent.createdByAdmin) return "submitted";
+  else if (mostRecentEvent.accept) return "accepted";
+  else return "rejected";
 });
 
 export const PdfDocument: Model<IPdfDocument> = model("PdfDocument", PdfDocumentSchema);
