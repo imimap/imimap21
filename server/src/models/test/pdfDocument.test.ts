@@ -36,7 +36,7 @@ describe("PdfDocument", () => {
   it("can not be created from invalid data", async () => {
     const objectId: Types.ObjectId = Types.ObjectId();
     const pdfId: Types.ObjectId = Types.ObjectId();
-    const path = "http://localhost:9000/pdfs/s0123456/" + objectId + "/" + pdfId + ".pdf";
+    const path = "http://localhost:9000/pdfs/s0123456/" + objectId + ".pdf";
     const props = {
       _id: objectId,
       path: path,
