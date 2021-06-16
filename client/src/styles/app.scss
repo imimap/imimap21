@@ -1,0 +1,11 @@
+@import "~bootstrap/scss/bootstrap";
+@import "_variables.scss";
+@import "_htw-button.scss";
+
+.bg-htw-green {
+  background: $htw-green-color;
+}
+
+.border-htw-green {
+  border-color: $htw-green-color;
+}

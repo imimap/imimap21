@@ -2,7 +2,7 @@
   <!-- Search Form -->
   <div id="form-block4" class="text-left mt-5 mx-3">
     <h4 class="mb-3">{{ $t("search.headline") }}</h4>
-    <div class="card text-white bg-success mt-2 mb-4 ms-3">
+    <div class="card text-white bg-htw-green mt-2 mb-4 ms-3">
       <div class="card-body p-1">
         <p class="card-text">
           <strong>{{ $t("search.hint.hintHeading") }}</strong>
@@ -456,14 +456,14 @@
         </div>
         <div class="btn-group" role="group">
           <div class="field me-2">
-            <button class="btn btn-success">
+            <button class="btn btn-htw-green">
               {{ $t("search.form.search") }}
             </button>
           </div>
           <form role="form" class="new_search" action="/de/shuffle" method="post">
             <input type="hidden" name="authenticity_token" value="">
             <div class="field">
-              <button class="btn btn-success text-white">
+              <button class="btn btn-htw-green">
                 {{ $t("search.form.random") }}
               </button>
             </div>
@@ -478,7 +478,7 @@
     <div class="text-center">
       <button
         type="button"
-        class="btn btn-success text-white mb-3"
+        class="btn btn-htw-green text-white mb-3"
         v-on:click="cardToggle = !cardToggle"
       >
         {{ $t("search.showMap") }}
@@ -512,7 +512,7 @@
               <td> {{ searchResult.department }}</td>
               <td>
                 <button
-                  class="btn btn-outline-success float-right"
+                  class="btn btn-outline-htw-green float-right"
                   data-bs-toggle="collapse"
                   :data-bs-target="'#collapseResult' + searchResult.id"
                   aria-expanded="false"

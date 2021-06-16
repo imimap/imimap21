@@ -1,5 +1,5 @@
 <template>
-  <div class="card border-success">
+  <div class="card border-htw-green">
     <div class="card-header">
       <h5 class="card-title " id="h5_block">Praktikum @
         Hasse UG</h5>
