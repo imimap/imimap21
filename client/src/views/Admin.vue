@@ -1,13 +1,17 @@
 <template>
   <div class="container my-5">
     <ul class="nav nav-pills">
-      <li class="nav-item">
+      <li class="nav-item me-2">
         <router-link class="nav-link" :class="{ active: isUsersRoute }"
-                     to="users">Users</router-link>
+                     to="users">Praktika</router-link>
       </li>
-      <li class="nav-item mx-2">
+      <li class="nav-item me-2">
         <router-link class="nav-link" :class="{ active: isCompaniesRoute }"
-                     to="companies">Companies</router-link>
+                     to="companies">Unternehmen</router-link>
+      </li>
+      <li class="nav-item me-2">
+        <router-link class="nav-link" :class="{ active: isPostponementsRoute }"
+                     to="postponements">Verschiebungen</router-link>
       </li>
     </ul>
   </div>
@@ -31,6 +35,9 @@ export default defineComponent({
     },
     isCompaniesRoute() {
       return this.$router.currentRoute.value.path.includes('companies');
+    },
+    isPostponementsRoute() {
+      return this.$router.currentRoute.value.path.includes('postponements');
     },
   },
 });

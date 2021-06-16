@@ -52,9 +52,16 @@
                  data-bs-parent="#listAccordion">
               <div class="accordion-body">
                 <div class="container">
+                  <div class="alert alert-warning" role="alert">
+                    <p>Eine Verschiebung wurde beantragt.</p>
+                    <p>{{ row.studentProfile.internshipModule.events }}}</p>
+                    <button class="btn btn-success btn-sm mx-2">Genehmigen</button>
+                    <button class="btn btn-danger btn-sm">Ablehnen</button>
+                  </div>
+
                   <div class="row">
                     <div class="col-8">
-                      <h6>Praktika</h6>
+                      <h5>Praktika</h5>
                       <div v-for="(internship, internshipIndex) in
                       row.studentProfile.internshipModule.internshipParts"
                            v-bind:key="internshipIndex" class="card mb-3">
@@ -132,13 +139,13 @@
                     <div class="col-4">
                       <div class="d-grid gap-2 mt-4 col-8 mx-auto">
                         <button class="btn btn-success" type="button">
-                          AEP-Status bearbeiten
+                          AEP bestanden markieren
                         </button>
                         <button class="btn btn-success" type="button">
-                          Kurs-Status bearbeiten
+                          Kurs bestanden markieren
                         </button>
                         <button class="btn btn-success" type="button">
-                          Zertifikat-Status bearbeiten
+                          Zertifikat vorhanden markieren
                         </button>
                         <button class="btn btn-secondary" type="button">
                           Details bearbeiten
@@ -146,25 +153,7 @@
                         <button class="btn btn-danger" type="button">
                           Löschen
                         </button>
-                        <button class="btn btn-secondary" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseExample" aria-expanded="false"
-                                aria-controls="collapseExample">
-                          Mehr Aktionen
-                        </button>
                       </div>
-                      <div class="collapse" id="collapseExample">
-                          <div class="d-grid gap-2 mt-4 col-8 mx-auto">
-                            <button class="btn btn-secondary" type="button">
-                              Aktion 2
-                            </button>
-                            <button class="btn btn-secondary" type="button">
-                              Aktion 3
-                            </button>
-                            <button class="btn btn-secondary" type="button">
-                              Aktion 4
-                            </button>
-                          </div>
-                        </div>
                     </div>
                   </div>
                 </div>
@@ -281,7 +270,14 @@ export default defineComponent({
             inSemesterOfStudy: 5,
             AepPassed: false,
             completeDocumentsPdf: '',
-            events: [],
+            events: [
+              {
+                type: 'postponementRequested',
+                semesterOfStudy: 6,
+                inSemester: '4',
+                reason: 'Failed another course.',
+              },
+            ],
           },
         },
       },

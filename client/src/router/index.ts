@@ -4,6 +4,7 @@ import Home from '@/views/Home.vue';
 import Search from '@/views/Search.vue';
 import UsersList from '@/components/admin/UsersList.vue';
 import CompaniesList from '@/components/admin/CompaniesList.vue';
+import PostponementsList from '@/components/admin/PostponementsList.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -18,6 +19,10 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'companies',
         component: CompaniesList,
+      },
+      {
+        path: 'postponements',
+        component: PostponementsList,
       },
     ],
   },
