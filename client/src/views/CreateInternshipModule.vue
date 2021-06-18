@@ -2,7 +2,6 @@
   <div class="container clear-top">
     <div id="form-block4" class="text-left">
       <div class="mb-5">
-        <input type="hidden" name="authenticity_token">
         <h3>Wann möchtest du dein Praktikum absolvieren?</h3>
         <div class="row">
           <div class="col-md-4">

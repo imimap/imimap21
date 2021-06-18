@@ -83,13 +83,6 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'NoInternshipModuleComponent',
-  methods: {
-    openModal(event) {
-      console.log(event.target);
-      const body = document.querySelector('body');
-      console.log(body);
-    },
-  },
 });
 </script>
 
