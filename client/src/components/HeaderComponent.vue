@@ -2,9 +2,12 @@
   <header class="container-fluid imimap-header">
     <div class="row">
       <div class="col-2">
-        <a href="" class="navbar-brand imi-map-logo">
-          <img src="/assets/plane.gif" alt="">
-        </a>
+        <router-link
+          class="navbar-brand imi-map-logo"
+          :to="{name: 'Home', params: { locale: $route.params.locale }}"
+        >
+          <img src="/assets/plane.gif" alt="Plane">
+        </router-link>
       </div>
       <div class="col-10">
         <div class="container">

@@ -1,7 +1,7 @@
 const search = {
   headline: 'Praktikumssuche',
   hint: {
-    hintHeading: 'Heinweis: ',
+    hintHeading: 'Hinweis: ',
     hintContent: 'Starte am besten mit einer möglichst spezifischen Suche, '
     + 'da die Ergebnisanzeige auf 12 Ergebnisse beschränkt ist. '
     + 'Firmen, die Du einmal gesehen hast, bleiben auch nach dem '
