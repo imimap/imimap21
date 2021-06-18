@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import locales from './locales/locales';
 import App from './App.vue';
 import router from './router';
+import 'bootstrap';
 
 library.add(faQuestionCircle);
 library.add(faUser);
