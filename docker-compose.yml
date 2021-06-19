@@ -15,6 +15,13 @@ services:
       - "9000:9000"
     depends_on:
       - db
+    environment:
+      - LDAP_URL=${LDAP_URL}
+      - LDAP_SEARCH_BASE=${LDAP_SEARCH_BASE}
+      - LDAP_STUDENT_GROUP=${LDAP_STUDENT_GROUP}
+      - LDAP_INSTRUCTOR_GROUP=${LDAP_INSTRUCTOR_GROUP}
+      - AUTH_SECRET=${AUTH_SECRET}
+      - API_HOST=${API_HOST}
 
   db:
     image: mongo:bionic
