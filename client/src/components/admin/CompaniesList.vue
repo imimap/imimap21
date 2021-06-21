@@ -239,12 +239,12 @@ export default defineComponent({
     };
   },
   methods: {
-    changeCurrentEditCompanyIndex(id: number) {
-      this.currentEditCompanyIndex = id;
+    changeCurrentEditCompanyIndex(companyId: number) {
+      this.currentEditCompanyIndex = companyId;
     },
-    updateCompany(id: number) {
+    updateCompany(companyId: number) {
       // API POST call
-      // update this.companies[id]
+      // update this.companies[companyId]
       console.log('updated ', this.companies[this.currentEditCompanyIndex].companyName);
       return true;
     },
