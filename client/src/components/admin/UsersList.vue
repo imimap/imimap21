@@ -124,7 +124,9 @@
                           </div>
                         </div>
                         <div class="card-footer">
-                          <button class="btn btn-success btn-sm me-2">
+                          <button class="btn btn-success btn-sm me-2"
+                                  @click="quickActionApproveApplicationOnInternshipPart(row.id,
+                                  internship.id)">
                             Antrag genehmigen</button>
                           <button class="btn btn-success btn-sm me-2">
                             Anrechenbar markieren</button>
@@ -862,20 +864,24 @@ export default defineComponent({
       }
       return true;
     },
-    // quickActionMarkApplicationApprovedOnInternshipPart(internshipModuleId: number,
-    //   internshipPartId: number) {
-    //   const userDoubleChecked = window.confirm('AEP zum Praktikumsmodul wirklich '
-    //     + 'als bestanden markieren?');
-    //   if (userDoubleChecked) {
-    //     this.users[internshipModuleId].studentProfile.internshipModule.AepPassed = true;
-    //     // this.updateIntershipModule(internshipModuleId)
-    //     console.log('AEP zu InternshipModule mit Id: ', internshipModuleId,
-    //     ' als bestanden markiert');
-    //   } else {
-    //     console.log('cancel');
-    //   }
-    //   return true;
-    // },
+    quickActionApproveApplicationOnInternshipPart(internshipModuleId: number,
+      internshipPartId: number) {
+      const userDoubleChecked = window.confirm('Antrag zum Praktikum wirklich genehmigen?');
+      if (userDoubleChecked) {
+        this.users[internshipModuleId]
+          .studentProfile
+          .internshipModule
+          .internshipParts[internshipPartId]
+          .events
+          .push({
+            type: 'Internship Application approved',
+          });
+        console.log('Antrag genehmigt!');
+      } else {
+        console.log('cancel');
+      }
+      return true;
+    },
     deleteInternshipPart(internshipModuleId: number, internshipPartId: number) {
       const userDoubleChecked = window.confirm('Teilpraktikum wirklich löschen?');
       if (userDoubleChecked) {
