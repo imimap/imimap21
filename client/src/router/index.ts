@@ -27,7 +27,6 @@ const routes: Array<RouteRecordRaw> = [
         component: Home,
         meta: {
           allowAnonymous: false,
-          allowLoggedin: true,
         },
       },
       {
@@ -45,7 +44,6 @@ const routes: Array<RouteRecordRaw> = [
         component: Search,
         meta: {
           allowAnonymous: false,
-          allowLoggedin: true,
         },
       },
       {
@@ -54,7 +52,6 @@ const routes: Array<RouteRecordRaw> = [
         component: InternshipModule,
         meta: {
           allowAnonymous: false,
-          allowLoggedin: true,
         },
       },
       {
@@ -63,7 +60,6 @@ const routes: Array<RouteRecordRaw> = [
         component: CreateInternshipModule,
         meta: {
           allowAnonymous: false,
-          allowLoggedin: true,
         },
       },
       {
@@ -72,7 +68,6 @@ const routes: Array<RouteRecordRaw> = [
         component: Student,
         meta: {
           allowAnonymous: false,
-          allowLoggedin: true,
         },
       },
     ],
@@ -90,13 +85,7 @@ router.beforeEach((to, from, next) => {
       name: 'Login',
       params: { locale: to.params.locale },
     });
-  } else {
-    next();
-  }
-});
-
-router.beforeEach((to, from, next) => {
-  if (!to.meta.allowLoggedin && isLoggedIn()) {
+  } else if (to.meta.allowAnonymous && isLoggedIn()) {
     next({
       name: 'Home',
       params: { locale: to.params.locale },

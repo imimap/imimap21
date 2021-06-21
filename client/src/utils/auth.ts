@@ -1,5 +1,5 @@
 function isLoggedIn(): boolean {
-  return true;
+  return false;
 }
 
 export default isLoggedIn;
