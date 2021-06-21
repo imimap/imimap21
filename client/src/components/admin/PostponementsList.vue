@@ -48,14 +48,14 @@
                  data-bs-parent="#listAccordion">
               <div class="accordion-body">
                 <h4>Hochschulsemester</h4>
-                <p>verschieben von
+                <p>Verschiebung von
                   <b>{{ row.studentProfile.internshipModule.inSemesterOfStudy }}</b>
                   auf
                   <b>{{ row.studentProfile.internshipModule.events[0].semesterOfStudy }}</b>
                 </p>
 
                 <h4>Fachsemester</h4>
-                <p>verschieben von
+                <p>Verschiebung von
                   <b>{{ row.studentProfile.internshipModule.inSemester }}</b>
                     auf
                   <b>{{ row.studentProfile.internshipModule.events[0].inSemester }}</b>
