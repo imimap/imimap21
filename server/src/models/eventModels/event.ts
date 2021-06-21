@@ -1,4 +1,4 @@
-import { Types, Schema } from "mongoose";
+import { Types, Schema, Document } from "mongoose";
 import { Change, ChangeSchema } from "./change";
 
 export interface IEvent {
