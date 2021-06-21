@@ -1,5 +1,7 @@
 // parse env variables before loading anything else
 import { config as dotenvConfig } from "dotenv";
+dotenvConfig({ path: "../.env" });
+
 import * as cors from "cors";
 import * as express from "express";
 import { NextFunction, Request, Response } from "express";
@@ -8,8 +10,6 @@ import { HttpError, NotFound } from "http-errors";
 import router from "./routes";
 import database from "./database";
 import ldapStrategy from "./authentication/strategy";
-
-dotenvConfig({ path: "../.env" });
 
 // load database
 (async () => await database())();

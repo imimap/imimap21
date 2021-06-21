@@ -2,14 +2,15 @@ import { Router } from "express";
 import { login } from "../controllers/auth";
 import * as asyncHandler from "express-async-handler";
 import { body } from "express-validator";
-import { studentIdValidator, usernameSanitizer, validate } from "../util/validation";
+import { validate } from "../helpers/validation";
+import { isValidStudentId, sanitizeUsername } from "../helpers/studentIdHelper";
 
 const authRouter = Router();
 
 authRouter.post(
   "/login",
   [
-    body("username").customSanitizer(usernameSanitizer).custom(studentIdValidator),
+    body("username").customSanitizer(sanitizeUsername).custom(isValidStudentId),
     body("password").isString().not().isEmpty(),
   ],
   validate,
