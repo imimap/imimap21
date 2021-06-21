@@ -13,6 +13,11 @@ import FooterComponent from '@/components/FooterComponent.vue';
 
 export default defineComponent({
   name: 'Layout',
+  data() {
+    return {
+      user: false,
+    };
+  },
   components: {
     HeaderComponent,
     FooterComponent,
