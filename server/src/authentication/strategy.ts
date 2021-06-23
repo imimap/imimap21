@@ -2,7 +2,7 @@ import * as LdapStrategy from "passport-ldapauth";
 import { readFileSync } from "fs";
 import { ldap as config } from "../config";
 import { IncomingMessage } from "http";
-import { LdapUser } from "./user";
+import { LdapUser, Role } from "./user";
 
 function getLDAPConfig(request: IncomingMessage, callback: LdapStrategy.OptionsFunctionCallback) {
   const req = (request as never) as Request;
@@ -31,7 +31,7 @@ function verifyLdapResponse(user: LdapUser, done: LdapStrategy.VerifyDoneCallbac
       firstName: user.givenName,
       lastName: user.sn,
       email: user.mail,
-      displayName: user.gecos,
+      role: user.memberOf.indexOf(config.instructorGroup) !== -1 ? Role.INSTRUCTOR : Role.STUDENT,
     });
   } else {
     done(null, null, { message: "ldap error" });

@@ -49,8 +49,13 @@ export interface AuthUser {
   id: string;
   firstName: string;
   lastName: string;
-  displayName: string;
   email: string;
+  role: Role;
+}
+
+export enum Role {
+  STUDENT,
+  INSTRUCTOR,
 }
 
 export function generateAuthToken(user: AuthUser): string {
