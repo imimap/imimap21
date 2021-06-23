@@ -128,7 +128,9 @@
                                   @click="quickActionApproveApplicationOnInternshipPart(row.id,
                                   internship.id)">
                             Antrag genehmigen</button>
-                          <button class="btn btn-success btn-sm me-2">
+                          <button class="btn btn-success btn-sm me-2"
+                                  @click="quickActionMarkAsCompletedOnInternshipPart(row.id,
+                                  internship.id)">
                             Anrechenbar markieren</button>
                           <button type="button" class="btn btn-secondary btn-sm me-2"
                                   data-bs-toggle="modal"
@@ -148,10 +150,6 @@
                         <button class="btn btn-success" type="button"
                                 @click="quickActionMarkAepPassedOnInternshipModule(row.id)">
                           AEP bestanden markieren
-                        </button>
-                        <button class="btn btn-success" type="button"
-                                @click="quickActionMarkModulePassedOnInternshipModule(row.id)">
-                          Kurs bestanden markieren
                         </button>
                         <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
                                 data-bs-target="#internshipModuleEditModal"
@@ -508,7 +506,9 @@ export default defineComponent({
                 contractPdf: '',
                 bvgTicketExemptionRequestPdf: '',
                 certificatePdf: '',
-                events: [],
+                events: [{
+                  type: '',
+                }],
               },
               {
                 id: 1,
@@ -549,7 +549,9 @@ export default defineComponent({
                 contractPdf: '',
                 bvgTicketExemptionRequestPdf: '',
                 certificatePdf: '',
-                events: [],
+                events: [{
+                  type: '',
+                }],
               },
             ],
             inSemester: '3',
@@ -617,7 +619,9 @@ export default defineComponent({
                 contractPdf: '',
                 bvgTicketExemptionRequestPdf: '',
                 certificatePdf: '',
-                events: [],
+                events: [{
+                  type: '',
+                }],
               },
               {
                 companyBranch: {
@@ -657,14 +661,18 @@ export default defineComponent({
                 contractPdf: '',
                 bvgTicketExemptionRequestPdf: '',
                 certificatePdf: '',
-                events: [],
+                events: [{
+                  type: '',
+                }],
               },
             ],
             inSemester: '3',
             inSemesterOfStudy: 5,
             AepPassed: false,
             completeDocumentsPdf: '',
-            events: [],
+            events: [{
+              type: '',
+            }],
           },
         },
       },
@@ -718,7 +726,9 @@ export default defineComponent({
                 contractPdf: '',
                 bvgTicketExemptionRequestPdf: '',
                 certificatePdf: '',
-                events: [],
+                events: [{
+                  type: '',
+                }],
               },
               {
                 companyBranch: {
@@ -758,7 +768,9 @@ export default defineComponent({
                 contractPdf: '',
                 bvgTicketExemptionRequestPdf: '',
                 certificatePdf: '',
-                events: [],
+                events: [{
+                  type: '',
+                }],
               },
               {
                 companyBranch: {
@@ -798,14 +810,18 @@ export default defineComponent({
                 contractPdf: '',
                 bvgTicketExemptionRequestPdf: '',
                 certificatePdf: '',
-                events: [],
+                events: [{
+                  type: '',
+                }],
               },
             ],
             inSemester: '3',
             inSemesterOfStudy: 5,
             AepPassed: false,
             completeDocumentsPdf: '',
-            events: [],
+            events: [{
+              type: '',
+            }],
           },
         },
       },
@@ -854,16 +870,6 @@ export default defineComponent({
       }
       return true;
     },
-    deleteInternshipModule(internshipModuleId: number) {
-      const userDoubleChecked = window.confirm('Praktikumsmodul wirklich löschen?');
-      if (userDoubleChecked) {
-        // API call delete
-        console.log('InternshipModule mit Id: ', internshipModuleId, ' gelöscht');
-      } else {
-        console.log('cancel');
-      }
-      return true;
-    },
     quickActionApproveApplicationOnInternshipPart(internshipModuleId: number,
       internshipPartId: number) {
       const userDoubleChecked = window.confirm('Antrag zum Praktikum wirklich genehmigen?');
@@ -877,6 +883,34 @@ export default defineComponent({
             type: 'Internship Application approved',
           });
         console.log('Antrag genehmigt!');
+      } else {
+        console.log('cancel');
+      }
+      return true;
+    },
+    quickActionMarkAsCompletedOnInternshipPart(internshipModuleId: number,
+      internshipPartId: number) {
+      const userDoubleChecked = window.confirm('Teilpraktikum wirklich als anrechenbar markieren?');
+      if (userDoubleChecked) {
+        this.users[internshipModuleId]
+          .studentProfile
+          .internshipModule
+          .internshipParts[internshipPartId]
+          .events
+          .push({
+            type: 'readyForGrading',
+          });
+        console.log('Teilpraktikum anrechenbar markiert!');
+      } else {
+        console.log('cancel');
+      }
+      return true;
+    },
+    deleteInternshipModule(internshipModuleId: number) {
+      const userDoubleChecked = window.confirm('Praktikumsmodul wirklich löschen?');
+      if (userDoubleChecked) {
+        // API call delete
+        console.log('InternshipModule mit Id: ', internshipModuleId, ' gelöscht');
       } else {
         console.log('cancel');
       }
