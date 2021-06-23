@@ -1,4 +1,6 @@
 import { Route, Router } from 'vue-router';
+import axios from 'axios';
+import VueAxios from 'vue-axios';
 import type { DefineComponent } from 'vue';
 
 declare module '*.vue' {

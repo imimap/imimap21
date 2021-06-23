@@ -7,6 +7,11 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'App',
+  beforeCreate() {
+    if (this.$route.params.locale !== 'de' && this.$route.params.locale !== 'en') {
+      this.$router.push({ params: { locale: 'de' } });
+    }
+  },
 });
 </script>
 

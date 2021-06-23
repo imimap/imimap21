@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import isLoggedIn from '@/utils/auth';
+import { isLoggedIn } from '@/utils/auth';
 import Layout from '@/layouts/Layout.vue';
-import LayoutFullscreen from '@/layouts/LayoutFullscreen.vue';
 import Home from '@/views/Home.vue';
 import Search from '@/views/Search.vue';
 import InternshipModule from '@/views/InternshipModule.vue';
@@ -16,7 +15,8 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/:locale',
-    component: isLoggedIn() ? Layout : LayoutFullscreen,
+    name: 'Index',
+    component: Layout,
     meta: {
       allowAnonymous: true,
     },
