@@ -1,6 +1,6 @@
-import {Document, model, Model, PopulatedDoc, Schema, Types} from "mongoose";
+import { Document, model, Model, PopulatedDoc, Schema, Types } from "mongoose";
 import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
-import { IEvent } from "./event";
+// import { IEvent } from "./event";
 import { Semester } from "../helpers/semesterHelper";
 import { ICompany } from "./company";
 

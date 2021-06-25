@@ -78,11 +78,13 @@ describe("StudentProfile", () => {
 
     const updatedUser = await User.findOne({ firstName: "Ada" }).lean();
 
-    if (updatedUser && updatedUser.studentProfile) {
-      expect(updatedUser.studentProfile.internship).toBeTruthy();
+    if (updatedUser) {
+      if (updatedUser && updatedUser.studentProfile) {
+        expect(updatedUser.studentProfile.internship).toBeTruthy();
 
-      if (updatedUser.studentProfile.internship) {
-        expect(updatedUser.studentProfile.internship).toEqual(internshipObjectId);
+        if (updatedUser.studentProfile.internship) {
+          expect(updatedUser.studentProfile.internship).toEqual(internshipObjectId);
+        }
       }
     }
   });
