@@ -7,22 +7,37 @@ function isValidPdf(path: string) {
 }
 
 export interface IPdfEvent extends IEvent {
+  _id?: Types.ObjectId;
   newPath?: string;
   accept?: boolean;
   createdByAdmin?: boolean;
 }
 
 export const PdfEventSchema = new Schema({
+  _id: {
+    type: Schema.Types.ObjectId,
+    default: Types.ObjectId(),
+  },
   newPath: {
     type: String,
+    validate: {
+      validator: isValidPdf,
+      message:
+        "Path is foreign or has invalid name. PDF needs to be saved on own server and be saved under a student id and document object id, as well as the version.",
+    },
   },
   accept: {
-    default: false,
     type: Boolean,
   },
-  createdByAdmin: {
-    default: false,
-    type: Boolean,
+  timestamp: {
+    default: Date.now(),
+    immutable: true,
+    type: Number,
+  },
+  creator: {
+    immutable: true,
+    required: true,
+    type: Schema.Types.ObjectId,
   },
 });
 
@@ -32,13 +47,7 @@ PdfEventSchema.pre("save", async function () {
 
   if (this.modifiedPaths().includes("accept")) {
     if (!creator.isAdmin) throw "Only Admins may accept or reject a pdf.";
-    this.set("createdByAdmin", true);
     if (!this.get("accept") && this.modifiedPaths().includes("newPath"))
       throw "You can not set a new path while rejecting a document. Did you mean to accept it instead?";
-  }
-
-  if (this.modifiedPaths().includes("newPath")) {
-    if (!isValidPdf(this.get("newPath")))
-      throw "Path is foreign or has invalid name. PDF needs to be saved on own server and be saved under a student id and document object id, as well as the version.";
   }
 });

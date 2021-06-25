@@ -1,12 +1,15 @@
 import * as dbHandler from "./database";
-import { IPdfDocument, PdfDocument, PdfDocumentSchema } from "../pdfDocument";
+import { IPdfDocument, PdfDocument } from "../pdfDocument";
 import { Types } from "mongoose";
 import { IPdfEvent } from "../eventModels/pdfEvent";
 import { User } from "../user";
-import {doc} from "prettier";
 
 beforeAll(async () => {
   await dbHandler.connect();
+});
+
+beforeEach(async () => {
+  await dbHandler.clearDatabase();
 
   // create user and admin
   const studentId = "s0123456";
@@ -16,7 +19,7 @@ beforeAll(async () => {
     lastName: "Lovelace",
   };
   const user = new User(userProperties);
-  await user.save();
+  const savedUser = await user.save();
 
   const adminProperties = {
     emailAddress: "mercury@htw-berlin.de",
@@ -33,18 +36,14 @@ beforeAll(async () => {
   const path =
     "http://localhost:9000/pdfs/" + studentId + "/" + documentId + "/" + versionId + ".pdf";
 
-  const submission = {
+  const submission: IPdfEvent = {
     _id: documentId,
     newPath: path,
-    creator: user._id,
+    creator: savedUser._id,
   };
 
   const pdfDocument: IPdfDocument = new PdfDocument({ events: [submission] });
   await pdfDocument.save();
-});
-
-beforeEach(async () => {
-  await dbHandler.clearDatabase();
 });
 
 afterAll(async () => {
@@ -58,6 +57,7 @@ describe("PdfDocument", () => {
     if (savedDocument) {
       expect(savedDocument.events.length).toEqual(1);
       expect(savedDocument.path).toBeTruthy();
+      expect(savedDocument.status).toEqual("submitted");
     }
   });
   it("can not be submitted with invalid data", async () => {
@@ -74,39 +74,117 @@ describe("PdfDocument", () => {
   describe("can be accepted and rejected", function () {
     it("can be accepted by an admin via event and get a new path", async () => {
       const pdfDocument = await PdfDocument.findOne({});
-      if (pdfDocument) {
-        const path = pdfDocument.nextPath();
+      const admin = await User.findOne({ isAdmin: true });
+      if (pdfDocument && admin) {
+        const previousPath = pdfDocument.path;
+        const newPath = pdfDocument.nextPath();
 
-        // todo: get admin's id
         const acceptance: IPdfEvent = {
-          newPath: path,
-          creator: Types.ObjectId(),
+          newPath: newPath,
+          creator: admin._id,
+          accept: true,
         };
 
         pdfDocument.events.push(acceptance);
-        await pdfDocument.save();
+        await expect(pdfDocument.save()).resolves.not.toThrow();
 
         const savedDocument = await PdfDocument.findOne({});
 
         if (savedDocument) {
           expect(savedDocument.events.length).toEqual(2);
-          const previousPath = pdfDocument.path;
-
           expect(savedDocument.path).not.toEqual(previousPath);
+          expect(savedDocument.status).toEqual("accepted");
         }
       }
     });
     it("can be accepted by an admin via event without a new path", async () => {
+      const pdfDocument = await PdfDocument.findOne({});
+      const admin = await User.findOne({ isAdmin: true });
+      if (pdfDocument && admin) {
+        const previousPath = pdfDocument.path;
 
+        const acceptance: IPdfEvent = {
+          creator: admin._id,
+          accept: true,
+        };
+
+        pdfDocument.events.push(acceptance);
+        await expect(pdfDocument.save()).resolves.not.toThrow();
+
+        const savedDocument = await PdfDocument.findOne({});
+
+        if (savedDocument) {
+          expect(savedDocument.events.length).toEqual(2);
+          expect(savedDocument.path).toBeTruthy();
+          expect(savedDocument.path).toEqual(previousPath);
+          expect(savedDocument.status).toEqual("accepted");
+        }
+      }
     });
     it("can be rejected by an admin via event and still get the most recent path", async () => {
+      const pdfDocument = await PdfDocument.findOne({});
+      const admin = await User.findOne({ isAdmin: true });
+      if (pdfDocument && admin) {
+        const previousPath = pdfDocument.path;
 
+        const rejection: IPdfEvent = {
+          creator: admin._id,
+          accept: false,
+        };
+
+        pdfDocument.events.push(rejection);
+        await expect(pdfDocument.save()).resolves.not.toThrow();
+
+        const savedDocument = await PdfDocument.findOne({});
+
+        if (savedDocument) {
+          expect(savedDocument.events.length).toEqual(2);
+          expect(savedDocument.path).toEqual(previousPath);
+          expect(savedDocument.status).toEqual("rejected");
+        }
+      }
+    });
+    it("can not be rejected by an admin with a new path", async () => {
+      const pdfDocument = await PdfDocument.findOne({});
+      const admin = await User.findOne({ isAdmin: true });
+      if (pdfDocument && admin) {
+        const newPath = pdfDocument.nextPath();
+
+        const rejection: IPdfEvent = {
+          newPath: newPath,
+          creator: admin._id,
+          accept: false,
+        };
+
+        pdfDocument.events.push(rejection);
+        await expect(pdfDocument.save()).rejects.toThrow();
+      }
     });
     it("can not be accepted by a regular user", async () => {
+      const pdfDocument = await PdfDocument.findOne({});
+      const user = await User.findOne({ isAdmin: false });
+      if (pdfDocument && user) {
+        const acceptance: IPdfEvent = {
+          creator: user._id,
+          accept: true,
+        };
 
+        pdfDocument.events.push(acceptance);
+        await expect(pdfDocument.save()).rejects.toThrow();
+      }
     });
     it("can not be rejected by a regular user", async () => {
+      const pdfDocument = await PdfDocument.findOne({});
+      const user = await User.findOne({ isAdmin: false });
+      if (pdfDocument && user) {
+        const rejection: IPdfEvent = {
+          creator: user._id,
+          accept: false,
+        };
 
+        pdfDocument.events.push(rejection);
+        await expect(pdfDocument.save()).rejects.toThrow();
+      }
     });
   });
 });

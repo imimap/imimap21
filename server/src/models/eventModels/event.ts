@@ -4,7 +4,7 @@ import { Change, ChangeSchema } from "./change";
 export interface IEvent {
   timestamp?: number,
   creator: Types.ObjectId,
-  changes?: [Change],
+  changes?: [Change], // a first draft of how this might be modelled
 }
 
 export const EventSchema = new Schema({
