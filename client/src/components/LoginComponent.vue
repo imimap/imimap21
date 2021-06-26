@@ -57,6 +57,7 @@ import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
 import {
   setAuthToken,
+  getUserInfo,
 } from '@/utils/auth';
 
 export default defineComponent({
@@ -73,7 +74,19 @@ export default defineComponent({
       try {
         const res = await http.post('/auth/login', { username: this.username, password: this.password });
         setAuthToken(res.data.token);
-        await this.$router.push({ name: 'Index' });
+        const decodedToken = getUserInfo();
+        if (decodedToken !== null) {
+          await this.$router.push({ name: 'Index' });
+          await this.$store.dispatch('setUser', {
+            displayName: decodedToken.displayName,
+            email: decodedToken.email,
+            firstName: decodedToken.firstName,
+            id: decodedToken.id,
+            lastName: decodedToken.lastName,
+            sub: decodedToken.sub,
+          });
+          await this.$store.dispatch('addNotification', { text: 'Du wurdest erfolgreich eingeloggt', type: 'success' });
+        }
       } catch (err) {
         this.error = err.message;
       }

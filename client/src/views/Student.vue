@@ -114,12 +114,11 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { mapState } from 'vuex';
 
 export default defineComponent({
   name: 'Student',
-  data() {
-    return {};
-  },
+  computed: mapState(['user']),
 });
 </script>
 

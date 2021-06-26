@@ -1,4 +1,5 @@
 import decode, { JwtPayload } from 'jwt-decode';
+import { UserState } from '@/store/types/UserState';
 import http from './http-common';
 
 const AUTH_TOKEN_KEY = 'imimapAuthToken';
@@ -37,7 +38,7 @@ export function isLoggedIn(): boolean {
   return !!authToken && !isTokenExpired(authToken);
 }
 
-export function getUserInfo(): JwtPayload | null {
+export function getUserInfo(): UserState | null {
   const token: string | null = getAuthToken();
   if (isLoggedIn() && token != null) return decode(token);
   return null;

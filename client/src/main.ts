@@ -1,4 +1,5 @@
 import { createApp } from 'vue';
+import store from '@/store';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faCog, faQuestionCircle, faSignOutAlt, faUser,
@@ -20,5 +21,6 @@ library.add(faSignOutAlt);
 createApp(App)
   .use(router)
   .use(locales)
+  .use(store)
   .component('font-awesome-icon', FontAwesomeIcon)
   .mount('#app');

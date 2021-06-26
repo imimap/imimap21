@@ -1,4 +1,5 @@
 module.exports = {
+  transpileDependencies: ['vuex-module-decorators'],
   css: {
     loaderOptions: {
       sass: {

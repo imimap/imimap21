@@ -5,6 +5,7 @@
       <router-view></router-view>
     </main>
     <footer-component></footer-component>
+    <NotificationsListComponent></NotificationsListComponent>
   </template>
 
   <template v-else>
@@ -16,6 +17,7 @@
 import { defineComponent } from 'vue';
 import HeaderComponent from '@/components/HeaderComponent.vue';
 import FooterComponent from '@/components/FooterComponent.vue';
+import NotificationsListComponent from '@/components/notification/NotificationListComponent.vue';
 import { isLoggedIn } from '@/utils/auth';
 
 export default defineComponent({
@@ -28,6 +30,7 @@ export default defineComponent({
   components: {
     HeaderComponent,
     FooterComponent,
+    NotificationsListComponent,
   },
   beforeCreate() {
     this.$i18n.locale = this.$route.params.locale as string;

@@ -4,12 +4,29 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import {
+  getUserInfo,
+  isLoggedIn,
+} from '@/utils/auth';
 
 export default defineComponent({
   name: 'App',
   beforeCreate() {
     if (this.$route.params.locale !== 'de' && this.$route.params.locale !== 'en') {
       this.$router.push({ params: { locale: 'de' } });
+    }
+    if (isLoggedIn() && this.$store.getters.getUser.id === '') {
+      const decodedToken = getUserInfo();
+      if (decodedToken !== null) {
+        this.$store.dispatch('setUser', {
+          displayName: decodedToken.displayName,
+          email: decodedToken.email,
+          firstName: decodedToken.firstName,
+          id: decodedToken.id,
+          lastName: decodedToken.lastName,
+          sub: decodedToken.sub,
+        });
+      }
     }
   },
 });

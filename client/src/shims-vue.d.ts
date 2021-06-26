@@ -1,5 +1,6 @@
 import { Route, Router } from 'vue-router';
 import type { DefineComponent } from 'vue';
+import { Store } from 'vuex';
 
 declare module '*.vue' {
   const component: DefineComponent<{}, {}, any>;
@@ -25,4 +26,11 @@ declare module '@vue-leaflet/vue-leaflet' {
   export const LPolyline: DefineComponent;
   export const LPolygon: DefineComponent;
   export const LRectangle: DefineComponent;
+}
+
+declare module '@vue/runtime-core' {
+  // provide typings for `this.$store`
+  interface ComponentCustomProperties {
+    $store: Store<State>;
+  }
 }

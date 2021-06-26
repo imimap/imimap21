@@ -120,6 +120,7 @@ export default defineComponent({
     },
     logout() {
       logoutUser();
+      this.$store.commit('resetUser');
       this.$router.push({ name: 'Login' });
     },
   },
