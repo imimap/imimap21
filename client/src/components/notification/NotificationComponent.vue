@@ -1,18 +1,19 @@
 <template>
   <div
-    v-show="isActive"
     class="notification alert alert-dismissible fade show"
     :class="classType"
     role="alert"
   >
-    {{ this.text }}
-    <button
-      type="button"
-      class="btn-close"
-      data-bs-dismiss="alert"
-      aria-label="Close"
-      v-on:click="fadeClose($event.target)"
-    ></button>
+    <small>
+      {{ this.text }}
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close"
+        v-on:click="fadeClose($event.target)"
+      ></button>
+    </small>
   </div>
 </template>
 
@@ -25,11 +26,6 @@ export default defineComponent({
     id: String,
     text: String,
     type: String,
-  },
-  data() {
-    return {
-      isActive: true,
-    };
   },
   computed: {
     classType(): string {
@@ -49,8 +45,7 @@ export default defineComponent({
     remove() {
       setTimeout(() => {
         this.$store.dispatch('removeNotification', this.id);
-        this.isActive = false;
-      }, 300);
+      }, 1000);
     },
   },
 });
@@ -58,6 +53,7 @@ export default defineComponent({
 
 <style lang="scss">
 .notification {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   opacity: 1;
   transition: opacity 1s ease-out;
 }

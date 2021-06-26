@@ -22,9 +22,9 @@
                 </li>
                 <li> &nbsp;</li>
                 <li class="imimap-nav-right-li">
-                  <a href="/de/students/778">
+                  <router-link  :to="{name: 'Student', params: { locale: $route.params.locale }}">
                     <font-awesome-icon icon="user" />
-                  </a>
+                  </router-link>
                 </li>
 
                 <li class="dropdown imimap-nav-right-li">
@@ -121,6 +121,7 @@ export default defineComponent({
     logout() {
       logoutUser();
       this.$store.commit('resetUser');
+      this.$store.dispatch('addNotification', { text: 'Du wurdest erfolgreich ausgeloggt!', type: 'success' });
       this.$router.push({ name: 'Login' });
     },
   },

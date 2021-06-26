@@ -1,6 +1,7 @@
 import { Route, Router } from 'vue-router';
 import type { DefineComponent } from 'vue';
 import { Store } from 'vuex';
+import VueProgressBar from '@aacassandra/vue3-progressbar';
 
 declare module '*.vue' {
   const component: DefineComponent<{}, {}, any>;
@@ -32,5 +33,6 @@ declare module '@vue/runtime-core' {
   // provide typings for `this.$store`
   interface ComponentCustomProperties {
     $store: Store<State>;
+    $Progress: VueProgressBar<VueProgressBar>;
   }
 }

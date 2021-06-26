@@ -63,7 +63,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: 'students/:studentID',
+        path: 'student',
         name: 'Student',
         component: Student,
         meta: {

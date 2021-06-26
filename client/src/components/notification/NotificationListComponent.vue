@@ -20,7 +20,9 @@ export default defineComponent({
   components: {
     NotificationComponent,
   },
-  computed: mapState(['notifications']),
+  computed: {
+    ...mapState(['notifications']),
+  },
 });
 </script>
 

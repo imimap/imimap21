@@ -8,6 +8,8 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css'; // Re-uses images from ~leaflet package
 import 'leaflet-defaulticon-compatibility';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import VueProgressBar from '@aacassandra/vue3-progressbar';
+import progressbarOptions from '@/utils/progressbar-options';
 import locales from './locales/locales';
 import App from './App.vue';
 import router from './router';
@@ -19,6 +21,7 @@ library.add(faCog);
 library.add(faSignOutAlt);
 
 createApp(App)
+  .use(VueProgressBar, progressbarOptions)
   .use(router)
   .use(locales)
   .use(store)

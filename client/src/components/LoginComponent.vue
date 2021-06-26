@@ -76,6 +76,7 @@ export default defineComponent({
         setAuthToken(res.data.token);
         const decodedToken = getUserInfo();
         if (decodedToken !== null) {
+          console.log(decodedToken);
           await this.$router.push({ name: 'Index' });
           await this.$store.dispatch('setUser', {
             displayName: decodedToken.displayName,
@@ -85,10 +86,10 @@ export default defineComponent({
             lastName: decodedToken.lastName,
             sub: decodedToken.sub,
           });
-          await this.$store.dispatch('addNotification', { text: 'Du wurdest erfolgreich eingeloggt', type: 'success' });
+          await this.$store.dispatch('addNotification', { text: 'Du wurdest erfolgreich eingeloggt!', type: 'success' });
         }
       } catch (err) {
-        this.error = err.message;
+        this.$store.dispatch('addNotification', { text: err.message, type: 'danger' });
       }
     },
   },

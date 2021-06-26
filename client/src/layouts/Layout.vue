@@ -10,6 +10,7 @@
 
   <template v-else>
     <router-view></router-view>
+    <NotificationsListComponent></NotificationsListComponent>
   </template>
 </template>
 

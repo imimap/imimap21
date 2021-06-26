@@ -12,13 +12,17 @@
     <div class="row mb-3">
       <div class="col-md-4">
         Matrikelnummer<br>
-        <span class="form-control-static pl-2 pt-5">130017</span>
+        <span class="form-control-static pl-2 pt-5">
+          {{ user.id.substring(2, user.id.length) }}
+        </span>
       </div>
     </div>
     <div class="row mb-3">
       <div class="col-md-4">
         Email<br>
-        <span class="form-control-static pl-2 pt-5">s0130017@htw-berlin.de</span>
+        <span class="form-control-static pl-2 pt-5">
+          {{ user.email }}
+        </span>
       </div>
       <div class="col-md-4">
         <div class="field">
@@ -39,8 +43,7 @@
               class="form-control"
               size="50"
               type="text"
-              value="Quirin"
-              name="student[first_name]"
+              :value="user.firstName"
               id="studentFirstName"
             >
           </div>
@@ -55,7 +58,7 @@
               class="form-control"
               size="50"
               type="text"
-              value="Reif"
+              :value="user.lastName"
               id="studentLastName"
             >
           </div>
@@ -101,6 +104,7 @@
             value="Informationen speichern"
             class="btn btn-secondary mt-3"
             data-disable-with="Informationen speichern"
+            v-on:click="save()"
           >
             Infornationen speichern
           </button>
@@ -119,6 +123,11 @@ import { mapState } from 'vuex';
 export default defineComponent({
   name: 'Student',
   computed: mapState(['user']),
+  methods: {
+    save() {
+      this.$store.dispatch('addNotification', { text: 'Dein Profil wurde erfolgreich gespeichert!', type: 'success' });
+    },
+  },
 });
 </script>
 
