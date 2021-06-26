@@ -5,8 +5,9 @@
   "main": "src/server.ts",
   "scripts": {
     "serve": "node dist/server.js",
+    "serve-debug": "node --inspect=0.0.0.0 dist/server.js",
     "build-ts": "tsc",
-    "watch": "tsc-watch --onSuccess \"npm run serve\"",
+    "watch": "tsc-watch --onSuccess \"npm run serve-debug\"",
     "format": "prettier src/server.ts **/*.js --write",
     "lint": "eslint \"src/**\""
   },
