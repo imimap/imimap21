@@ -15,7 +15,7 @@ const getTokenExpirationDate = (encodedToken): Date | null => {
 function isTokenExpired(token): boolean {
   const expirationDate: Date | null = getTokenExpirationDate(token);
   if (expirationDate != null) return expirationDate < new Date();
-  return false;
+  return true;
 }
 
 export function getAuthToken(): string | null {
