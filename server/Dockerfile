@@ -5,6 +5,7 @@ RUN apk add git && npm install
 COPY ./ ./
 RUN npm run build-ts
 EXPOSE 9000
+EXPOSE 9229
 ENTRYPOINT ["npm", "run", "watch"]
 
 FROM node:fermium-alpine
