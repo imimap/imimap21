@@ -2,8 +2,8 @@ import { Schema } from "mongoose";
 import { isValidEmail, normalizeEmail } from "../helpers/emailAddressHelper";
 
 export interface ISupervisor {
-  fullName?: string,
-  emailAddress?: string,
+  fullName?: string;
+  emailAddress?: string;
 }
 
 export const SupervisorSchema = new Schema(

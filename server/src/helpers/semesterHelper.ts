@@ -1,12 +1,9 @@
-// todo : complete!
-// https://github.com/imimap/imimap/blob/master/app/models/semester_helper.rb
-// https://github.com/imimap/imimap/blob/master/app/models/semester.rb
 class Season {
-  static SUMMER = (year: number) => {
+  static SUMMER = (year: number): Season => {
     return new Season("SS", new Date(Date.UTC(year, 4, 1)));
   };
 
-  static WINTER = (year: number) => {
+  static WINTER = (year: number): Season => {
     return new Season("WS", new Date(Date.UTC(year, 10, 1)));
   };
 
@@ -32,11 +29,11 @@ class Season {
     return this.#year;
   }
 
-  toString() {
+  toString(): string {
     return this.#abbrv + this.startDate.getUTCFullYear();
   }
 
-  equals(otherSeason: Season) {
+  equals(otherSeason: Season): boolean {
     return this.#abbrv === otherSeason.abbrv && this.#year === otherSeason.year;
   }
 }
@@ -50,11 +47,11 @@ export class Semester {
 
   /* Navigation */
 
-  next() {
+  next(): Semester {
     return Semester.getSemesterAfter(this);
   }
 
-  previous() {
+  previous(): Semester {
     const currentSeason: Season = this.#season;
     const currentYear: number = currentSeason.year;
 
@@ -71,7 +68,7 @@ export class Semester {
 
   /* Creators */
 
-  static get(date: Date) {
+  static get(date: Date): Semester {
     const utcFullYear = date.getUTCFullYear();
     let season = Season.SUMMER(utcFullYear);
 
@@ -84,15 +81,15 @@ export class Semester {
     return new Semester(season);
   }
 
-  static getCurrent() {
+  static getCurrent(): Semester {
     return this.get(new Date());
   }
 
-  static getUpcoming() {
+  static getUpcoming(): Semester {
     return Semester.getSemesterAfter(Semester.getCurrent());
   }
 
-  static getSemesterAfter(currentSemester: Semester) {
+  static getSemesterAfter(currentSemester: Semester): Semester {
     const currentSeason: Season = currentSemester.#season;
     const currentYear: number = currentSeason.year;
 
@@ -109,11 +106,11 @@ export class Semester {
 
   /* Helpers */
 
-  toString() {
+  toString(): string {
     return this.#season.toString();
   }
 
-  startDate() {
+  startDate(): Date {
     return this.#season.startDate;
   }
 }

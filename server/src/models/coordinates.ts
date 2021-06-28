@@ -3,8 +3,8 @@ import { Schema } from "mongoose";
 import axios from "axios";
 
 export interface ICoordinates {
-  latitude: number,
-  longitude: number,
+  latitude: number;
+  longitude: number;
 }
 
 export const CoordinatesSchema = new Schema(
@@ -21,7 +21,7 @@ export const CoordinatesSchema = new Schema(
   { _id: false }
 );
 
-export const getCoordinates = async function (document: IAddress) {
+export const getCoordinates = async function (document: IAddress): Promise<ICoordinates> {
   const key = process.env.GoogleAPIkey; // todo: get key
 
   const addressString = Object.values(document).join(" ");

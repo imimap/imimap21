@@ -1,8 +1,8 @@
 import { Schema } from "mongoose";
 
 export interface Change {
-  propertyName?: string,
-  newPropertyValue: any,
+  propertyName?: string;
+  newPropertyValue: any;
 }
 
 export const ChangeSchema = new Schema({

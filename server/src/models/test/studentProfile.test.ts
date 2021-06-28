@@ -1,7 +1,7 @@
 import * as dbHandler from "./database";
 import { User } from "../user";
 import { IStudentProfile } from "../studentProfile";
-import { Schema, Types } from "mongoose";
+import { Types } from "mongoose";
 
 beforeAll(async () => {
   await dbHandler.connect();

@@ -30,7 +30,6 @@ describe("Internship", () => {
     if (savedInternship) expect(savedInternship.paymentTypes).toContainEqual("cash benefit");
   });
   it("can be updated", async () => {
-    const endDate = new Date(Date.UTC(2010, 10, 10));
     const update = await Internship.updateOne(
       { operationalArea: "Game Design" },
       { workingHoursPerWeek: 38 },

@@ -5,16 +5,16 @@ import { companySizes } from "../helpers/companySizes";
 import { isValidEmail, normalizeEmail } from "../helpers/emailAddressHelper";
 
 export interface ICompany extends Document {
-  companyName: string,
-  branchName?: string,
-  address?: IAddress,
-  emailAddress?: string,
-  industry?: string,
-  website?: string,
-  mainLanguage?: string,
-  size?: string,
-  comment?: string,
-  excludedFromSearch?: boolean,
+  companyName: string;
+  branchName?: string;
+  address?: IAddress;
+  emailAddress?: string;
+  industry?: string;
+  website?: string;
+  mainLanguage?: string;
+  size?: string;
+  comment?: string;
+  excludedFromSearch?: boolean;
 }
 
 const CompanySchema = new Schema({
@@ -68,7 +68,7 @@ CompanySchema.pre("validate", function () {
   }
   if (this.modifiedPaths().includes("website")) {
     let givenUrl = this.get("website");
-    if (!/http/.test(givenUrl)) givenUrl = "http://" + givenUrl;
+    if (!/http/.test(givenUrl)) givenUrl = "https://" + givenUrl;
     this.set("website", new URL(givenUrl).href);
   }
 });

@@ -1,6 +1,6 @@
-import { ICompany, Company } from "../company";
+import { Company } from "../company";
 import * as dbHandler from "./database";
-import {Internship} from "../internship";
+import { Internship } from "../internship";
 
 beforeAll(async () => {
   await dbHandler.connect();
