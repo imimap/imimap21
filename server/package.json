@@ -12,11 +12,6 @@
     "lint": "eslint \"src/**\"",
     "test-mongoose": "jest --runInBand --detectOpenHandles ./src/models/test"
   },
-  "jest": {
-    "transform": {
-      "^.+\\.[t|j]s?$": "babel-jest"
-    }
-  },
   "license": "ISC",
   "dependencies": {
     "axios": "^0.21.1",

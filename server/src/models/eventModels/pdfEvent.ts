@@ -1,5 +1,5 @@
-import { Types, Schema } from "mongoose";
-import { IEvent } from "./event";
+import { Schema } from "mongoose";
+import { EventSchema, IEvent } from "./event";
 import { User } from "../user";
 
 function isValidPdf(path: string) {
@@ -7,17 +7,13 @@ function isValidPdf(path: string) {
 }
 
 export interface IPdfEvent extends IEvent {
-  _id?: Types.ObjectId;
   newPath?: string;
   accept?: boolean;
   createdByAdmin?: boolean;
 }
 
 export const PdfEventSchema = new Schema({
-  _id: {
-    type: Schema.Types.ObjectId,
-    default: Types.ObjectId(),
-  },
+  ...EventSchema,
   newPath: {
     type: String,
     validate: {
@@ -28,16 +24,6 @@ export const PdfEventSchema = new Schema({
   },
   accept: {
     type: Boolean,
-  },
-  timestamp: {
-    default: Date.now(),
-    immutable: true,
-    type: Number,
-  },
-  creator: {
-    immutable: true,
-    required: true,
-    type: Schema.Types.ObjectId,
   },
 });
 

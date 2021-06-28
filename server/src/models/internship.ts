@@ -4,6 +4,7 @@ import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
 import { Semester } from "../helpers/semesterHelper";
 import { isValidDateRange, normalizeDate } from "../helpers/dateHelper";
 import { ICompany } from "./company";
+import { IInternshipEvent, InternshipEventSchema } from "./eventModels/internshipEvent";
 
 export interface IInternship extends Document {
   startDate?: Date;
@@ -23,61 +24,74 @@ export interface IInternship extends Document {
   contractPdf?: IPdfDocument;
   bvgTicketExemptionPdf?: IPdfDocument;
   certificatePdf?: IPdfDocument;
-  // events: InternshipPartEvents
+  events: IInternshipEvent[];
+  status: string;
 }
 
-export const InternshipSchema = new Schema({
-  startDate: {
-    default: Semester.getUpcoming().startDate(),
-    type: Date,
-  },
-  endDate: {
-    type: Date,
-  },
-  company: {
-    ref: "Company",
-    type: Schema.Types.ObjectId,
-  },
-  tasks: {
-    type: String,
-  },
-  operationalArea: {
-    type: String,
-  },
-  programmingLanguages: [
-    {
+export const InternshipSchema = new Schema(
+  {
+    startDate: {
+      default: Semester.getUpcoming().startDate(),
+      type: Date,
+    },
+    endDate: {
+      type: Date,
+    },
+    company: {
+      ref: "Company",
+      type: Schema.Types.ObjectId,
+    },
+    tasks: {
       type: String,
     },
-  ],
-  livingCosts: {
-    min: 0,
-    type: Number,
-  },
-  salary: {
-    default: 0,
-    min: 0,
-    type: Number,
-  },
-  paymentTypes: [
-    {
-      default: "uncharted",
-      enum: ["uncharted", "cash benefit", "noncash benefit", "no payment"],
+    operationalArea: {
       type: String,
     },
-  ],
-  workingHoursPerWeek: {
-    default: 40,
-    min: 0,
-    type: Number,
+    programmingLanguages: [
+      {
+        type: String,
+      },
+    ],
+    livingCosts: {
+      min: 0,
+      type: Number,
+    },
+    salary: {
+      default: 0,
+      min: 0,
+      type: Number,
+    },
+    paymentTypes: [
+      {
+        default: "uncharted",
+        enum: ["uncharted", "cash benefit", "noncash benefit", "no payment"],
+        type: String,
+      },
+    ],
+    workingHoursPerWeek: {
+      default: 40,
+      min: 0,
+      type: Number,
+    },
+    supervisor: SupervisorSchema,
+    requestPdf: PdfDocumentSchema,
+    lsfEctsProofPdf: PdfDocumentSchema,
+    locationJustificationPdf: PdfDocumentSchema,
+    contractPdf: PdfDocumentSchema,
+    bvgTicketExemptionPdf: PdfDocumentSchema,
+    certificatePdf: PdfDocumentSchema,
+    events: [
+      {
+        type: InternshipEventSchema,
+      },
+    ],
   },
-  supervisor: SupervisorSchema,
-  requestPdf: PdfDocumentSchema,
-  lsfEctsProofPdf: PdfDocumentSchema,
-  locationJustificationPdf: PdfDocumentSchema,
-  contractPdf: PdfDocumentSchema,
-  bvgTicketExemptionPdf: PdfDocumentSchema,
-  certificatePdf: PdfDocumentSchema,
-});
+  {
+    toJSON: {
+      virtuals: true,
+    },
+  }
+);
 
 InternshipSchema.pre("validate", function () {
   if (this.modifiedPaths().includes("startDate")) {
@@ -100,6 +114,10 @@ InternshipSchema.pre("save", function () {
       );
     }
   }
+});
+
+InternshipSchema.virtual("status").get(function () {
+  // TODO: Add Linda's virtual property getter for event sourcing
 });
 
 export const Internship: Model<IInternship> = model("Internship", InternshipSchema);
