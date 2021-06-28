@@ -33,10 +33,5 @@ export default defineComponent({
       ],
     };
   },
-  methods: {
-    log(a: string) {
-      console.log(a);
-    },
-  },
 });
 </script>
