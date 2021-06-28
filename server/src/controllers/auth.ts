@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import * as passport from "passport";
-import { ldap as config } from "../config";
+import { auth as config } from "../config";
 import { AuthUser, generateAuthToken, Role } from "../authentication/user";
 import { Unauthorized } from "http-errors";
 import { IUser, User } from "../models/user";
@@ -39,7 +39,7 @@ async function getUser(user: AuthUser): Promise<IUser> {
 
 export async function login(req: Request, res: Response, next: NextFunction): Promise<void> {
   passport.authenticate(
-    config.strategyName,
+    config.strategy,
     { session: false },
     async (error: unknown, user: AuthUser | null, info: { message: string }) => {
       if (error) return next(error);

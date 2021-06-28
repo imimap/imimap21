@@ -2,7 +2,7 @@ import { Document, model, Model, Schema, Types } from "mongoose";
 import { IPdfEvent, PdfEventSchema } from "./eventModels/pdfEvent";
 
 export interface IPdfDocument extends Document {
-  events: [IPdfEvent];
+  events: IPdfEvent[];
   path?: string;
   status?: string;
   nextPath(): string;
