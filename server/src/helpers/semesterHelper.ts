@@ -1,25 +1,116 @@
-// todo : complete!
-// https://github.com/imimap/imimap/blob/master/app/models/semester_helper.rb
-// https://github.com/imimap/imimap/blob/master/app/models/semester.rb
-const WINTER_SEMESTER = "WS";
-const SUMMER_SEMESTER = "SS";
+class Season {
+  static SUMMER = (year: number): Season => {
+    return new Season("SS", new Date(Date.UTC(year, 4, 1)));
+  };
 
-export function getUpcomingSemester(): string {
-  const date = new Date();
-  // Check if it's the 31st of March
-  // In this case, only add 5 months to prevent skipping a semester
-  if (date.getMonth() === 2 && date.getDay() === 31) date.setMonth(date.getMonth() + 5);
-  else date.setMonth(date.getMonth() + 6);
+  static WINTER = (year: number): Season => {
+    return new Season("WS", new Date(Date.UTC(year, 10, 1)));
+  };
 
-  return dateToSemester(date);
+  readonly #abbrv: string;
+  readonly #startDate: Date;
+  readonly #year: number;
+
+  constructor(abbrv: string, startDate: Date) {
+    this.#abbrv = abbrv;
+    this.#startDate = startDate;
+    this.#year = this.#startDate.getUTCFullYear();
+  }
+
+  get abbrv() {
+    return this.#abbrv;
+  }
+
+  get startDate() {
+    return this.#startDate;
+  }
+
+  get year() {
+    return this.#year;
+  }
+
+  toString(): string {
+    return this.#abbrv + this.startDate.getUTCFullYear();
+  }
+
+  equals(otherSeason: Season): boolean {
+    return this.#abbrv === otherSeason.abbrv && this.#year === otherSeason.year;
+  }
 }
 
-export function dateToSemester(date: Date): string {
-  const yearModifier = date.getMonth() < 3 ? -1 : 1;
-  return dateToSemesterType(date) + (date.getFullYear() + yearModifier);
-}
+export class Semester {
+  readonly #season: Season;
 
-function dateToSemesterType(date: Date): string {
-  if (date.getMonth() < 3 || date.getMonth() >= 9) return WINTER_SEMESTER;
-  return SUMMER_SEMESTER;
+  constructor(season: Season) {
+    this.#season = season;
+  }
+
+  /* Navigation */
+
+  next(): Semester {
+    return Semester.getSemesterAfter(this);
+  }
+
+  previous(): Semester {
+    const currentSeason: Season = this.#season;
+    const currentYear: number = currentSeason.year;
+
+    let previousYear = currentYear;
+    let previousSeason = Season.SUMMER(currentYear);
+
+    if (currentSeason.equals(Season.SUMMER(currentYear))) {
+      previousYear = currentYear - 1;
+      previousSeason = Season.WINTER(previousYear);
+    }
+
+    return new Semester(previousSeason);
+  }
+
+  /* Creators */
+
+  static get(date: Date): Semester {
+    const utcFullYear = date.getUTCFullYear();
+    let season = Season.SUMMER(utcFullYear);
+
+    if (date < season.startDate) {
+      season = Season.WINTER(utcFullYear - 1); //WS of the previous year
+    } else if (date >= Season.WINTER(utcFullYear).startDate) {
+      season = Season.WINTER(utcFullYear); //WS of this year
+    }
+
+    return new Semester(season);
+  }
+
+  static getCurrent(): Semester {
+    return this.get(new Date());
+  }
+
+  static getUpcoming(): Semester {
+    return Semester.getSemesterAfter(Semester.getCurrent());
+  }
+
+  static getSemesterAfter(currentSemester: Semester): Semester {
+    const currentSeason: Season = currentSemester.#season;
+    const currentYear: number = currentSeason.year;
+
+    let nextYear = currentYear;
+    let nextSeason = Season.WINTER(currentYear);
+
+    if (currentSeason.equals(Season.WINTER(currentYear))) {
+      nextYear = currentYear + 1;
+      nextSeason = Season.SUMMER(nextYear);
+    }
+
+    return new Semester(nextSeason);
+  }
+
+  /* Helpers */
+
+  toString(): string {
+    return this.#season.toString();
+  }
+
+  startDate(): Date {
+    return this.#season.startDate;
+  }
 }

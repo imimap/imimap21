@@ -7,6 +7,10 @@ In the root folder run
 
 Ctrl + C will stop the containers.
 
+Alternatively use
+`docker-compose -f docker-compose.yml -f docker-compose.local.yml up -d`
+
+In that case, shut down the containers with docker-compose down.
 
 Three docker containers with the following NAMES are created:
 `im2-client`, `im2-db` and `im2-server`. 
