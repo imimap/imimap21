@@ -34,19 +34,12 @@ describe("Address", () => {
   it("can be saved for company model", async () => {
     const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
 
-    expect(savedCompany).toBeTruthy();
-    if (savedCompany && savedCompany.address) expect(savedCompany.address.city).toEqual("Berlin");
+    expect(savedCompany?.address?.city).toEqual("Berlin");
   });
   it("can retrieve the coordinates for an address", async () => {
     const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
 
-    expect(savedCompany).toBeTruthy();
-    if (savedCompany && savedCompany.address) {
-      expect(savedCompany.address.coordinates).toBeTruthy();
-      if (savedCompany.address.coordinates) {
-        expect(savedCompany.address.coordinates.latitude).toEqual(52.4922232);
-        expect(savedCompany.address.coordinates.longitude).toEqual(13.5243112);
-      }
-    }
+    expect(savedCompany?.address?.coordinates?.latitude).toEqual(52.4922232);
+    expect(savedCompany?.address?.coordinates?.longitude).toEqual(13.5243112);
   });
 });

@@ -33,21 +33,13 @@ describe("StudentProfile", () => {
   it("can be saved for User", async () => {
     const savedUser = await User.findOne({ firstName: "Ada" }).lean();
 
-    expect(savedUser).toBeTruthy();
-    if (savedUser) {
-      expect(savedUser.studentProfile).toBeTruthy();
-      if (savedUser.studentProfile) expect(savedUser.studentProfile.studentId).toEqual("s0123456");
-    }
+    expect(savedUser?.studentProfile?.studentId).toEqual("s0123456");
   });
   it("registers which internships a user has seen", async () => {
     const createdUser = await User.findOne({ firstName: "Ada" });
 
     //is there a way I can avoid these annoying nullish checks?
-    if (
-      !createdUser ||
-      !createdUser.studentProfile ||
-      !createdUser.studentProfile.internshipsSeen
-    ) {
+    if (!createdUser?.studentProfile?.internshipsSeen) {
       throw "createdUser or one of its properties is null.";
     }
 
@@ -56,17 +48,12 @@ describe("StudentProfile", () => {
     await createdUser.save();
 
     const updatedUser = await User.findOne({ firstName: "Ada" }).lean();
-    if (updatedUser && updatedUser.studentProfile) {
-      expect(updatedUser.studentProfile.internshipsSeen).toBeTruthy();
-      if (updatedUser.studentProfile.internshipsSeen) {
-        expect(updatedUser.studentProfile.internshipsSeen).toContainEqual(internshipObjectId);
-      }
-    }
+    expect(updatedUser?.studentProfile?.internshipsSeen).toContainEqual(internshipObjectId);
   });
   it("can have own internships", async () => {
     const createdUser = await User.findOne({ firstName: "Ada" });
 
-    if (!createdUser || !createdUser.studentProfile) {
+    if (!createdUser?.studentProfile) {
       throw "createdUser or one of its properties is null.";
     }
 
@@ -78,14 +65,6 @@ describe("StudentProfile", () => {
 
     const updatedUser = await User.findOne({ firstName: "Ada" }).lean();
 
-    if (updatedUser) {
-      if (updatedUser && updatedUser.studentProfile) {
-        expect(updatedUser.studentProfile.internship).toBeTruthy();
-
-        if (updatedUser.studentProfile.internship) {
-          expect(updatedUser.studentProfile.internship).toEqual(internshipObjectId);
-        }
-      }
-    }
+    expect(updatedUser?.studentProfile?.internship).toEqual(internshipObjectId);
   });
 });

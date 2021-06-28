@@ -29,8 +29,7 @@ afterAll(async () => {
 describe("Company model", () => {
   it("can be created from valid data", async () => {
     const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
-    expect(savedCompany).toBeTruthy();
-    if (savedCompany) expect(savedCompany.companyName).toEqual("HTW Berlin");
+    expect(savedCompany?.companyName).toEqual("HTW Berlin");
   });
   it("can normalize email", async () => {
     const company = await Company.findOne({ companyName: "HTW Berlin" });
@@ -41,8 +40,7 @@ describe("Company model", () => {
     }
 
     const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
-    expect(savedCompany).toBeTruthy();
-    if (savedCompany) expect(savedCompany.emailAddress).toEqual("rechenzentrum@htw-berlin.de");
+    expect(savedCompany?.emailAddress).toEqual("rechenzentrum@htw-berlin.de");
   });
   it("can normalize website url", async () => {
     const company = await Company.findOne({ companyName: "HTW Berlin" });
@@ -53,8 +51,7 @@ describe("Company model", () => {
     }
 
     const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
-    expect(savedCompany).toBeTruthy();
-    if (savedCompany) expect(savedCompany.website).toEqual("http://rz.htw-berlin.de/");
+    expect(savedCompany?.website).toEqual("https://rz.htw-berlin.de/");
   });
   it("will not accept something different than iso codes for mainLanguage", async () => {
     const company = await Company.findOne({ companyName: "HTW Berlin" });
@@ -73,8 +70,7 @@ describe("Company model", () => {
     }
 
     const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
-    expect(savedCompany).toBeTruthy();
-    if (savedCompany) expect(savedCompany.mainLanguage).toEqual("de");
+    expect(savedCompany?.mainLanguage).toEqual("de");
   });
   it("can be saved for a certain internship", async () => {
     const company = await Company.findOne({ companyName: "HTW Berlin" });
@@ -90,12 +86,6 @@ describe("Company model", () => {
     const savedInternship = await Internship.findOne({ operationalArea: "Game Design" }).populate(
       "company"
     );
-    expect(savedInternship).toBeTruthy();
-    if (savedInternship) {
-      expect(savedInternship.company).toBeTruthy();
-      if (savedInternship.company) {
-        expect(savedInternship.company.companyName).toEqual("HTW Berlin");
-      }
-    }
+    expect(savedInternship?.company.companyName).toEqual("HTW Berlin");
   });
 });

@@ -22,15 +22,10 @@ afterAll(async () => {
 describe("InternshipModule", () => {
   it("can be created from valid data", async () => {
     const savedInternshipModule = await InternshipModule.findOne({ aepPassed: false });
-
-    expect(savedInternshipModule).toBeTruthy();
-    if (savedInternshipModule) expect(savedInternshipModule.aepPassed).toEqual(false);
+    expect(savedInternshipModule?.aepPassed).toEqual(false);
   });
   it("automatically plans the internship module for the upcoming semester", async () => {
     const savedInternshipModule = await InternshipModule.findOne({ aepPassed: false });
-
-    if (savedInternshipModule) {
-      expect(savedInternshipModule.inSemester).toEqual(Semester.getUpcoming().toString());
-    }
+    expect(savedInternshipModule?.inSemester).toEqual(Semester.getUpcoming().toString());
   });
 });

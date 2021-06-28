@@ -26,8 +26,7 @@ describe("Internship", () => {
   it("can be created from valid data", async () => {
     const savedInternship = await Internship.findOne({ operationalArea: "Game Design" }).lean();
 
-    expect(savedInternship).toBeTruthy();
-    if (savedInternship) expect(savedInternship.paymentTypes).toContainEqual("cash benefit");
+    expect(savedInternship?.paymentTypes).toContainEqual("cash benefit");
   });
   it("can be updated", async () => {
     const update = await Internship.updateOne(
@@ -39,11 +38,9 @@ describe("Internship", () => {
     expect(update.nModified).toEqual(1);
 
     const saved = await Internship.findOne({ operationalArea: "Game Design" }).lean();
-    expect(saved).toBeTruthy();
-    if (saved) {
-      expect(saved.workingHoursPerWeek).toBeTruthy();
-      expect(saved.workingHoursPerWeek).toEqual(38);
-    }
+
+    expect(saved?.workingHoursPerWeek).toBeTruthy();
+    expect(saved?.workingHoursPerWeek).toEqual(38);
   });
   it("won't save endDate that lays before startDate", async () => {
     const toBeUpdated = await Internship.findOne({ operationalArea: "Game Design" });
@@ -51,28 +48,21 @@ describe("Internship", () => {
     expect(toBeUpdated).toBeTruthy();
     if (toBeUpdated) {
       toBeUpdated.endDate = new Date(2010, 10, 10);
-      await toBeUpdated.save();
+      await toBeUpdated?.save();
     }
 
     const saved = await Internship.findOne({ operationalArea: "Game Design" }).lean();
-    expect(saved).toBeTruthy();
-    if (saved) expect(saved.endDate).toBeFalsy();
+    expect(saved?.endDate).toBeFalsy();
   });
   it("will only accept a valid paymentType", async () => {
     const toBeUpdated = await Internship.findOne({ operationalArea: "Game Design" });
 
-    expect(toBeUpdated).toBeTruthy();
-    if (toBeUpdated) {
-      expect(toBeUpdated.paymentTypes).toBeTruthy();
-      if (toBeUpdated.paymentTypes) {
-        toBeUpdated.paymentTypes.push("cash benefit");
-        await toBeUpdated.save();
-      }
-    }
+    expect(toBeUpdated?.paymentTypes).toBeTruthy();
+    toBeUpdated?.paymentTypes?.push("cash benefit");
+    await toBeUpdated?.save();
 
     const saved = await Internship.findOne({ operationalArea: "Game Design" }).lean();
-    expect(saved).toBeTruthy();
-    if (saved) expect(saved.paymentTypes).toContain("cash benefit");
+    expect(saved?.paymentTypes).toContain("cash benefit");
   });
   it("can have a supervisor", async () => {
     const toBeUpdated = await Internship.findOne({ operationalArea: "Game Design" });
@@ -83,17 +73,11 @@ describe("Internship", () => {
         fullName: "Douglas Adams",
         emailAddress: "d.Adams@Email.com ",
       };
-      await toBeUpdated.save();
+      await toBeUpdated?.save();
     }
 
     const saved = await Internship.findOne({ operationalArea: "Game Design" }).lean();
-    expect(saved).toBeTruthy();
-    if (saved) {
-      expect(saved.supervisor).toBeTruthy();
-      if (saved.supervisor) {
-        expect(saved.supervisor.fullName).toBe("Douglas Adams");
-        expect(saved.supervisor.emailAddress).toBe("d.adams@email.com");
-      }
-    }
+    expect(saved?.supervisor?.fullName).toBe("Douglas Adams");
+    expect(saved?.supervisor?.emailAddress).toBe("d.adams@email.com");
   });
 });

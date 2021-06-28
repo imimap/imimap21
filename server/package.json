@@ -9,7 +9,7 @@
     "watch": "tsc-watch --onSuccess \"npm run serve\"",
     "format": "prettier src/server.ts **/*.js --write",
     "lint": "eslint \"src/**\"",
-    "test-mongoose": "jest --runInBand --detectOpenHandles ./test"
+    "test-mongoose": "jest --runInBand --detectOpenHandles ./src/models/test"
   },
   "jest": {
     "transform": {
