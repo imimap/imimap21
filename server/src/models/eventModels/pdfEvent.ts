@@ -10,7 +10,6 @@ export interface IPdfEvent extends IEvent {
   _id?: Types.ObjectId;
   newPath?: string;
   accept?: boolean;
-  createdByAdmin?: boolean;
 }
 
 export const PdfEventSchema = new Schema({

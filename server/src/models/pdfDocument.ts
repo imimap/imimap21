@@ -1,5 +1,6 @@
 import { Document, model, Model, Schema, Types } from "mongoose";
 import { IPdfEvent, PdfEventSchema } from "./eventModels/pdfEvent";
+import { getRecentValueForPropSetByEvent } from "../helpers/eventQueryHelper";
 
 export interface IPdfDocument extends Document {
   events: [IPdfEvent];
@@ -26,15 +27,9 @@ export const PdfDocumentSchema = new Schema<IPdfDocument>(
 );
 
 PdfDocumentSchema.virtual("path").get(function () {
-  let recentPath;
-  let i = -1; // counter starts with last element in events array
-  while (!recentPath) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    recentPath = this.events.slice(i)[0].newPath;
-    i--;
-  }
-  return recentPath;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return getRecentValueForPropSetByEvent("newPath", this);
 });
 
 // when generating the next pdf path, this method should be used

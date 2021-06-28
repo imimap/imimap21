@@ -113,4 +113,21 @@ export class Semester {
   startDate(): Date {
     return this.#season.startDate;
   }
+
+  static parseString(semesterString: string): Semester {
+    const yearString = semesterString.match(/20[0-9]{2}$/);
+    if (!yearString) throw "Semester is not a valid string. Needs to give full year.";
+    const yearNumber = parseInt(yearString[0]);
+
+    if (semesterString.includes(Season.SUMMER(yearNumber).abbrv))
+      return new Semester(Season.SUMMER(yearNumber));
+    else if (semesterString.includes(Season.WINTER(yearNumber).abbrv))
+      return new Semester(Season.WINTER(yearNumber));
+    else throw "Semester is not a valid string. Needs to indicate season.";
+  }
+
+  static sanitizeSemesterString(semesterString: string): string {
+    const semester = this.parseString(semesterString);
+    return semester.toString();
+  }
 }
