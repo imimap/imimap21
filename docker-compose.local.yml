@@ -16,6 +16,8 @@ services:
   server:
     build:
       target: build
+    ports:
+      - "9229:9229"
     volumes:
       - /app/node_modules
       - ./server:/app

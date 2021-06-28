@@ -5,7 +5,8 @@ node_modules
 # mongo tmp folder
 /tmp
 
-# local env files
+# env files
+.env
 .env.local
 .env.*.local
 
