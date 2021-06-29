@@ -9,7 +9,7 @@ import {
   getUserInfo,
   isLoggedIn,
 } from '@/utils/auth';
-import apiClient from '@/utils/http-common';
+import http from '@/utils/http-common';
 
 export default defineComponent({
   name: 'App',
@@ -33,12 +33,12 @@ export default defineComponent({
       this.$Progress.finish();
     });
 
-    apiClient.interceptors.request.use((config) => {
+    http.interceptors.request.use((config) => {
       this.$Progress.start();
       return config;
     });
 
-    apiClient.interceptors.response.use((response) => {
+    http.interceptors.response.use((response) => {
       this.$Progress.finish();
       return response;
     });
