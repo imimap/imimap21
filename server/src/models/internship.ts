@@ -12,10 +12,10 @@ export interface IInternship extends Document {
   company?: PopulatedDoc<ICompany & Document>;
   tasks?: string;
   operationalArea?: string;
-  programmingLanguages?: [string];
+  programmingLanguages?: string[];
   livingCosts?: number;
   salary?: number;
-  paymentTypes?: [string];
+  paymentTypes?: string[];
   workingHoursPerWeek?: number;
   supervisor?: ISupervisor;
   requestPdf?: IPdfDocument;

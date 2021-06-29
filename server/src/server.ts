@@ -10,6 +10,7 @@ import { HttpError, NotFound } from "http-errors";
 import router from "./routes";
 import database from "./database";
 import ldapStrategy from "./authentication/strategy";
+import localStrategy from "./authentication/localStrategy";
 
 // load database
 (async () => await database())();
@@ -24,6 +25,7 @@ app.use(cors());
 app.use(express.json());
 app.use(passport.initialize());
 passport.use(ldapStrategy);
+if (process.env.NODE_ENV === "development" && process.env.BYPASS_LDAP) passport.use(localStrategy);
 
 // Defining route middleware
 app.use("/api", router);

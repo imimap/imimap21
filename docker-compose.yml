@@ -16,11 +16,13 @@ services:
     depends_on:
       - db
     environment:
+      - NODE_ENV=${NODE_ENV}
       - LDAP_URL=${LDAP_URL}
       - LDAP_SEARCH_BASE=${LDAP_SEARCH_BASE}
       - LDAP_STUDENT_GROUP=${LDAP_STUDENT_GROUP}
       - LDAP_INSTRUCTOR_GROUP=${LDAP_INSTRUCTOR_GROUP}
       - AUTH_SECRET=${AUTH_SECRET}
+      - BYPASS_LDAP=${BYPASS_LDAP}
       - API_HOST=${API_HOST}
 
   db:
