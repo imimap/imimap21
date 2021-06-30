@@ -3,20 +3,18 @@ import { IStudentProfile, StudentProfileSchema } from "./studentProfile";
 import { isValidEmail, normalizeEmail } from "../helpers/emailAddressHelper";
 
 export interface IUser extends Document {
-  firstName: string,
-  lastName: string,
-  isAdmin: boolean,
-  emailAddress: string,
-  studentProfile: IStudentProfile,
+  firstName?: string;
+  lastName?: string;
+  isAdmin?: boolean;
+  emailAddress: string;
+  studentProfile?: IStudentProfile;
 }
 
 const UserSchema = new Schema({
   firstName: {
-    required: true,
     type: String,
   },
   lastName: {
-    required: true,
     type: String,
   },
   isAdmin: {

@@ -1,42 +1,42 @@
-import { Document, model, Model, ObjectId, Schema } from "mongoose";
+import { Document, model, Model, PopulatedDoc, Schema } from "mongoose";
 import { ISupervisor, SupervisorSchema } from "./supervisor";
 import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
+import { Semester } from "../helpers/semesterHelper";
+import { isValidDateRange, normalizeDate } from "../helpers/dateHelper";
+import { ICompany } from "./company";
 
 export interface IInternship extends Document {
-  startDate: Date,
-  endDate: Date,
-  company: ObjectId,
-  description: string,
-  tasks: string,
-  operationalArea: string,
-  programmingLanguages: string[],
-  livingCosts: number,
-  salary: number,
-  paymentType: [string], //should be an enum or so
-  workingHoursPerWeek: number,
-  supervisor: ISupervisor,
-  requestPdf: IPdfDocument,
-  lsfEctsProofPdf: IPdfDocument,
-  locationJustificationPdf: IPdfDocument,
-  contractPdf: IPdfDocument,
-  bvgTicketExemptionPdf: IPdfDocument,
-  certificatePdf: IPdfDocument,
+  startDate?: Date;
+  endDate?: Date;
+  company?: PopulatedDoc<ICompany & Document>;
+  tasks?: string;
+  operationalArea?: string;
+  programmingLanguages?: string[];
+  livingCosts?: number;
+  salary?: number;
+  paymentTypes?: string[];
+  workingHoursPerWeek?: number;
+  supervisor?: ISupervisor;
+  requestPdf?: IPdfDocument;
+  lsfEctsProofPdf?: IPdfDocument;
+  locationJustificationPdf?: IPdfDocument;
+  contractPdf?: IPdfDocument;
+  bvgTicketExemptionPdf?: IPdfDocument;
+  certificatePdf?: IPdfDocument;
   // events: InternshipPartEvents
 }
 
 export const InternshipSchema = new Schema({
   startDate: {
+    default: Semester.getUpcoming().startDate(),
     type: Date,
   },
   endDate: {
     type: Date,
   },
   company: {
-    ref: "CompanyBranch",
+    ref: "Company",
     type: Schema.Types.ObjectId,
-  },
-  description: {
-    type: String,
   },
   tasks: {
     type: String,
@@ -46,7 +46,7 @@ export const InternshipSchema = new Schema({
   },
   programmingLanguages: [
     {
-      type: String, //should be an enum/ or so
+      type: String,
     },
   ],
   livingCosts: {
@@ -58,7 +58,7 @@ export const InternshipSchema = new Schema({
     min: 0,
     type: Number,
   },
-  paymentType: [
+  paymentTypes: [
     {
       default: "uncharted",
       enum: ["uncharted", "cash benefit", "noncash benefit", "no payment"],
@@ -77,6 +77,29 @@ export const InternshipSchema = new Schema({
   contractPdf: PdfDocumentSchema,
   bvgTicketExemptionPdf: PdfDocumentSchema,
   certificatePdf: PdfDocumentSchema,
+});
+
+InternshipSchema.pre("validate", function () {
+  if (this.modifiedPaths().includes("startDate")) {
+    this.set("startDate", normalizeDate(this.get("startDate")));
+  }
+  if (this.modifiedPaths().includes("endDate")) {
+    this.set("endDate", normalizeDate(this.get("endDate")));
+  }
+});
+
+InternshipSchema.pre("save", function () {
+  if (this.modifiedPaths().includes("endDate")) {
+    const startDate = this.get("startDate");
+    const endDate = this.get("endDate");
+    const endDateAfterStartDate = isValidDateRange(startDate, endDate);
+    if (!endDateAfterStartDate) {
+      this.invalidate(
+        "endDate",
+        "End date is not valid. Needs to be at least 4 weeks after start date."
+      );
+    }
+  }
 });
 
 export const Internship: Model<IInternship> = model("Internship", InternshipSchema);
