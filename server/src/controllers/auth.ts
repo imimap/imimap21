@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import * as passport from "passport";
 import { auth as config } from "../config";
 import { AuthUser, generateAuthToken, Role } from "../authentication/user";
-import { Unauthorized } from "http-errors";
+import { NotFound, Unauthorized } from "http-errors";
 import { IUser, User } from "../models/user";
 import { InternshipModule } from "../models/internshipModule";
 import { IStudentProfile } from "../models/studentProfile";
@@ -19,15 +19,8 @@ async function createStudentProfile(user: AuthUser): Promise<IStudentProfile> {
   };
 }
 
-async function getUser(user: AuthUser): Promise<IUser> {
+async function createUser(user: AuthUser): Promise<IUser> {
   const isStudent = user.role === Role.STUDENT;
-  // TODO: Add correct filter for instructor accounts
-  const userFilter = isStudent ? { "studentProfile.studentId": user.id } : {};
-  // Try to fetch user from the database
-  const foundUser = await User.findOne(userFilter);
-  if (foundUser) return foundUser;
-
-  // User doesn't exist yet, create a new user
   return await User.create({
     firstName: user.firstName,
     lastName: user.lastName,
@@ -44,10 +37,18 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
     async (error: unknown, user: AuthUser | null, info: { message: string }) => {
       if (error) return next(error);
       if (!user) return next(new Unauthorized(info.message));
-      // User successfully authenticated, get user from database
-      const userEntity = await getUser(user);
+      // User successfully authenticated, check if user exists
+      const userEntity = await User.findOne({ emailAddress: user.email });
+      // Create user account if it doesn't exist
+      if (!userEntity) await createUser(user);
       // Send auth token and user profile
-      res.json({ token: generateAuthToken(user), user: userEntity });
+      res.json({ token: generateAuthToken(user) });
     }
   )(req, res, next);
+}
+
+export async function profile(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const user = await User.findOne({ emailAddress: (req.user as AuthUser).email });
+  if (!user) return next(new NotFound("User not found"));
+  res.json(user);
 }

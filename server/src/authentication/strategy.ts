@@ -3,9 +3,10 @@ import { readFileSync } from "fs";
 import { ldap as config } from "../config";
 import { IncomingMessage } from "http";
 import { LdapUser, Role } from "./user";
+import { normalizeEmail } from "../helpers/emailAddressHelper";
 
 function getLDAPConfig(request: IncomingMessage, callback: LdapStrategy.OptionsFunctionCallback) {
-  const req = (request as never) as Request;
+  const req = request as never as Request;
   callback(null, {
     server: {
       url: config.url,
@@ -30,7 +31,7 @@ function verifyLdapResponse(user: LdapUser, done: LdapStrategy.VerifyDoneCallbac
       id: user.uid,
       firstName: user.givenName,
       lastName: user.sn,
-      email: user.mail,
+      email: normalizeEmail(user.mail),
       role: user.memberOf.indexOf(config.instructorGroup) !== -1 ? Role.INSTRUCTOR : Role.STUDENT,
     });
   } else {
