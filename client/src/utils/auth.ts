@@ -1,3 +1,4 @@
+import store from '@/store';
 import decode, { JwtPayload } from 'jwt-decode';
 import { UserState } from '@/store/types/UserState';
 import http from './http-common';
@@ -46,4 +47,50 @@ export function getUserInfo(): UserState | null {
 
 export function logoutUser() {
   clearAuthToken();
+}
+
+export async function storeAuthUser(token): Promise<boolean> {
+  setAuthToken(token);
+  const decodedToken = getUserInfo();
+  if (decodedToken !== null) {
+    await store.dispatch('setUser', {
+      email: decodedToken.email,
+      firstName: decodedToken.firstName,
+      id: decodedToken.id,
+      lastName: decodedToken.lastName,
+      sub: decodedToken.sub,
+    });
+    return true;
+  }
+  return false;
+}
+
+export async function storeAuthUserProfile(userProfile) {
+  await store.dispatch('setUserProfile', {
+    ...userProfile,
+  });
+}
+
+export async function getAuthUserProfile() {
+  try {
+    const res = await http.get('/auth/profile');
+    await storeAuthUserProfile(res.data);
+  } catch (err) {
+    await store.dispatch('addNotification', { text: err.message, type: 'danger' });
+  }
+}
+
+export async function login(username: string, password: string): Promise<boolean> {
+  try {
+    const res = await http.post('/auth/login', { username, password });
+    if (await storeAuthUser(res.data.token)) {
+      await getAuthUserProfile();
+      await store.dispatch('addNotification', { text: 'Du wurdest erfolgreich eingeloggt!', type: 'success' });
+      return true;
+    }
+  } catch (err) {
+    await store.dispatch('addNotification', { text: err.message, type: 'danger' });
+    return false;
+  }
+  return false;
 }

@@ -2,9 +2,9 @@ import { createI18n } from 'vue-i18n';
 import de from '@/locales/de/de';
 import en from '@/locales/en/en';
 
-const defaultLocale = 'de';
-
-const messages = {
+export const availableLocales = ['de', 'en'];
+export const defaultLocale = 'de';
+export const messages = {
   de,
   en,
 };
@@ -12,7 +12,7 @@ const messages = {
 const locales = createI18n({
   locale: defaultLocale,
   messages,
-  fallbackLocale: 'en',
+  fallbackLocale: defaultLocale,
 });
 
 export default locales;

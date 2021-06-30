@@ -17,7 +17,7 @@ Prozesse dokumentiert.
 
 ### Notizen vom 24.04.2021
 
-Für das Requirements Engineering soll zunächst der aktuelle Stand der IMIMAP analysiert werden und in User Stories
+Für das Requirements Engineering soll zunächst der aktuelle Stand der IMIMAP analysiert werden und in UserProfileState Stories
 formuliert werden. Basierend darauf ist ein Interview mit dem Praktikumsbeauftragten geplant, um zusätzliche
 Anforderungen zu sammeln. Zudem könnte eine Fokusgruppe mit Studierenden durchgeführt werden, die gerade ihr Praktikum
 eingetragen haben, damit auch Insights aus der Studierendenperspektive mit einbezogen werden können.
@@ -59,7 +59,7 @@ Datenbank:
 
 Planning:
 
-- User Stories als Milestones im GitHub-Repo
+- UserProfileState Stories als Milestones im GitHub-Repo
 - Für Stories werden Issues erstellt, die diese genauer beschreiben und in Sub-Tasks unterteilen; Labels für Frontend
   und Backend
 

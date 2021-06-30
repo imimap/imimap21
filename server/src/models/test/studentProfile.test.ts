@@ -30,7 +30,7 @@ afterAll(async () => {
 });
 
 describe("StudentProfile", () => {
-  it("can be saved for User", async () => {
+  it("can be saved for UserProfileState", async () => {
     const savedUser = await User.findOne({ firstName: "Ada" }).lean();
 
     expect(savedUser?.studentProfile?.studentId).toEqual("s0123456");

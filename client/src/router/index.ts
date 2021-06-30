@@ -1,5 +1,11 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import { isLoggedIn } from '@/utils/auth';
+import {
+  createRouter,
+  createWebHistory,
+  RouteRecordRaw,
+} from 'vue-router';
+import {
+  getAuthToken, getAuthUserProfile, isLoggedIn, storeAuthUser,
+} from '@/utils/auth';
 import Layout from '@/layouts/Layout.vue';
 import Home from '@/views/Home.vue';
 import Search from '@/views/Search.vue';
@@ -7,6 +13,9 @@ import InternshipModule from '@/views/InternshipModule.vue';
 import CreateInternshipModule from '@/views/CreateInternshipModule.vue';
 import Login from '@/views/Login.vue';
 import Student from '@/views/Student.vue';
+import Help from '@/views/Help.vue';
+import rootStore from '@/store';
+import CreatePostponement from '@/views/CreatePostponement.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -35,7 +44,6 @@ const routes: Array<RouteRecordRaw> = [
         component: Login,
         meta: {
           allowAnonymous: true,
-          allowLoggedin: false,
         },
       },
       {
@@ -70,6 +78,22 @@ const routes: Array<RouteRecordRaw> = [
           allowAnonymous: false,
         },
       },
+      {
+        path: 'postponement/new',
+        name: 'CreatePostponement',
+        component: CreatePostponement,
+        meta: {
+          allowAnonymous: false,
+        },
+      },
+      {
+        path: 'help',
+        name: 'Help',
+        component: Help,
+        meta: {
+          allowAnonymous: false,
+        },
+      },
     ],
   },
 ];
@@ -79,17 +103,34 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   if (!to.meta.allowAnonymous && !isLoggedIn()) {
     next({
       name: 'Login',
       params: { locale: to.params.locale },
     });
-  } else if (to.meta.allowAnonymous && isLoggedIn()) {
+  } else {
+    next();
+  }
+});
+
+router.beforeEach(async (to, from, next) => {
+  if (to.meta.allowAnonymous && isLoggedIn()) {
     next({
       name: 'Home',
       params: { locale: to.params.locale },
     });
+  } else {
+    next();
+  }
+});
+
+router.beforeEach(async (to, from, next) => {
+  if (isLoggedIn() && rootStore.getters.getUser.id === '') {
+    if (await storeAuthUser(getAuthToken())) {
+      await getAuthUserProfile();
+      next();
+    }
   } else {
     next();
   }

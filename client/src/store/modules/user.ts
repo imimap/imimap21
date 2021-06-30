@@ -5,7 +5,6 @@ import { UserState } from '@/store/types/UserState';
 import { RootState } from '@/store/types/RootState';
 
 export const userState: UserState = {
-  displayName: '',
   email: '',
   firstName: '',
   id: '',
@@ -21,19 +20,17 @@ export const getters: GetterTree<UserState, RootState> = {
 
 export const mutations: MutationTree<UserState> = {
   updateUser(state, user: UserState) {
-    state.displayName = user.displayName;
     state.email = user.email;
     state.firstName = user.firstName;
-    state.id = user.id;
     state.lastName = user.lastName;
     state.sub = user.sub;
+    state.id = user.id;
   },
   resetUser(state) {
-    state.displayName = '';
     state.email = '';
     state.firstName = '';
-    state.id = '';
     state.lastName = '';
+    state.id = '';
     state.sub = '';
   },
 };

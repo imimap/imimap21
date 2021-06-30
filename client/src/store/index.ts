@@ -1,6 +1,7 @@
 import Vuex from 'vuex';
 import notifications from '@/store/modules/notifications';
 import user from '@/store/modules/user';
+import userProfile from '@/store/modules/userProfile';
 
 const rootStore = new Vuex.Store({
   state: {
@@ -9,6 +10,7 @@ const rootStore = new Vuex.Store({
   modules: {
     notifications,
     user,
+    userProfile,
   },
 });
 export default rootStore;

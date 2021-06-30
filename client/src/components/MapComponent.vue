@@ -31,7 +31,6 @@ export default defineComponent({
   },
   methods: {
     setupLeafletMap() {
-      console.log(this.locations);
       this.map = new Map('mapContainer').setView([55, 0], 2);
 
       new TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
