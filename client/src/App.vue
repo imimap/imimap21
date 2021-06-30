@@ -14,7 +14,7 @@ import apiClient from '@/utils/http-common';
 export default defineComponent({
   name: 'App',
   mounted() {
-    //  [App.vue specific] When App.vue is finish loading finish the progress bar
+    //  [App.vue specific] When App.vue is finished loading finish the progress bar
     this.$Progress.finish();
   },
   created() {
@@ -44,6 +44,7 @@ export default defineComponent({
     });
   },
   beforeCreate() {
+    // rausziehen. hier ist eine liste gültiger locales?!
     if (this.$route.params.locale !== 'de' && this.$route.params.locale !== 'en') {
       this.$router.push({ params: { locale: 'de' } });
     }

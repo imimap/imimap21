@@ -5,6 +5,8 @@
 In the root folder run
 `mevn dockerize`
 
+(you need to install mevn-cli first, `npm install -g mevn-cli`)
+
 Ctrl + C will stop the containers.
 
 Alternatively use
@@ -13,7 +15,7 @@ Alternatively use
 In that case, shut down the containers with docker-compose down.
 
 Three docker containers with the following NAMES are created:
-`im2-client`, `im2-db` and `im2-server`. 
+`im2-client`, `im2-db` and `im2-server`.
 Run `docker logs -f NAME` to see the logs for one of the containers.
 
 
