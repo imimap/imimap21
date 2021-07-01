@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { login } from "../controllers/auth";
+import { login, profile } from "../controllers/auth";
 import * as asyncHandler from "express-async-handler";
 import { body } from "express-validator";
 import { validate } from "../helpers/validation";
 import { isValidStudentId, sanitizeUsername } from "../helpers/studentIdHelper";
+import authMiddleware from "../authentication/middleware";
 
 const authRouter = Router();
 
@@ -16,5 +17,7 @@ authRouter.post(
   validate,
   asyncHandler(login)
 );
+
+authRouter.get("/profile", authMiddleware, asyncHandler(profile));
 
 export default authRouter;
