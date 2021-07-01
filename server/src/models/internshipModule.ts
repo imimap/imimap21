@@ -1,4 +1,4 @@
-import { Document, model, Model, PopulatedDoc, Schema } from "mongoose";
+import { Document, model, Model, PopulatedDoc, Schema, Types } from "mongoose";
 import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
 import { ICompany } from "./company";
 import {
@@ -7,10 +7,11 @@ import {
 } from "./eventModels/internshipModuleScheduleEvent";
 import {
   getRecentAcceptedValueForPropSetByEvent,
-  getRecentNotRejectedValueForPropSetByEvent
+  getRecentNotRejectedValueForPropSetByEvent,
 } from "../helpers/eventQueryHelper";
 import { Semester } from "../helpers/semesterHelper";
 import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
+import { User } from "./user";
 
 export interface IInternshipModule extends Document {
   internships?: PopulatedDoc<ICompany & Document>[];
@@ -20,10 +21,18 @@ export interface IInternshipModule extends Document {
   reportPdf?: IPdfDocument;
   completeDocumentsPdf?: IPdfDocument;
   events: IInternshipModuleScheduleEvent[];
-  status?: string;
+  status: string;
+  create(): IInternshipModule;
+  requestPostponement(
+    creator: Types.ObjectId,
+    newSemester: string,
+    newSemesterOfStudy: number
+  ): IInternshipModule;
+  acceptPostponement(creator: Types.ObjectId): IInternshipModule;
+  rejectPostponement(creator: Types.ObjectId): IInternshipModule;
 }
 
-const InternshipModuleSchema = new Schema(
+const InternshipModuleSchema = new Schema<IInternshipModule>(
   {
     internships: [
       {
@@ -44,8 +53,14 @@ const InternshipModuleSchema = new Schema(
     events: [
       {
         type: InternshipModuleScheduleEventSchema,
+        required: true,
       },
     ],
+    status: {
+      type: String,
+      enum: ["unknown", "created", "postponement requested", "scheduled", "postponement rejected"], //todo: separate postponement stati from other stati
+      required: true,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -72,6 +87,7 @@ InternshipModuleSchema.virtual("inSemesterOfStudy").get(function () {
     : getRecentNotRejectedValueForPropSetByEvent("newSemesterOfStudy", thisDocument);
 });
 
+/*
 InternshipModuleSchema.virtual("status").get(function () {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -84,19 +100,66 @@ InternshipModuleSchema.virtual("status").get(function () {
   else if (mostRecentEvent.newSemesterOfStudy !== 4) return "postponement requested";
   else return "unknown";
 });
+ */
 
-InternshipModuleSchema.pre("save", async function () {
-  if (this.isNew && this.get("events").length <= 1) {
-    const eventWithDefaultValues: IInternshipModuleScheduleEvent = this.get("events")[0] || {
-      creator: (await imimapAdmin)._id,
-    };
+InternshipModuleSchema.methods.create = async function () {
+  this.events.push({
+    creator: (await imimapAdmin)._id,
+    newSemester: Semester.getUpcoming().toString(),
+    newSemesterOfStudy: 4,
+  });
+  this.status = "scheduled";
 
-    eventWithDefaultValues.newSemester =
-      this.get("events").newSemester || Semester.getUpcoming().toString();
-    eventWithDefaultValues.newSemesterOfStudy = this.get("events").newSemesterOfStudy || 4;
-    this.set("events", [eventWithDefaultValues]);
-  }
-});
+  return this.save();
+};
+
+InternshipModuleSchema.methods.requestPostponement = async function (
+  creator: Types.ObjectId,
+  newSemester: string,
+  newSemesterOfStudy: number
+) {
+  const user = await User.findById(creator);
+  if (!user) throw new Error("Creator (User) with that objectId does not exist.");
+
+  this.events.push({
+    creator: creator,
+    newSemester: newSemester,
+    newSemesterOfStudy: newSemesterOfStudy,
+  });
+  this.status = "postponement requested";
+
+  return this.save();
+};
+
+InternshipModuleSchema.methods.acceptPostponement = async function (
+  creator: Types.ObjectId
+) {
+  const user = await User.findById(creator);
+  if (!user?.isAdmin) throw new Error("Only Admins may accept a postponement.");
+
+  this.events.push({
+    creator: creator,
+    accept: true,
+  });
+  this.status = "scheduled";
+
+  return this.save();
+};
+
+InternshipModuleSchema.methods.rejectPostponement = async function (
+  creator: Types.ObjectId
+) {
+  const user = await User.findById(creator);
+  if (!user?.isAdmin) throw new Error("Only Admins may accept a postponement.");
+
+  this.events.push({
+    creator: creator,
+    accept: false,
+  });
+  this.status = "postponement rejected";
+
+  return this.save();
+};
 
 export const InternshipModule: Model<IInternshipModule> = model(
   "InternshipModule",
