@@ -53,39 +53,30 @@ describe("InternshipModule", () => {
   });
   it("automatically plans the internship module for the upcoming semester", async () => {
     const savedInternshipModule = await InternshipModule.findOne({ aepPassed: false });
-    expect(savedInternshipModule?.inSemester).toEqual(Semester.getUpcoming().toString());
-  });
-  it("can be scheduled for regular semester", async () => {
-    const user = await User.findOne({ isAdmin: false });
-    const scheduleEvent: IInternshipModuleScheduleEvent = {
-      creator: user?._id,
-    };
-
-    const internshipModule = await InternshipModule.findOne({});
-    internshipModule?.events.push(scheduleEvent);
-    const savedInternshipModule = await internshipModule?.save();
-
     expect(savedInternshipModule?.events.length).toEqual(1);
-    expect(savedInternshipModule?.inSemesterOfStudy).toEqual(4);
     expect(savedInternshipModule?.inSemester).toEqual(Semester.getUpcoming().toString());
-    expect(savedInternshipModule?.schedulingStatus).toEqual("scheduled");
+    expect(savedInternshipModule?.inSemesterOfStudy).toEqual(4);
+    expect(savedInternshipModule?.status).toEqual("scheduled");
   });
   describe("postponement requests", () => {
     it("can be made for a valid semester", async () => {
       const newSemester = "WS2025";
+      const newSemesterOfStudy = 6;
       const user = await User.findOne({ isAdmin: false });
       const postponementRequest: IInternshipModuleScheduleEvent = {
         creator: user?._id,
         newSemester: newSemester,
-        newSemesterOfStudy: 6, //todo: auto calculate newSemesterOfStudy if it is missing
+        newSemesterOfStudy: newSemesterOfStudy, //todo: auto calculate newSemesterOfStudy if it is missing
       };
 
       const internshipModule = await InternshipModule.findOne({ aepPassed: false });
       internshipModule?.events.push(postponementRequest);
       const savedInternshipModule = await internshipModule?.save();
 
-      expect(savedInternshipModule?.events.length).toEqual(1);
+      expect(savedInternshipModule?.events.length).toEqual(2);
       expect(savedInternshipModule?.inSemester).toEqual(newSemester);
+      expect(savedInternshipModule?.inSemester).toEqual(newSemesterOfStudy);
+      expect(savedInternshipModule?.status).toEqual("postponement requested");
     });
     it("can not be made for an invalid semester", async () => {
       const newSemester = "ES2015";
@@ -100,11 +91,54 @@ describe("InternshipModule", () => {
       internshipModule?.events.push(postponementRequest);
       await expect(internshipModule?.save()).rejects.toThrow();
     });
-    it("can be accepted by admin", async () => {
+    describe("admin actions: ", () => {
+      beforeEach(async () => {
+        const newSemester = "WS2025";
+        const user = await User.findOne({ isAdmin: false });
+        const postponementRequest: IInternshipModuleScheduleEvent = {
+          creator: user?._id,
+          newSemester: newSemester,
+          newSemesterOfStudy: 6, //todo: auto calculate newSemesterOfStudy if it is missing
+        };
 
-    });
-    it("can be rejected by admin", async () => {
+        const internshipModule = await InternshipModule.findOne({ aepPassed: false });
+        internshipModule?.events.push(postponementRequest);
+        await internshipModule?.save();
+      });
+      it("can be accepted by admin", async () => {
+        const admin = await User.findOne({ isAdmin: true });
+        const acceptance: IInternshipModuleScheduleEvent = {
+          creator: admin?._id,
+          accept: true,
+        };
 
+        const internshipModule = await InternshipModule.findOne({ aepPassed: false });
+        const lastSetSemester = internshipModule?.inSemester;
+        const lastSetSemesterOfStudy = internshipModule?.inSemesterOfStudy;
+        internshipModule?.events.push(acceptance);
+        const savedInternshipModule = await internshipModule?.save();
+
+        expect(savedInternshipModule?.events.length).toEqual(3);
+        expect(savedInternshipModule?.status).toEqual("scheduled");
+        expect(savedInternshipModule?.inSemesterOfStudy).toEqual(lastSetSemesterOfStudy);
+        expect(savedInternshipModule?.inSemester).toEqual(lastSetSemester);
+      });
+      it("can be rejected by admin", async () => {
+        const admin = await User.findOne({ isAdmin: true });
+        const rejection: IInternshipModuleScheduleEvent = {
+          creator: admin?._id,
+          accept: false,
+        };
+
+        const internshipModule = await InternshipModule.findOne({ aepPassed: false });
+        const lastSetSemester = internshipModule?.inSemester;
+        internshipModule?.events.push(rejection);
+        const savedInternshipModule = await internshipModule?.save();
+
+        expect(savedInternshipModule?.events.length).toEqual(3);
+        expect(savedInternshipModule?.inSemester).not.toEqual(lastSetSemester);
+        expect(savedInternshipModule?.status).toEqual("postponement rejected");
+      });
     });
   });
 });

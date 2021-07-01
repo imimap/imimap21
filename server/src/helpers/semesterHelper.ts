@@ -127,7 +127,16 @@ export class Semester {
   }
 
   static sanitizeSemesterString(semesterString: string): string {
-    const semester = this.parseString(semesterString);
+    const semester = Semester.parseString(semesterString);
     return semester.toString();
+  }
+
+  static isValidSemesterString(semesterString: string): boolean {
+    try {
+      Semester.parseString(semesterString);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

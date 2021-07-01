@@ -1,4 +1,6 @@
 import { Document } from "mongoose";
+import { IEvent } from "../models/eventModels/event";
+import { IInternshipModuleScheduleEvent } from "../models/eventModels/internshipModuleScheduleEvent";
 
 export const getRecentValueForPropSetByEvent = (propName: string, document: Document): any => {
   let recentPropValue;
@@ -13,15 +15,18 @@ export const getRecentValueForPropSetByEvent = (propName: string, document: Docu
 };
 
 export const getRecentNotRejectedValueForPropSetByEvent = (
+  //todo: this only works for internship scheduling events
   propName: string,
   document: Document
 ): any => {
   let recentPropValue;
   let i = -1;
 
-  const events = document.get("events");
+  const events = document.get("events").filter((event: IInternshipModuleScheduleEvent) => {
+    return event.accept !== false;
+  });
   while (!recentPropValue && i >= events.length * -1) {
-    if (document.get("status") !== "rejected") recentPropValue = events.slice(i)[0].get(propName);
+    recentPropValue = events.slice(i)[0][propName];
     i--;
   }
   return recentPropValue;

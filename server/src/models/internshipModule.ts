@@ -6,6 +6,8 @@ import {
   InternshipModuleScheduleEventSchema,
 } from "./eventModels/internshipModuleScheduleEvent";
 import { getRecentNotRejectedValueForPropSetByEvent } from "../helpers/eventQueryHelper";
+import { Semester } from "../helpers/semesterHelper";
+import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
 
 export interface IInternshipModule extends Document {
   internships?: [PopulatedDoc<ICompany & Document>];
@@ -15,7 +17,7 @@ export interface IInternshipModule extends Document {
   reportPdf?: IPdfDocument;
   completeDocumentsPdf?: IPdfDocument;
   events: IInternshipModuleScheduleEvent[];
-  schedulingStatus?: string;
+  status?: string;
 }
 
 const InternshipModuleSchema = new Schema(
@@ -59,7 +61,7 @@ InternshipModuleSchema.virtual("inSemesterOfStudy").get(function () {
   return getRecentNotRejectedValueForPropSetByEvent("newSemesterOfStudy", this);
 });
 
-InternshipModuleSchema.virtual("schedulingStatus").get(function () {
+InternshipModuleSchema.virtual("status").get(function () {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const allEvents = this.events;
@@ -70,6 +72,19 @@ InternshipModuleSchema.virtual("schedulingStatus").get(function () {
   else if (mostRecentEvent.accept === false) return "postponement rejected";
   else if (mostRecentEvent.newSemesterOfStudy !== 4) return "postponement requested";
   else return "unknown";
+});
+
+InternshipModuleSchema.pre("validate", async function () {
+  if (this.isNew) {
+    const eventWithDefaultValues: IInternshipModuleScheduleEvent = this.get("events")[0] || {
+      creator: (await imimapAdmin)._id,
+    };
+
+    eventWithDefaultValues.newSemester =
+      this.get("events").newSemester || Semester.getUpcoming().toString();
+    eventWithDefaultValues.newSemesterOfStudy = this.get("events").newSemesterOfStudy || 4;
+    this.set("events", [eventWithDefaultValues]);
+  }
 });
 
 export const InternshipModule: Model<IInternshipModule> = model(
