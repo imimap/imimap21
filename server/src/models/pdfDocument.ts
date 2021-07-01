@@ -3,7 +3,7 @@ import { IPdfEvent, PdfEventSchema } from "./eventModels/pdfEvent";
 import { getRecentValueForPropSetByEvent } from "../helpers/eventQueryHelper";
 
 export interface IPdfDocument extends Document {
-  events: [IPdfEvent];
+  events: IPdfEvent[];
   path?: string;
   status?: string;
   nextPath(): string;

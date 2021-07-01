@@ -1,6 +1,10 @@
 <template>
   <div class="w-100 h-100 text-center " style="background-color: #333333;">
-    <div class="w-50 h-25 m-auto"></div>
+    <div class="w-50 h-25 m-auto pt-5">
+      <div v-if="error" class="alert alert-danger" >
+        {{ error }}
+      </div>
+    </div>
     <div id="login_inputs" class="w-50 h-50 m-auto mt-0 container">
       <router-link
         class="m-0 navbar-brand imi-map-logo"
@@ -19,6 +23,7 @@
               placeholder="s0123456@htw-berlin.de"
               type="email" name="user[email]"
               id="user_email"
+              v-model="username"
             >
           </div>
         </div>
@@ -29,11 +34,18 @@
               class="form-control"
               placeholder="********"
               type="password"
+              v-model="password"
             >
           </div>
         </div>
         <div id="submit" class="mt-3">
-          <button type="submit" class="btn btn-htw-green">Login</button>
+          <button
+            v-on:keyup.enter="login"
+            v-on:click="login()"
+            class="btn btn-htw-green"
+          >
+            Login
+          </button>
         </div>
     </div>
     <div class="w-75 h-25 m-auto"></div>
@@ -42,9 +54,45 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import http from '@/utils/http-common';
+import {
+  setAuthToken,
+  getUserInfo,
+} from '@/utils/auth';
 
 export default defineComponent({
   name: 'LoginComponent',
+  data() {
+    return {
+      username: '',
+      password: '',
+      error: null,
+    };
+  },
+  methods: {
+    async login() {
+      try {
+        const res = await http.post('/auth/login', { username: this.username, password: this.password });
+        setAuthToken(res.data.token);
+        const decodedToken = getUserInfo();
+        if (decodedToken !== null) {
+          console.log(decodedToken);
+          await this.$router.push({ name: 'Index' });
+          await this.$store.dispatch('setUser', {
+            displayName: decodedToken.displayName,
+            email: decodedToken.email,
+            firstName: decodedToken.firstName,
+            id: decodedToken.id,
+            lastName: decodedToken.lastName,
+            sub: decodedToken.sub,
+          });
+          await this.$store.dispatch('addNotification', { text: 'Du wurdest erfolgreich eingeloggt!', type: 'success' });
+        }
+      } catch (err) {
+        this.$store.dispatch('addNotification', { text: err.message, type: 'danger' });
+      }
+    },
+  },
 });
 </script>
 

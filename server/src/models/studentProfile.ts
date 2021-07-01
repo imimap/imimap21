@@ -4,7 +4,7 @@ import { ICompany } from "./company";
 
 export interface IStudentProfile {
   studentId: string;
-  internshipsSeen?: [PopulatedDoc<ICompany & Document>];
+  internshipsSeen?: PopulatedDoc<ICompany & Document>[];
   internship?: PopulatedDoc<ICompany & Document>;
 }
 

@@ -22,9 +22,9 @@
                 </li>
                 <li> &nbsp;</li>
                 <li class="imimap-nav-right-li">
-                  <a href="/de/students/778">
+                  <router-link  :to="{name: 'Student', params: { locale: $route.params.locale }}">
                     <font-awesome-icon icon="user" />
-                  </a>
+                  </router-link>
                 </li>
 
                 <li class="dropdown imimap-nav-right-li">
@@ -46,7 +46,7 @@
                   </ul>
                 </li>
                 <li class="imimap-nav-right-li">
-                  <a rel="nofollow" data-method="delete" href="/de/users/sign_out">
+                  <a v-on:click="logout()">
                     <font-awesome-icon icon="sign-out-alt" />
                   </a>
                 </li>
@@ -109,6 +109,7 @@
 
 <script  lang="ts">
 import { defineComponent } from 'vue';
+import { logoutUser } from '@/utils/auth';
 
 export default defineComponent({
   name: 'HeaderComponent',
@@ -116,6 +117,12 @@ export default defineComponent({
     switchLocale(locale: string) {
       this.$i18n.locale = locale;
       this.$router.push({ params: { locale } });
+    },
+    logout() {
+      logoutUser();
+      this.$store.commit('resetUser');
+      this.$store.dispatch('addNotification', { text: 'Du wurdest erfolgreich ausgeloggt!', type: 'success' });
+      this.$router.push({ name: 'Login' });
     },
   },
 });

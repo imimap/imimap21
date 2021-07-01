@@ -1,12 +1,66 @@
 <template>
+  <vue-progress-bar></vue-progress-bar>
   <router-view></router-view>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import {
+  getUserInfo,
+  isLoggedIn,
+} from '@/utils/auth';
+import apiClient from '@/utils/http-common';
 
 export default defineComponent({
   name: 'App',
+  mounted() {
+    //  [App.vue specific] When App.vue is finish loading finish the progress bar
+    this.$Progress.finish();
+  },
+  created() {
+    this.$Progress.start();
+    this.$router.beforeEach((to, from, next) => {
+      //  does the page we want to go to have a meta.progress object
+      if (to.meta.progress !== undefined) {
+        const meta = to.meta.progress;
+        this.$Progress.parseMeta(meta);
+      }
+      this.$Progress.start();
+      next();
+    });
+    //  hook the progress bar to finish after we've finished moving router-view
+    this.$router.afterEach(() => {
+      this.$Progress.finish();
+    });
+
+    apiClient.interceptors.request.use((config) => {
+      this.$Progress.start();
+      return config;
+    });
+
+    apiClient.interceptors.response.use((response) => {
+      this.$Progress.finish();
+      return response;
+    });
+  },
+  beforeCreate() {
+    if (this.$route.params.locale !== 'de' && this.$route.params.locale !== 'en') {
+      this.$router.push({ params: { locale: 'de' } });
+    }
+    if (isLoggedIn() && this.$store.getters.getUser.id === '') {
+      const decodedToken = getUserInfo();
+      if (decodedToken !== null) {
+        this.$store.dispatch('setUser', {
+          displayName: decodedToken.displayName,
+          email: decodedToken.email,
+          firstName: decodedToken.firstName,
+          id: decodedToken.id,
+          lastName: decodedToken.lastName,
+          sub: decodedToken.sub,
+        });
+      }
+    }
+  },
 });
 </script>
 
@@ -14,11 +68,13 @@ export default defineComponent({
 html {
   font-family: sans-serif;
   line-height: 1.15;
+  height: 100vh;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 body {
+  height: 100%;
   margin: 0;
   font-size: 1rem;
   font-weight: 400;

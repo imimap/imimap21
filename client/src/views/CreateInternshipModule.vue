@@ -71,6 +71,10 @@ export default defineComponent({
     };
   },
   methods: {
+    save() {
+      this.$store.dispatch('addNotification', { text: 'Praktikum erfolgreich angelegt!', type: 'success' });
+      this.$router.push({ name: 'InternshipModule' });
+    },
   },
 });
 </script>
