@@ -141,6 +141,17 @@ describe("InternshipModule", () => {
         expect(savedInternshipModule?.inSemesterOfStudy).not.toEqual(lastSetSemesterOfStudy);
         expect(savedInternshipModule?.inSemester).not.toEqual(lastSetSemester);
       });
+      it("can not be accepted or rejected by a normal user", async () => {
+        const user = await User.findOne({ isAdmin: false });
+        const rejection: IInternshipModuleScheduleEvent = {
+          creator: user?._id,
+          accept: false,
+        };
+
+        const internshipModule = await InternshipModule.findOne({ aepPassed: false });
+        internshipModule?.events.push(rejection);
+        await expect(internshipModule?.save()).rejects.toThrow();
+      });
     });
   });
 });
