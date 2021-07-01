@@ -17,7 +17,6 @@ export const InternshipModuleScheduleEventSchema = new Schema({
   },
   newSemester: {
     type: String,
-    default: Semester.getUpcoming(),
     validate: {
       validator: Semester.isValidSemesterString,
       message: "Semester is not valid. Needs to be WS20XX or SS20XX (replace XX with numbers)",
@@ -25,7 +24,6 @@ export const InternshipModuleScheduleEventSchema = new Schema({
   },
   newSemesterOfStudy: {
     type: Number,
-    default: 4,
     min: 1,
   },
   accept: {

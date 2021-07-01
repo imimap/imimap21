@@ -31,3 +31,21 @@ export const getRecentNotRejectedValueForPropSetByEvent = (
   }
   return recentPropValue;
 };
+
+export const getRecentAcceptedValueForPropSetByEvent = (
+  //todo: this only works for internship scheduling events
+  propName: string,
+  document: Document
+): any => {
+  let recentPropValue;
+  let i = -1;
+
+  const events = document.get("events").filter((event: IInternshipModuleScheduleEvent) => {
+    return event.accept === true;
+  });
+  while (!recentPropValue && i >= events.length * -1) {
+    recentPropValue = events.slice(i)[0][propName];
+    i--;
+  }
+  return recentPropValue;
+};

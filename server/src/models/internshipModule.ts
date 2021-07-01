@@ -5,7 +5,10 @@ import {
   IInternshipModuleScheduleEvent,
   InternshipModuleScheduleEventSchema,
 } from "./eventModels/internshipModuleScheduleEvent";
-import { getRecentNotRejectedValueForPropSetByEvent } from "../helpers/eventQueryHelper";
+import {
+  getRecentAcceptedValueForPropSetByEvent,
+  getRecentNotRejectedValueForPropSetByEvent
+} from "../helpers/eventQueryHelper";
 import { Semester } from "../helpers/semesterHelper";
 import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
 
@@ -52,13 +55,21 @@ const InternshipModuleSchema = new Schema(
 InternshipModuleSchema.virtual("inSemester").get(function () {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  return getRecentNotRejectedValueForPropSetByEvent("newSemester", this);
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const thisDocument = this;
+  return thisDocument.status === "postponement rejected"
+    ? getRecentAcceptedValueForPropSetByEvent("newSemester", thisDocument)
+    : getRecentNotRejectedValueForPropSetByEvent("newSemester", thisDocument);
 });
 
 InternshipModuleSchema.virtual("inSemesterOfStudy").get(function () {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  return getRecentNotRejectedValueForPropSetByEvent("newSemesterOfStudy", this);
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const thisDocument = this;
+  return thisDocument.status === "postponement rejected"
+    ? getRecentAcceptedValueForPropSetByEvent("newSemesterOfStudy", thisDocument)
+    : getRecentNotRejectedValueForPropSetByEvent("newSemesterOfStudy", thisDocument);
 });
 
 InternshipModuleSchema.virtual("status").get(function () {
@@ -74,8 +85,8 @@ InternshipModuleSchema.virtual("status").get(function () {
   else return "unknown";
 });
 
-InternshipModuleSchema.pre("validate", async function () {
-  if (this.isNew) {
+InternshipModuleSchema.pre("save", async function () {
+  if (this.isNew && this.get("events").length <= 1) {
     const eventWithDefaultValues: IInternshipModuleScheduleEvent = this.get("events")[0] || {
       creator: (await imimapAdmin)._id,
     };
