@@ -1,5 +1,6 @@
 import { Types, Schema } from "mongoose";
 import { Change, ChangeSchema } from "./change";
+import {User} from "../user";
 
 export interface IEvent {
   timestamp?: number;
@@ -23,4 +24,9 @@ export const EventSchema = new Schema({
       type: ChangeSchema,
     },
   ],
+});
+
+EventSchema.pre("save", async function () {
+  const creator = await User.findById(this.get("creator"));
+  if (!creator) throw "Creator (User) with that objectId does not exist.";
 });

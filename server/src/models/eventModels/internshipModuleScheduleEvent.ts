@@ -43,9 +43,8 @@ export const InternshipModuleScheduleEventSchema = new Schema({
 
 InternshipModuleScheduleEventSchema.pre("save", async function () {
   const creator = await User.findById(this.get("creator"));
-  if (!creator) throw "Creator (User) with that objectId does not exist.";
 
-  if (!creator.isAdmin && this.modifiedPaths().includes("accept")) {
+  if (this.modifiedPaths().includes("accept") && !creator?.isAdmin) {
     throw "Only Admins may accept or reject a postponement.";
   }
 

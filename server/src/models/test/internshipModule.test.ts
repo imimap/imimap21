@@ -1,9 +1,7 @@
 import * as dbHandler from "./database";
 import { IInternshipModule, InternshipModule } from "../internshipModule";
 import { Semester } from "../../helpers/semesterHelper";
-import { IInternshipModuleScheduleEvent } from "../eventModels/internshipModuleScheduleEvent";
 import { User } from "../user";
-import { Types } from "mongoose";
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -11,12 +9,13 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await dbHandler.clearDatabase();
+
   // create module
 
   const properties = {}; // everything we need is in the default values for a normal creation
   const internshipModule: IInternshipModule = new InternshipModule(properties);
 
-  const savedInternshipModule = await internshipModule.save();
+  const savedInternshipModule = await internshipModule.create(); //todo: update to actual event
 
   // create user and admin
   const studentId = "s0123456";
@@ -26,7 +25,7 @@ beforeEach(async () => {
     lastName: "Lovelace",
     studentProfile: {
       studentId: studentId,
-      internship: savedInternshipModule._id,
+      internship: savedInternshipModule._id, //todo: at some point one should be able to add an internship more easily, maybe with a method
     },
   };
   const user = new User(userProperties);
@@ -63,15 +62,13 @@ describe("InternshipModule", () => {
       const newSemester = "WS2025";
       const newSemesterOfStudy = 6;
       const user = await User.findOne({ isAdmin: false });
-      const postponementRequest: IInternshipModuleScheduleEvent = {
-        creator: user?._id,
-        newSemester: newSemester,
-        newSemesterOfStudy: newSemesterOfStudy, //todo: auto calculate newSemesterOfStudy if it is missing
-      };
 
       const internshipModule = await InternshipModule.findOne({ aepPassed: false });
-      internshipModule?.events.push(postponementRequest);
-      const savedInternshipModule = await internshipModule?.save();
+      const savedInternshipModule = await internshipModule?.requestPostponement(
+        user?._id,
+        newSemester,
+        newSemesterOfStudy
+      );
 
       expect(savedInternshipModule?.events.length).toEqual(2);
       expect(savedInternshipModule?.inSemester).toEqual(newSemester);
@@ -81,42 +78,25 @@ describe("InternshipModule", () => {
     it("can not be made for an invalid semester", async () => {
       const newSemester = "ES2015";
       const user = await User.findOne({ isAdmin: false });
-      const postponementRequest: IInternshipModuleScheduleEvent = {
-        creator: user?._id,
-        newSemester: newSemester,
-        newSemesterOfStudy: 6,
-      };
-
       const internshipModule = await InternshipModule.findOne({ aepPassed: false });
-      internshipModule?.events.push(postponementRequest);
-      await expect(internshipModule?.save()).rejects.toThrow();
+      await expect(
+        internshipModule?.requestPostponement(user?._id, newSemester, 6)
+      ).rejects.toThrow();
     });
     describe("admin actions: ", () => {
       beforeEach(async () => {
-        const newSemester = "WS2025";
         const user = await User.findOne({ isAdmin: false });
-        const postponementRequest: IInternshipModuleScheduleEvent = {
-          creator: user?._id,
-          newSemester: newSemester,
-          newSemesterOfStudy: 6, //todo: auto calculate newSemesterOfStudy if it is missing
-        };
-
         const internshipModule = await InternshipModule.findOne({ aepPassed: false });
-        internshipModule?.events.push(postponementRequest);
-        await internshipModule?.save();
+        await internshipModule?.requestPostponement(user?._id, "WS2025", 6);
       });
       it("can be accepted by admin", async () => {
         const admin = await User.findOne({ isAdmin: true });
-        const acceptance: IInternshipModuleScheduleEvent = {
-          creator: admin?._id,
-          accept: true,
-        };
 
         const internshipModule = await InternshipModule.findOne({ aepPassed: false });
         const lastSetSemester = internshipModule?.inSemester;
         const lastSetSemesterOfStudy = internshipModule?.inSemesterOfStudy;
-        internshipModule?.events.push(acceptance);
-        const savedInternshipModule = await internshipModule?.save();
+
+        const savedInternshipModule = await internshipModule?.acceptPostponement(admin?._id);
 
         expect(savedInternshipModule?.events.length).toEqual(3);
         expect(savedInternshipModule?.status).toEqual("scheduled");
@@ -125,21 +105,22 @@ describe("InternshipModule", () => {
       });
       it("can be rejected by admin", async () => {
         const admin = await User.findOne({ isAdmin: true });
-        const rejection: IInternshipModuleScheduleEvent = {
-          creator: admin?._id,
-          accept: false,
-        };
 
         const internshipModule = await InternshipModule.findOne({ aepPassed: false });
         const lastSetSemester = internshipModule?.inSemester;
         const lastSetSemesterOfStudy = internshipModule?.inSemesterOfStudy;
-        internshipModule?.events.push(rejection);
-        const savedInternshipModule = await internshipModule?.save();
+
+        const savedInternshipModule = await internshipModule?.rejectPostponement(admin?._id);
 
         expect(savedInternshipModule?.events.length).toEqual(3);
         expect(savedInternshipModule?.status).toEqual("postponement rejected");
         expect(savedInternshipModule?.inSemesterOfStudy).not.toEqual(lastSetSemesterOfStudy);
         expect(savedInternshipModule?.inSemester).not.toEqual(lastSetSemester);
+      });
+      it("can not be accepted or rejected by a normal user", async () => {
+        const user = await User.findOne({ isAdmin: false });
+        const internshipModule = await InternshipModule.findOne({ aepPassed: false });
+        await expect(internshipModule?.rejectPostponement(user?._id)).rejects.toThrow();
       });
     });
   });
