@@ -9,9 +9,9 @@ export interface IPdfDocument extends Document {
   path: string;
   status: string;
   nextPath(): string;
-  submit(creator: Types.ObjectId, newPath: string): void;
-  accept(creator: Types.ObjectId, newPath?: string): void;
-  reject(creator: Types.ObjectId): void;
+  submit(creator: Types.ObjectId, newPath: string): IPdfDocument;
+  accept(creator: Types.ObjectId, newPath?: string): IPdfDocument;
+  reject(creator: Types.ObjectId): IPdfDocument;
 }
 
 export const PdfDocumentSchema = new Schema<IPdfDocument>(
@@ -65,6 +65,7 @@ PdfDocumentSchema.methods.submit = async function (creator: Types.ObjectId, newP
     creator: creator,
   });
   this.status = "submitted";
+  return this.save();
 };
 
 PdfDocumentSchema.methods.accept = async function (creator: Types.ObjectId, newPath?: string) {
@@ -79,6 +80,7 @@ PdfDocumentSchema.methods.accept = async function (creator: Types.ObjectId, newP
 
   this.events.push(event);
   this.status = "accepted";
+  return this.save();
 };
 
 PdfDocumentSchema.methods.reject = async function (creator: Types.ObjectId) {
@@ -90,6 +92,7 @@ PdfDocumentSchema.methods.reject = async function (creator: Types.ObjectId) {
     accept: false,
   });
   this.status = "rejected";
+  return this.save();
 };
 
 export const PdfDocument: Model<IPdfDocument> = model("PdfDocument", PdfDocumentSchema);

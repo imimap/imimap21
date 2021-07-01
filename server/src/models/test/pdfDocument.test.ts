@@ -37,7 +37,6 @@ beforeEach(async () => {
 
   const pdfDocument: IPdfDocument = new PdfDocument();
   await pdfDocument.submit(savedUser._id, path);
-  await pdfDocument.save();
 });
 
 afterAll(async () => {
@@ -64,9 +63,7 @@ describe("PdfDocument", () => {
       const previousPath = pdfDocument?.path;
       const newPath = pdfDocument?.nextPath();
 
-      await pdfDocument?.accept(admin?._id, newPath);
-
-      const savedDocument = await pdfDocument?.save();
+      const savedDocument = await pdfDocument?.accept(admin?._id, newPath);
 
       expect(savedDocument?.events.length).toEqual(2);
       expect(savedDocument?.path).not.toEqual(previousPath);
@@ -77,9 +74,7 @@ describe("PdfDocument", () => {
       const admin = await User.findOne({ isAdmin: true });
       const previousPath = pdfDocument?.path;
 
-      await pdfDocument?.accept(admin?._id);
-
-      const savedDocument = await pdfDocument?.save();
+      const savedDocument = await pdfDocument?.accept(admin?._id);
 
       expect(savedDocument?.events.length).toEqual(2);
       expect(savedDocument?.path).toEqual(previousPath);
@@ -91,8 +86,7 @@ describe("PdfDocument", () => {
 
       const previousPath = pdfDocument?.path;
 
-      await pdfDocument?.reject(admin?._id);
-      const savedDocument = await pdfDocument?.save();
+      const savedDocument = await pdfDocument?.reject(admin?._id);
 
       expect(savedDocument?.events.length).toEqual(2);
       expect(savedDocument?.path).toEqual(previousPath);
