@@ -1,21 +1,17 @@
-import { Types, Schema } from "mongoose";
-import { IEvent } from "./event";
+import { Schema } from "mongoose";
+import { EventSchema, IEvent } from "./event";
 
 function isValidPdf(path: string) {
   return /http:\/\/localhost:9000\/pdfs\/s0[0-9]{6}\/[0-9a-f]{24}\/[0-9a-f]{24}\.pdf$/.test(path); //example: http://localhost:9000/pdfs/s0555949/507f1f77bcf86cd799439011/requestPdf-01.pdf
 }
 
 export interface IPdfEvent extends IEvent {
-  _id?: Types.ObjectId;
   newPath?: string;
   accept?: boolean;
 }
 
 export const PdfEventSchema = new Schema({
-  _id: {
-    type: Schema.Types.ObjectId,
-    default: Types.ObjectId(),
-  },
+  ...EventSchema,
   newPath: {
     type: String,
     validate: {
@@ -26,15 +22,5 @@ export const PdfEventSchema = new Schema({
   },
   accept: {
     type: Boolean,
-  },
-  timestamp: {
-    default: Date.now(),
-    immutable: true,
-    type: Number,
-  },
-  creator: {
-    immutable: true,
-    required: true,
-    type: Schema.Types.ObjectId,
   },
 });

@@ -15,7 +15,7 @@ beforeEach(async () => {
   const properties = {}; // everything we need is in the default values for a normal creation
   const internshipModule: IInternshipModule = new InternshipModule(properties);
 
-  const savedInternshipModule = await internshipModule.create(); //todo: update to actual event
+  const savedInternshipModule = await internshipModule.plan();
 
   // create user and admin
   const studentId = "s0123456";

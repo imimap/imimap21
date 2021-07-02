@@ -22,7 +22,7 @@ export interface IInternshipModule extends Document {
   completeDocumentsPdf?: IPdfDocument;
   events: IInternshipModuleScheduleEvent[];
   status: string;
-  create(): IInternshipModule;
+  plan(): IInternshipModule;
   requestPostponement(
     creator: Types.ObjectId,
     newSemester: string,
