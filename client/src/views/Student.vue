@@ -13,7 +13,10 @@
       <div class="col-md-4">
         Matrikelnummer<br>
         <span class="form-control-static pl-2 pt-5">
-          {{ user.id.substring(2, user.id.length) }}
+          {{ userProfile.studentProfile.studentId.substring(
+          2,
+          userProfile.studentProfile.studentId.length
+          ) }}
         </span>
       </div>
     </div>
@@ -21,7 +24,7 @@
       <div class="col-md-4">
         Email<br>
         <span class="form-control-static pl-2 pt-5">
-          {{ user.email }}
+          {{ userProfile.emailAddress }}
         </span>
       </div>
       <div class="col-md-4">
@@ -43,7 +46,7 @@
               class="form-control"
               size="50"
               type="text"
-              :value="user.firstName"
+              :value="userProfile.firstName"
               id="studentFirstName"
             >
           </div>
@@ -58,38 +61,8 @@
               class="form-control"
               size="50"
               type="text"
-              :value="user.lastName"
+              :value="userProfile.lastName"
               id="studentLastName"
-            >
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row mb-3">
-      <div class="col-md-4">
-        <div class="field">
-          <div class="form-group" data-children-count="1">
-            <label class="required_application" for="studentBirthday">Geburtsdatum</label>
-            <input
-              placeholder="dd.mm.YYYY"
-              class="form-control"
-              value="1962-09-07"
-              type="date"
-              id="studentBirthday"
-            >
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="field">
-          <div class="form-group" data-children-count="1">
-            <label class="required_application" for="studentBirthplace">Geburtsort</label>
-            <input
-              maxlength="50"
-              class="form-control"
-              size="50" type="text"
-              name="student[birthplace]"
-              id="studentBirthplace"
             >
           </div>
         </div>
@@ -122,7 +95,7 @@ import { mapState } from 'vuex';
 
 export default defineComponent({
   name: 'Student',
-  computed: mapState(['user']),
+  computed: mapState(['userProfile']),
   methods: {
     save() {
       this.$store.dispatch('addNotification', { text: 'Dein Profil wurde erfolgreich gespeichert!', type: 'success' });

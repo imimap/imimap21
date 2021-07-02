@@ -16,9 +16,9 @@
               <ul class="nav float-right imi-nav-right">
 
                 <li class="imimap-nav-right-li">
-                  <a href="/de/help">
+                  <router-link :to="{name: 'Help', params: { locale: $route.params.locale }}">
                     <font-awesome-icon icon="question-circle" />
-                  </a>
+                  </router-link>
                 </li>
                 <li> &nbsp;</li>
                 <li class="imimap-nav-right-li">
