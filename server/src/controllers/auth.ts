@@ -37,7 +37,7 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
     async (error: unknown, user: AuthUser | null, info: { message: string }) => {
       if (error) return next(error);
       if (!user) return next(new Unauthorized(info.message));
-      // UserProfileState successfully authenticated, check if user exists
+      // User successfully authenticated, check if user exists
       const userEntity = await User.findOne({ emailAddress: user.email });
       // Create user account if it doesn't exist
       if (!userEntity) await createUser(user);
@@ -49,6 +49,6 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
 
 export async function profile(req: Request, res: Response, next: NextFunction): Promise<void> {
   const user = await User.findOne({ emailAddress: (req.user as AuthUser).email });
-  if (!user) return next(new NotFound("UserProfileState not found"));
+  if (!user) return next(new NotFound("User not found"));
   res.json(user);
 }
