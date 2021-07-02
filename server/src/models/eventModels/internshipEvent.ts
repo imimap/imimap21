@@ -2,6 +2,22 @@ import { Schema } from "mongoose";
 import { EventSchema, IEvent } from "./event";
 import { User } from "../user";
 
+export enum InternshipStatuses {
+  PLANNED = "planned",
+  REQUESTED = "requested",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+  OVER = "over",
+  READY_FOR_GRADING = "readyForGrading",
+  PASSED = "passed",
+}
+
+const adminOnlyStatuses = [
+  InternshipStatuses.APPROVED,
+  InternshipStatuses.REJECTED,
+  InternshipStatuses.PASSED,
+];
+
 export interface IInternshipEvent extends IEvent {
   status: string;
 }
@@ -10,11 +26,9 @@ export const InternshipEventSchema = new Schema({
   ...EventSchema,
   status: {
     type: String,
-    enum: ["planned", "requested", "approved", "rejected", "over", "readyForGrading", "passed"],
+    enum: Object.values(InternshipStatuses),
   },
 });
-
-const adminOnlyStatuses = ["rejected", "approved", "passed"];
 
 InternshipEventSchema.pre("save", async function () {
   const creator = await User.findById(this.get("creator"));
