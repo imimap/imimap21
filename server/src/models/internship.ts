@@ -9,6 +9,8 @@ import {
   InternshipEventSchema,
   InternshipStatuses,
 } from "./eventModels/internshipEvent";
+import { getRecentValueForPropSetByEvent } from "../helpers/eventQueryHelper";
+import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
 
 export interface IInternship extends Document {
   startDate?: Date;
@@ -28,6 +30,7 @@ export interface IInternship extends Document {
   contractPdf?: IPdfDocument;
   bvgTicketExemptionPdf?: IPdfDocument;
   certificatePdf?: IPdfDocument;
+  reportPdf?: IPdfDocument;
   events: IInternshipEvent[];
   status: string;
 }
@@ -84,6 +87,7 @@ export const InternshipSchema = new Schema(
     contractPdf: PdfDocumentSchema,
     bvgTicketExemptionPdf: PdfDocumentSchema,
     certificatePdf: PdfDocumentSchema,
+    reportPdf: PdfDocumentSchema,
     events: [
       {
         type: InternshipEventSchema,
@@ -96,6 +100,41 @@ export const InternshipSchema = new Schema(
     },
   }
 );
+
+async function trySetRequested(document: Document) {
+  const requiredFields = [
+    "startDate",
+    "endDate",
+    "operationalArea",
+    "tasks",
+    "workingHours",
+    "supervisor.fullName",
+    "supervisor.emailAddress",
+  ];
+
+  for (const field of requiredFields) {
+    if (!document.get(field)) return;
+  }
+
+  // TODO: Any required fields missing from the list above?
+  const requestEvent: IInternshipEvent = {
+    creator: Types.ObjectId("000000000000000000000000"),
+    timestamp: Date.now(),
+    status: InternshipStatuses.REQUESTED,
+  };
+  document.get("events").push(requestEvent);
+}
+
+async function trySetReadyForGrading(document: Document) {
+  if (!document.get("reportPdf")) return;
+
+  const readyEvent: IInternshipEvent = {
+    creator: (await imimapAdmin).id,
+    timestamp: Date.now(),
+    status: InternshipStatuses.READY_FOR_GRADING,
+  };
+  document.get("events").push(readyEvent);
+}
 
 InternshipSchema.pre("init", function () {
   const createEvent: IInternshipEvent = {
@@ -116,7 +155,7 @@ InternshipSchema.pre("validate", function () {
   }
 });
 
-InternshipSchema.pre("save", function () {
+InternshipSchema.pre("save", async function () {
   if (this.modifiedPaths().includes("endDate")) {
     const startDate = this.get("startDate");
     const endDate = this.get("endDate");
@@ -130,31 +169,21 @@ InternshipSchema.pre("save", function () {
     }
   }
 
-  const requiredFields = [
-    "startDate",
-    "endDate",
-    "operationalArea",
-    "tasks",
-    "workingHours",
-    "supervisor.fullName",
-    "supervisor.emailAddress",
-  ];
-
-  for (const field of requiredFields) {
-    if (!this.get(field)) return;
+  // Update internship state if necessary
+  switch (this.get("status")) {
+    case InternshipStatuses.PLANNED:
+      await trySetRequested(this);
+      break;
+    case InternshipStatuses.OVER:
+      await trySetReadyForGrading(this);
+      break;
   }
-
-  // TODO: Any required fields missing from the list above?
-  const requestEvent: IInternshipEvent = {
-    creator: Types.ObjectId("000000000000000000000000"),
-    timestamp: Date.now(),
-    status: InternshipStatuses.REQUESTED,
-  };
-  this.get("events").push(requestEvent);
 });
 
 InternshipSchema.virtual("status").get(function () {
-  // TODO: Add Linda's virtual property getter for event sourcing
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return getRecentValueForPropSetByEvent("status", this);
 });
 
 export const Internship: Model<IInternship> = model("Internship", InternshipSchema);

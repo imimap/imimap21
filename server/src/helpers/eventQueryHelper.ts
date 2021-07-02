@@ -1,8 +1,7 @@
 import { Document } from "mongoose";
-import { IEvent } from "../models/eventModels/event";
 import { IInternshipModuleScheduleEvent } from "../models/eventModels/internshipModuleScheduleEvent";
 
-export const getRecentValueForPropSetByEvent = (propName: string, document: Document): any => {
+export const getRecentValueForPropSetByEvent = (propName: string, document: Document): unknown => {
   let recentPropValue;
   let i = -1; // counter starts with last element in events array
 
@@ -18,7 +17,7 @@ export const getRecentNotRejectedValueForPropSetByEvent = (
   //todo: this only works for internship scheduling events
   propName: string,
   document: Document
-): any => {
+): unknown => {
   let recentPropValue;
   let i = -1;
 
@@ -36,7 +35,7 @@ export const getRecentAcceptedValueForPropSetByEvent = (
   //todo: this only works for internship scheduling events
   propName: string,
   document: Document
-): any => {
+): unknown => {
   let recentPropValue;
   let i = -1;
 
