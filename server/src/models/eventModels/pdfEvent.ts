@@ -1,4 +1,4 @@
-import { Types, Schema } from "mongoose";
+import { Schema, Types } from "mongoose";
 import { IEvent } from "./event";
 import { User } from "../user";
 

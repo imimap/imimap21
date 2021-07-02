@@ -54,10 +54,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import http from '@/utils/http-common';
 import {
-  setAuthToken,
-  getUserInfo,
+  login,
 } from '@/utils/auth';
 
 export default defineComponent({
@@ -71,25 +69,8 @@ export default defineComponent({
   },
   methods: {
     async login() {
-      try {
-        const res = await http.post('/auth/login', { username: this.username, password: this.password });
-        setAuthToken(res.data.token);
-        const decodedToken = getUserInfo();
-        if (decodedToken !== null) {
-          console.log(decodedToken);
-          await this.$router.push({ name: 'Index' });
-          await this.$store.dispatch('setUser', {
-            displayName: decodedToken.displayName,
-            email: decodedToken.email,
-            firstName: decodedToken.firstName,
-            id: decodedToken.id,
-            lastName: decodedToken.lastName,
-            sub: decodedToken.sub,
-          });
-          await this.$store.dispatch('addNotification', { text: 'Du wurdest erfolgreich eingeloggt!', type: 'success' });
-        }
-      } catch (err) {
-        this.$store.dispatch('addNotification', { text: err.message, type: 'danger' });
+      if (await login(this.username, this.password)) {
+        await this.$router.push({ name: 'Index' });
       }
     },
   },
