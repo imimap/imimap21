@@ -55,7 +55,7 @@ describe("InternshipModule", () => {
     expect(savedInternshipModule?.events.length).toEqual(1);
     expect(savedInternshipModule?.inSemester).toEqual(Semester.getUpcoming().toString());
     expect(savedInternshipModule?.inSemesterOfStudy).toEqual(4);
-    expect(savedInternshipModule?.status).toEqual("scheduled");
+    expect(savedInternshipModule?.status).toEqual("planned");
   });
   describe("postponement requests", () => {
     it("can be made for a valid semester", async () => {
@@ -99,7 +99,7 @@ describe("InternshipModule", () => {
         const savedInternshipModule = await internshipModule?.acceptPostponement(admin?._id);
 
         expect(savedInternshipModule?.events.length).toEqual(3);
-        expect(savedInternshipModule?.status).toEqual("scheduled");
+        expect(savedInternshipModule?.status).toEqual("planned");
         expect(savedInternshipModule?.inSemesterOfStudy).toEqual(lastSetSemesterOfStudy);
         expect(savedInternshipModule?.inSemester).toEqual(lastSetSemester);
       });

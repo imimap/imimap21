@@ -1,6 +1,5 @@
 import { Types, Schema } from "mongoose";
 import { IEvent } from "./event";
-import { User } from "../user";
 import { Semester } from "../../helpers/semesterHelper";
 
 export interface IInternshipModuleScheduleEvent extends IEvent {
@@ -39,19 +38,4 @@ export const InternshipModuleScheduleEventSchema = new Schema({
     required: true,
     type: Schema.Types.ObjectId,
   },
-});
-
-InternshipModuleScheduleEventSchema.pre("save", async function () {
-  const creator = await User.findById(this.get("creator"));
-
-  if (this.modifiedPaths().includes("accept") && !creator?.isAdmin) {
-    throw "Only Admins may accept or reject a postponement.";
-  }
-
-  if (this.get("newSemesterOfStudy") === 4) this.set("accept", true);
-});
-
-InternshipModuleScheduleEventSchema.post("save", async function (doc) {
-  if (doc.newSemesterOfStudy === 4) doc.accept = true;
-  return doc;
 });

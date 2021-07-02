@@ -58,7 +58,7 @@ const InternshipModuleSchema = new Schema<IInternshipModule>(
     ],
     status: {
       type: String,
-      enum: ["unknown", "created", "postponement requested", "scheduled", "postponement rejected"], //todo: separate postponement stati from other stati
+      enum: ["unknown", "planned", "postponement requested", "postponement rejected"], //todo: separate postponement stati from other stati
       required: true,
     },
   },
@@ -87,28 +87,13 @@ InternshipModuleSchema.virtual("inSemesterOfStudy").get(function () {
     : getRecentNotRejectedValueForPropSetByEvent("newSemesterOfStudy", thisDocument);
 });
 
-/*
-InternshipModuleSchema.virtual("status").get(function () {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const allEvents = this.events;
-  const mostRecentEvent = allEvents.slice(-1)[0]; //todo: update if more event types are added
-
-  // if (allEvents.length < 1) return "unknown"; // might need this again
-  if (mostRecentEvent.accept === true) return "scheduled";
-  else if (mostRecentEvent.accept === false) return "postponement rejected";
-  else if (mostRecentEvent.newSemesterOfStudy !== 4) return "postponement requested";
-  else return "unknown";
-});
- */
-
-InternshipModuleSchema.methods.create = async function () {
+InternshipModuleSchema.methods.plan = async function () {
   this.events.push({
     creator: (await imimapAdmin)._id,
     newSemester: Semester.getUpcoming().toString(),
     newSemesterOfStudy: 4,
   });
-  this.status = "scheduled";
+  this.status = "planned";
 
   return this.save();
 };
@@ -141,7 +126,7 @@ InternshipModuleSchema.methods.acceptPostponement = async function (
     creator: creator,
     accept: true,
   });
-  this.status = "scheduled";
+  this.status = "planned";
 
   return this.save();
 };
@@ -150,7 +135,7 @@ InternshipModuleSchema.methods.rejectPostponement = async function (
   creator: Types.ObjectId
 ) {
   const user = await User.findById(creator);
-  if (!user?.isAdmin) throw new Error("Only Admins may accept a postponement.");
+  if (!user?.isAdmin) throw new Error("Only Admins may reject a postponement.");
 
   this.events.push({
     creator: creator,
