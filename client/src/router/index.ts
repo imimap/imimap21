@@ -16,6 +16,7 @@ import Student from '@/views/Student.vue';
 import Help from '@/views/Help.vue';
 import rootStore from '@/store';
 import CreatePostponement from '@/views/CreatePostponement.vue';
+import { availableLocales, defaultLocale } from '@/locales/locales';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -129,6 +130,21 @@ router.beforeEach(async (to, from, next) => {
   if (isLoggedIn() && rootStore.getters.getUser.id === '') {
     if (await storeAuthUser(getAuthToken())) {
       await getAuthUserProfile();
+      next();
+    }
+  } else {
+    next();
+  }
+});
+
+router.beforeEach(async (to, from, next) => {
+  if (typeof to.params.locale !== 'undefined') {
+    if (!availableLocales.includes(to.params.locale.toString())) {
+      next({
+        name: 'Home',
+        params: { locale: defaultLocale },
+      });
+    } else {
       next();
     }
   } else {
