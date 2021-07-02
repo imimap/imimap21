@@ -124,4 +124,25 @@ describe("InternshipModule", () => {
       });
     });
   });
+  describe("registers whether aep has been passed", () => {
+    it("before internships have been completed", async () => {
+      const savedInternshipModule = await InternshipModule.findOne({ aepPassed: false });
+      const user = await User.findOne({ isAdmin: true });
+      const updatedInternshipModule = await savedInternshipModule?.passAep(user?._id);
+      expect(updatedInternshipModule?.events.length).toEqual(2);
+      expect(updatedInternshipModule?.aepPassed).toEqual(true);
+      expect(updatedInternshipModule?.aepPassed).not.toEqual("passed");
+      await updatedInternshipModule?.passAep(user?._id); //register the same event again
+      expect(updatedInternshipModule?.events.length).toEqual(2);
+      expect(updatedInternshipModule?.aepPassed).toEqual(true);
+    });
+    it("after internships have been completed", async () => {
+      const savedInternshipModule = await InternshipModule.findOne({ aepPassed: false });
+      const user = await User.findOne({ isAdmin: true });
+      // todo: add completed internships to test
+      const updatedInternshipModule = await savedInternshipModule?.passAep(user?._id);
+      expect(updatedInternshipModule?.aepPassed).toEqual(true);
+      expect(updatedInternshipModule?.aepPassed).toEqual("passed");
+    });
+  });
 });
