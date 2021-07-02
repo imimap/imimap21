@@ -14,10 +14,11 @@ Prozesse dokumentiert.
 * [Notizen vom 19.05.2021](#notizen-vom-19052021)
 * [Notizen vom 26.05.2021](#notizen-vom-26052021)
 * [Notizen vom 02.06.2021](#notizen-vom-02062021)
+* [Notizen vom 29.06.2021](#notizen-vom-29062021)
 
 ### Notizen vom 24.04.2021
 
-Für das Requirements Engineering soll zunächst der aktuelle Stand der IMIMAP analysiert werden und in UserProfileState Stories
+Für das Requirements Engineering soll zunächst der aktuelle Stand der IMIMAP analysiert werden und in User Stories
 formuliert werden. Basierend darauf ist ein Interview mit dem Praktikumsbeauftragten geplant, um zusätzliche
 Anforderungen zu sammeln. Zudem könnte eine Fokusgruppe mit Studierenden durchgeführt werden, die gerade ihr Praktikum
 eingetragen haben, damit auch Insights aus der Studierendenperspektive mit einbezogen werden können.
@@ -59,7 +60,7 @@ Datenbank:
 
 Planning:
 
-- UserProfileState Stories als Milestones im GitHub-Repo
+- User Stories als Milestones im GitHub-Repo
 - Für Stories werden Issues erstellt, die diese genauer beschreiben und in Sub-Tasks unterteilen; Labels für Frontend
   und Backend
 
@@ -124,3 +125,13 @@ Testing, Deployment) extra?
 Offene Frage: Welche Dokumente müssen von Praktikumsbeauftragten unterschrieben werden und bei welchen reicht eine
 Checkbox auf der Website? -> Lotte schreibt eine Mail an Prof. Strippgen; bei bestandenem Praktikum muss eine
 Unterschrift drauf, da hier eine Prüfungsleistung gemeldet wird
+
+### Notizen vom 29.06.2021
+
+Fokus des Meetings lag darauf, ein Minimum Viable Product zu definieren, welches auf der Showtime präsentiert wird.
+Weiterhin ist das Ziel bis dahin möglichst viele User Stories aus diesem prozess umzusetzen.
+Zudem stellte sich die Frage, wie die Sicherung der Praktikumsunterlagen, welche nach Upload auf dem Server gespeichert werden,
+langfristig sichergestellt werden kann. Bei eventuellen Ausfällen sollte es auf keinen Fall zu Datenlücken in den Dokumenten kommen.
+Darüber hinaus wurde im Meeting kurz besprochen, welche Inhalte auf die Showtimeseite kommen sollen.
+Lotte hat sich bereit erklärt Erstellung des ersten Website-Pull-Requests zu übernehmen und sich inhaltlich damit zu befassen.
+
