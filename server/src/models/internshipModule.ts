@@ -1,8 +1,17 @@
-import { Document, model, Model, PopulatedDoc, Schema } from "mongoose";
+import { Document, model, Model, PopulatedDoc, Schema, Types } from "mongoose";
 import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
-// import { IEvent } from "./event";
-import { Semester } from "../helpers/semesterHelper";
 import { ICompany } from "./company";
+import {
+  IInternshipModuleScheduleEvent,
+  InternshipModuleScheduleEventSchema,
+} from "./eventModels/internshipModuleScheduleEvent";
+import {
+  getRecentAcceptedValueForPropSetByEvent,
+  getRecentNotRejectedValueForPropSetByEvent,
+} from "../helpers/eventQueryHelper";
+import { Semester } from "../helpers/semesterHelper";
+import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
+import { User } from "./user";
 
 export interface IInternshipModule extends Document {
   internships?: PopulatedDoc<ICompany & Document>[];
@@ -11,40 +20,131 @@ export interface IInternshipModule extends Document {
   aepPassed?: boolean;
   reportPdf?: IPdfDocument;
   completeDocumentsPdf?: IPdfDocument;
-  //events: IInternshipEvent[], // extends Event?
+  events: IInternshipModuleScheduleEvent[];
+  status: string;
+  plan(): IInternshipModule;
+  requestPostponement(
+    creator: Types.ObjectId,
+    newSemester: string,
+    newSemesterOfStudy: number
+  ): IInternshipModule;
+  acceptPostponement(creator: Types.ObjectId): IInternshipModule;
+  rejectPostponement(creator: Types.ObjectId): IInternshipModule;
 }
 
-const InternshipModuleSchema = new Schema({
-  internships: [
-    {
-      ref: "Internship",
-      type: Schema.Types.ObjectId,
+const InternshipModuleSchema = new Schema<IInternshipModule>(
+  {
+    internships: [
+      {
+        ref: "Internship",
+        type: Schema.Types.ObjectId,
+      },
+    ],
+    aepPassed: {
+      type: Boolean,
+      default: false,
     },
-  ],
-  inSemester: {
-    type: String,
-    default: Semester.getUpcoming().toString(),
-  },
-  inSemesterOfStudy: {
-    type: Number,
-    default: 4,
-  },
-  aepPassed: {
-    type: Boolean,
-    default: false,
-  },
-  reportPdf: {
-    type: PdfDocumentSchema,
-  },
-  completeDocumentsPdf: {
-    type: PdfDocumentSchema,
-  },
-  events: [
-    {
-      //type: InternshipEventSchema,
+    reportPdf: {
+      type: PdfDocumentSchema,
     },
-  ],
+    completeDocumentsPdf: {
+      type: PdfDocumentSchema,
+    },
+    events: [
+      {
+        type: InternshipModuleScheduleEventSchema,
+        required: true,
+      },
+    ],
+    status: {
+      type: String,
+      enum: ["unknown", "planned", "postponement requested", "postponement rejected"], //todo: separate postponement stati from other stati
+      required: true,
+    },
+  },
+  {
+    toJSON: { virtuals: true },
+  }
+);
+
+InternshipModuleSchema.virtual("inSemester").get(function () {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const thisDocument = this;
+  return thisDocument.status === "postponement rejected"
+    ? getRecentAcceptedValueForPropSetByEvent("newSemester", thisDocument)
+    : getRecentNotRejectedValueForPropSetByEvent("newSemester", thisDocument);
 });
+
+InternshipModuleSchema.virtual("inSemesterOfStudy").get(function () {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const thisDocument = this;
+  return thisDocument.status === "postponement rejected"
+    ? getRecentAcceptedValueForPropSetByEvent("newSemesterOfStudy", thisDocument)
+    : getRecentNotRejectedValueForPropSetByEvent("newSemesterOfStudy", thisDocument);
+});
+
+InternshipModuleSchema.methods.plan = async function () {
+  this.events.push({
+    creator: (await imimapAdmin)._id,
+    newSemester: Semester.getUpcoming().toString(),
+    newSemesterOfStudy: 4,
+  });
+  this.status = "planned";
+
+  return this.save();
+};
+
+InternshipModuleSchema.methods.requestPostponement = async function (
+  creator: Types.ObjectId,
+  newSemester: string,
+  newSemesterOfStudy: number
+) {
+  const user = await User.findById(creator);
+  if (!user) throw new Error("Creator (User) with that objectId does not exist.");
+
+  this.events.push({
+    creator: creator,
+    newSemester: newSemester,
+    newSemesterOfStudy: newSemesterOfStudy,
+  });
+  this.status = "postponement requested";
+
+  return this.save();
+};
+
+InternshipModuleSchema.methods.acceptPostponement = async function (
+  creator: Types.ObjectId
+) {
+  const user = await User.findById(creator);
+  if (!user?.isAdmin) throw new Error("Only Admins may accept a postponement.");
+
+  this.events.push({
+    creator: creator,
+    accept: true,
+  });
+  this.status = "planned";
+
+  return this.save();
+};
+
+InternshipModuleSchema.methods.rejectPostponement = async function (
+  creator: Types.ObjectId
+) {
+  const user = await User.findById(creator);
+  if (!user?.isAdmin) throw new Error("Only Admins may reject a postponement.");
+
+  this.events.push({
+    creator: creator,
+    accept: false,
+  });
+  this.status = "postponement rejected";
+
+  return this.save();
+};
 
 export const InternshipModule: Model<IInternshipModule> = model(
   "InternshipModule",
