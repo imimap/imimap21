@@ -2,7 +2,7 @@ import { Document, model, Model, PopulatedDoc, Schema, Types } from "mongoose";
 import { ISupervisor, SupervisorSchema } from "./supervisor";
 import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
 import { Semester } from "../helpers/semesterHelper";
-import { isValidDateRange, normalizeDate } from "../helpers/dateHelper";
+import { getWeeksBetween, isValidDateRange, normalizeDate } from "../helpers/dateHelper";
 import { ICompany } from "./company";
 import { getRecentValueForPropSetByEvent } from "../helpers/eventQueryHelper";
 import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
@@ -12,6 +12,7 @@ import { EventSchema, IEvent } from "./eventModels/event";
 export interface IInternship extends Document {
   startDate?: Date;
   endDate?: Date;
+  durationInWeeksSoFar: number;
   company?: PopulatedDoc<ICompany & Document>;
   tasks?: string;
   operationalArea?: string;
@@ -225,6 +226,17 @@ InternshipSchema.virtual("status").get(function () {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return getRecentValueForPropSetByEvent("status", this);
+});
+
+InternshipSchema.virtual("durationInWeeksSoFar").get(function () {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const document = this;
+  let dateToCompareWith: Date = normalizeDate(new Date());
+  if (document.startDate > dateToCompareWith) return 0;
+  if (document.endDate < dateToCompareWith) dateToCompareWith = document.endDate;
+  return getWeeksBetween(document.startDate, dateToCompareWith);
 });
 
 /*******************/

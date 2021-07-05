@@ -1,7 +1,9 @@
 import * as dbHandler from "./database";
-import { IInternshipModule, InternshipModule } from "../../src/models/internshipModule";
-import { Semester } from "../../src/helpers/semesterHelper";
-import { User } from "../../src/models/user";
+import { IInternshipModule, InternshipModule } from "../internshipModule";
+import { Semester } from "../../helpers/semesterHelper";
+import { User } from "../user";
+import { Internship } from "../internship";
+import { Types } from "mongoose";
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -47,11 +49,11 @@ afterAll(async () => {
 
 describe("InternshipModule", () => {
   it("can be created from valid data", async () => {
-    const savedInternshipModule = await InternshipModule.findOne({ aepPassed: false });
+    const savedInternshipModule = await InternshipModule.findOne();
     expect(savedInternshipModule?.aepPassed).toEqual(false);
   });
   it("automatically plans the internship module for the upcoming semester", async () => {
-    const savedInternshipModule = await InternshipModule.findOne({ aepPassed: false });
+    const savedInternshipModule = await InternshipModule.findOne();
     expect(savedInternshipModule?.events.length).toEqual(1);
     expect(savedInternshipModule?.inSemester).toEqual(Semester.getUpcoming().toString());
     expect(savedInternshipModule?.inSemesterOfStudy).toEqual(4);
@@ -63,7 +65,7 @@ describe("InternshipModule", () => {
       const newSemesterOfStudy = 6;
       const user = await User.findOne({ isAdmin: false });
 
-      const internshipModule = await InternshipModule.findOne({ aepPassed: false });
+      const internshipModule = await InternshipModule.findOne();
       const savedInternshipModule = await internshipModule?.requestPostponement(
         user?._id,
         newSemester,
@@ -78,7 +80,7 @@ describe("InternshipModule", () => {
     it("can not be made for an invalid semester", async () => {
       const newSemester = "ES2015";
       const user = await User.findOne({ isAdmin: false });
-      const internshipModule = await InternshipModule.findOne({ aepPassed: false });
+      const internshipModule = await InternshipModule.findOne();
       await expect(
         internshipModule?.requestPostponement(user?._id, newSemester, 6)
       ).rejects.toThrow();
@@ -86,13 +88,13 @@ describe("InternshipModule", () => {
     describe("admin actions: ", () => {
       beforeEach(async () => {
         const user = await User.findOne({ isAdmin: false });
-        const internshipModule = await InternshipModule.findOne({ aepPassed: false });
+        const internshipModule = await InternshipModule.findOne();
         await internshipModule?.requestPostponement(user?._id, "WS2025", 6);
       });
       it("can be accepted by admin", async () => {
         const admin = await User.findOne({ isAdmin: true });
 
-        const internshipModule = await InternshipModule.findOne({ aepPassed: false });
+        const internshipModule = await InternshipModule.findOne();
         const lastSetSemester = internshipModule?.inSemester;
         const lastSetSemesterOfStudy = internshipModule?.inSemesterOfStudy;
 
@@ -106,7 +108,7 @@ describe("InternshipModule", () => {
       it("can be rejected by admin", async () => {
         const admin = await User.findOne({ isAdmin: true });
 
-        const internshipModule = await InternshipModule.findOne({ aepPassed: false });
+        const internshipModule = await InternshipModule.findOne();
         const lastSetSemester = internshipModule?.inSemester;
         const lastSetSemesterOfStudy = internshipModule?.inSemesterOfStudy;
 
@@ -119,9 +121,53 @@ describe("InternshipModule", () => {
       });
       it("can not be accepted or rejected by a normal user", async () => {
         const user = await User.findOne({ isAdmin: false });
-        const internshipModule = await InternshipModule.findOne({ aepPassed: false });
+        const internshipModule = await InternshipModule.findOne();
         await expect(internshipModule?.rejectPostponement(user?._id)).rejects.toThrow();
       });
+    });
+  });
+  describe("registers whether aep has been passed", () => {
+    it("automatically registers module to not have passed aep", async () => {
+      const savedInternshipModule = await InternshipModule.findOne({ aepPassed: false });
+      expect(savedInternshipModule).toBeTruthy();
+    });
+    it("before internships have been completed", async () => {
+      const savedInternshipModule = await InternshipModule.findOne();
+      const user = await User.findOne({ isAdmin: true });
+      const updatedInternshipModule = await savedInternshipModule?.passAep(user?._id);
+      expect(updatedInternshipModule?.events.length).toEqual(2);
+      expect(updatedInternshipModule?.aepPassed).toEqual(true);
+      expect(updatedInternshipModule?.status).not.toEqual("passed");
+
+      await expect(updatedInternshipModule?.passAep(user?._id)).rejects.toThrow();
+    });
+    it("after internships have been completed", async () => {
+      const savedInternshipModule = await InternshipModule.findOne();
+      const user = await User.findOne({ isAdmin: true });
+
+      const internshipId = Types.ObjectId("00000000000000000000000a");
+      const savedInternship = await Internship.create({
+        _id: internshipId,
+        operationalArea: "Game Design",
+        programmingLanguages: ["C#", "JavaScript"],
+        paymentTypes: ["cash benefit"],
+        startDate: new Date("2020-05-02"),
+        endDate: new Date("2021-03-02"),
+        tasks: "These are crazy tasks for an intern to do",
+        workingHoursPerWeek: 42,
+        supervisor: {
+          fullName: "Peter Pan",
+          emailAddress: "peter@pan.de",
+        },
+      });
+      // todo: approve internship by admin / adapt test to what we finally did for internship
+
+      savedInternshipModule?.internships?.push(internshipId);
+      await savedInternshipModule?.save();
+
+      const updatedInternshipModule = await savedInternshipModule?.passAep(user?._id);
+      expect(updatedInternshipModule?.aepPassed).toEqual(true);
+      expect(updatedInternshipModule?.status).toEqual("passed");
     });
   });
 });
