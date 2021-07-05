@@ -1,6 +1,5 @@
 import * as dbHandler from "./database";
-import { Internship } from "../../src/models/internship";
-import { InternshipStatuses } from "../../src/models/eventModels/internshipEvent";
+import { Internship, InternshipStatuses } from "../../src/models/internship";
 import { Error, Types } from "mongoose";
 import { User } from "../../src/models/user";
 
@@ -164,7 +163,10 @@ describe("Internship", () => {
 
     internship?.events.push({
       creator: ADMIN_USER_ID,
-      status: InternshipStatuses.OVER,
+      accept: true,
+      changes: {
+        status: InternshipStatuses.OVER,
+      },
     });
     await internship?.save();
     const path = `http://localhost:9000/pdfs/s0100000/${Types.ObjectId()}/${Types.ObjectId()}.pdf`;

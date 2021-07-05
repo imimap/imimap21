@@ -1,10 +1,10 @@
-import { Types, Schema } from "mongoose";
+import { Schema, Types } from "mongoose";
 
 export interface IEvent {
   timestamp?: number;
   creator: Types.ObjectId;
   changes?: {
-    [key: string]: any;
+    [key: string]: unknown;
   };
   accept?: boolean;
 }

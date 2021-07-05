@@ -4,14 +4,10 @@ import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
 import { Semester } from "../helpers/semesterHelper";
 import { isValidDateRange, normalizeDate } from "../helpers/dateHelper";
 import { ICompany } from "./company";
-import {
-  IInternshipEvent,
-  InternshipEventSchema,
-  InternshipStatuses,
-} from "./eventModels/internshipEvent";
 import { getRecentValueForPropSetByEvent } from "../helpers/eventQueryHelper";
 import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
 import { User } from "./user";
+import { EventSchema, IEvent } from "./eventModels/event";
 
 export interface IInternship extends Document {
   startDate?: Date;
@@ -32,7 +28,7 @@ export interface IInternship extends Document {
   bvgTicketExemptionPdf?: IPdfDocument;
   certificatePdf?: IPdfDocument;
   reportPdf?: IPdfDocument;
-  events: IInternshipEvent[];
+  events: IEvent[];
   status: string;
 
   approve(creator: Types.ObjectId): Promise<IInternship>;
@@ -97,7 +93,7 @@ export const InternshipSchema = new Schema<IInternship>(
     reportPdf: { type: PdfDocumentSchema, default: { events: [] } },
     events: [
       {
-        type: InternshipEventSchema,
+        type: EventSchema,
       },
     ],
   },
@@ -107,6 +103,16 @@ export const InternshipSchema = new Schema<IInternship>(
     },
   }
 );
+
+export enum InternshipStatuses {
+  PLANNED = "planned",
+  REQUESTED = "requested",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+  OVER = "over",
+  READY_FOR_GRADING = "readyForGrading",
+  PASSED = "passed",
+}
 
 // TODO: Any required fields missing from the list?
 const requiredFields = [
@@ -133,19 +139,23 @@ async function trySetRequested(document: Document) {
     // If status is not 'planned', leave it as is
     if (status !== InternshipStatuses.PLANNED) return;
     // If status is 'planned', set to 'requested'
-    const requestEvent: IInternshipEvent = {
+    document.get("events").push({
       creator: (await imimapAdmin)._id,
-      status: InternshipStatuses.REQUESTED,
-    };
-    document.get("events").push(requestEvent);
+      accept: true,
+      changes: {
+        status: InternshipStatuses.REQUESTED,
+      },
+    });
   } else {
     if (getRecentValueForPropSetByEvent("status", document) === InternshipStatuses.PLANNED) return;
     // Set status back to 'planned'
-    const plannedEvent: IInternshipEvent = {
+    document.get("events").push({
       creator: (await imimapAdmin)._id,
-      status: InternshipStatuses.PLANNED,
-    };
-    document.get("events").push(plannedEvent);
+      accept: true,
+      changes: {
+        status: InternshipStatuses.PLANNED,
+      },
+    });
   }
 }
 
@@ -153,11 +163,13 @@ async function trySetReadyForGrading(document: Document) {
   const reportPdf = document.get("reportPdf");
   if (!reportPdf) return;
 
-  const readyEvent: IInternshipEvent = {
+  document.get("events").push({
     creator: (await imimapAdmin)._id,
-    status: InternshipStatuses.READY_FOR_GRADING,
-  };
-  document.get("events").push(readyEvent);
+    accept: true,
+    changes: {
+      status: InternshipStatuses.READY_FOR_GRADING,
+    },
+  });
 }
 
 /*********************/
@@ -184,12 +196,13 @@ InternshipSchema.pre("validate", function () {
 
 InternshipSchema.pre("save", async function () {
   if (this.isNew) {
-    const createEvent: IInternshipEvent = {
+    this.events.push({
       creator: (await imimapAdmin)._id,
-      status: InternshipStatuses.PLANNED,
-    };
-
-    this.events.push(createEvent);
+      accept: true,
+      changes: {
+        status: InternshipStatuses.PLANNED,
+      },
+    });
   }
 
   // Update internship state if necessary
@@ -227,7 +240,10 @@ InternshipSchema.methods.approve = async function (creator: Types.ObjectId) {
 
   this.events.push({
     creator: creator,
-    status: InternshipStatuses.APPROVED,
+    accept: true,
+    changes: {
+      status: InternshipStatuses.APPROVED,
+    },
   });
 
   return await this.save();
@@ -243,7 +259,10 @@ InternshipSchema.methods.reject = async function (creator: Types.ObjectId) {
 
   this.events.push({
     creator: creator,
-    status: InternshipStatuses.REJECTED,
+    accept: true,
+    changes: {
+      status: InternshipStatuses.REJECTED,
+    },
   });
 
   return await this.save();
@@ -259,7 +278,10 @@ InternshipSchema.methods.pass = async function (creator: Types.ObjectId) {
 
   this.events.push({
     creator: creator,
-    status: InternshipStatuses.PASSED,
+    accept: true,
+    changes: {
+      status: InternshipStatuses.PASSED,
+    },
   });
 
   return await this.save();
