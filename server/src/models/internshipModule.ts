@@ -1,5 +1,5 @@
 import { Document, model, Model, PopulatedDoc, Schema, Types } from "mongoose";
-import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
+import { IPdfDocument, PdfDocument, PdfDocumentSchema } from "./pdfDocument";
 import {
   getRecentAcceptedValueForPropSetByEvent,
   getRecentNotRejectedValueForPropSetByEvent,
@@ -8,7 +8,7 @@ import { Semester } from "../helpers/semesterHelper";
 import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
 import { User } from "./user";
 import { EventSchema, IEvent } from "./eventModels/event";
-import {IInternship, Internship} from "./internship";
+import { IInternship, Internship } from "./internship";
 
 export interface IInternshipModule extends Document {
   internships?: PopulatedDoc<IInternship & Document>[];
@@ -29,6 +29,8 @@ export interface IInternshipModule extends Document {
   acceptPostponement(creator: Types.ObjectId): IInternshipModule;
   rejectPostponement(creator: Types.ObjectId): IInternshipModule;
   passAep(creator: Types.ObjectId): IInternshipModule;
+  trySetPassed(): IInternshipModule;
+  submitCompleteDocumentsPdf(creator: Types.ObjectId, newPath: string): IInternshipModule;
 }
 
 const InternshipModuleSchema = new Schema<IInternshipModule>(
@@ -122,7 +124,7 @@ InternshipModuleSchema.methods.plan = async function () {
   return this.save();
 };
 
-InternshipModuleSchema.methods.trySetPassed = async function (): boolean {
+InternshipModuleSchema.methods.trySetPassed = async function () {
   if (
     this.aepPassed &&
     this.weeksTotalLongEnough &&
@@ -206,6 +208,21 @@ InternshipModuleSchema.methods.passAep = async function (creator: Types.ObjectId
     this.internships?.every((internship) => internship.status === InternshipStatuses.APPROVED)
   )
     this.status = "passed";
+
+  return this.save();
+};
+
+InternshipModuleSchema.methods.submitCompleteDocumentsPdf = async function (
+  creator: Types.ObjectId,
+  newPath: string
+) {
+  const user = await User.findById(creator);
+  if (!user?.isAdmin) throw new Error("Only Admins may declare the AEP as passed.");
+
+  const pdfDocument: IPdfDocument = new PdfDocument();
+
+  const savedDocument = await pdfDocument.submit(user._id, newPath);
+  this.completeDocumentsPdf = savedDocument;
 
   return this.save();
 };
