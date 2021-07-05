@@ -1,5 +1,4 @@
-import { Types, Schema, SchemaDefinition } from "mongoose";
-import { Change, ChangeSchema } from "./change";
+import { Types, Schema } from "mongoose";
 
 export interface IEvent {
   timestamp?: number;
@@ -7,6 +6,7 @@ export interface IEvent {
   changes?: {
     [key: string]: any;
   };
+  accept?: boolean;
 }
 
 export const EventSchema = new Schema({
@@ -22,5 +22,8 @@ export const EventSchema = new Schema({
   },
   changes: {
     type: Schema.Types.Mixed,
+  },
+  accept: {
+    type: Boolean,
   },
 });

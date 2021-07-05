@@ -1,11 +1,14 @@
 import { Document, model, Model, Schema, Types } from "mongoose";
-import { IPdfEvent, PdfEventSchema } from "./eventModels/pdfEvent";
 import { getRecentValueForPropSetByEvent } from "../helpers/eventQueryHelper";
 import { User } from "./user";
-import {rejects} from "assert";
+import { EventSchema, IEvent } from "./eventModels/event";
+
+function isValidPdf(path: string) {
+  return /http:\/\/localhost:9000\/pdfs\/s0[0-9]{6}\/[0-9a-f]{24}\/[0-9a-f]{24}\.pdf$/.test(path); //example: http://localhost:9000/pdfs/s0555949/507f1f77bcf86cd799439011/requestPdf-01.pdf
+}
 
 export interface IPdfDocument extends Document {
-  events: IPdfEvent[];
+  events: IEvent[];
   path: string;
   status: string;
   nextPath(): string;
@@ -18,12 +21,12 @@ export const PdfDocumentSchema = new Schema<IPdfDocument>(
   {
     events: [
       {
-        type: PdfEventSchema,
+        type: EventSchema,
+        required: true,
         validate: {
-          validator: (value: [IPdfEvent]) => value.length > 0,
+          validator: (value: [IEvent]) => value.length > 0,
           message: "To create a PdfDocument, submit at least one event.",
         },
-        required: true,
       },
     ],
     status: {
@@ -60,9 +63,18 @@ PdfDocumentSchema.methods.submit = async function (creator: Types.ObjectId, newP
   const user = await User.findById(creator);
   if (!user) throw new Error("Creator (User) with that objectId does not exist.");
 
+  if (!isValidPdf(newPath))
+    throw new Error(
+      "Path is foreign or has invalid name. " +
+        "PDF needs to be saved on own server and be saved under a student id and document object id, " +
+        "as well as the version."
+    );
+
   this.events.push({
-    newPath: newPath,
     creator: creator,
+    changes: {
+      newPath: newPath,
+    },
   });
   this.status = "submitted";
   return this.save();
@@ -72,11 +84,22 @@ PdfDocumentSchema.methods.accept = async function (creator: Types.ObjectId, newP
   const user = await User.findById(creator);
   if (!user?.isAdmin) throw new Error("Only Admins may accept a pdf.");
 
-  const event: IPdfEvent = {
+  if (newPath && !isValidPdf(newPath))
+    throw new Error(
+      "Path is foreign or has invalid name. " +
+        "PDF needs to be saved on own server and be saved under a student id and document object id, " +
+        "as well as the version."
+    );
+
+  const event: IEvent = {
     creator: creator,
     accept: true,
   };
-  if (newPath) event.newPath = newPath;
+  if (newPath) {
+    event.changes = {
+      newPath: newPath,
+    };
+  }
 
   this.events.push(event);
   this.status = "accepted";

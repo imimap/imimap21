@@ -2,10 +2,6 @@ import { Document, model, Model, PopulatedDoc, Schema, Types } from "mongoose";
 import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
 import { ICompany } from "./company";
 import {
-  IInternshipModuleScheduleEvent,
-  InternshipModuleScheduleEventSchema,
-} from "./eventModels/internshipModuleScheduleEvent";
-import {
   getRecentAcceptedValueForPropSetByEvent,
   getRecentNotRejectedValueForPropSetByEvent,
 } from "../helpers/eventQueryHelper";
@@ -55,6 +51,10 @@ const InternshipModuleSchema = new Schema<IInternshipModule>(
       {
         type: EventSchema,
         required: true,
+        validate: {
+          validator: (value: [IEvent]) => value.length > 0,
+          message: "To create a PdfDocument, submit at least one event.",
+        },
       },
     ],
     status: {
@@ -134,9 +134,7 @@ InternshipModuleSchema.methods.acceptPostponement = async function (creator: Typ
 
   this.events.push({
     creator: creator,
-    changes: {
-      accept: true,
-    },
+    accept: true,
   });
   this.status = "planned";
 
@@ -149,9 +147,7 @@ InternshipModuleSchema.methods.rejectPostponement = async function (creator: Typ
 
   this.events.push({
     creator: creator,
-    changes: {
-      accept: false,
-    },
+    accept: false,
   });
   this.status = "postponement rejected";
 
