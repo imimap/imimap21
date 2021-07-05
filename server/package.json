@@ -10,7 +10,7 @@
     "watch": "tsc-watch --onSuccess \"npm run serve-debug\"",
     "format": "prettier src/server.ts **/*.js --write",
     "lint": "eslint \"src/**\"",
-    "test-mongoose": "jest --runInBand --detectOpenHandles ./src/models/test"
+    "test": "jest --runInBand --detectOpenHandles"
   },
   "license": "ISC",
   "dependencies": {

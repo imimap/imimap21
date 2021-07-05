@@ -1,7 +1,7 @@
 import * as dbHandler from "./database";
-import { IInternshipModule, InternshipModule } from "../internshipModule";
-import { Semester } from "../../helpers/semesterHelper";
-import { User } from "../user";
+import { IInternshipModule, InternshipModule } from "../../src/models/internshipModule";
+import { Semester } from "../../src/helpers/semesterHelper";
+import { User } from "../../src/models/user";
 
 beforeAll(async () => {
   await dbHandler.connect();

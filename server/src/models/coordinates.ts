@@ -22,7 +22,7 @@ export const CoordinatesSchema = new Schema(
 );
 
 export const getCoordinates = async function (document: IAddress): Promise<ICoordinates> {
-  const key = process.env.GoogleAPIkey; // todo: get key
+  const key = process.env.GOOGLE_API_KEY;
 
   const addressString = Object.values(document).join(" ");
   const url = encodeURI(

@@ -2,7 +2,6 @@ import { Document, model, Model, Schema, Types } from "mongoose";
 import { IPdfEvent, PdfEventSchema } from "./eventModels/pdfEvent";
 import { getRecentValueForPropSetByEvent } from "../helpers/eventQueryHelper";
 import { User } from "./user";
-import {rejects} from "assert";
 
 export interface IPdfDocument extends Document {
   events: IPdfEvent[];
@@ -52,8 +51,7 @@ PdfDocumentSchema.methods.nextPath = function () {
   if (!currentPath) throw new Error("Path for this document is not set.");
   const pathParts = currentPath.split("/");
   pathParts.pop();
-  const newPath = pathParts.join("/") + "/" + Types.ObjectId() + ".pdf";
-  return newPath;
+  return pathParts.join("/") + "/" + Types.ObjectId() + ".pdf";
 };
 
 PdfDocumentSchema.methods.submit = async function (creator: Types.ObjectId, newPath: string) {
@@ -65,7 +63,7 @@ PdfDocumentSchema.methods.submit = async function (creator: Types.ObjectId, newP
     creator: creator,
   });
   this.status = "submitted";
-  return this.save();
+  return (this.$parent() ?? this).save();
 };
 
 PdfDocumentSchema.methods.accept = async function (creator: Types.ObjectId, newPath?: string) {
@@ -80,7 +78,7 @@ PdfDocumentSchema.methods.accept = async function (creator: Types.ObjectId, newP
 
   this.events.push(event);
   this.status = "accepted";
-  return this.save();
+  return (this.$parent() ?? this).save();
 };
 
 PdfDocumentSchema.methods.reject = async function (creator: Types.ObjectId) {
@@ -92,7 +90,7 @@ PdfDocumentSchema.methods.reject = async function (creator: Types.ObjectId) {
     accept: false,
   });
   this.status = "rejected";
-  return this.save();
+  return (this.$parent() ?? this).save();
 };
 
 export const PdfDocument: Model<IPdfDocument> = model("PdfDocument", PdfDocumentSchema);

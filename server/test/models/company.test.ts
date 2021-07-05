@@ -1,6 +1,6 @@
-import { Company } from "../company";
+import { Company } from "../../src/models/company";
 import * as dbHandler from "./database";
-import { Internship } from "../internship";
+import { Internship } from "../../src/models/internship";
 
 beforeAll(async () => {
   await dbHandler.connect();

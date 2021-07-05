@@ -31,8 +31,9 @@ export const InternshipEventSchema = new Schema({
 });
 
 InternshipEventSchema.pre("save", async function () {
-  const creator = await User.findById(this.get("creator"));
-  if (!creator) throw "Creator (User) with that objectId does not exist.";
+  const creatorId = this.get("creator");
+  const creator = await User.findById(creatorId);
+  if (!creator) throw `Creator (user) with id ${creatorId} does not exist.`;
 
   const status = this.get("status");
   if (adminOnlyStatuses.indexOf(status) !== -1 && !creator.isAdmin)

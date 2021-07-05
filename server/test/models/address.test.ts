@@ -1,8 +1,10 @@
+import { config as dotenvConfig } from "dotenv";
 import * as dbHandler from "./database";
-import { Company } from "../company";
-import { IAddress } from "../address";
+import { Company } from "../../src/models/company";
+import { IAddress } from "../../src/models/address";
 
 beforeAll(async () => {
+  dotenvConfig({ path: "../.env" });
   await dbHandler.connect();
 });
 

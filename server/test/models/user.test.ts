@@ -1,5 +1,5 @@
 import * as dbHandler from "./database";
-import { User } from "../user";
+import { User } from "../../src/models/user";
 
 beforeAll(async () => {
   await dbHandler.connect();
