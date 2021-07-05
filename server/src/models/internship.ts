@@ -2,7 +2,7 @@ import { Document, model, Model, PopulatedDoc, Schema } from "mongoose";
 import { ISupervisor, SupervisorSchema } from "./supervisor";
 import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
 import { Semester } from "../helpers/semesterHelper";
-import {getWeeksBetween, isValidDateRange, normalizeDate} from "../helpers/dateHelper";
+import { getWeeksBetween, isValidDateRange, normalizeDate } from "../helpers/dateHelper";
 import { ICompany } from "./company";
 
 export interface IInternship extends Document {
