@@ -2,12 +2,11 @@ import { Document, model, Model, PopulatedDoc, Schema, Types } from "mongoose";
 import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
 import {
   getRecentAcceptedValueForPropSetByEvent,
-  getRecentNotRejectedValueForPropSetByEvent,
+  getRecentNotRejectedValueForPropSetByEvent, getRecentValueForPropSetByEvent,
 } from "../helpers/eventQueryHelper";
 import { Semester } from "../helpers/semesterHelper";
 import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
 import { User } from "./user";
-import { IAepPassedEventSchema } from "./eventModels/aepPassedEvent";
 import { EventSchema, IEvent } from "./eventModels/event";
 import { IInternship } from "./internship";
 
@@ -95,17 +94,25 @@ InternshipModuleSchema.virtual("inSemesterOfStudy").get(function () {
 });
 
 InternshipModuleSchema.virtual("aepPassed").get(function () {
-  let i = -1;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  //return getRecentValueForPropSetByEvent("aepPassed", this) ? true : false;
+  //let i = -1;
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const events = this.events;
-  while (i >= events.length * -1) {
+  const aepEvents = this.events.filter((event) => event.changes?.aepPassed);
+  console.log(aepEvents);
+  return aepEvents[0] || false;
+  //return events.length > 0;
+  /*while (i >= events.length * -1) {
     const recentEvent: IEvent = events.slice(i)[0];
     if (typeof recentEvent === IAepPassedEventSchema.toString()) return true;
     i--;
   }
   return false;
+
+   */
 });
 
 InternshipModuleSchema.virtual("weeksTotalLongEnough").get(function () {
@@ -123,6 +130,7 @@ InternshipModuleSchema.methods.plan = async function () {
     changes: {
       newSemester: Semester.getUpcoming().toString(),
       newSemesterOfStudy: 4,
+      aepPassed: false,
     },
   });
   this.status = "planned";
@@ -184,11 +192,17 @@ InternshipModuleSchema.methods.rejectPostponement = async function (creator: Typ
 };
 
 InternshipModuleSchema.methods.passAep = async function (creator: Types.ObjectId) {
+  if (this.aepPassed) throw new Error("Aep has already been passed.");
+
   const user = await User.findById(creator);
   if (!user?.isAdmin) throw new Error("Only Admins may declare the AEP as passed.");
 
   this.events.push({
     creator: creator,
+    changes: {
+      aepPassed: true,
+    },
+    accept: true,
   });
   if (this.weeksTotalLongEnough) this.status = "passed";
 
