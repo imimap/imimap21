@@ -8,7 +8,7 @@ import { Semester } from "../helpers/semesterHelper";
 import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
 import { User } from "./user";
 import { EventSchema, IEvent } from "./eventModels/event";
-import { IInternship } from "./internship";
+import {IInternship, Internship} from "./internship";
 
 export interface IInternshipModule extends Document {
   internships?: PopulatedDoc<IInternship & Document>[];
@@ -122,6 +122,19 @@ InternshipModuleSchema.methods.plan = async function () {
   return this.save();
 };
 
+InternshipModuleSchema.methods.trySetPassed = async function (): boolean {
+  if (
+    this.aepPassed &&
+    this.weeksTotalLongEnough &&
+    this.internships?.every((internship) => internship.status === InternshipStatuses.APPROVED)
+  ) {
+    this.status = "passed";
+    await this.save();
+    return true;
+  }
+  return false;
+};
+
 InternshipModuleSchema.methods.requestPostponement = async function (
   creator: Types.ObjectId,
   newSemester: string,
@@ -188,7 +201,11 @@ InternshipModuleSchema.methods.passAep = async function (creator: Types.ObjectId
     },
     accept: true,
   });
-  if (this.weeksTotalLongEnough) this.status = "passed";
+  if (
+    this.weeksTotalLongEnough &&
+    this.internships?.every((internship) => internship.status === InternshipStatuses.APPROVED)
+  )
+    this.status = "passed";
 
   return this.save();
 };

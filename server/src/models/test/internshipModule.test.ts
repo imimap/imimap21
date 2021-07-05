@@ -138,7 +138,8 @@ describe("InternshipModule", () => {
       expect(updatedInternshipModule?.events.length).toEqual(2);
       expect(updatedInternshipModule?.aepPassed).toEqual(true);
       expect(updatedInternshipModule?.status).not.toEqual("passed");
-      await expect(updatedInternshipModule?.passAep(user?._id)).rejects.toThrow(); //register the same event again
+
+      await expect(updatedInternshipModule?.passAep(user?._id)).rejects.toThrow();
     });
     it("after internships have been completed", async () => {
       const savedInternshipModule = await InternshipModule.findOne();
