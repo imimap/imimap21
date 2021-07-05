@@ -12,6 +12,7 @@ import {
 import { Semester } from "../helpers/semesterHelper";
 import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
 import { User } from "./user";
+import { EventSchema, IEvent } from "./eventModels/event";
 
 export interface IInternshipModule extends Document {
   internships?: PopulatedDoc<ICompany & Document>[];
@@ -20,7 +21,7 @@ export interface IInternshipModule extends Document {
   aepPassed?: boolean;
   reportPdf?: IPdfDocument;
   completeDocumentsPdf?: IPdfDocument;
-  events: IInternshipModuleScheduleEvent[];
+  events: IEvent[];
   status: string;
   plan(): IInternshipModule;
   requestPostponement(
@@ -52,7 +53,7 @@ const InternshipModuleSchema = new Schema<IInternshipModule>(
     },
     events: [
       {
-        type: InternshipModuleScheduleEventSchema,
+        type: EventSchema,
         required: true,
       },
     ],
@@ -90,8 +91,10 @@ InternshipModuleSchema.virtual("inSemesterOfStudy").get(function () {
 InternshipModuleSchema.methods.plan = async function () {
   this.events.push({
     creator: (await imimapAdmin)._id,
-    newSemester: Semester.getUpcoming().toString(),
-    newSemesterOfStudy: 4,
+    changes: {
+      newSemester: Semester.getUpcoming().toString(),
+      newSemesterOfStudy: 4,
+    },
   });
   this.status = "planned";
 
@@ -106,40 +109,49 @@ InternshipModuleSchema.methods.requestPostponement = async function (
   const user = await User.findById(creator);
   if (!user) throw new Error("Creator (User) with that objectId does not exist.");
 
+  if (!Semester.isValidSemesterString(newSemester))
+    throw new Error(
+      "Semester is not valid. Needs to be WS20XX or SS20XX (replace XX with numbers)"
+    );
+  if (newSemesterOfStudy < 1)
+    throw new Error("SemesterOfStudy is not valid. Needs to be a positive number.");
+
   this.events.push({
     creator: creator,
-    newSemester: newSemester,
-    newSemesterOfStudy: newSemesterOfStudy,
+    changes: {
+      newSemester: newSemester,
+      newSemesterOfStudy: newSemesterOfStudy,
+    },
   });
   this.status = "postponement requested";
 
   return this.save();
 };
 
-InternshipModuleSchema.methods.acceptPostponement = async function (
-  creator: Types.ObjectId
-) {
+InternshipModuleSchema.methods.acceptPostponement = async function (creator: Types.ObjectId) {
   const user = await User.findById(creator);
   if (!user?.isAdmin) throw new Error("Only Admins may accept a postponement.");
 
   this.events.push({
     creator: creator,
-    accept: true,
+    changes: {
+      accept: true,
+    },
   });
   this.status = "planned";
 
   return this.save();
 };
 
-InternshipModuleSchema.methods.rejectPostponement = async function (
-  creator: Types.ObjectId
-) {
+InternshipModuleSchema.methods.rejectPostponement = async function (creator: Types.ObjectId) {
   const user = await User.findById(creator);
   if (!user?.isAdmin) throw new Error("Only Admins may reject a postponement.");
 
   this.events.push({
     creator: creator,
-    accept: false,
+    changes: {
+      accept: false,
+    },
   });
   this.status = "postponement rejected";
 

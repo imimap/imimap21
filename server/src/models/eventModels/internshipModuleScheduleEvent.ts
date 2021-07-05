@@ -9,7 +9,7 @@ export interface IInternshipModuleScheduleEvent extends IEvent {
 }
 
 export const InternshipModuleScheduleEventSchema = new Schema({
-  ...EventSchema,
+  //...EventSchema,
   newSemester: {
     type: String,
     validate: {

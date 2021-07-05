@@ -11,7 +11,7 @@ export interface IPdfEvent extends IEvent {
 }
 
 export const PdfEventSchema = new Schema({
-  ...EventSchema,
+  //...EventSchema,
   newPath: {
     type: String,
     validate: {

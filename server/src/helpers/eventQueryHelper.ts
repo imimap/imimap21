@@ -8,43 +8,41 @@ export const getRecentValueForPropSetByEvent = (propName: string, document: Docu
 
   const events = document.get("events");
   while (!recentPropValue && i >= events.length * -1) {
-    recentPropValue = events.slice(i)[0].get(propName);
+    recentPropValue = events.slice(i)[0].changes.get(propName);
     i--;
   }
   return recentPropValue;
 };
 
 export const getRecentNotRejectedValueForPropSetByEvent = (
-  //todo: this only works for internship scheduling events
   propName: string,
   document: Document
 ): any => {
   let recentPropValue;
   let i = -1;
 
-  const events = document.get("events").filter((event: IInternshipModuleScheduleEvent) => {
-    return event.accept !== false;
+  const events = document.get("events").filter((event: IEvent) => {
+    return event.changes?.accept !== false;
   });
   while (!recentPropValue && i >= events.length * -1) {
-    recentPropValue = events.slice(i)[0][propName];
+    recentPropValue = events.slice(i)[0].changes[propName];
     i--;
   }
   return recentPropValue;
 };
 
 export const getRecentAcceptedValueForPropSetByEvent = (
-  //todo: this only works for internship scheduling events
   propName: string,
   document: Document
 ): any => {
   let recentPropValue;
   let i = -1;
 
-  const events = document.get("events").filter((event: IInternshipModuleScheduleEvent) => {
-    return event.accept === true;
+  const events = document.get("events").filter((event: IEvent) => {
+    return event.changes?.accept === true;
   });
   while (!recentPropValue && i >= events.length * -1) {
-    recentPropValue = events.slice(i)[0][propName];
+    recentPropValue = events.slice(i)[0].changes[propName];
     i--;
   }
   return recentPropValue;
