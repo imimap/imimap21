@@ -96,7 +96,7 @@ InternshipModuleSchema.virtual("inSemesterOfStudy").get(function () {
 InternshipModuleSchema.virtual("aepPassed").get(function () {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  return this.events.filter((event) => event.changes?.aepPassed || false);
+  return this.events.filter((event) => event.changes?.aepPassed === true).length > 0;
 });
 
 InternshipModuleSchema.virtual("weeksTotalLongEnough").get(function () {
@@ -104,7 +104,7 @@ InternshipModuleSchema.virtual("weeksTotalLongEnough").get(function () {
   // @ts-ignore
   const amountOfWeeks = this.internships
     .map((internship: IInternship) => internship.durationInWeeksSoFar)
-    .sum();
+    .reduce((a: number, b: number) => a + b, 0);
   return Math.floor(amountOfWeeks) >= 16;
 });
 

@@ -2,6 +2,8 @@ import * as dbHandler from "./database";
 import { IInternshipModule, InternshipModule } from "../internshipModule";
 import { Semester } from "../../helpers/semesterHelper";
 import { User } from "../user";
+import { Internship } from "../internship";
+import { Types } from "mongoose";
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -130,18 +132,38 @@ describe("InternshipModule", () => {
       expect(savedInternshipModule).toBeTruthy();
     });
     it("before internships have been completed", async () => {
-      const savedInternshipModule = await InternshipModule.findOne({ aepPassed: false });
+      const savedInternshipModule = await InternshipModule.findOne();
       const user = await User.findOne({ isAdmin: true });
       const updatedInternshipModule = await savedInternshipModule?.passAep(user?._id);
       expect(updatedInternshipModule?.events.length).toEqual(2);
       expect(updatedInternshipModule?.aepPassed).toEqual(true);
       expect(updatedInternshipModule?.status).not.toEqual("passed");
-      await expect(updatedInternshipModule?.passAep(user?._id)).toThrow(); //register the same event again
+      await expect(updatedInternshipModule?.passAep(user?._id)).rejects.toThrow(); //register the same event again
     });
     it("after internships have been completed", async () => {
-      const savedInternshipModule = await InternshipModule.findOne({ aepPassed: false });
+      const savedInternshipModule = await InternshipModule.findOne();
       const user = await User.findOne({ isAdmin: true });
-      // todo: add completed internships to test
+
+      const internshipId = Types.ObjectId("00000000000000000000000a");
+      const savedInternship = await Internship.create({
+        _id: internshipId,
+        operationalArea: "Game Design",
+        programmingLanguages: ["C#", "JavaScript"],
+        paymentTypes: ["cash benefit"],
+        startDate: new Date("2020-05-02"),
+        endDate: new Date("2021-03-02"),
+        tasks: "These are crazy tasks for an intern to do",
+        workingHoursPerWeek: 42,
+        supervisor: {
+          fullName: "Peter Pan",
+          emailAddress: "peter@pan.de",
+        },
+      });
+      // todo: approve internship by admin / adapt test to what we finally did for internship
+
+      savedInternshipModule?.internships?.push(internshipId);
+      await savedInternshipModule?.save();
+
       const updatedInternshipModule = await savedInternshipModule?.passAep(user?._id);
       expect(updatedInternshipModule?.aepPassed).toEqual(true);
       expect(updatedInternshipModule?.status).toEqual("passed");
