@@ -1,13 +1,15 @@
-import { Types, Schema, SchemaDefinition} from "mongoose";
-import { Change, ChangeSchema } from "./change";
+import { Types, Schema } from "mongoose";
 
 export interface IEvent {
   timestamp?: number;
   creator: Types.ObjectId;
-  changes?: [Change]; // a first draft of how this might be modelled
+  changes?: {
+    [key: string]: any;
+  };
+  accept?: boolean;
 }
 
-export const EventSchema: SchemaDefinition<IEvent> = {
+export const EventSchema = new Schema({
   timestamp: {
     default: Date.now(),
     immutable: true,
@@ -18,9 +20,10 @@ export const EventSchema: SchemaDefinition<IEvent> = {
     required: true,
     type: Schema.Types.ObjectId,
   },
-  changes: [
-    {
-      type: ChangeSchema,
-    },
-  ],
-};
+  changes: {
+    type: Schema.Types.Mixed,
+  },
+  accept: {
+    type: Boolean,
+  },
+});

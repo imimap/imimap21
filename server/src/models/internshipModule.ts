@@ -1,10 +1,5 @@
 import { Document, model, Model, PopulatedDoc, Schema, Types } from "mongoose";
 import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
-import { ICompany } from "./company";
-import {
-  IInternshipModuleScheduleEvent,
-  InternshipModuleScheduleEventSchema,
-} from "./eventModels/internshipModuleScheduleEvent";
 import {
   getRecentAcceptedValueForPropSetByEvent,
   getRecentNotRejectedValueForPropSetByEvent,
@@ -13,7 +8,7 @@ import { Semester } from "../helpers/semesterHelper";
 import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
 import { User } from "./user";
 import { IAepPassedEventSchema } from "./eventModels/aepPassedEvent";
-import {EventSchema, IEvent} from "./eventModels/event";
+import { EventSchema, IEvent } from "./eventModels/event";
 import { IInternship } from "./internship";
 
 export interface IInternshipModule extends Document {
@@ -55,6 +50,10 @@ const InternshipModuleSchema = new Schema<IInternshipModule>(
       {
         type: EventSchema,
         required: true,
+        validate: {
+          validator: (value: [IEvent]) => value.length > 0,
+          message: "To create a PdfDocument, submit at least one event.",
+        },
       },
     ],
     status: {
@@ -121,8 +120,10 @@ InternshipModuleSchema.virtual("weeksTotalLongEnough").get(function () {
 InternshipModuleSchema.methods.plan = async function () {
   this.events.push({
     creator: (await imimapAdmin)._id,
-    newSemester: Semester.getUpcoming().toString(),
-    newSemesterOfStudy: 4,
+    changes: {
+      newSemester: Semester.getUpcoming().toString(),
+      newSemesterOfStudy: 4,
+    },
   });
   this.status = "planned";
 
@@ -137,10 +138,19 @@ InternshipModuleSchema.methods.requestPostponement = async function (
   const user = await User.findById(creator);
   if (!user) throw new Error("Creator (User) with that objectId does not exist.");
 
+  if (!Semester.isValidSemesterString(newSemester))
+    throw new Error(
+      "Semester is not valid. Needs to be WS20XX or SS20XX (replace XX with numbers)"
+    );
+  if (newSemesterOfStudy < 1)
+    throw new Error("SemesterOfStudy is not valid. Needs to be a positive number.");
+
   this.events.push({
     creator: creator,
-    newSemester: newSemester,
-    newSemesterOfStudy: newSemesterOfStudy,
+    changes: {
+      newSemester: newSemester,
+      newSemesterOfStudy: newSemesterOfStudy,
+    },
   });
   this.status = "postponement requested";
 
