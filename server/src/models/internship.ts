@@ -2,12 +2,13 @@ import { Document, model, Model, PopulatedDoc, Schema } from "mongoose";
 import { ISupervisor, SupervisorSchema } from "./supervisor";
 import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
 import { Semester } from "../helpers/semesterHelper";
-import { isValidDateRange, normalizeDate } from "../helpers/dateHelper";
+import { getWeeksBetween, isValidDateRange, normalizeDate } from "../helpers/dateHelper";
 import { ICompany } from "./company";
 
 export interface IInternship extends Document {
   startDate?: Date;
   endDate?: Date;
+  durationInWeeksSoFar: number;
   company?: PopulatedDoc<ICompany & Document>;
   tasks?: string;
   operationalArea?: string;
@@ -77,6 +78,17 @@ export const InternshipSchema = new Schema({
   contractPdf: PdfDocumentSchema,
   bvgTicketExemptionPdf: PdfDocumentSchema,
   certificatePdf: PdfDocumentSchema,
+});
+
+InternshipSchema.virtual("durationInWeeksSoFar").get(function () {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const document = this;
+  let dateToCompareWith: Date = normalizeDate(new Date());
+  if (document.startDate > dateToCompareWith) return 0;
+  if (document.endDate < dateToCompareWith) dateToCompareWith = document.endDate;
+  return getWeeksBetween(document.startDate, dateToCompareWith);
 });
 
 InternshipSchema.pre("validate", function () {
