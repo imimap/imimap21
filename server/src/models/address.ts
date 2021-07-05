@@ -41,12 +41,12 @@ export const AddressSchema = new Schema(
   { _id: false }
 );
 
-AddressSchema.pre("save", function () {
+AddressSchema.pre("save", async function () {
   if (!this.modifiedPaths().includes("coordinates")) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const object: IAddress = this.toObject();
 
-    this.set("coordinates", getCoordinates(object));
+    this.set("coordinates", await getCoordinates(object));
   }
 });

@@ -24,6 +24,7 @@
     "http-errors": "^1.7.2",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.4",
+    "node-cron": "^3.0.0",
     "passport": "^0.4.1",
     "passport-ldapauth": "^3.0.1",
     "validator": "^13.6.0"

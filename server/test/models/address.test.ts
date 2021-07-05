@@ -41,7 +41,17 @@ describe("Address", () => {
   it("can retrieve the coordinates for an address", async () => {
     const savedCompany = await Company.findOne({ companyName: "HTW Berlin" });
 
-    expect(savedCompany?.address?.coordinates?.latitude).toEqual(52.4922232);
-    expect(savedCompany?.address?.coordinates?.longitude).toEqual(13.5243112);
+    const latitude = savedCompany?.address?.coordinates?.latitude;
+    const longitude = savedCompany?.address?.coordinates?.longitude;
+
+    expect(latitude).toBeTruthy();
+    expect(longitude).toBeTruthy();
+    if (!latitude || !longitude) return;
+
+    const roundedLatitude = Math.floor(latitude * 10000) / 10000;
+    const roundedLongitude = Math.floor(longitude * 10000) / 10000;
+
+    expect(roundedLatitude).toEqual(52.4922);
+    expect(roundedLongitude).toEqual(13.5264);
   });
 });

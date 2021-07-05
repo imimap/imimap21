@@ -34,7 +34,7 @@ export const getCoordinates = async function (document: IAddress): Promise<ICoor
   let coordinates;
 
   if (data.status !== "OK") throw data.status + ". Could not get coordinates for " + addressString;
-  else coordinates = data.results.geometry.location;
+  else coordinates = data.results[0].geometry.location;
 
   return {
     latitude: coordinates.lat,
