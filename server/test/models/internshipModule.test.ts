@@ -1,8 +1,8 @@
 import * as dbHandler from "./database";
-import { IInternshipModule, InternshipModule } from "../internshipModule";
-import { Semester } from "../../helpers/semesterHelper";
-import { User } from "../user";
-import { Internship } from "../internship";
+import { IInternshipModule, InternshipModule } from "../../src/models/internshipModule";
+import { Semester } from "../../src/helpers/semesterHelper";
+import { User } from "../../src/models/user";
+import { Internship } from "../../src/models/internship";
 import { Types } from "mongoose";
 
 beforeAll(async () => {
@@ -128,8 +128,9 @@ describe("InternshipModule", () => {
   });
   describe("registers whether aep has been passed", () => {
     it("automatically registers module to not have passed aep", async () => {
-      const savedInternshipModule = await InternshipModule.findOne({ aepPassed: false });
+      const savedInternshipModule = await InternshipModule.findOne();
       expect(savedInternshipModule).toBeTruthy();
+      expect(savedInternshipModule?.aepPassed).toBe(false);
     });
     it("before internships have been completed", async () => {
       const savedInternshipModule = await InternshipModule.findOne();
@@ -146,7 +147,7 @@ describe("InternshipModule", () => {
       const user = await User.findOne({ isAdmin: true });
 
       const internshipId = Types.ObjectId("00000000000000000000000a");
-      const savedInternship = await Internship.create({
+      await Internship.create({
         _id: internshipId,
         operationalArea: "Game Design",
         programmingLanguages: ["C#", "JavaScript"],

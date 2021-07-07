@@ -7,7 +7,11 @@ const mongod = new MongoMemoryServer();
 export const connect = async (): Promise<void> => {
   const uri = await mongod.getUri();
   try {
-    await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+    });
   } catch (error) {
     console.error(`Connection to test database at ${uri} failed.`, error);
   }

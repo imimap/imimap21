@@ -10,12 +10,7 @@
     "watch": "tsc-watch --onSuccess \"npm run serve-debug\"",
     "format": "prettier src/server.ts **/*.js --write",
     "lint": "eslint \"src/**\"",
-    "test-mongoose": "jest --runInBand --detectOpenHandles ./src/models/test"
-  },
-  "jest": {
-    "transform": {
-      "^.+\\.[t|j]s?$": "babel-jest"
-    }
+    "test": "jest --runInBand --detectOpenHandles"
   },
   "license": "ISC",
   "dependencies": {
@@ -29,6 +24,7 @@
     "http-errors": "^1.7.2",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.4",
+    "node-cron": "^3.0.0",
     "passport": "^0.4.1",
     "passport-ldapauth": "^3.0.1",
     "validator": "^13.6.0"

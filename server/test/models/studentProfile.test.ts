@@ -1,6 +1,6 @@
 import * as dbHandler from "./database";
-import { User } from "../user";
-import { IStudentProfile } from "../studentProfile";
+import { User } from "../../src/models/user";
+import { IStudentProfile } from "../../src/models/studentProfile";
 import { Types } from "mongoose";
 
 beforeAll(async () => {

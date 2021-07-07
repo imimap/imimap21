@@ -1,7 +1,7 @@
 import * as dbHandler from "./database";
-import { IPdfDocument, PdfDocument } from "../pdfDocument";
+import { IPdfDocument, PdfDocument } from "../../src/models/pdfDocument";
 import { Types } from "mongoose";
-import { User } from "../user";
+import { User } from "../../src/models/user";
 
 beforeAll(async () => {
   await dbHandler.connect();
