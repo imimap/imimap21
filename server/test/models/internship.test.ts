@@ -161,14 +161,7 @@ describe("Internship", () => {
   it("may be marked as passed by admins", async () => {
     const internship = await Internship.findById(INTERNSHIP_ID);
 
-    internship?.events.push({
-      creator: ADMIN_USER_ID,
-      accept: true,
-      changes: {
-        status: InternshipStatuses.OVER,
-      },
-    });
-    await internship?.save();
+    await internship?.markAsOver(ADMIN_USER_ID);
     const path = `http://localhost:9000/pdfs/s0100000/${Types.ObjectId()}/${Types.ObjectId()}.pdf`;
     await internship?.reportPdf?.submit(USER_ID, path);
 

@@ -7,7 +7,7 @@ import { ICompany } from "./company";
 import { getRecentValueForPropSetByEvent } from "../helpers/eventQueryHelper";
 import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
 import { User } from "./user";
-import { EventSchema, IEvent } from "./eventModels/event";
+import { EventSchema, IEvent } from "./event";
 
 export interface IInternship extends Document {
   startDate?: Date;
@@ -36,6 +36,8 @@ export interface IInternship extends Document {
 
   reject(creator: Types.ObjectId): Promise<IInternship>;
 
+  markAsOver(creator: Types.ObjectId): Promise<IInternship>;
+
   pass(creator: Types.ObjectId): Promise<IInternship>;
 }
 
@@ -54,13 +56,16 @@ export const InternshipSchema = new Schema<IInternship>(
     },
     tasks: {
       type: String,
+      trim: true,
     },
     operationalArea: {
       type: String,
+      trim: true,
     },
     programmingLanguages: [
       {
         type: String,
+        trim: true,
       },
     ],
     livingCosts: {
@@ -115,7 +120,6 @@ export enum InternshipStatuses {
   PASSED = "passed",
 }
 
-// TODO: Any required fields missing from the list?
 const requiredFields = [
   "startDate",
   "endDate",
@@ -124,6 +128,10 @@ const requiredFields = [
   "workingHoursPerWeek",
   "supervisor.fullName",
   "supervisor.emailAddress",
+  "lsfEctsProofPdf",
+  "locationJustificationPdf",
+  "contractPdf",
+  //TODO: eventually add "requestPdf",
 ];
 
 function internshipRequestComplete(document: Document) {
@@ -147,6 +155,8 @@ async function trySetRequested(document: Document) {
         status: InternshipStatuses.REQUESTED,
       },
     });
+    // TODO what if instead we did:
+    // this.status = InternshipStatuses.REQUESTED;
   } else {
     if (getRecentValueForPropSetByEvent("status", document) === InternshipStatuses.PLANNED) return;
     // Set status back to 'planned'
@@ -258,7 +268,7 @@ InternshipSchema.methods.approve = async function (creator: Types.ObjectId) {
     },
   });
 
-  return await this.save();
+  return this.save();
 };
 
 InternshipSchema.methods.reject = async function (creator: Types.ObjectId) {
@@ -277,7 +287,23 @@ InternshipSchema.methods.reject = async function (creator: Types.ObjectId) {
     },
   });
 
-  return await this.save();
+  return this.save();
+};
+
+InternshipSchema.methods.markAsOver = async function (creator: Types.ObjectId) {
+  // Check if user is admin
+  const user = await User.findById(creator);
+  if (!user?.isAdmin) throw new Error("Only admins may mark an internship as over");
+
+  this.events.push({
+    creator: creator,
+    accept: true,
+    changes: {
+      status: InternshipStatuses.OVER,
+    },
+  });
+
+  return this.save();
 };
 
 InternshipSchema.methods.pass = async function (creator: Types.ObjectId) {
@@ -296,7 +322,7 @@ InternshipSchema.methods.pass = async function (creator: Types.ObjectId) {
     },
   });
 
-  return await this.save();
+  return this.save();
 };
 
 export const Internship: Model<IInternship> = model("Internship", InternshipSchema);

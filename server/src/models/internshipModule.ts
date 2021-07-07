@@ -7,8 +7,16 @@ import {
 import { Semester } from "../helpers/semesterHelper";
 import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
 import { User } from "./user";
-import { EventSchema, IEvent } from "./eventModels/event";
+import { EventSchema, IEvent } from "./event";
 import { IInternship, InternshipStatuses } from "./internship";
+
+export enum InternshipModuleStatuses {
+  UNKNOWN = "unknown",
+  PLANNED = "planned",
+  POSTPONEMENT_REQUESTED = "postponement requested",
+  POSTPONEMENT_REJECTED = "postponement rejected",
+  PASSED = "passed",
+}
 
 export interface IInternshipModule extends Document {
   internships?: PopulatedDoc<IInternship & Document>[];
@@ -20,24 +28,21 @@ export interface IInternshipModule extends Document {
   events: IEvent[];
   status: string;
 
-  isWeeksTotalLongEnough(): boolean;
-
-  plan(): IInternshipModule;
+  plan(): Promise<IInternshipModule>;
 
   requestPostponement(
     creator: Types.ObjectId,
     newSemester: string,
     newSemesterOfStudy: number
-  ): IInternshipModule;
+  ): Promise<IInternshipModule>;
 
-  acceptPostponement(creator: Types.ObjectId): IInternshipModule;
+  acceptPostponement(creator: Types.ObjectId): Promise<IInternshipModule>;
 
-  rejectPostponement(creator: Types.ObjectId): IInternshipModule;
+  rejectPostponement(creator: Types.ObjectId): Promise<IInternshipModule>;
 
-  passAep(creator: Types.ObjectId): IInternshipModule;
+  passAep(creator: Types.ObjectId): Promise<IInternshipModule>;
 
-  trySetPassed(): IInternshipModule;
-  submitCompleteDocumentsPdf(creator: Types.ObjectId, newPath: string): IInternshipModule;
+  submitCompleteDocumentsPdf(creator: Types.ObjectId, newPath: string): Promise<IInternshipModule>;
 }
 
 const InternshipModuleSchema = new Schema<IInternshipModule>(
@@ -60,21 +65,15 @@ const InternshipModuleSchema = new Schema<IInternshipModule>(
         required: true,
         validate: {
           validator: (value: [IEvent]) => value.length > 0,
-          message: "To create a PdfDocument, submit at least one event.",
+          message: "To create an InternshipModule, submit at least one event.",
         },
       },
     ],
     status: {
       type: String,
-      enum: [
-        "unknown",
-        "planned",
-        "postponement requested",
-        "postponement rejected",
-        "complete",
-        "passed",
-      ], //todo: separate postponement stati from other stati
+      enum: InternshipModuleStatuses,
       required: true,
+      default: InternshipModuleStatuses.UNKNOWN,
     },
   },
   {
@@ -82,12 +81,16 @@ const InternshipModuleSchema = new Schema<IInternshipModule>(
   }
 );
 
+/*******************/
+/* Virtual Getters */
+/*******************/
+
 InternshipModuleSchema.virtual("inSemester").get(function () {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const thisDocument = this;
-  return thisDocument.status === "postponement rejected"
+  return thisDocument.status === InternshipModuleStatuses.POSTPONEMENT_REJECTED
     ? getRecentAcceptedValueForPropSetByEvent("newSemester", thisDocument)
     : getRecentNotRejectedValueForPropSetByEvent("newSemester", thisDocument);
 });
@@ -97,7 +100,7 @@ InternshipModuleSchema.virtual("inSemesterOfStudy").get(function () {
   // @ts-ignore
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const thisDocument = this;
-  return thisDocument.status === "postponement rejected"
+  return thisDocument.status === InternshipModuleStatuses.POSTPONEMENT_REJECTED
     ? getRecentAcceptedValueForPropSetByEvent("newSemesterOfStudy", thisDocument)
     : getRecentNotRejectedValueForPropSetByEvent("newSemesterOfStudy", thisDocument);
 });
@@ -108,18 +111,9 @@ InternshipModuleSchema.virtual("aepPassed").get(function () {
   return this.events.filter((event) => event.changes?.aepPassed === true).length > 0;
 });
 
-InternshipModuleSchema.methods.isWeeksTotalLongEnough = async function () {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  await this.populate("internships").execPopulate();
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const durations = this.internships.map(
-    (internship: IInternship) => internship.durationInWeeksSoFar
-  );
-  const amountOfWeeks = durations.reduce((a: number, b: number) => a + b, 0);
-  return Math.floor(amountOfWeeks) >= 16;
-};
+/*******************/
+/*  Model Methods  */
+/*******************/
 
 InternshipModuleSchema.methods.plan = async function () {
   this.events.push({
@@ -130,22 +124,9 @@ InternshipModuleSchema.methods.plan = async function () {
       aepPassed: false,
     },
   });
-  this.status = "planned";
+  this.status = InternshipModuleStatuses.PLANNED;
 
   return this.save();
-};
-
-InternshipModuleSchema.methods.trySetPassed = async function () {
-  if (
-    this.aepPassed &&
-    (await this.isWeeksTotalLongEnough()) &&
-    this.internships?.every((internship) => internship.status === InternshipStatuses.APPROVED)
-  ) {
-    this.status = "passed";
-    await this.save();
-    return true;
-  }
-  return false;
 };
 
 InternshipModuleSchema.methods.requestPostponement = async function (
@@ -170,7 +151,7 @@ InternshipModuleSchema.methods.requestPostponement = async function (
       newSemesterOfStudy: newSemesterOfStudy,
     },
   });
-  this.status = "postponement requested";
+  this.status = InternshipModuleStatuses.POSTPONEMENT_REQUESTED;
 
   return this.save();
 };
@@ -183,7 +164,7 @@ InternshipModuleSchema.methods.acceptPostponement = async function (creator: Typ
     creator: creator,
     accept: true,
   });
-  this.status = "planned";
+  this.status = InternshipModuleStatuses.PLANNED;
 
   return this.save();
 };
@@ -196,7 +177,7 @@ InternshipModuleSchema.methods.rejectPostponement = async function (creator: Typ
     creator: creator,
     accept: false,
   });
-  this.status = "postponement rejected";
+  this.status = InternshipModuleStatuses.POSTPONEMENT_REJECTED;
 
   return this.save();
 };
@@ -215,13 +196,6 @@ InternshipModuleSchema.methods.passAep = async function (creator: Types.ObjectId
     accept: true,
   });
 
-  await this.populate("internships").execPopulate();
-  const longEnough = await this.isWeeksTotalLongEnough();
-  const allInternshipsApproved = this.internships?.every(
-    (internship) => internship.status === InternshipStatuses.PASSED
-  );
-  if (longEnough && allInternshipsApproved) this.status = "passed";
-
   return this.save();
 };
 
@@ -238,6 +212,37 @@ InternshipModuleSchema.methods.submitCompleteDocumentsPdf = async function (
 
   return this.save();
 };
+
+/*********************/
+/* Model Event Hooks */
+/*********************/
+async function trySetPassed(document: Document) {
+  if (
+    document.get("status") === InternshipModuleStatuses.PLANNED &&
+    document.get("aepPassed") === true &&
+    (await isWeeksTotalLongEnough(document.get("internships"))) &&
+    document
+      .get("internships")
+      .every((internship: IInternship) => internship.status === InternshipStatuses.APPROVED)
+  ) {
+    document.set("status", InternshipModuleStatuses.PASSED);
+    await document.save();
+    return true;
+  }
+  return false;
+}
+
+async function isWeeksTotalLongEnough(internships: IInternship[]) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const durations = internships.map((internship: IInternship) => internship.durationInWeeksSoFar);
+  const amountOfWeeks = durations.reduce((a: number, b: number) => a + b, 0);
+  return Math.floor(amountOfWeeks) >= 16;
+}
+
+InternshipModuleSchema.post("save", async function () {
+  await trySetPassed(this);
+});
 
 export const InternshipModule: Model<IInternshipModule> = model(
   "InternshipModule",

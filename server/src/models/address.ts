@@ -15,24 +15,30 @@ export const AddressSchema = new Schema(
   {
     street: {
       type: String,
+      trim: true,
     },
     streetNumber: {
       type: String,
+      trim: true,
     },
     additionalLines: {
       type: String,
+      trim: true,
     },
     zip: {
       required: true,
       type: String,
+      trim: true,
     },
     city: {
       required: true,
       type: String,
+      trim: true,
     },
     country: {
       required: true,
       type: String,
+      trim: true,
     },
     coordinates: {
       type: CoordinatesSchema,
