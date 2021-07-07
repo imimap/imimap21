@@ -10,6 +10,7 @@ import { IStudentProfile } from "../models/studentProfile";
 async function createStudentProfile(user: AuthUser): Promise<IStudentProfile> {
   const internshipModule = await InternshipModule.create({
     internships: [],
+    status: "unknown",
   });
 
   return {
