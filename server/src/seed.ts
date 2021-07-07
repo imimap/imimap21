@@ -6,7 +6,6 @@ import { Company } from "./models/company";
 import { companySizes } from "./helpers/companySizes";
 import { isoLanguages } from "./helpers/isoLanguages";
 import { IInternshipModule, InternshipModule } from "./models/internshipModule";
-import { Semester } from "./helpers/semesterHelper";
 
 function generateRange(size: number, start?: number): number[] {
   return [...Array(size).keys()].map((i) => i + (start ?? 0));
@@ -30,15 +29,8 @@ async function createUser(
 async function createInternshipModule(
   internshipIds: Schema.Types.ObjectId[] = []
 ): Promise<IInternshipModule> {
-  return await InternshipModule.create({
-    internships: internshipIds,
-    aepPassed: faker.datatype.boolean(),
-    inSemester: Semester.get(faker.date.between("2020-04-01", "2022-10-01")),
-    inSemesterOfStudy: faker.datatype.number({
-      min: 3,
-      max: 8,
-    }),
-  });
+  const internshipModule = await InternshipModule.create({ internships: internshipIds });
+  return internshipModule.plan();
 }
 
 async function createInternship(): Promise<IInternship> {
@@ -104,7 +96,9 @@ async function generateStudents(
       async (id) =>
         await createUser(
           id.toString(),
-          (await createInternshipModule(await internshipGenerator())).id
+          (
+            await createInternshipModule(await internshipGenerator())
+          ).id
         )
     )
   );

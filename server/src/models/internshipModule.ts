@@ -118,6 +118,7 @@ InternshipModuleSchema.virtual("aepPassed").get(function () {
 InternshipModuleSchema.methods.plan = async function () {
   this.events.push({
     creator: (await imimapAdmin)._id,
+    accept: true,
     changes: {
       newSemester: Semester.getUpcoming().toString(),
       newSemesterOfStudy: 4,
