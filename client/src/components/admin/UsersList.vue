@@ -3,6 +3,48 @@
     <div class="row">
       <div class="col-12">
 
+        <div class="row">
+          <div class="col-lg-3 col-md-12 mb-3">
+            <select class="form-select"
+                    aria-label="Sortieren nach"
+                    v-model="currentSorting">
+              <option selected value="">Sortieren nach...</option>
+              <option value="name">Nachname</option>
+              <option value="matrikelnummer">Matrikelnummer</option>
+              <option value="status">Status</option>
+            </select>
+          </div>
+          <div class="col-lg-3 col-md-12 mb-3">
+            <select class="form-select"
+                    aria-label="Sortieren nach"
+                    v-model="currentFilterDuration">
+              <option selected value="">Dauer...</option>
+              <option value="uncomplete">&lt; 19 Wochen</option>
+              <option value="complete">&#8925; 19 Wochen</option>
+            </select>
+          </div>
+          <div class="col-lg-3 col-md-12 mb-3">
+            <select class="form-select"
+                    aria-label="Sortieren nach"
+                    v-model="currentFilterStatus">
+              <option selected value="">Status...</option>
+              <option value="uncomplete">Unvollständig</option>
+              <option value="complete">Vollständig</option>
+              <option value="passed">Bestanden</option>
+            </select>
+          </div>
+          <div class="col-lg-3 col-md-12 mb-3">
+            <input type="text"
+                   class="form-control"
+                   placeholder="Suche..."
+                   aria-label="Suche"
+                   aria-describedby="suche"
+                   v-model="currentSearch">
+            <div id="emailHelp" class="form-text">
+              Matrikelnummer oder Nachname</div>
+          </div>
+        </div>
+
         <div class="accordion" id="listAccordion">
           <div v-for="(row, index) in users" v-bind:key="index" class="accordion-item">
             <h2 class="accordion-header" v-bind:id="index">
@@ -451,6 +493,10 @@ export default defineComponent({
     return {
       currentEditInternshipModuleIndex: 0,
       currentEditInternshipPartIndex: 0,
+      currentSorting: '',
+      currentFilterDuration: '',
+      currentFilterStatus: '',
+      currentSearch: '',
       users: [{
         id: 0,
         firstName: 'Mark',
@@ -829,6 +875,10 @@ export default defineComponent({
     };
   },
   methods: {
+    updateList() {
+      // API call for GET list with params
+      return true;
+    },
     getDateString(ISODateString: string) {
       const date = new Date(ISODateString);
       return date.toLocaleDateString();

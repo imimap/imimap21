@@ -3,6 +3,16 @@
     <div class="row">
       <div class="col-12">
 
+        <div class="row mb-3">
+          <div class="col-lg-3 col-md-12">
+            <select class="form-select" aria-label="Sortieren nach">
+              <option selected value="1">Sortieren nach...</option>
+              <option value="2">Name</option>
+              <option value="3">Ort</option>
+            </select>
+          </div>
+        </div>
+
         <div class="accordion" id="listAccordion">
           <div v-for="(row, index) in companies" v-bind:key="index" class="accordion-item">
             <h2 class="accordion-header" v-bind:id="index">

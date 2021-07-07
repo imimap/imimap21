@@ -3,6 +3,38 @@
     <div class="row">
       <div class="col-12">
 
+        <div class="row mb-3">
+          <div class="col-lg-3 col-md-12">
+            <select class="form-select" aria-label="Sortieren nach">
+              <option selected value="1">Sortieren nach...</option>
+              <option value="2">Nachname</option>
+              <option value="3">Matrikelnummer</option>
+              <option value="4">Status</option>
+            </select>
+          </div>
+          <div class="col-lg-3 col-md-12">
+            <select class="form-select" aria-label="Sortieren nach">
+              <option selected value="1">Dauer...</option>
+              <option value="2">&lt; 19 Wochen</option>
+              <option value="3">&#8925; 19 Wochen</option>
+            </select>
+          </div>
+          <div class="col-lg-3 col-md-12">
+            <select class="form-select" aria-label="Sortieren nach">
+              <option selected value="1">Status...</option>
+              <option value="2">Beantragt</option>
+              <option value="3">Genehmigt</option>
+              <option value="4">Abgelehnt</option>
+            </select>
+          </div>
+          <div class="col-lg-3 col-md-12">
+            <input type="text" class="form-control" placeholder="Suche..."
+                   aria-label="Suche" aria-describedby="suche">
+            <div id="emailHelp" class="form-text">
+              Matrikelnummer oder Nachname</div>
+          </div>
+        </div>
+
         <div class="accordion" id="listAccordion">
           <div v-for="(row, index) in openPostponements" v-bind:key="index" class="accordion-item">
             <h2 class="accordion-header" v-bind:id="index">
