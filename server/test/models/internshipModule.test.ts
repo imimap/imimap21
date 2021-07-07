@@ -1,9 +1,16 @@
 import * as dbHandler from "./database";
-import { IInternshipModule, InternshipModule } from "../../src/models/internshipModule";
+import {
+  IInternshipModule,
+  InternshipModule,
+  InternshipModuleStatuses,
+} from "../../src/models/internshipModule";
 import { Semester } from "../../src/helpers/semesterHelper";
 import { User } from "../../src/models/user";
 import { Internship } from "../../src/models/internship";
 import { Types } from "mongoose";
+
+const ADMIN_USER_ID = Types.ObjectId("0000a0000000000000000000");
+const USER_ID = Types.ObjectId("0000b0000000000000000000");
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -29,6 +36,7 @@ beforeEach(async () => {
       studentId: studentId,
       internship: savedInternshipModule._id, //todo: at some point one should be able to add an internship more easily, maybe with a method
     },
+    _id: USER_ID,
   };
   const user = new User(userProperties);
   await user.save();
@@ -38,6 +46,7 @@ beforeEach(async () => {
     firstName: "Freddy",
     lastName: "Mercury",
     isAdmin: true,
+    _id: ADMIN_USER_ID,
   };
   const admin = new User(adminProperties);
   await admin.save();
@@ -57,17 +66,16 @@ describe("InternshipModule", () => {
     expect(savedInternshipModule?.events.length).toEqual(1);
     expect(savedInternshipModule?.inSemester).toEqual(Semester.getUpcoming().toString());
     expect(savedInternshipModule?.inSemesterOfStudy).toEqual(4);
-    expect(savedInternshipModule?.status).toEqual("planned");
+    expect(savedInternshipModule?.status).toEqual(InternshipModuleStatuses.PLANNED);
   });
   describe("postponement requests", () => {
     it("can be made for a valid semester", async () => {
       const newSemester = "WS2025";
       const newSemesterOfStudy = 6;
-      const user = await User.findOne({ isAdmin: false });
 
       const internshipModule = await InternshipModule.findOne();
       const savedInternshipModule = await internshipModule?.requestPostponement(
-        user?._id,
+        USER_ID,
         newSemester,
         newSemesterOfStudy
       );
@@ -75,54 +83,51 @@ describe("InternshipModule", () => {
       expect(savedInternshipModule?.events.length).toEqual(2);
       expect(savedInternshipModule?.inSemester).toEqual(newSemester);
       expect(savedInternshipModule?.inSemesterOfStudy).toEqual(newSemesterOfStudy);
-      expect(savedInternshipModule?.status).toEqual("postponement requested");
+      expect(savedInternshipModule?.status).toEqual(
+        InternshipModuleStatuses.POSTPONEMENT_REQUESTED
+      );
     });
     it("can not be made for an invalid semester", async () => {
       const newSemester = "ES2015";
-      const user = await User.findOne({ isAdmin: false });
       const internshipModule = await InternshipModule.findOne();
       await expect(
-        internshipModule?.requestPostponement(user?._id, newSemester, 6)
+        internshipModule?.requestPostponement(USER_ID, newSemester, 6)
       ).rejects.toThrow();
     });
     describe("admin actions: ", () => {
       beforeEach(async () => {
-        const user = await User.findOne({ isAdmin: false });
         const internshipModule = await InternshipModule.findOne();
-        await internshipModule?.requestPostponement(user?._id, "WS2025", 6);
+        await internshipModule?.requestPostponement(USER_ID, "WS2025", 6);
       });
       it("can be accepted by admin", async () => {
-        const admin = await User.findOne({ isAdmin: true });
-
         const internshipModule = await InternshipModule.findOne();
         const lastSetSemester = internshipModule?.inSemester;
         const lastSetSemesterOfStudy = internshipModule?.inSemesterOfStudy;
 
-        const savedInternshipModule = await internshipModule?.acceptPostponement(admin?._id);
+        const savedInternshipModule = await internshipModule?.acceptPostponement(ADMIN_USER_ID);
 
         expect(savedInternshipModule?.events.length).toEqual(3);
-        expect(savedInternshipModule?.status).toEqual("planned");
+        expect(savedInternshipModule?.status).toEqual(InternshipModuleStatuses.PLANNED);
         expect(savedInternshipModule?.inSemesterOfStudy).toEqual(lastSetSemesterOfStudy);
         expect(savedInternshipModule?.inSemester).toEqual(lastSetSemester);
       });
       it("can be rejected by admin", async () => {
-        const admin = await User.findOne({ isAdmin: true });
-
         const internshipModule = await InternshipModule.findOne();
         const lastSetSemester = internshipModule?.inSemester;
         const lastSetSemesterOfStudy = internshipModule?.inSemesterOfStudy;
 
-        const savedInternshipModule = await internshipModule?.rejectPostponement(admin?._id);
+        const savedInternshipModule = await internshipModule?.rejectPostponement(ADMIN_USER_ID);
 
         expect(savedInternshipModule?.events.length).toEqual(3);
-        expect(savedInternshipModule?.status).toEqual("postponement rejected");
+        expect(savedInternshipModule?.status).toEqual(
+          InternshipModuleStatuses.POSTPONEMENT_REJECTED
+        );
         expect(savedInternshipModule?.inSemesterOfStudy).not.toEqual(lastSetSemesterOfStudy);
         expect(savedInternshipModule?.inSemester).not.toEqual(lastSetSemester);
       });
       it("can not be accepted or rejected by a normal user", async () => {
-        const user = await User.findOne({ isAdmin: false });
         const internshipModule = await InternshipModule.findOne();
-        await expect(internshipModule?.rejectPostponement(user?._id)).rejects.toThrow();
+        await expect(internshipModule?.rejectPostponement(USER_ID)).rejects.toThrow();
       });
     });
   });
@@ -134,20 +139,18 @@ describe("InternshipModule", () => {
     });
     it("before internships have been completed", async () => {
       const savedInternshipModule = await InternshipModule.findOne();
-      const user = await User.findOne({ isAdmin: true });
-      const updatedInternshipModule = await savedInternshipModule?.passAep(user?._id);
+      const updatedInternshipModule = await savedInternshipModule?.passAep(ADMIN_USER_ID);
       expect(updatedInternshipModule?.events.length).toEqual(2);
       expect(updatedInternshipModule?.aepPassed).toEqual(true);
-      expect(updatedInternshipModule?.status).not.toEqual("passed");
+      expect(updatedInternshipModule?.status).not.toEqual(InternshipModuleStatuses.PASSED);
 
-      await expect(updatedInternshipModule?.passAep(user?._id)).rejects.toThrow();
+      await expect(updatedInternshipModule?.passAep(ADMIN_USER_ID)).rejects.toThrow();
     });
     it("after internships have been completed", async () => {
       const savedInternshipModule = await InternshipModule.findOne();
-      const user = await User.findOne({ isAdmin: true });
 
       const internshipId = Types.ObjectId("00000000000000000000000a");
-      await Internship.create({
+      const internship = await Internship.create({
         _id: internshipId,
         operationalArea: "Game Design",
         programmingLanguages: ["C#", "JavaScript"],
@@ -161,14 +164,25 @@ describe("InternshipModule", () => {
           emailAddress: "peter@pan.de",
         },
       });
-      // todo: approve internship by admin / adapt test to what we finally did for internship
+
+      // fake that cron job has triggered when internship period is over
+      await internship?.markAsOver(ADMIN_USER_ID);
+
+      // fake that report has been submitted
+      const user = await User.findOne({ isAdmin: false });
+      const path = `http://localhost:9000/pdfs/${
+        user?.studentProfile?.studentId
+      }/${Types.ObjectId()}/${Types.ObjectId()}.pdf`;
+      await internship?.reportPdf?.submit(USER_ID, path);
+
+      await internship.pass(ADMIN_USER_ID);
 
       savedInternshipModule?.internships?.push(internshipId);
       await savedInternshipModule?.save();
 
-      const updatedInternshipModule = await savedInternshipModule?.passAep(user?._id);
+      const updatedInternshipModule = await savedInternshipModule?.passAep(ADMIN_USER_ID);
       expect(updatedInternshipModule?.aepPassed).toEqual(true);
-      expect(updatedInternshipModule?.status).toEqual("passed");
+      expect(updatedInternshipModule?.status).toEqual(InternshipModuleStatuses.PASSED);
     });
   });
 });
