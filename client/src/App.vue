@@ -1,21 +1,43 @@
 <template>
-  <HeaderComponent></HeaderComponent>
-  <main class="margin_bottom_10">
-    <router-view></router-view>
-  </main>
-  <footer-component></footer-component>
+  <vue-progress-bar></vue-progress-bar>
+  <router-view></router-view>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import HeaderComponent from '@/components/HeaderComponent.vue';
-import FooterComponent from '@/components/FooterComponent.vue';
+import http from '@/utils/http-common';
 
 export default defineComponent({
   name: 'App',
-  components: {
-    HeaderComponent,
-    FooterComponent,
+  mounted() {
+    //  [App.vue specific] When App.vue is finish loading finish the progress bar
+    this.$Progress.finish();
+  },
+  created() {
+    this.$Progress.start();
+    this.$router.beforeEach((to, from, next) => {
+      //  does the page we want to go to have a meta.progress object
+      if (to.meta.progress !== undefined) {
+        const meta = to.meta.progress;
+        this.$Progress.parseMeta(meta);
+      }
+      this.$Progress.start();
+      next();
+    });
+    //  hook the progress bar to finish after we've finished moving router-view
+    this.$router.afterEach(() => {
+      this.$Progress.finish();
+    });
+
+    http.interceptors.request.use((config) => {
+      this.$Progress.start();
+      return config;
+    });
+
+    http.interceptors.response.use((response) => {
+      this.$Progress.finish();
+      return response;
+    });
   },
 });
 </script>
@@ -24,11 +46,13 @@ export default defineComponent({
 html {
   font-family: sans-serif;
   line-height: 1.15;
+  height: 100vh;
   -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0)
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 body {
+  height: 100%;
   margin: 0;
   font-size: 1rem;
   font-weight: 400;

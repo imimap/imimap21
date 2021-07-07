@@ -1,0 +1,26 @@
+.btn-htw-green {
+  @include button-variant($htw-green-color, $htw-green-color);
+  color: white;
+
+  &:hover {
+    color: white;
+  }
+
+  btn-check:focus + &,
+  &:focus {
+    color: white;
+  }
+}
+
+.btn-outline-htw-green {
+  @include button-outline-variant($htw-green-color, $htw-green-color);
+
+  &:hover {
+    color: white !important;
+  }
+
+  btn-check:focus + &,
+  &:focus {
+    color: white;
+  }
+}

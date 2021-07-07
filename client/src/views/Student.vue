@@ -1,0 +1,113 @@
+<template>
+<div class="container">
+  <div id="form-block4" class="text-left mt-5 mx-3">
+    <h3> Persönliche Details</h3>
+    <div class="alert alert-primary">
+        <small>
+          <label class="required_application">Die mit </label>
+          markierten Felder werden für einen vollständigen Antrag benötigt.
+          Speichern kannst du aber auch, ohne diese auszufüllen.
+        </small>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-4">
+        Matrikelnummer<br>
+        <span class="form-control-static pl-2 pt-5">
+          {{ userProfile.studentProfile.studentId.substring(
+          2,
+          userProfile.studentProfile.studentId.length
+          ) }}
+        </span>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-4">
+        Email<br>
+        <span class="form-control-static pl-2 pt-5">
+          {{ userProfile.emailAddress }}
+        </span>
+      </div>
+      <div class="col-md-4">
+        <div class="field">
+          <div class="form-group" data-children-count="1">
+            <label for="studentPrivateEmail">Private E-Mail</label>
+            <input class="form-control" type="text" id="studentPrivateEmail">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <div class="field">
+          <div class="form-group" data-children-count="1">
+            <label class="required_application" for="studentFirstName">Vorname</label>
+            <input
+              maxlength="50"
+              class="form-control"
+              size="50"
+              type="text"
+              :value="userProfile.firstName"
+              id="studentFirstName"
+            >
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="field">
+          <div class="form-group" data-children-count="1">
+            <label class="required_application" for="studentLastName">Nachname</label>
+            <input
+              maxlength="50"
+              class="form-control"
+              size="50"
+              type="text"
+              :value="userProfile.lastName"
+              id="studentLastName"
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <div class="field">
+          <button
+            type="submit"
+            name="commit"
+            value="Informationen speichern"
+            class="btn btn-secondary mt-3"
+            data-disable-with="Informationen speichern"
+            v-on:click="save()"
+          >
+            Infornationen speichern
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</template>
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+import { mapState } from 'vuex';
+
+export default defineComponent({
+  name: 'Student',
+  computed: mapState(['userProfile']),
+  methods: {
+    save() {
+      this.$store.dispatch('addNotification', { text: 'Dein Profil wurde erfolgreich gespeichert!', type: 'success' });
+    },
+  },
+});
+</script>
+
+<style lang="scss">
+label.required_application::after {
+  content: " *";
+  color: #0000b9;
+  font-weight: bold;
+}
+</style>

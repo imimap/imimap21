@@ -2,9 +2,12 @@
   <header class="container-fluid imimap-header">
     <div class="row">
       <div class="col-2">
-        <a href="" class="navbar-brand imi-map-logo">
-          <img src="/assets/plane.gif" alt="">
-        </a>
+        <router-link
+          class="navbar-brand imi-map-logo"
+          :to="{name: 'Home', params: { locale: $route.params.locale }}"
+        >
+          <img src="/assets/plane.gif" alt="Plane">
+        </router-link>
       </div>
       <div class="col-10">
         <div class="container">
@@ -13,15 +16,15 @@
               <ul class="nav float-right imi-nav-right">
 
                 <li class="imimap-nav-right-li">
-                  <a href="/de/help">
+                  <router-link :to="{name: 'Help', params: { locale: $route.params.locale }}">
                     <font-awesome-icon icon="question-circle" />
-                  </a>
+                  </router-link>
                 </li>
                 <li> &nbsp;</li>
                 <li class="imimap-nav-right-li">
-                  <a href="/de/students/778">
+                  <router-link  :to="{name: 'Student', params: { locale: $route.params.locale }}">
                     <font-awesome-icon icon="user" />
-                  </a>
+                  </router-link>
                 </li>
 
                 <li class="dropdown imimap-nav-right-li">
@@ -31,16 +34,19 @@
                     <font-awesome-icon icon="cog" />
                   </a>
                   <ul class="dropdown-menu" role="menu" aria-labelledby="drop3">
-                    <li class="locale-de dropdown-item">
-                      <a href="/de">de</a>
-                    </li>
-                    <li class="locale-en dropdown-item">
-                      <a href="/en">en</a>
-                    </li>
+                      <li
+                        class="locale-de dropdown-item"
+                        v-for="(locale, i) in $i18n.availableLocales"
+                        :key="`lang-${i}`"
+                        :value="locale"
+                        v-on:click="switchLocale(locale)"
+                      >
+                        {{ locale }}
+                      </li>
                   </ul>
                 </li>
                 <li class="imimap-nav-right-li">
-                  <a rel="nofollow" data-method="delete" href="/de/users/sign_out">
+                  <a v-on:click="logout()">
                     <font-awesome-icon icon="sign-out-alt" />
                   </a>
                 </li>
@@ -67,17 +73,28 @@
                 >
                   <ul class="navbar-nav ">
                     <li class="nav-item im-nav-itemactive">
-                      <a class="nav-link im-nav-link imi-map-navlink" href="/">Start</a>
+                      <router-link
+                        class="nav-link im-nav-link imi-map-navlink"
+                        :to="{name: 'Home', params: { locale: $route.params.locale }}"
+                      >
+                        Start
+                      </router-link>
                     </li>
                     <li class="nav-item im-nav-item">
-                      <a class="nav-link im-nav-link imi-map-navlink" href="/search">
-                        Praktikumssuche
-                      </a>
+                      <router-link
+                        class="nav-link im-nav-link imi-map-navlink"
+                        :to="{name: 'Search', params: { locale: $route.params.locale }}"
+                      >
+                        {{ $t("header.headerLinks.internshipSearch") }}
+                      </router-link>
                     </li>
                     <li class="nav-item im-nav-item">
-                      <a class="nav-link im-nav-link imi-map-navlink" href="#">
-                        Mein Praktikum
-                      </a>
+                      <router-link
+                        class="nav-link im-nav-link imi-map-navlink"
+                        :to="{name: 'InternshipModule', params: { locale: $route.params.locale }}"
+                      >
+                        {{ $t("header.headerLinks.myInternship") }}
+                      </router-link>
                     </li>
                   </ul>
                 </div>
@@ -92,9 +109,22 @@
 
 <script  lang="ts">
 import { defineComponent } from 'vue';
+import { logoutUser } from '@/utils/auth';
 
 export default defineComponent({
   name: 'HeaderComponent',
+  methods: {
+    switchLocale(locale: string) {
+      this.$i18n.locale = locale;
+      this.$router.push({ params: { locale } });
+    },
+    logout() {
+      logoutUser();
+      this.$store.commit('resetUser');
+      this.$store.dispatch('addNotification', { text: 'Du wurdest erfolgreich ausgeloggt!', type: 'success' });
+      this.$router.push({ name: 'Login' });
+    },
+  },
 });
 </script>
 

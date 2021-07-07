@@ -1,8 +1,9 @@
 module.exports = {
+  transpileDependencies: ['vuex-module-decorators'],
   css: {
     loaderOptions: {
       sass: {
-        additionalData: '@import "~bootstrap/scss/functions"; @import "~bootstrap/scss/variables"; @import "~bootstrap/scss/mixins"; @import "@/styles/_variables.scss";',
+        additionalData: '@import "@/styles/app.scss"; ',
       },
     },
   },

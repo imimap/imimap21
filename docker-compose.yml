@@ -4,17 +4,26 @@ services:
 
   client:
     build: ./client
-    image: imimap21/client:latest
+    image: htwimimap/client:latest
     ports:
       - "80:80"
 
   server:
     build: ./server
-    image: imimap21/server:latest
+    image: htwimimap/server:latest
     ports:
       - "9000:9000"
     depends_on:
       - db
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - LDAP_URL=${LDAP_URL}
+      - LDAP_SEARCH_BASE=${LDAP_SEARCH_BASE}
+      - LDAP_STUDENT_GROUP=${LDAP_STUDENT_GROUP}
+      - LDAP_INSTRUCTOR_GROUP=${LDAP_INSTRUCTOR_GROUP}
+      - AUTH_SECRET=${AUTH_SECRET}
+      - BYPASS_LDAP=${BYPASS_LDAP}
+      - API_HOST=${API_HOST}
 
   db:
     image: mongo:bionic
@@ -29,6 +38,8 @@ services:
       - "8081:8081"
     environment:
       - ME_CONFIG_MONGODB_SERVER=db
+      - ME_CONFIG_BASICAUTH_USERNAME=${ME_USER}
+      - ME_CONFIG_BASICAUTH_PASSWORD=${ME_PASS}
 
 volumes:
   db-data:
