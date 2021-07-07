@@ -2,6 +2,7 @@ import * as dbHandler from "./database";
 import { Internship, InternshipStatuses } from "../../src/models/internship";
 import { Error, Types } from "mongoose";
 import { User } from "../../src/models/user";
+import { PdfDocumentStatuses } from "../../src/models/pdfDocument";
 
 const INCOMPLETE_INTERNSHIP_ID = Types.ObjectId("00000000000000000000000a");
 const INTERNSHIP_ID = Types.ObjectId("00000000000000000000000b");
@@ -54,6 +55,15 @@ beforeEach(async () => {
     supervisor: {
       fullName: "Peter Pan",
       emailAddress: "peter@pan.de",
+    },
+    lsfEctsProofPdf: {
+      status: PdfDocumentStatuses.SUBMITTED,
+    },
+    locationJustificationPdf: {
+      status: PdfDocumentStatuses.SUBMITTED,
+    },
+    contractPdf: {
+      status: PdfDocumentStatuses.SUBMITTED,
     },
   });
 });

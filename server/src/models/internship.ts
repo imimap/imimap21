@@ -1,6 +1,6 @@
 import { Document, model, Model, PopulatedDoc, Schema, Types } from "mongoose";
 import { ISupervisor, SupervisorSchema } from "./supervisor";
-import { IPdfDocument, PdfDocumentSchema } from "./pdfDocument";
+import { IPdfDocument, PdfDocumentSchema, PdfDocumentStatuses } from "./pdfDocument";
 import { Semester } from "../helpers/semesterHelper";
 import { getWeeksBetween, isValidDateRange, normalizeDate } from "../helpers/dateHelper";
 import { ICompany } from "./company";
@@ -128,6 +128,9 @@ const requiredFields = [
   "workingHoursPerWeek",
   "supervisor.fullName",
   "supervisor.emailAddress",
+];
+
+const requiredPdfs = [
   "lsfEctsProofPdf",
   "locationJustificationPdf",
   "contractPdf",
@@ -135,9 +138,15 @@ const requiredFields = [
 ];
 
 function internshipRequestComplete(document: Document) {
+  // Check if all required fields exist
   for (const field of requiredFields) {
     if (!document.get(field)) return false;
   }
+  // Check if all required pdf files exist
+  for (const pdf of requiredPdfs) {
+    if (document.get(pdf).status !== PdfDocumentStatuses.SUBMITTED) return false;
+  }
+  // Everything filled in, request complete
   return true;
 }
 
