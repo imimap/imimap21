@@ -13,6 +13,7 @@ import Admin from '@/views/Admin.vue';
 import UsersList from '@/components/admin/UsersList.vue';
 import CompaniesList from '@/components/admin/CompaniesList.vue';
 import PostponementsList from '@/components/admin/PostponementsList.vue';
+import Dashboard from '@/components/admin/Dashboard.vue';
 import InternshipModule from '@/views/InternshipModule.vue';
 import CreateInternshipModule from '@/views/CreateInternshipModule.vue';
 import Login from '@/views/Login.vue';
@@ -100,20 +101,33 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: '/admin',
+        path: 'admin',
+        name: 'Admin',
         component: Admin,
-        redirect: '/admin/users',
+        meta: {
+          allowAnonymous: false,
+        },
+        // Todo: Props for direct filtering on users, companies and postponements when navigating
+        //  from dashboard
         children: [
           {
+            path: 'dashboard',
+            name: 'Dashboard',
+            component: Dashboard,
+          },
+          {
             path: 'users',
+            name: 'AdminUsersList',
             component: UsersList,
           },
           {
             path: 'companies',
+            name: 'AdminCompaniesList',
             component: CompaniesList,
           },
           {
             path: 'postponements',
+            name: 'AdminPostponementsList',
             component: PostponementsList,
           },
         ],
@@ -131,6 +145,17 @@ router.beforeEach(async (to, from, next) => {
   if (!to.meta.allowAnonymous && !isLoggedIn()) {
     next({
       name: 'Login',
+      params: { locale: to.params.locale },
+    });
+  } else {
+    next();
+  }
+});
+
+router.beforeEach(async (to, from, next) => {
+  if (to.name === 'Admin' && !to.meta.allowAnonymous && isLoggedIn()) {
+    next({
+      name: 'AdminUsersList',
       params: { locale: to.params.locale },
     });
   } else {

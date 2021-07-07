@@ -2,6 +2,10 @@
   <div class="container my-5">
     <ul class="nav nav-pills">
       <li class="nav-item me-2">
+        <router-link class="nav-link" :class="{ active: isDashboardRoute }"
+                     to="dashboard">Dashboard</router-link>
+      </li>
+      <li class="nav-item me-2">
         <router-link class="nav-link" :class="{ active: isUsersRoute }"
                      to="users">Praktika</router-link>
       </li>
@@ -30,6 +34,9 @@ export default defineComponent({
     return {};
   },
   computed: {
+    isDashboardRoute() {
+      return this.$router.currentRoute.value.path.includes('dashboard');
+    },
     isUsersRoute() {
       return this.$router.currentRoute.value.path.includes('users');
     },
