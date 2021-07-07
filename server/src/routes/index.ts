@@ -9,6 +9,6 @@ router.use("/auth", authRouter);
 
 router.use("/x", exampleRouter);
 
-router.use("/internship-module", internshipModuleRouter);
+router.use("/internship-modules", internshipModuleRouter);
 
 export default router;
