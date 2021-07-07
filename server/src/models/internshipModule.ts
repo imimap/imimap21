@@ -217,14 +217,11 @@ InternshipModuleSchema.methods.submitCompleteDocumentsPdf = async function (
 /* Model Event Hooks */
 /*********************/
 async function trySetPassed(document: Document) {
-  if (
-    document.get("status") === InternshipModuleStatuses.PLANNED &&
-    document.get("aepPassed") === true &&
-    (await isWeeksTotalLongEnough(document.get("internships"))) &&
-    document
-      .get("internships")
-      .every((internship: IInternship) => internship.status === InternshipStatuses.APPROVED)
-  ) {
+  await document.populate("internships").execPopulate();
+  const longEnough = await isWeeksTotalLongEnough(document.get("internships"));
+  const aepPassed = document.get("aepPassed");
+  const statusIsPlanned = document.get("status") === InternshipModuleStatuses.PLANNED;
+  if (statusIsPlanned && aepPassed && longEnough) {
     document.set("status", InternshipModuleStatuses.PASSED);
     await document.save();
     return true;
@@ -235,7 +232,9 @@ async function trySetPassed(document: Document) {
 async function isWeeksTotalLongEnough(internships: IInternship[]) {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const durations = internships.map((internship: IInternship) => internship.durationInWeeksSoFar);
+  const durations = internships
+    .filter((i) => i.status === InternshipStatuses.PASSED)
+    .map((internship: IInternship) => internship.durationInWeeksSoFar);
   const amountOfWeeks = durations.reduce((a: number, b: number) => a + b, 0);
   return Math.floor(amountOfWeeks) >= 16;
 }

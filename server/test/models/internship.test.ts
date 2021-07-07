@@ -76,11 +76,12 @@ describe("Internship", () => {
   });
 
   it("can be updated", async () => {
-    const update = await Internship.findByIdAndUpdate(
-      INCOMPLETE_INTERNSHIP_ID,
-      { workingHoursPerWeek: 38 },
-      { runValidators: true, context: "query" }
-    );
+    const internship = await Internship.findById(INCOMPLETE_INTERNSHIP_ID);
+    expect(internship).toBeTruthy();
+    if (!internship) return;
+
+    internship.workingHoursPerWeek = 38;
+    const update = await internship.save();
 
     expect(update).toBeTruthy();
 

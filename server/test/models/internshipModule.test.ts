@@ -6,7 +6,7 @@ import {
 } from "../../src/models/internshipModule";
 import { Semester } from "../../src/helpers/semesterHelper";
 import { User } from "../../src/models/user";
-import { Internship, InternshipStatuses } from "../../src/models/internship";
+import { Internship } from "../../src/models/internship";
 import { Types } from "mongoose";
 
 const ADMIN_USER_ID = Types.ObjectId("0000a0000000000000000000");
@@ -178,8 +178,7 @@ describe("InternshipModule", () => {
       await internship.pass(ADMIN_USER_ID);
 
       savedInternshipModule?.internships?.push(internshipId);
-      const test = await savedInternshipModule?.save();
-      console.log(test?.internships);
+      await savedInternshipModule?.save();
 
       const updatedInternshipModule = await savedInternshipModule?.passAep(ADMIN_USER_ID);
       expect(updatedInternshipModule?.aepPassed).toEqual(true);
