@@ -172,6 +172,8 @@ InternshipModuleSchema.methods.acceptPostponement = async function (
     creator: creator,
     accept: true,
     changes: {
+      newSemester: newSemester,
+      newSemesterOfStudy: newSemesterOfStudy,
       status: InternshipModuleStatuses.PLANNED,
     },
   };
