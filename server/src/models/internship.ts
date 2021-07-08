@@ -120,7 +120,7 @@ export enum InternshipStatuses {
   PASSED = "passed",
 }
 
-const requiredFields = [
+export const requiredFields = [
   "startDate",
   "endDate",
   "operationalArea",
@@ -130,7 +130,7 @@ const requiredFields = [
   "supervisor.emailAddress",
 ];
 
-const requiredPdfs = [
+export const requiredPdfs = [
   "lsfEctsProofPdf",
   "locationJustificationPdf",
   "contractPdf",
@@ -150,12 +150,11 @@ function internshipRequestComplete(document: Document) {
   return true;
 }
 
-async function trySetRequested(document: Document) {
+export async function trySetRequested(document: Document) {
   // Check if request is filled in completely
-  if (internshipRequestComplete(document)) {
-    const status = document.get("status");
-    // If status is not 'planned', leave it as is
-    if (status !== InternshipStatuses.PLANNED) return;
+  const status = document.get("status");
+  const complete = internshipRequestComplete(document);
+  if (complete && status === InternshipStatuses.PLANNED) {
     // If status is 'planned', set to 'requested'
     document.get("events").push({
       creator: (await imimapAdmin)._id,
@@ -166,8 +165,7 @@ async function trySetRequested(document: Document) {
     });
     // TODO what if instead we did:
     // this.status = InternshipStatuses.REQUESTED;
-  } else {
-    if (getRecentValueForPropSetByEvent("status", document) === InternshipStatuses.PLANNED) return;
+  } else if (!complete && status !== InternshipStatuses.PLANNED) {
     // Set status back to 'planned'
     document.get("events").push({
       creator: (await imimapAdmin)._id,
@@ -179,9 +177,14 @@ async function trySetRequested(document: Document) {
   }
 }
 
-async function trySetReadyForGrading(document: Document) {
+export async function trySetReadyForGrading(document: Document) {
+  if (document.get("status") !== InternshipStatuses.OVER) return;
+
   const reportPdf = document.get("reportPdf");
   if (!reportPdf) return;
+
+  const certificatePdf = document.get("certificatePdf");
+  if (!certificatePdf) return;
 
   document.get("events").push({
     creator: (await imimapAdmin)._id,
@@ -314,6 +317,15 @@ InternshipSchema.methods.markAsOver = async function (creator: Types.ObjectId) {
 
   return this.save();
 };
+
+export async function tryMarkAsOver(document: Document) {
+  // Check if user is admin
+  if (document.get("endDate") <= Date.now()) {
+    document.set("status", InternshipStatuses.OVER);
+
+    return document.save();
+  }
+}
 
 InternshipSchema.methods.pass = async function (creator: Types.ObjectId) {
   // Check if user is admin
