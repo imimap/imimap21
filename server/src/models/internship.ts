@@ -178,10 +178,14 @@ export async function trySetRequested(document: Document) {
   }
 }
 
-async function trySetReadyForGrading(document: Document) {
-  //todo: can only be ready for grading under certain circumstances
+export async function trySetReadyForGrading(document: Document) {
+  if (document.get("status") !== InternshipStatuses.OVER) return;
+
   const reportPdf = document.get("reportPdf");
   if (!reportPdf) return;
+
+  const certificatePdf = document.get("certificatePdf");
+  if (!certificatePdf) return;
 
   document.get("events").push({
     creator: (await imimapAdmin)._id,
