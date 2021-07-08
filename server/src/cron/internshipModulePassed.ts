@@ -2,7 +2,7 @@ import { Internship } from "../models/internship";
 import { InternshipModuleStatuses, trySetPassed } from "../models/internshipModule";
 
 export async function checkModulePassed(): Promise<void> {
-  const internshipsModules = await Internship.find({
+  const internshipsModules = await InternshipModule.find({
     status: InternshipModuleStatuses.PLANNED,
     aepPassed: true,
   });
