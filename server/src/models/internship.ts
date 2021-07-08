@@ -139,8 +139,6 @@ export const requiredPdfs = [
 
 function internshipRequestComplete(document: Document) {
   // Check if all required fields exist
-  if (document.get("status") !== InternshipStatuses.PLANNED) return false;
-
   for (const field of requiredFields) {
     if (!document.get(field)) return false;
   }
@@ -154,8 +152,9 @@ function internshipRequestComplete(document: Document) {
 
 export async function trySetRequested(document: Document) {
   // Check if request is filled in completely
-  if (internshipRequestComplete(document)) {
-    const status = document.get("status");
+  const status = document.get("status");
+  const complete = internshipRequestComplete(document);
+  if (complete && status === InternshipStatuses.PLANNED) {
     // If status is 'planned', set to 'requested'
     document.get("events").push({
       creator: (await imimapAdmin)._id,
@@ -166,7 +165,7 @@ export async function trySetRequested(document: Document) {
     });
     // TODO what if instead we did:
     // this.status = InternshipStatuses.REQUESTED;
-  } else {
+  } else if (!complete && status !== InternshipStatuses.PLANNED) {
     // Set status back to 'planned'
     document.get("events").push({
       creator: (await imimapAdmin)._id,
