@@ -10,7 +10,7 @@ export async function findInternshipModule(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const user = await User.findOne({ emailAddress: req.user?.email }).populate({
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean().populate({
     path: "studentProfile.internship",
     populate: { path: "internships" },
   });
@@ -26,7 +26,7 @@ export async function findInternshipModule(
     );
     if (req.user?.role === Role.STUDENT && user?.studentProfile?.internship.id !== req.params.id)
       return next(new Forbidden("You may only access your own internship module"));
-    const internshipModule = await InternshipModule.findById(req.params.id).populate("internships");
+    const internshipModule = await InternshipModule.findById(req.params.id).lean().populate("internships");
     if (!internshipModule) return next(new NotFound("Internship module not found"));
     res.json(internshipModule);
   }
