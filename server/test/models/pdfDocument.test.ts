@@ -52,7 +52,7 @@ describe("PdfDocument", () => {
   it("can be submitted via event", async () => {
     const savedDocument = await PdfDocument.findOne({});
     expect(savedDocument?.events.length).toEqual(1);
-    expect(savedDocument?.path).toBeTruthy();
+    expect(savedDocument?.path()).toBeTruthy();
     expect(savedDocument?.status).toEqual(PdfDocumentStatuses.SUBMITTED);
   });
   it("can not be submitted with invalid data", async () => {
@@ -64,34 +64,34 @@ describe("PdfDocument", () => {
   describe("can be accepted and rejected", function () {
     it("can be accepted by an admin via event and get a new path", async () => {
       const pdfDocument = await PdfDocument.findOne({});;
-      const previousPath = pdfDocument?.path;
+      const previousPath = pdfDocument?.path();
       const newPath = pdfDocument?.nextPath();
 
       const savedDocument = await pdfDocument?.accept(ADMIN_USER_ID, newPath);
 
       expect(savedDocument?.events.length).toEqual(2);
-      expect(savedDocument?.path).not.toEqual(previousPath);
+      expect(savedDocument?.path()).not.toEqual(previousPath);
       expect(savedDocument?.status).toEqual(PdfDocumentStatuses.ACCEPTED);
     });
     it("can be accepted by an admin via event without a new path", async () => {
       const pdfDocument = await PdfDocument.findOne({});
-      const previousPath = pdfDocument?.path;
+      const previousPath = pdfDocument?.path();
 
       const savedDocument = await pdfDocument?.accept(ADMIN_USER_ID);
 
       expect(savedDocument?.events.length).toEqual(2);
-      expect(savedDocument?.path).toEqual(previousPath);
+      expect(savedDocument?.path()).toEqual(previousPath);
       expect(savedDocument?.status).toEqual(PdfDocumentStatuses.ACCEPTED);
     });
     it("can be rejected by an admin via event and still get the most recent path", async () => {
       const pdfDocument = await PdfDocument.findOne({});
 
-      const previousPath = pdfDocument?.path;
+      const previousPath = pdfDocument?.path();
 
       const savedDocument = await pdfDocument?.reject(ADMIN_USER_ID);
 
       expect(savedDocument?.events.length).toEqual(2);
-      expect(savedDocument?.path).toEqual(previousPath);
+      expect(savedDocument?.path()).toEqual(previousPath);
       expect(savedDocument?.status).toEqual(PdfDocumentStatuses.REJECTED);
     });
     it("can not be accepted by a regular user", async () => {

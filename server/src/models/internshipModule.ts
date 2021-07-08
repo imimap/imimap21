@@ -123,6 +123,7 @@ InternshipModuleSchema.methods.plan = async function () {
       newSemester: Semester.getUpcoming().toString(),
       newSemesterOfStudy: 4,
       aepPassed: false,
+      status: InternshipModuleStatuses.PLANNED,
     },
   });
   this.status = InternshipModuleStatuses.PLANNED;
@@ -151,6 +152,7 @@ InternshipModuleSchema.methods.requestPostponement = async function (
     changes: {
       newSemester: newSemester,
       newSemesterOfStudy: newSemesterOfStudy,
+      status: InternshipModuleStatuses.POSTPONEMENT_REQUESTED,
     },
     comment: reason,
   });
@@ -169,6 +171,11 @@ InternshipModuleSchema.methods.acceptPostponement = async function (
   const event: IEvent = {
     creator: creator,
     accept: true,
+    changes: {
+      newSemester: newSemester,
+      newSemesterOfStudy: newSemesterOfStudy,
+      status: InternshipModuleStatuses.PLANNED,
+    },
   };
   if (reason) event.comment = reason;
   this.events.push(event);
@@ -187,6 +194,9 @@ InternshipModuleSchema.methods.rejectPostponement = async function (
   const event: IEvent = {
     creator: creator,
     accept: false,
+    changes: {
+      status: InternshipModuleStatuses.POSTPONEMENT_REJECTED,
+    },
   };
   if(reason) event.comment = reason;
   this.events.push(event);
@@ -217,7 +227,7 @@ InternshipModuleSchema.methods.submitCompleteDocumentsPdf = async function (
   newPath: string
 ) {
   const user = await User.findById(creator);
-  if (!user?.isAdmin) throw new Error("Only Admins may declare the AEP as passed.");
+  if (!user?.isAdmin) throw new Error("Only Admins may submit the complete documents pdf.");
 
   const pdfDocument: IPdfDocument = new PdfDocument();
 
@@ -235,6 +245,12 @@ export async function trySetPassed(document: Document) {
   const aepPassed = document.get("aepPassed");
   const statusIsPlanned = document.get("status") === InternshipModuleStatuses.PLANNED;
   if (statusIsPlanned && aepPassed && longEnough) {
+    document.get("events").push({
+      creator: (await imimapAdmin)._id,
+      changes: {
+        status: InternshipModuleStatuses.PASSED,
+      },
+    });
     document.set("status", InternshipModuleStatuses.PASSED);
     await document.save();
     return true;
@@ -247,7 +263,7 @@ async function isWeeksTotalLongEnough(internships: IInternship[]) {
   // @ts-ignore
   const durations = internships
     .filter((i) => i.status === InternshipStatuses.PASSED)
-    .map((internship: IInternship) => internship.durationInWeeksSoFar);
+    .map((internship: IInternship) => internship.durationInWeeksSoFar());
   const amountOfWeeks = durations.reduce((a: number, b: number) => a + b, 0);
   return Math.floor(amountOfWeeks) >= 16;
 }
