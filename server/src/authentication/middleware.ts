@@ -3,7 +3,7 @@ import { UnauthorizedError } from "express-jwt";
 import { ErrorRequestHandler, NextFunction, Request, RequestHandler, Response } from "express";
 import { Forbidden, Unauthorized } from "http-errors";
 import { auth as config } from "../config";
-import { AuthUser, Role } from "./user";
+import { Role } from "./user";
 
 /**
  * Extracts the auth token from the request authorization header and returns it.
@@ -45,8 +45,7 @@ function authErrorHandler(error: unknown, req: Request, res: Response, next: Nex
  * @param next The next middleware
  */
 function adminOnlyMiddleware(req: Request, res: Response, next: NextFunction): void {
-  if ((req.user as AuthUser).role !== Role.INSTRUCTOR)
-    return next(new Forbidden("admin role required"));
+  if (req.user?.role !== Role.INSTRUCTOR) return next(new Forbidden("admin role required"));
   else return next();
 }
 
