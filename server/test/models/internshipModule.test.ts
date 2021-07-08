@@ -77,7 +77,8 @@ describe("InternshipModule", () => {
       const savedInternshipModule = await internshipModule?.requestPostponement(
         USER_ID,
         newSemester,
-        newSemesterOfStudy
+        newSemesterOfStudy,
+        "I have not found an internship yet."
       );
 
       expect(savedInternshipModule?.events.length).toEqual(2);
@@ -91,13 +92,18 @@ describe("InternshipModule", () => {
       const newSemester = "ES2015";
       const internshipModule = await InternshipModule.findOne();
       await expect(
-        internshipModule?.requestPostponement(USER_ID, newSemester, 6)
+        internshipModule?.requestPostponement(USER_ID, newSemester, 6, "Because!")
       ).rejects.toThrow();
     });
     describe("admin actions: ", () => {
       beforeEach(async () => {
         const internshipModule = await InternshipModule.findOne();
-        await internshipModule?.requestPostponement(USER_ID, "WS2025", 6);
+        await internshipModule?.requestPostponement(
+          USER_ID,
+          "WS2025",
+          6,
+          "I have not found an internship yet"
+        );
       });
       it("can be accepted by admin", async () => {
         const internshipModule = await InternshipModule.findOne();
@@ -116,7 +122,10 @@ describe("InternshipModule", () => {
         const lastSetSemester = internshipModule?.inSemester;
         const lastSetSemesterOfStudy = internshipModule?.inSemesterOfStudy;
 
-        const savedInternshipModule = await internshipModule?.rejectPostponement(ADMIN_USER_ID);
+        const savedInternshipModule = await internshipModule?.rejectPostponement(
+          ADMIN_USER_ID,
+          "Thats just not true."
+        );
 
         expect(savedInternshipModule?.events.length).toEqual(3);
         expect(savedInternshipModule?.status).toEqual(
