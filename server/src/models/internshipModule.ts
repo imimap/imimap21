@@ -140,8 +140,6 @@ InternshipModuleSchema.methods.acceptPostponement = async function (
     creator: creator,
     accept: true,
     changes: {
-      newSemester: newSemester,
-      newSemesterOfStudy: newSemesterOfStudy,
       status: InternshipModuleStatuses.PLANNED,
     },
   };
@@ -213,7 +211,7 @@ InternshipModuleSchema.methods.submitCompleteDocumentsPdf = async function (
 /*********************/
 /* Model Event Hooks */
 /*********************/
-export async function trySetPassed(document: Document) {
+export async function trySetPassed(document: Document): Promise<boolean> {
   await document.populate("internships").execPopulate();
   const longEnough = await isWeeksTotalLongEnough(document.get("internships"));
   const aepPassed = document.get("aepPassed");
