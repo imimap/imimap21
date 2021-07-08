@@ -1,5 +1,6 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import seed from "../seed";
+import { Forbidden } from "http-errors";
 
 export async function exampleGet(req: Request, res: Response): Promise<void> {
   res.json(req.user);
@@ -9,7 +10,9 @@ export async function examplePost(req: Request, res: Response): Promise<void> {
   res.json(req.body);
 }
 
-export async function seedDb(req: Request, res: Response): Promise<void> {
+export async function seedDb(req: Request, res: Response, next: NextFunction): Promise<void> {
+  if (process.env.NODE_ENV !== "development")
+    return next(new Forbidden("Only allowed in development environment"));
   await seed();
   res.json({ msg: "done" });
 }
