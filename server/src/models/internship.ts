@@ -9,6 +9,17 @@ import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
 import { User } from "./user";
 import { EventSchema, IEvent } from "./event";
 
+export enum InternshipStatuses {
+  UNKNOWN = "unknown",
+  PLANNED = "planned",
+  REQUESTED = "requested",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+  OVER = "over",
+  READY_FOR_GRADING = "readyForGrading",
+  PASSED = "passed",
+}
+
 export interface IInternship extends Document {
   startDate?: Date;
   endDate?: Date;
@@ -97,6 +108,12 @@ export const InternshipSchema = new Schema<IInternship>(
     bvgTicketExemptionPdf: { type: PdfDocumentSchema, default: { events: [] } },
     certificatePdf: { type: PdfDocumentSchema, default: { events: [] } },
     reportPdf: { type: PdfDocumentSchema, default: { events: [] } },
+    status: {
+      type: String,
+      required: true,
+      enum: InternshipStatuses,
+      default: InternshipStatuses.UNKNOWN,
+    },
     events: [
       {
         type: EventSchema,
@@ -109,16 +126,6 @@ export const InternshipSchema = new Schema<IInternship>(
     },
   }
 );
-
-export enum InternshipStatuses {
-  PLANNED = "planned",
-  REQUESTED = "requested",
-  APPROVED = "approved",
-  REJECTED = "rejected",
-  OVER = "over",
-  READY_FOR_GRADING = "readyForGrading",
-  PASSED = "passed",
-}
 
 const requiredFields = [
   "startDate",
@@ -152,30 +159,16 @@ function internshipRequestComplete(document: Document) {
 
 async function trySetRequested(document: Document) {
   // Check if request is filled in completely
+  const status = document.get("status");
   if (internshipRequestComplete(document)) {
-    const status = document.get("status");
     // If status is not 'planned', leave it as is
     if (status !== InternshipStatuses.PLANNED) return;
     // If status is 'planned', set to 'requested'
-    document.get("events").push({
-      creator: (await imimapAdmin)._id,
-      accept: true,
-      changes: {
-        status: InternshipStatuses.REQUESTED,
-      },
-    });
-    // TODO what if instead we did:
-    // this.status = InternshipStatuses.REQUESTED;
+    document.set("status", InternshipStatuses.REQUESTED);
   } else {
-    if (getRecentValueForPropSetByEvent("status", document) === InternshipStatuses.PLANNED) return;
+    if (status === InternshipStatuses.PLANNED) return;
     // Set status back to 'planned'
-    document.get("events").push({
-      creator: (await imimapAdmin)._id,
-      accept: true,
-      changes: {
-        status: InternshipStatuses.PLANNED,
-      },
-    });
+    document.set("status", InternshipStatuses.PLANNED);
   }
 }
 
@@ -183,13 +176,7 @@ async function trySetReadyForGrading(document: Document) {
   const reportPdf = document.get("reportPdf");
   if (!reportPdf) return;
 
-  document.get("events").push({
-    creator: (await imimapAdmin)._id,
-    accept: true,
-    changes: {
-      status: InternshipStatuses.READY_FOR_GRADING,
-    },
-  });
+  document.set("status", InternshipStatuses.READY_FOR_GRADING);
 }
 
 /*********************/
@@ -216,13 +203,7 @@ InternshipSchema.pre("validate", function () {
 
 InternshipSchema.pre("save", async function () {
   if (this.isNew) {
-    this.events.push({
-      creator: (await imimapAdmin)._id,
-      accept: true,
-      changes: {
-        status: InternshipStatuses.PLANNED,
-      },
-    });
+    this.set("status", InternshipStatuses.PLANNED);
   }
 
   // Update internship state if necessary
@@ -241,11 +222,6 @@ InternshipSchema.pre("save", async function () {
 /*******************/
 /* Virtual Getters */
 /*******************/
-InternshipSchema.virtual("status").get(function () {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  return getRecentValueForPropSetByEvent("status", this);
-});
 
 InternshipSchema.virtual("durationInWeeksSoFar").get(function () {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -269,13 +245,7 @@ InternshipSchema.methods.approve = async function (creator: Types.ObjectId) {
   if (this.status !== InternshipStatuses.REQUESTED)
     throw new Error("Internship is not ready for approval yet");
 
-  this.events.push({
-    creator: creator,
-    accept: true,
-    changes: {
-      status: InternshipStatuses.APPROVED,
-    },
-  });
+  this.status = InternshipStatuses.APPROVED;
 
   return this.save();
 };
@@ -288,13 +258,7 @@ InternshipSchema.methods.reject = async function (creator: Types.ObjectId) {
   if (this.status !== InternshipStatuses.REQUESTED)
     throw new Error("Internship is not ready for approval yet");
 
-  this.events.push({
-    creator: creator,
-    accept: true,
-    changes: {
-      status: InternshipStatuses.REJECTED,
-    },
-  });
+  this.status = InternshipStatuses.REJECTED;
 
   return this.save();
 };
@@ -304,13 +268,7 @@ InternshipSchema.methods.markAsOver = async function (creator: Types.ObjectId) {
   const user = await User.findById(creator);
   if (!user?.isAdmin) throw new Error("Only admins may mark an internship as over");
 
-  this.events.push({
-    creator: creator,
-    accept: true,
-    changes: {
-      status: InternshipStatuses.OVER,
-    },
-  });
+  this.status = InternshipStatuses.OVER;
 
   return this.save();
 };
@@ -323,13 +281,7 @@ InternshipSchema.methods.pass = async function (creator: Types.ObjectId) {
   if (this.status !== InternshipStatuses.READY_FOR_GRADING)
     throw new Error("Internship is not ready for grading yet");
 
-  this.events.push({
-    creator: creator,
-    accept: true,
-    changes: {
-      status: InternshipStatuses.PASSED,
-    },
-  });
+  this.status = InternshipStatuses.PASSED;
 
   return this.save();
 };
