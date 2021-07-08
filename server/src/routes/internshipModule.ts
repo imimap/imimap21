@@ -14,7 +14,7 @@ const internshipModuleRouter = Router();
 
 internshipModuleRouter.get(
   "/",
-  authMiddleware,
+  authMiddleware(true),
   query("semester")
     .toUpperCase()
     .custom((s) => Semester.isValidSemesterString(s) || !s),
@@ -22,11 +22,11 @@ internshipModuleRouter.get(
   asyncHandler(listAll)
 );
 
-internshipModuleRouter.get("/my", authMiddleware, asyncHandler(getMyInternshipModule));
+internshipModuleRouter.get("/my", authMiddleware(), asyncHandler(getMyInternshipModule));
 
 internshipModuleRouter.get(
   "/postponements",
-  authMiddleware,
+  authMiddleware(true),
   asyncHandler(listPostponementRequests)
 );
 
