@@ -4,8 +4,6 @@ import { IPdfDocument, PdfDocumentSchema, PdfDocumentStatuses } from "./pdfDocum
 import { Semester } from "../helpers/semesterHelper";
 import { getWeeksBetween, isValidDateRange, normalizeDate } from "../helpers/dateHelper";
 import { ICompany } from "./company";
-import { getRecentValueForPropSetByEvent } from "../helpers/eventQueryHelper";
-import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
 import { User } from "./user";
 import { EventSchema, IEvent } from "./event";
 
@@ -23,7 +21,6 @@ export enum InternshipStatuses {
 export interface IInternship extends Document {
   startDate?: Date;
   endDate?: Date;
-  durationInWeeksSoFar: number;
   company?: PopulatedDoc<ICompany & Document>;
   tasks?: string;
   operationalArea?: string;
@@ -42,6 +39,8 @@ export interface IInternship extends Document {
   reportPdf?: IPdfDocument;
   events: IEvent[];
   status: string;
+
+  durationInWeeksSoFar(): number;
 
   approve(creator: Types.ObjectId): Promise<IInternship>;
 
@@ -220,23 +219,21 @@ InternshipSchema.pre("save", async function () {
 });
 
 /*******************/
-/* Virtual Getters */
+/*  Model Methods  */
 /*******************/
 
-InternshipSchema.virtual("durationInWeeksSoFar").get(function () {
+InternshipSchema.methods.durationInWeeksSoFar = function (): number {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const document = this;
   let dateToCompareWith: Date = normalizeDate(new Date());
-  if (document.startDate > dateToCompareWith) return 0;
-  if (document.endDate < dateToCompareWith) dateToCompareWith = document.endDate;
-  return getWeeksBetween(document.startDate, dateToCompareWith);
-});
+  if (document.startDate && document.startDate > dateToCompareWith) return 0;
+  if (document.endDate && document.endDate < dateToCompareWith)
+    dateToCompareWith = document.endDate;
+  return getWeeksBetween(document?.startDate || dateToCompareWith, dateToCompareWith);
+};
 
-/*******************/
-/*  Model Methods  */
-/*******************/
 InternshipSchema.methods.approve = async function (creator: Types.ObjectId) {
   // Check if user is admin
   const user = await User.findById(creator);
@@ -266,7 +263,10 @@ InternshipSchema.methods.reject = async function (creator: Types.ObjectId) {
 InternshipSchema.methods.markAsOver = async function (creator: Types.ObjectId) {
   // Check if user is admin
   const user = await User.findById(creator);
-  if (!user?.isAdmin) throw new Error("Only admins may mark an internship as over");
+  if (!user?.isAdmin)
+    throw new Error(
+      "Only admins may mark an internship as over. An internship is automatically marked as over when the endDate is reached."
+    );
 
   this.status = InternshipStatuses.OVER;
 

@@ -234,7 +234,7 @@ async function isWeeksTotalLongEnough(internships: IInternship[]) {
   // @ts-ignore
   const durations = internships
     .filter((i) => i.status === InternshipStatuses.PASSED)
-    .map((internship: IInternship) => internship.durationInWeeksSoFar);
+    .map((internship: IInternship) => internship.durationInWeeksSoFar());
   const amountOfWeeks = durations.reduce((a: number, b: number) => a + b, 0);
   return Math.floor(amountOfWeeks) >= 16;
 }
