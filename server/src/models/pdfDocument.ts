@@ -16,7 +16,7 @@ function isValidPdf(path: string) {
 
 export interface IPdfDocument extends Document {
   events: IEvent[];
-  path: string;
+  path(): string;
   status: string;
   nextPath(): string;
   submit(creator: Types.ObjectId, newPath: string): Promise<IPdfDocument>;
@@ -48,18 +48,18 @@ export const PdfDocumentSchema = new Schema<IPdfDocument>(
   }
 );
 
-PdfDocumentSchema.virtual("path").get(function () {
+PdfDocumentSchema.methods.path = function () {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return getRecentValueForPropSetByEvent("newPath", this);
-});
+};
 
 // when generating the next pdf path, this method should be used
 // it makes sure that the versioning is correct
 PdfDocumentSchema.methods.nextPath = function () {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const currentPath = this.path;
+  const currentPath = this.path();
   if (!currentPath) throw new Error("Path for this document is not set.");
   const pathParts = currentPath.split("/");
   pathParts.pop();
