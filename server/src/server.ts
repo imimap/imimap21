@@ -9,7 +9,7 @@ import * as passport from "passport";
 import { HttpError, NotFound } from "http-errors";
 import router from "./routes";
 import database from "./database";
-import ldapStrategy from "./authentication/strategy";
+import ldapStrategy from "./authentication/ldapStrategy";
 import localStrategy from "./authentication/localStrategy";
 
 // load database

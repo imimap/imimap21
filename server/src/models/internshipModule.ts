@@ -33,12 +33,13 @@ export interface IInternshipModule extends Document {
   requestPostponement(
     creator: Types.ObjectId,
     newSemester: string,
-    newSemesterOfStudy: number
+    newSemesterOfStudy: number,
+    reason: string,
   ): Promise<IInternshipModule>;
 
-  acceptPostponement(creator: Types.ObjectId): Promise<IInternshipModule>;
+  acceptPostponement(creator: Types.ObjectId, reason?: string): Promise<IInternshipModule>;
 
-  rejectPostponement(creator: Types.ObjectId): Promise<IInternshipModule>;
+  rejectPostponement(creator: Types.ObjectId, reason?: string): Promise<IInternshipModule>;
 
   passAep(creator: Types.ObjectId): Promise<IInternshipModule>;
 
@@ -133,7 +134,8 @@ InternshipModuleSchema.methods.plan = async function () {
 InternshipModuleSchema.methods.requestPostponement = async function (
   creator: Types.ObjectId,
   newSemester: string,
-  newSemesterOfStudy: number
+  newSemesterOfStudy: number,
+  reason: string
 ) {
   const user = await User.findById(creator);
   if (!user) throw new Error("Creator (User) with that objectId does not exist.");
@@ -152,39 +154,50 @@ InternshipModuleSchema.methods.requestPostponement = async function (
       newSemesterOfStudy: newSemesterOfStudy,
       status: InternshipModuleStatuses.POSTPONEMENT_REQUESTED,
     },
+    comment: reason,
   });
   this.status = InternshipModuleStatuses.POSTPONEMENT_REQUESTED;
 
   return this.save();
 };
 
-InternshipModuleSchema.methods.acceptPostponement = async function (creator: Types.ObjectId) {
+InternshipModuleSchema.methods.acceptPostponement = async function (
+  creator: Types.ObjectId,
+  reason?: string
+) {
   const user = await User.findById(creator);
   if (!user?.isAdmin) throw new Error("Only Admins may accept a postponement.");
 
-  this.events.push({
+  const event: IEvent = {
     creator: creator,
     accept: true,
     changes: {
       status: InternshipModuleStatuses.PLANNED,
     },
-  });
+  };
+  if (reason) event.comment = reason;
+  this.events.push(event);
   this.status = InternshipModuleStatuses.PLANNED;
 
   return this.save();
 };
 
-InternshipModuleSchema.methods.rejectPostponement = async function (creator: Types.ObjectId) {
+InternshipModuleSchema.methods.rejectPostponement = async function (
+  creator: Types.ObjectId,
+  reason?: string
+) {
   const user = await User.findById(creator);
   if (!user?.isAdmin) throw new Error("Only Admins may reject a postponement.");
 
-  this.events.push({
+  const event: IEvent = {
     creator: creator,
     accept: false,
     changes: {
       status: InternshipModuleStatuses.POSTPONEMENT_REJECTED,
     },
-  });
+  };
+  if(reason) event.comment = reason;
+  this.events.push(event);
   this.status = InternshipModuleStatuses.POSTPONEMENT_REJECTED;
 
   return this.save();

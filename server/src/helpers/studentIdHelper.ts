@@ -3,6 +3,6 @@ export const isValidStudentId = (id: string): boolean => {
 };
 
 export function sanitizeUsername(username: string): string {
-  const regexMatches = /^(s0[0-9]{6})(@htw-berlin\.de)?$/.exec(username);
+  const regexMatches = /^((s0[0-9]{6})|([a-z]+(\.[a-z]+)?))(@htw-berlin\.de)?$/.exec(username);
   return regexMatches ? regexMatches[1] : "";
 }

@@ -7,6 +7,7 @@ export interface IEvent {
     [key: string]: unknown;
   };
   accept?: boolean;
+  comment?: string;
 }
 
 export const EventSchema = new Schema({
@@ -25,5 +26,8 @@ export const EventSchema = new Schema({
   },
   accept: {
     type: Boolean,
+  },
+  comment: {
+    type: String,
   },
 });

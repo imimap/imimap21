@@ -1,8 +1,9 @@
 import * as jwt from "express-jwt";
 import { UnauthorizedError } from "express-jwt";
-import { NextFunction, Request, Response } from "express";
-import { Unauthorized } from "http-errors";
+import { ErrorRequestHandler, NextFunction, Request, RequestHandler, Response } from "express";
+import { Forbidden, Unauthorized } from "http-errors";
 import { auth as config } from "../config";
+import { AuthUser, Role } from "./user";
 
 /**
  * Extracts the auth token from the request authorization header and returns it.
@@ -19,15 +20,45 @@ function getAuthTokenFromHeader(request: Request) {
   return null;
 }
 
-const authMiddleware = [
-  jwt({
-    secret: config.secret,
-    userProperty: "user",
-    getToken: getAuthTokenFromHeader,
-    algorithms: ["HS256"],
-  }),
-  (error: unknown, request: Request, response: Response, next: NextFunction): void =>
-    next(error instanceof UnauthorizedError ? new Unauthorized(error.message) : error),
-];
+const jwtMiddleware = jwt({
+  secret: config.secret,
+  userProperty: "user",
+  getToken: getAuthTokenFromHeader,
+  algorithms: ["HS256"],
+});
+
+/**
+ * Converts authorization errors to 401 - Unauthorized, uses pass-through for other errors
+ * @param error The error that occurred during authorization
+ * @param req The express request
+ * @param res The express response
+ * @param next The next middleware
+ */
+function authErrorHandler(error: unknown, req: Request, res: Response, next: NextFunction): void {
+  next(error instanceof UnauthorizedError ? new Unauthorized(error.message) : error);
+}
+
+/**
+ * Checks if the current user is an admin and throws a 403 - Forbidden if they are not
+ * @param req The express request
+ * @param res The express response
+ * @param next The next middleware
+ */
+function adminOnlyMiddleware(req: Request, res: Response, next: NextFunction): void {
+  if ((req.user as AuthUser).role !== Role.INSTRUCTOR)
+    return next(new Forbidden("admin role required"));
+  else return next();
+}
+
+/**
+ * An authorization middleware. Checks if the authorization header contains a valid auth token and
+ * if the user has the permissions necessary to access the protected resource.
+ * @param adminOnly Boolean flag to only allow admins to access the protected resource
+ */
+function authMiddleware(adminOnly = false): (RequestHandler | ErrorRequestHandler)[] {
+  const middleware: (RequestHandler | ErrorRequestHandler)[] = [jwtMiddleware, authErrorHandler];
+  if (adminOnly) middleware.splice(1, 0, adminOnlyMiddleware);
+  return middleware;
+}
 
 export default authMiddleware;
