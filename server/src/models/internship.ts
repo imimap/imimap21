@@ -180,6 +180,7 @@ async function trySetRequested(document: Document) {
 }
 
 async function trySetReadyForGrading(document: Document) {
+  //todo: can only be ready for grading under certain circumstances
   const reportPdf = document.get("reportPdf");
   if (!reportPdf) return;
 
@@ -314,6 +315,15 @@ InternshipSchema.methods.markAsOver = async function (creator: Types.ObjectId) {
 
   return this.save();
 };
+
+export async function tryMarkAsOver(document: Document) {
+  // Check if user is admin
+  if (document.get("endDate") <= Date.now()) {
+    document.set("status", InternshipStatuses.OVER);
+
+    return document.save();
+  }
+}
 
 InternshipSchema.methods.pass = async function (creator: Types.ObjectId) {
   // Check if user is admin
