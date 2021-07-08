@@ -30,7 +30,7 @@ export interface IInternshipModule extends Document {
     creator: Types.ObjectId,
     newSemester: string,
     newSemesterOfStudy: number,
-    reason: string,
+    reason: string
   ): Promise<IInternshipModule>;
 
   acceptPostponement(creator: Types.ObjectId, reason?: string): Promise<IInternshipModule>;
@@ -161,7 +161,7 @@ InternshipModuleSchema.methods.rejectPostponement = async function (
     creator: creator,
     accept: false,
   };
-  if(reason) event.comment = reason;
+  if (reason) event.comment = reason;
   this.events.push(event);
   this.status = InternshipModuleStatuses.POSTPONEMENT_REJECTED;
 

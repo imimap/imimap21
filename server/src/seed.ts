@@ -38,7 +38,7 @@ async function createUser(
 async function createInternshipModule(
   internshipIds: Schema.Types.ObjectId[] = []
 ): Promise<IInternshipModule> {
-  const internshipModule = await InternshipModule.create({ internships: internshipIds });
+  const internshipModule = new InternshipModule({ internships: internshipIds });
   return internshipModule.plan();
 }
 

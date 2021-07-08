@@ -1,5 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import { IInternshipModule, InternshipModule } from "../models/internshipModule";
+import {
+  IInternshipModule,
+  InternshipModule,
+  InternshipModuleStatuses,
+} from "../models/internshipModule";
 import { FilterQuery } from "mongoose";
 import { User } from "../models/user";
 import { Forbidden, NotFound } from "http-errors";
@@ -36,55 +40,59 @@ export async function listInternshipModules(req: Request, res: Response): Promis
 }
 
 export async function listPostponementRequests(req: Request, res: Response): Promise<void> {
-  res.json(
-    await InternshipModule.aggregate([
-      {
-        $project: {
-          postponementEvents: {
-            $filter: {
-              input: "$events",
-              as: "event",
-              cond: {
-                $and: [
-                  { $gt: ["$$event.changes.newSemester", null] },
-                  { $or: [{ $eq: ["$$event.accept", false] }, { $lte: ["$$event.accept", null] }] },
-                ],
-              },
-            },
-          },
-        },
+  const postponementRequests = await InternshipModule.aggregate([
+    {
+      $match: {
+        status: InternshipModuleStatuses.POSTPONEMENT_REQUESTED,
       },
-      {
-        $match: {
-          postponementEvents: { $not: { $size: 0 } },
-        },
-      },
-      {
-        $project: {
-          postponementEvent: {
-            $reduce: {
-              input: "$postponementEvents",
-              initialValue: 0,
-              in: {
-                $cond: {
-                  if: { $gt: ["$$value.timestamp", "$$this.timestamp"] },
-                  then: "$$value",
-                  else: "$$this",
+    },
+    {
+      $project: {
+        postponementEvent: {
+          $reduce: {
+            input: {
+              $filter: {
+                input: "$events",
+                as: "event",
+                cond: {
+                  $and: [
+                    { $gt: ["$$event.changes.newSemester", null] },
+                    {
+                      $or: [{ $eq: ["$$event.accept", false] }, { $lte: ["$$event.accept", null] }],
+                    },
+                  ],
                 },
               },
             },
+            initialValue: 0,
+            in: {
+              $cond: {
+                if: { $gt: ["$$value.timestamp", "$$this.timestamp"] },
+                then: "$$value",
+                else: "$$this",
+              },
+            },
           },
-          status: 1,
-          internships: 1,
         },
       },
-      {
-        $project: {
-          newSemester: "$postponementEvent.changes.newSemester",
-          newSemesterOfStudy: "$postponementEvent.changes.newSemesterOfStudy",
-          reason: "$postponementEvent.changes.reason",
-        },
+    },
+    {
+      $project: {
+        newSemester: "$postponementEvent.changes.newSemester",
+        newSemesterOfStudy: "$postponementEvent.changes.newSemesterOfStudy",
+        reason: "$postponementEvent.comment",
       },
-    ])
-  );
+    },
+  ]);
+
+  const requestsWithUsers = [];
+  for (const request of postponementRequests) {
+    request.user = await User.findOne(
+      { "studentProfile.internship": request._id },
+      "firstName lastName"
+    );
+    requestsWithUsers.push(request);
+  }
+
+  res.json(requestsWithUsers);
 }
