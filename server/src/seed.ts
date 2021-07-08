@@ -11,6 +11,15 @@ function generateRange(size: number, start?: number): number[] {
   return [...Array(size).keys()].map((i) => i + (start ?? 0));
 }
 
+async function createAdmin(): Promise<IUser> {
+  return await User.create({
+    firstName: "Test",
+    lastName: "Admin",
+    emailAddress: "admin@htw-berlin.de",
+    isAdmin: true,
+  });
+}
+
 async function createUser(
   studentId: string,
   internshipModuleId: Schema.Types.ObjectId
@@ -58,8 +67,8 @@ async function createInternship(): Promise<IInternship> {
   });
 
   return await Internship.create({
-    startDate: faker.date.recent(120),
-    endDate: faker.date.soon(50),
+    startDate: faker.date.recent(120, "2020-01-01"),
+    endDate: faker.date.soon(50, "2021-05-01"),
     company: company.id,
     tasks: faker.lorem.lines(3),
     operationalArea: faker.company.catchPhraseNoun(),
@@ -105,6 +114,9 @@ async function generateStudents(
 }
 
 export default async function seed(): Promise<void> {
+  // Generate admin account
+  await createAdmin();
+
   // Generate users without internships
   await generateStudents(100000, 10);
 
