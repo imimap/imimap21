@@ -120,7 +120,7 @@ export enum InternshipStatuses {
   PASSED = "passed",
 }
 
-const requiredFields = [
+export const requiredFields = [
   "startDate",
   "endDate",
   "operationalArea",
@@ -130,7 +130,7 @@ const requiredFields = [
   "supervisor.emailAddress",
 ];
 
-const requiredPdfs = [
+export const requiredPdfs = [
   "lsfEctsProofPdf",
   "locationJustificationPdf",
   "contractPdf",
@@ -139,6 +139,8 @@ const requiredPdfs = [
 
 function internshipRequestComplete(document: Document) {
   // Check if all required fields exist
+  if (document.get("status") !== InternshipStatuses.PLANNED) return false;
+
   for (const field of requiredFields) {
     if (!document.get(field)) return false;
   }
@@ -150,12 +152,10 @@ function internshipRequestComplete(document: Document) {
   return true;
 }
 
-async function trySetRequested(document: Document) {
+export async function trySetRequested(document: Document) {
   // Check if request is filled in completely
   if (internshipRequestComplete(document)) {
     const status = document.get("status");
-    // If status is not 'planned', leave it as is
-    if (status !== InternshipStatuses.PLANNED) return;
     // If status is 'planned', set to 'requested'
     document.get("events").push({
       creator: (await imimapAdmin)._id,
@@ -167,7 +167,6 @@ async function trySetRequested(document: Document) {
     // TODO what if instead we did:
     // this.status = InternshipStatuses.REQUESTED;
   } else {
-    if (getRecentValueForPropSetByEvent("status", document) === InternshipStatuses.PLANNED) return;
     // Set status back to 'planned'
     document.get("events").push({
       creator: (await imimapAdmin)._id,
