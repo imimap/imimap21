@@ -12,21 +12,18 @@ export async function findInternshipModule(
 ): Promise<void> {
   const user = await User.findOne({ emailAddress: req.user?.email }).populate({
     path: "studentProfile.internship",
-    populate: { path: "internships" },
+    populate: { path: "internships", lean: true },
+    lean: true,
   });
   if (req.params.id === "my") {
     if (!user || !user.studentProfile) return next(new NotFound("Student not found"));
     res.json(user.studentProfile.internship);
   } else {
-    console.log(
-      "[DEBUG]",
-      req.user?.role,
-      user?.studentProfile?.internship.id,
-      user?.studentProfile?.internship.id !== req.params.id
-    );
-    if (req.user?.role === Role.STUDENT && user?.studentProfile?.internship.id !== req.params.id)
+    if (req.user?.role !== Role.INSTRUCTOR && user?.studentProfile?.internship.id !== req.params.id)
       return next(new Forbidden("You may only access your own internship module"));
-    const internshipModule = await InternshipModule.findById(req.params.id).populate("internships");
+    const internshipModule = await InternshipModule.findById(req.params.id)
+      .populate({ path: "internships", lean: true })
+      .lean();
     if (!internshipModule) return next(new NotFound("Internship module not found"));
     res.json(internshipModule);
   }
@@ -35,7 +32,7 @@ export async function findInternshipModule(
 export async function listInternshipModules(req: Request, res: Response): Promise<void> {
   const filter: FilterQuery<IInternshipModule> = {};
   if (req.query.semester) filter.inSemester = req.query.semester as string;
-  res.json(await InternshipModule.find(filter));
+  res.json(await InternshipModule.find(filter).lean());
 }
 
 export async function listPostponementRequests(req: Request, res: Response): Promise<void> {
