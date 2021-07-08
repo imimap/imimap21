@@ -122,6 +122,7 @@ InternshipModuleSchema.methods.plan = async function () {
       newSemester: Semester.getUpcoming().toString(),
       newSemesterOfStudy: 4,
       aepPassed: false,
+      status: InternshipModuleStatuses.PLANNED,
     },
   });
   this.status = InternshipModuleStatuses.PLANNED;
@@ -149,6 +150,7 @@ InternshipModuleSchema.methods.requestPostponement = async function (
     changes: {
       newSemester: newSemester,
       newSemesterOfStudy: newSemesterOfStudy,
+      status: InternshipModuleStatuses.POSTPONEMENT_REQUESTED,
     },
   });
   this.status = InternshipModuleStatuses.POSTPONEMENT_REQUESTED;
@@ -163,6 +165,9 @@ InternshipModuleSchema.methods.acceptPostponement = async function (creator: Typ
   this.events.push({
     creator: creator,
     accept: true,
+    changes: {
+      status: InternshipModuleStatuses.PLANNED,
+    },
   });
   this.status = InternshipModuleStatuses.PLANNED;
 
@@ -176,6 +181,9 @@ InternshipModuleSchema.methods.rejectPostponement = async function (creator: Typ
   this.events.push({
     creator: creator,
     accept: false,
+    changes: {
+      status: InternshipModuleStatuses.POSTPONEMENT_REJECTED,
+    },
   });
   this.status = InternshipModuleStatuses.POSTPONEMENT_REJECTED;
 
@@ -204,7 +212,7 @@ InternshipModuleSchema.methods.submitCompleteDocumentsPdf = async function (
   newPath: string
 ) {
   const user = await User.findById(creator);
-  if (!user?.isAdmin) throw new Error("Only Admins may declare the AEP as passed.");
+  if (!user?.isAdmin) throw new Error("Only Admins may submit the complete documents pdf.");
 
   const pdfDocument: IPdfDocument = new PdfDocument();
 
@@ -222,6 +230,12 @@ async function trySetPassed(document: Document) {
   const aepPassed = document.get("aepPassed");
   const statusIsPlanned = document.get("status") === InternshipModuleStatuses.PLANNED;
   if (statusIsPlanned && aepPassed && longEnough) {
+    document.get("events").push({
+      creator: (await imimapAdmin)._id,
+      changes: {
+        status: InternshipModuleStatuses.PASSED,
+      },
+    });
     document.set("status", InternshipModuleStatuses.PASSED);
     await document.save();
     return true;

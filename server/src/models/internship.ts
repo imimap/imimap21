@@ -6,6 +6,7 @@ import { getWeeksBetween, isValidDateRange, normalizeDate } from "../helpers/dat
 import { ICompany } from "./company";
 import { User } from "./user";
 import { EventSchema, IEvent } from "./event";
+import {imimapAdmin} from "../helpers/imimapAsAdminHelper";
 
 export enum InternshipStatuses {
   UNKNOWN = "unknown",
@@ -163,10 +164,22 @@ async function trySetRequested(document: Document) {
     // If status is not 'planned', leave it as is
     if (status !== InternshipStatuses.PLANNED) return;
     // If status is 'planned', set to 'requested'
+    document.get("events").push({
+      creator: (await imimapAdmin)._id,
+      changes: {
+        status: InternshipStatuses.REQUESTED,
+      },
+    });
     document.set("status", InternshipStatuses.REQUESTED);
   } else {
     if (status === InternshipStatuses.PLANNED) return;
     // Set status back to 'planned'
+    document.get("events").push({
+      creator: (await imimapAdmin)._id,
+      changes: {
+        status: InternshipStatuses.PLANNED,
+      },
+    });
     document.set("status", InternshipStatuses.PLANNED);
   }
 }
@@ -175,6 +188,12 @@ async function trySetReadyForGrading(document: Document) {
   const reportPdf = document.get("reportPdf");
   if (!reportPdf) return;
 
+  document.get("events").push({
+    creator: (await imimapAdmin)._id,
+    changes: {
+      status: InternshipStatuses.READY_FOR_GRADING,
+    },
+  });
   document.set("status", InternshipStatuses.READY_FOR_GRADING);
 }
 
@@ -242,6 +261,10 @@ InternshipSchema.methods.approve = async function (creator: Types.ObjectId) {
   if (this.status !== InternshipStatuses.REQUESTED)
     throw new Error("Internship is not ready for approval yet");
 
+  this.events.push({
+    creator: user._id,
+    accept: true,
+  });
   this.status = InternshipStatuses.APPROVED;
 
   return this.save();
@@ -255,6 +278,10 @@ InternshipSchema.methods.reject = async function (creator: Types.ObjectId) {
   if (this.status !== InternshipStatuses.REQUESTED)
     throw new Error("Internship is not ready for approval yet");
 
+  this.events.push({
+    creator: user._id,
+    accept: false,
+  });
   this.status = InternshipStatuses.REJECTED;
 
   return this.save();
@@ -268,6 +295,12 @@ InternshipSchema.methods.markAsOver = async function (creator: Types.ObjectId) {
       "Only admins may mark an internship as over. An internship is automatically marked as over when the endDate is reached."
     );
 
+  this.events.push({
+    creator: user._id,
+    changes: {
+      status: InternshipStatuses.OVER,
+    },
+  });
   this.status = InternshipStatuses.OVER;
 
   return this.save();
@@ -281,6 +314,12 @@ InternshipSchema.methods.pass = async function (creator: Types.ObjectId) {
   if (this.status !== InternshipStatuses.READY_FOR_GRADING)
     throw new Error("Internship is not ready for grading yet");
 
+  this.events.push({
+    creator: user._id,
+    changes: {
+      status: InternshipStatuses.PASSED,
+    },
+  });
   this.status = InternshipStatuses.PASSED;
 
   return this.save();
