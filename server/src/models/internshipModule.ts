@@ -73,7 +73,10 @@ const InternshipModuleSchema = new Schema<IInternshipModule>({
   },
   inSemester: String,
   inSemesterOfStudy: Number,
-  aepPassed: Boolean,
+  aepPassed: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 /*******************/
