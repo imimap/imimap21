@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { param, query } from "express-validator";
-import { Semester } from "../helpers/semesterHelper";
 import authMiddleware from "../authentication/middleware";
 import { findInternships, getInternshipsById } from "../controllers/internship";
 import { validate } from "../helpers/validation";
@@ -11,9 +10,17 @@ const internshipRouter = Router();
 internshipRouter.get(
   "/",
   authMiddleware(true),
-  query("semester")
-    .toUpperCase()
-    .custom((s) => Semester.isValidSemesterString(s) || !s),
+  query([
+    "companyName",
+    "branchName",
+    "country",
+    "industry",
+    "mainLanguage",
+    "size",
+    "programmingLanguage",
+    "operationalArea",
+    "paymentType",
+  ]).toUpperCase(),
   validate,
   asyncHandler(findInternships)
 );
