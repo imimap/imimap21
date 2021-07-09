@@ -2,6 +2,8 @@
 
 ## Develop locally
 
+First copy the ".env.sample" file to a new file ".env" and fill out with the secrets.
+
 Install mevn-cli globally, if not done yet
 `npm install -g mevn-cli`
 
@@ -12,10 +14,10 @@ Ctrl + C will stop the containers.
 
 Alternatively use
 `docker-compose -f docker-compose.yml -f docker-compose.local.yml up -d --build`
-In that case, shut down the containers with docker-compose down.
+In that case, shut down the containers with `docker-compose down`.
 
 Three docker containers with the following NAMES are created:
-`im2-client`, `im2-db` and `im2-server`. 
+`imimap21_client_1`, `imimap21_server_1`, `imimap21_db_1` and `imimap21_db-gui_1`. 
 Run `docker logs -f NAME` to see the logs for one of the containers.
 
 
