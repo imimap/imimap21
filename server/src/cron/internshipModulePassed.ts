@@ -1,5 +1,4 @@
-import { Internship } from "../models/internship";
-import { InternshipModuleStatuses, trySetPassed } from "../models/internshipModule";
+import { InternshipModule, InternshipModuleStatuses, trySetPassed } from "../models/internshipModule";
 
 export async function checkModulePassed(): Promise<void> {
   const internshipsModules = await InternshipModule.find({
