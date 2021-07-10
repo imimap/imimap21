@@ -1,7 +1,7 @@
 <template>
   <template v-if="isLoggedInUser()">
     <HeaderComponent></HeaderComponent>
-    <main class="margin_bottom_10">
+    <main>
       <router-view></router-view>
     </main>
     <footer-component></footer-component>
@@ -40,5 +40,14 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-
+#form-block4 {
+  background-color: #FFFFFF;
+  color: #000000;
+  font-weight: 100;
+  height: 96%;
+  margin-bottom: 30px;
+  margin-top: 50px;
+  padding: 30px 50px;
+  box-shadow: 4px 6px 1px 0px rgb(0 0 0 / 30%);
+}
 </style>

@@ -60,18 +60,15 @@ body {
   color: #212529;
   text-align: left;
   background-color: #fff;
+  background: url('/assets/bg.gif');
+  font-family: 'Merriweather Sans', sans-serif;
+  color: $black;
 }
 
 @include media-breakpoint-up(md) {
   html, body {
     min-height: 100%;
     height: 100%;
-  }
-
-  body {
-    font-family: 'Merriweather Sans', sans-serif;
-    background: url('/assets/bg.gif');
-    color: $black;
   }
 }
 

@@ -45,8 +45,7 @@
                 name="commit"
                 class="btn btn-secondary mt-3"
                 data-disable-with="Speichern"
-                v-on:click="save()"
-              >
+                v-on:click="save()">
                 Speichern
               </button>
             </div>

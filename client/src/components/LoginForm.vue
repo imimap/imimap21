@@ -23,8 +23,7 @@
               placeholder="s0123456@htw-berlin.de"
               type="email" name="user[email]"
               id="user_email"
-              v-model="username"
-            >
+              v-model="username"/>
           </div>
         </div>
         <div class="input-group w-auto mt-1 row">
@@ -34,16 +33,14 @@
               class="form-control"
               placeholder="********"
               type="password"
-              v-model="password"
-            >
+              v-model="password"/>
           </div>
         </div>
         <div id="submit" class="mt-3">
           <button
             v-on:keyup.enter="login"
             v-on:click="login()"
-            class="btn btn-htw-green"
-          >
+            class="btn btn-htw-green">
             Login
           </button>
         </div>

@@ -14,7 +14,6 @@
           <div class="row">
             <div class="col-12">
               <ul class="nav float-right imi-nav-right">
-
                 <li class="imimap-nav-right-li">
                   <router-link :to="{name: 'Help', params: { locale: $route.params.locale }}">
                     <font-awesome-icon icon="question-circle" />
@@ -28,19 +27,18 @@
                 </li>
 
                 <li class="dropdown imimap-nav-right-li">
-                  <a href="#" id="drop3" role="button"
-                     class="dropdown-toggle" data-bs-toggle="dropdown"
-                  >
+                  <a href="#" id="drop3"
+                     role="button"
+                     class="dropdown-toggle"
+                     data-bs-toggle="dropdown">
                     <font-awesome-icon icon="cog" />
                   </a>
                   <ul class="dropdown-menu" role="menu" aria-labelledby="drop3">
-                      <li
-                        class="locale-de dropdown-item"
-                        v-for="(locale, i) in $i18n.availableLocales"
-                        :key="`lang-${i}`"
-                        :value="locale"
-                        v-on:click="switchLocale(locale)"
-                      >
+                      <li class="locale-de dropdown-item"
+                          v-for="(locale, i) in $i18n.availableLocales"
+                          :key="`lang-${i}`"
+                          :value="locale"
+                          v-on:click="switchLocale(locale)">
                         {{ locale }}
                       </li>
                   </ul>
@@ -56,43 +54,37 @@
           <div class="row">
             <div class="col-12">
               <nav class="mt-4 ml-3 pb-3 navbar navbar-expand-md navbar-dark bg-dark"
-                   id="imi-maps-navbar-main"
-              >
+                   id="imi-maps-navbar-main">
                 <button class="navbar-toggler imi-map-toggler"
-                        type="button" data-toggle="collapse"
-                        data-target="#imi-map-navbar-core"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#imi-map-navbar-core"
                         aria-controls="imi-map-navbar-core"
                         aria-expanded="false"
-                        aria-label="Toggle navigation"
-                >
+                        aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon"></span>
                 </button>
                 <div
-                  class="collapse navbar-collapse navbar-expand-lg pr-3"
-                  id="imi-map-navbar-core"
-                >
+                  class="collapse navbar-collapse navbar-dark bg-dark navbar-expand-lg pr-3"
+                  id="imi-map-navbar-core">
                   <ul class="navbar-nav ">
                     <li class="nav-item im-nav-itemactive">
                       <router-link
                         class="nav-link im-nav-link imi-map-navlink"
-                        :to="{name: 'Home', params: { locale: $route.params.locale }}"
-                      >
+                        :to="{name: 'Home', params: { locale: $route.params.locale }}">
                         Start
                       </router-link>
                     </li>
                     <li class="nav-item im-nav-item">
                       <router-link
                         class="nav-link im-nav-link imi-map-navlink"
-                        :to="{name: 'Search', params: { locale: $route.params.locale }}"
-                      >
+                        :to="{name: 'Search', params: { locale: $route.params.locale }}">
                         {{ $t("header.headerLinks.internshipSearch") }}
                       </router-link>
                     </li>
                     <li class="nav-item im-nav-item">
                       <router-link
                         class="nav-link im-nav-link imi-map-navlink"
-                        :to="{name: 'InternshipModule', params: { locale: $route.params.locale }}"
-                      >
+                        :to="{name: 'InternshipModule', params: { locale: $route.params.locale }}">
                         {{ $t("header.headerLinks.myInternship") }}
                       </router-link>
                     </li>
@@ -159,14 +151,19 @@ export default defineComponent({
   height: 130px;
   margin-top: 8px;
 
-img {
-  height: 130px;
-  width: 130px;
+  img {
+    height: 130px;
+    width: 130px;
+  }
 }
+
+#imi-maps-navbar-main {
+  justify-content: right;
 }
 
 .imi-nav-right {
   margin-left: 50%;
+  width: 150px;
 }
 
 .float-right {
@@ -185,11 +182,12 @@ img {
   font-weight: bold;
   background-color: #77b900 !important;
   color: #fff !important;
-  padding-bottom: 3px;
-  padding-left: 8px;
-  padding-right: 8px;
-  padding-top: 3px;
+  padding: 3px 8px 3px 8px;
   font-weight: 100;
+}
+
+.nav-bar {
+  justify-content: right;
 }
 
 .navbar-dark .navbar-toggler {
@@ -200,6 +198,10 @@ img {
 @include media-breakpoint-up(md) {
   .navbar-expand-md .navbar-toggler {
     display: none;
+  }
+
+  #imi-maps-navbar-main {
+    justify-content: normal;
   }
 }
 

@@ -23,7 +23,7 @@
             <div class="row">&nbsp;</div>
             <div class="row">
               Dieses wird mein
-              <div class="form-group">
+              <div class="form-group max" >
                 <label class="sr-only" for="postponementSemester">
                   Semester of study
                 </label>
@@ -32,8 +32,7 @@
                   class="form-control"
                   type="number"
                   id="postponementSemester"
-                  data-form-type="other"
-                />
+                  data-form-type="other"/>
               </div>
               . Fachsemester sein.
             </div>
@@ -46,14 +45,16 @@
                   rows="10"
                   class="form-control"
                   id="postponementReason"
-                  data-form-type="other"></textarea>
+                  data-form-type="other"/>
               </div>
-
             </div>
-
             <div class="row">
               <div class="actions">
-                <button type="submit" class="btn btn-secondary">Verschiebung beantragen</button>
+                <button
+                  type="submit"
+                  class="btn btn-secondary my-4">
+                  Verschiebung beantragen
+                </button>
               </div>
             </div>
           </div>
