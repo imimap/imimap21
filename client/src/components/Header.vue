@@ -151,7 +151,7 @@ export default defineComponent({
   width: 130px;
   height: 130px;
   margin-top: 8px;
-  z-index: 10000;
+  z-index: $zindex-modal-backdrop;
 
   img {
     height: 130px;
