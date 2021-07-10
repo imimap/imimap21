@@ -4,8 +4,7 @@
       <div class="col-2">
         <router-link
           class="navbar-brand imi-map-logo"
-          :to="{name: 'Home', params: { locale: $route.params.locale }}"
-        >
+          :to="{name: 'Home', params: { locale: $route.params.locale }}">
           <img src="/assets/plane.gif" alt="Plane">
         </router-link>
       </div>
@@ -25,7 +24,6 @@
                     <font-awesome-icon icon="user" />
                   </router-link>
                 </li>
-
                 <li class="dropdown imimap-nav-right-li">
                   <a href="#" id="drop3"
                      role="button"
@@ -104,7 +102,7 @@ import { defineComponent } from 'vue';
 import { logoutUser } from '@/utils/auth';
 
 export default defineComponent({
-  name: 'HeaderComponent',
+  name: 'Header',
   methods: {
     switchLocale(locale: string) {
       this.$i18n.locale = locale;

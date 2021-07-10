@@ -21,7 +21,7 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'NotificationComponent',
+  name: 'Notification',
   props: {
     id: String,
     text: String,

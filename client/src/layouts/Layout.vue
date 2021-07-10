@@ -1,16 +1,16 @@
 <template>
   <template v-if="isLoggedInUser()">
-    <HeaderComponent></HeaderComponent>
+    <header-component></header-component>
     <main>
       <router-view></router-view>
     </main>
     <footer-component></footer-component>
-    <NotificationsListComponent></NotificationsListComponent>
+    <notification-list></notification-list>
   </template>
 
   <template v-else>
     <router-view></router-view>
-    <NotificationsListComponent></NotificationsListComponent>
+    <notification-list></notification-list>
   </template>
 </template>
 
@@ -18,7 +18,7 @@
 import { defineComponent } from 'vue';
 import HeaderComponent from '@/components/Header.vue';
 import FooterComponent from '@/components/Footer.vue';
-import NotificationsListComponent from '@/components/notification/NotificationListComponent.vue';
+import NotificationList from '@/components/notification/NotificationList.vue';
 import { isLoggedIn } from '@/utils/auth';
 
 export default defineComponent({
@@ -31,7 +31,7 @@ export default defineComponent({
   components: {
     HeaderComponent,
     FooterComponent,
-    NotificationsListComponent,
+    NotificationList,
   },
   beforeCreate() {
     this.$i18n.locale = this.$route.params.locale as string;
@@ -50,7 +50,7 @@ export default defineComponent({
   padding: 2em 1em;
   box-shadow: 4px 6px 1px 0px rgb(0 0 0 / 30%);
   @include media-breakpoint-up(md) {
-    padding: 30px 50px;
+    padding: 2.5em 5em;
   }
 }
 </style>
