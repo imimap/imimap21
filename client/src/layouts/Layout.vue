@@ -16,8 +16,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import HeaderComponent from '@/components/HeaderComponent.vue';
-import FooterComponent from '@/components/FooterComponent.vue';
+import HeaderComponent from '@/components/Header.vue';
+import FooterComponent from '@/components/Footer.vue';
 import NotificationsListComponent from '@/components/notification/NotificationListComponent.vue';
 import { isLoggedIn } from '@/utils/auth';
 

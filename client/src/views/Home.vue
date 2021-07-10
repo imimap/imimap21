@@ -11,17 +11,17 @@
       </select>
     </div>
   </div>
-  <MapComponent :locations="this.locations"></MapComponent>
+  <Map :locations="this.locations"></Map>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import MapComponent from '@/components/MapComponent.vue';
+import Map from '@/components/Map.vue';
 import http from '@/utils/http-common';
 
 export default defineComponent({
   name: 'Home',
-  components: { MapComponent },
+  components: { Map },
   methods: {
     async getInternshipLocations() {
       try {

@@ -555,7 +555,7 @@
 
     </div>
     <div id="map-results">
-      <MapComponent v-if="cardToggle" :locations="locations"></MapComponent>
+      <Map v-if="cardToggle" :locations="locations"></Map>
     </div>
   </div>
 </template>
@@ -563,13 +563,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import 'leaflet/dist/leaflet.css';
-import MapComponent from '@/components/MapComponent.vue';
+import Map from '@/components/Map.vue';
 
 export default defineComponent({
   name: 'Search',
-  components: {
-    MapComponent,
-  },
+  components: { Map },
   data() {
     return {
       searchResults: [

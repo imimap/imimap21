@@ -82,7 +82,7 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'NoInternshipModuleComponent',
+  name: 'NoInternshipModule',
 });
 </script>
 

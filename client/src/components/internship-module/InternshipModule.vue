@@ -52,10 +52,10 @@
 
 <script  lang="ts">
 import { defineComponent } from 'vue';
-import InternshipComponent from '@/components/internship-module/InternshipComponent.vue';
+import InternshipComponent from '@/components/internship-module/Internship.vue';
 
 export default defineComponent({
-  name: 'InternshipModuleComponent',
+  name: 'InternshipModule',
   components: {
     InternshipComponent,
   },
