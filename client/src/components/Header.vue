@@ -19,7 +19,7 @@
                     <font-awesome-icon icon="question-circle" />
                   </router-link>
                 </li>
-                <li> &nbsp;</li>
+                <li class="imi-nav-right-spacer"></li>
                 <li class="imimap-nav-right-li">
                   <router-link  :to="{name: 'Student', params: { locale: $route.params.locale }}">
                     <font-awesome-icon icon="user" />
@@ -55,7 +55,7 @@
             <div class="col-12">
               <nav class="mt-4 ml-3 pb-3 navbar navbar-expand-md navbar-dark bg-dark"
                    id="imi-maps-navbar-main">
-                <button class="navbar-toggler imi-map-toggler"
+                <button class="navbar-toggler imi-map-toggler mt-3"
                         data-bs-toggle="collapse"
                         data-bs-target="#imi-map-navbar-core"
                         aria-controls="imi-map-navbar-core"
@@ -66,24 +66,24 @@
                 <div
                   class="collapse navbar-collapse navbar-dark bg-dark navbar-expand-lg pr-3"
                   id="imi-map-navbar-core">
-                  <ul class="navbar-nav ">
-                    <li class="nav-item im-nav-itemactive">
+                  <ul class="navbar-nav">
+                    <li class="nav-item imi-nav-item">
                       <router-link
-                        class="nav-link im-nav-link imi-map-navlink"
+                        class="nav-link imi-nav-link imi-map-navlink"
                         :to="{name: 'Home', params: { locale: $route.params.locale }}">
                         Start
                       </router-link>
                     </li>
-                    <li class="nav-item im-nav-item">
+                    <li class="nav-item imi-nav-item">
                       <router-link
-                        class="nav-link im-nav-link imi-map-navlink"
+                        class="nav-link imi-nav-link imi-map-navlink"
                         :to="{name: 'Search', params: { locale: $route.params.locale }}">
                         {{ $t("header.headerLinks.internshipSearch") }}
                       </router-link>
                     </li>
-                    <li class="nav-item im-nav-item">
+                    <li class="nav-item imi-nav-item">
                       <router-link
-                        class="nav-link im-nav-link imi-map-navlink"
+                        class="nav-link imi-nav-link imi-map-navlink"
                         :to="{name: 'InternshipModule', params: { locale: $route.params.locale }}">
                         {{ $t("header.headerLinks.myInternship") }}
                       </router-link>
@@ -145,11 +145,13 @@ export default defineComponent({
 
 .imi-map-logo {
   background: url('/assets/logo.png') no-repeat;
+  position: relative;
   background-size: 100%;
   margin-top: -20px;
   width: 130px;
   height: 130px;
   margin-top: 8px;
+  z-index: 10000;
 
   img {
     height: 130px;
@@ -163,11 +165,20 @@ export default defineComponent({
 
 .imi-nav-right {
   margin-left: 50%;
-  width: 150px;
+  width: 175px;
+}
+
+.imi-nav-right-spacer {
+  width: 1em;
 }
 
 .float-right {
   float: right !important;
+}
+
+.dropdown-menu.show {
+  position: relative;
+  z-index: 100000;
 }
 
 .imi-nav-right>li>a {
@@ -178,7 +189,7 @@ export default defineComponent({
   float: left;
   display: inline;
   vertical-align: top;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: bold;
   background-color: #77b900 !important;
   color: #fff !important;
@@ -190,14 +201,29 @@ export default defineComponent({
   justify-content: right;
 }
 
+.navbar-collapse {
+  background-color: #292929 !important;
+  z-index: 1000;
+}
+
 .navbar-dark .navbar-toggler {
   color: rgba(255,255,255,0.5);
   border-color: rgba(255,255,255,0.1);
 }
 
+#imi-map-navbar-core {
+  padding: .75em 0;
+}
+
 @include media-breakpoint-up(md) {
+  .imi-nav-right>li>a {
+    font-size: 12px;
+  }
   .navbar-expand-md .navbar-toggler {
     display: none;
+  }
+  .navbar-collapse {
+    background-color: transparent;
   }
 
   #imi-maps-navbar-main {
@@ -209,19 +235,33 @@ export default defineComponent({
   background-color: transparent !important;
 }
 
+.imi-nav-item {
+  background-color: $htw-gray-color;
+  padding: .25em 1em;
+
+  @include media-breakpoint-up(md) {
+    background-color: transparent;
+  }
+}
+
+#imi-maps-navbar-main .router-link-exact-active {
+  text-decoration: none;
+  border-bottom: 1px solid #77b900;
+}
+
 .imi-map-navlink {
   color: #c0b9b9 !important;
   text-decoration: none;
 }
 
-.im-nav-link {
-  color: #000;
+.imi-nav-link {
   text-shadow: none;
   font-family: 'Josefin Sans', sans-serif;
   text-transform: uppercase;
   text-decoration: none;
   font-size: 1rem;
   float: right;
+  padding: .5em 0;
   color: #6b6b6b;
 }
 </style>
