@@ -486,6 +486,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Internship from '@/components/admin/Internship';
+import { getInternshipModulesList } from '@/utils/gateways';
 
 export default defineComponent({
   name: 'UsersList',
@@ -874,10 +875,18 @@ export default defineComponent({
       ],
     };
   },
+  mounted() {
+    this.updateList();
+  },
   methods: {
     updateList() {
       // API call for GET list with params
-      return true;
+      getInternshipModulesList()
+        .then((list) => {
+          console.log('internshipList');
+          console.log(list);
+          this.users = list;
+        }).catch((err) => console.log(err));
     },
     getDateString(ISODateString: string) {
       const date = new Date(ISODateString);
