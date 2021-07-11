@@ -4,7 +4,7 @@ import {
   RouteRecordRaw,
 } from 'vue-router';
 import {
-  getAuthToken, getAuthUserProfile, isLoggedIn, storeAuthUser,
+  getAuthToken, getAuthUserProfile, isAdmin, isLoggedIn, storeAuthUser,
 } from '@/utils/auth';
 import Layout from '@/layouts/Layout.vue';
 import Home from '@/views/Home.vue';
@@ -145,6 +145,17 @@ router.beforeEach(async (to, from, next) => {
   if (!to.meta.allowAnonymous && !isLoggedIn()) {
     next({
       name: 'Login',
+      params: { locale: to.params.locale },
+    });
+  } else {
+    next();
+  }
+});
+
+router.beforeEach(async (to, from, next) => {
+  if (to.path.includes('admin') && !isAdmin()) {
+    next({
+      name: 'Home',
       params: { locale: to.params.locale },
     });
   } else {
