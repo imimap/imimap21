@@ -1,5 +1,5 @@
 import { Document } from "mongoose";
-import { IEvent } from "../models/eventModels/event";
+import { IEvent } from "../models/event";
 
 function getValue(allEvents: IEvent[], propName: string) {
   const events = allEvents.filter((event: IEvent) => {

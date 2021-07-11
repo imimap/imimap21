@@ -10,6 +10,7 @@ export const SupervisorSchema = new Schema(
   {
     fullName: {
       type: String,
+      trim: true,
     },
     emailAddress: {
       type: String,
@@ -17,13 +18,9 @@ export const SupervisorSchema = new Schema(
         validator: isValidEmail,
         message: "Email address is not valid",
       },
+      trim: true,
+      lowercase: true,
     },
   },
   { _id: false }
 );
-
-SupervisorSchema.pre("validate", function () {
-  if (this.modifiedPaths().includes("emailAddress")) {
-    this.set("emailAddress", normalizeEmail(this.get("emailAddress")));
-  }
-});

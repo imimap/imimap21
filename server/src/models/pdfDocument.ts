@@ -1,7 +1,14 @@
 import { Document, model, Model, Schema, Types } from "mongoose";
 import { getRecentValueForPropSetByEvent } from "../helpers/eventQueryHelper";
 import { User } from "./user";
-import { EventSchema, IEvent } from "./eventModels/event";
+import { EventSchema, IEvent } from "./event";
+
+export enum PdfDocumentStatuses {
+  UNKNOWN = "unknown",
+  SUBMITTED = "submitted",
+  ACCEPTED = "accepted",
+  REJECTED = "rejected",
+}
 
 function isValidPdf(path: string) {
   return /http:\/\/localhost:9000\/pdfs\/s0[0-9]{6}\/[0-9a-f]{24}\/[0-9a-f]{24}\.pdf$/.test(path); //example: http://localhost:9000/pdfs/s0555949/507f1f77bcf86cd799439011/requestPdf-01.pdf
@@ -9,12 +16,12 @@ function isValidPdf(path: string) {
 
 export interface IPdfDocument extends Document {
   events: IEvent[];
-  path: string;
+  path(): string;
   status: string;
   nextPath(): string;
-  submit(creator: Types.ObjectId, newPath: string): IPdfDocument;
-  accept(creator: Types.ObjectId, newPath?: string): IPdfDocument;
-  reject(creator: Types.ObjectId): IPdfDocument;
+  submit(creator: Types.ObjectId, newPath: string): Promise<IPdfDocument>;
+  accept(creator: Types.ObjectId, newPath?: string): Promise<IPdfDocument>;
+  reject(creator: Types.ObjectId): Promise<IPdfDocument>;
 }
 
 export const PdfDocumentSchema = new Schema<IPdfDocument>(
@@ -31,8 +38,9 @@ export const PdfDocumentSchema = new Schema<IPdfDocument>(
     ],
     status: {
       type: String,
-      enum: ["unknown", "submitted", "accepted", "rejected"],
-      default: "unknown",
+      enum: PdfDocumentStatuses,
+      default: PdfDocumentStatuses.UNKNOWN,
+      required: true,
     },
   },
   {
@@ -40,18 +48,18 @@ export const PdfDocumentSchema = new Schema<IPdfDocument>(
   }
 );
 
-PdfDocumentSchema.virtual("path").get(function () {
+PdfDocumentSchema.methods.path = function () {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return getRecentValueForPropSetByEvent("newPath", this);
-});
+};
 
 // when generating the next pdf path, this method should be used
 // it makes sure that the versioning is correct
 PdfDocumentSchema.methods.nextPath = function () {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const currentPath = this.path;
+  const currentPath = this.path();
   if (!currentPath) throw new Error("Path for this document is not set.");
   const pathParts = currentPath.split("/");
   pathParts.pop();
@@ -75,7 +83,7 @@ PdfDocumentSchema.methods.submit = async function (creator: Types.ObjectId, newP
       newPath: newPath,
     },
   });
-  this.status = "submitted";
+  this.status = PdfDocumentStatuses.SUBMITTED;
   return (this.$parent() ?? this).save();
 };
 
@@ -101,7 +109,7 @@ PdfDocumentSchema.methods.accept = async function (creator: Types.ObjectId, newP
   }
 
   this.events.push(event);
-  this.status = "accepted";
+  this.status = PdfDocumentStatuses.ACCEPTED;
   return (this.$parent() ?? this).save();
 };
 
@@ -113,7 +121,7 @@ PdfDocumentSchema.methods.reject = async function (creator: Types.ObjectId) {
     creator: creator,
     accept: false,
   });
-  this.status = "rejected";
+  this.status = PdfDocumentStatuses.REJECTED;
   return (this.$parent() ?? this).save();
 };
 

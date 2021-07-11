@@ -45,12 +45,17 @@ export interface LdapUser {
   loginShell: string;
 }
 
-export interface AuthUser {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: Role;
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace Express {
+    interface User {
+      id: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+      role: Role;
+    }
+  }
 }
 
 export enum Role {
@@ -58,7 +63,7 @@ export enum Role {
   INSTRUCTOR,
 }
 
-export function generateAuthToken(user: AuthUser): string {
+export function generateAuthToken(user: Express.User): string {
   const payload = user;
   const options: SignOptions = {
     expiresIn: config.expiryTime,

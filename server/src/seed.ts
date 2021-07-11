@@ -6,10 +6,18 @@ import { Company } from "./models/company";
 import { companySizes } from "./helpers/companySizes";
 import { isoLanguages } from "./helpers/isoLanguages";
 import { IInternshipModule, InternshipModule } from "./models/internshipModule";
-import { Semester } from "./helpers/semesterHelper";
 
 function generateRange(size: number, start?: number): number[] {
   return [...Array(size).keys()].map((i) => i + (start ?? 0));
+}
+
+async function createAdmin(): Promise<IUser> {
+  return await User.create({
+    firstName: "Test",
+    lastName: "Admin",
+    emailAddress: "admin@htw-berlin.de",
+    isAdmin: true,
+  });
 }
 
 async function createUser(
@@ -30,15 +38,8 @@ async function createUser(
 async function createInternshipModule(
   internshipIds: Schema.Types.ObjectId[] = []
 ): Promise<IInternshipModule> {
-  return await InternshipModule.create({
-    internships: internshipIds,
-    aepPassed: faker.datatype.boolean(),
-    inSemester: Semester.get(faker.date.between("2020-04-01", "2022-10-01")),
-    inSemesterOfStudy: faker.datatype.number({
-      min: 3,
-      max: 8,
-    }),
-  });
+  const internshipModule = new InternshipModule({ internships: internshipIds });
+  return internshipModule.plan();
 }
 
 async function createInternship(): Promise<IInternship> {
@@ -66,8 +67,8 @@ async function createInternship(): Promise<IInternship> {
   });
 
   return await Internship.create({
-    startDate: faker.date.recent(120),
-    endDate: faker.date.soon(50),
+    startDate: faker.date.recent(120, "2020-01-01"),
+    endDate: faker.date.soon(50, "2021-05-01"),
     company: company.id,
     tasks: faker.lorem.lines(3),
     operationalArea: faker.company.catchPhraseNoun(),
@@ -104,13 +105,18 @@ async function generateStudents(
       async (id) =>
         await createUser(
           id.toString(),
-          (await createInternshipModule(await internshipGenerator())).id
+          (
+            await createInternshipModule(await internshipGenerator())
+          ).id
         )
     )
   );
 }
 
 export default async function seed(): Promise<void> {
+  // Generate admin account
+  await createAdmin();
+
   // Generate users without internships
   await generateStudents(100000, 10);
 

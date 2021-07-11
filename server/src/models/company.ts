@@ -2,7 +2,7 @@ import { Document, model, Model, Schema } from "mongoose";
 import { IAddress, AddressSchema } from "./address";
 import { isoLanguages } from "../helpers/isoLanguages";
 import { companySizes } from "../helpers/companySizes";
-import { isValidEmail, normalizeEmail } from "../helpers/emailAddressHelper";
+import { isValidEmail } from "../helpers/emailAddressHelper";
 
 export interface ICompany extends Document {
   companyName: string;
@@ -21,9 +21,11 @@ const CompanySchema = new Schema({
   companyName: {
     type: String,
     required: true,
+    trim: true,
   },
   branchName: {
     type: String,
+    trim: true,
   },
   address: {
     type: AddressSchema,
@@ -34,12 +36,17 @@ const CompanySchema = new Schema({
       validator: isValidEmail,
       message: "Email address is not valid",
     },
+    trim: true,
+    lowercase: true,
   },
   industry: {
     type: String,
+    trim: true,
   },
   website: {
     type: String,
+    trim: true,
+    lowercase: true,
   },
   mainLanguage: {
     default: "en", //2 letter ISO tag, see https://www.loc.gov/standards/iso639-2/php/English_list.php
@@ -52,6 +59,7 @@ const CompanySchema = new Schema({
   },
   comment: {
     type: String,
+    trim: true,
   },
   excludedFromSearch: {
     default: false,
@@ -63,9 +71,6 @@ const CompanySchema = new Schema({
  * Normalizes properties upon saving
  * */
 CompanySchema.pre("validate", function () {
-  if (this.modifiedPaths().includes("emailAddress")) {
-    this.set("emailAddress", normalizeEmail(this.get("emailAddress")));
-  }
   if (this.modifiedPaths().includes("website")) {
     let givenUrl = this.get("website");
     if (!/http/.test(givenUrl)) givenUrl = "https://" + givenUrl;

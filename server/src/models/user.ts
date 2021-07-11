@@ -13,9 +13,11 @@ export interface IUser extends Document {
 const UserSchema = new Schema({
   firstName: {
     type: String,
+    trim: true,
   },
   lastName: {
     type: String,
+    trim: true,
   },
   isAdmin: {
     default: false,
@@ -29,16 +31,12 @@ const UserSchema = new Schema({
       validator: isValidEmail,
       message: "Email address is not valid",
     },
+    trim: true,
+    lowercase: true,
   },
   studentProfile: {
     type: StudentProfileSchema,
   },
-});
-
-UserSchema.pre("save", function () {
-  if (this.modifiedPaths().includes("emailAddress")) {
-    this.set("emailAddress", normalizeEmail(this.get("emailAddress")));
-  }
 });
 
 export const User: Model<IUser> = model("User", UserSchema);

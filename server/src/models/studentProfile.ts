@@ -1,11 +1,12 @@
 import { Document, PopulatedDoc, Schema } from "mongoose";
-import { isValidStudentId, normalizeStudentId } from "../helpers/studentIdHelper";
+import { isValidStudentId } from "../helpers/studentIdHelper";
 import { ICompany } from "./company";
+import { IInternshipModule } from "./internshipModule";
 
 export interface IStudentProfile {
   studentId: string;
   internshipsSeen?: PopulatedDoc<ICompany & Document>[];
-  internship?: PopulatedDoc<ICompany & Document>;
+  internship?: PopulatedDoc<IInternshipModule & Document>;
 }
 
 export const StudentProfileSchema = new Schema(
@@ -17,6 +18,8 @@ export const StudentProfileSchema = new Schema(
         validator: isValidStudentId,
         message: "StudentId (Matrikelnummer) is not valid. Needs to be of form s0xxxxxx.",
       },
+      trim: true,
+      lowercase: true,
     },
     internshipsSeen: [
       {
@@ -31,10 +34,3 @@ export const StudentProfileSchema = new Schema(
   },
   { _id: false }
 );
-
-StudentProfileSchema.pre("save", function () {
-  if (this.modifiedPaths().includes("studentId")) {
-    const givenId = this.get("studentId");
-    this.set("studentId", normalizeStudentId(givenId));
-  }
-});
