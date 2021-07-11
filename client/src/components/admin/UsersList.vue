@@ -883,8 +883,6 @@ export default defineComponent({
       // API call for GET list with params
       getInternshipModulesList()
         .then((list) => {
-          console.log('internshipList');
-          console.log(list);
           this.users = list;
         }).catch((err) => console.log(err));
     },
