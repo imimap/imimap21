@@ -94,13 +94,6 @@
                  data-bs-parent="#listAccordion">
               <div class="accordion-body">
                 <div class="container">
-                  <div class="alert alert-warning" role="alert">
-                    <p>Eine Verschiebung wurde beantragt.</p>
-                    <p>{{ row.studentProfile.internshipModule.events }}}</p>
-                    <button class="btn btn-success btn-sm mx-2">Genehmigen</button>
-                    <button class="btn btn-danger btn-sm">Ablehnen</button>
-                  </div>
-
                   <div class="row">
                     <div class="col-8">
                       <h5>Praktika</h5>
@@ -485,8 +478,9 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Internship from '@/components/admin/Internship';
-import { getInternshipModulesList } from '@/utils/gateways';
+import Internship from '@/models/Internship';
+import Student from '@/models/Student';
+import { getUsersList } from '@/utils/gateways';
 
 export default defineComponent({
   name: 'UsersList',
@@ -498,6 +492,7 @@ export default defineComponent({
       currentFilterDuration: '',
       currentFilterStatus: '',
       currentSearch: '',
+      students: [] as Student[],
       users: [{
         id: 0,
         firstName: 'Mark',
@@ -881,9 +876,23 @@ export default defineComponent({
   methods: {
     updateList() {
       // API call for GET list with params
-      getInternshipModulesList()
+      getUsersList()
         .then((list) => {
-          this.users = list;
+          const studentsList = [] as Student[];
+          list.forEach((user) => {
+            console.log(user);
+            console.log('studentProfile' in user);
+            if ('studentProfile' in user) {
+              studentsList.push({
+                firstName: user.firstName,
+                lastName: user.lastName,
+                emailAddress: user.emailAddress,
+                studentProfile: user.studentProfile,
+              });
+            }
+          });
+          this.students = studentsList;
+          console.log(this.students);
         }).catch((err) => console.log(err));
     },
     getDateString(ISODateString: string) {
