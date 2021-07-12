@@ -1,7 +1,7 @@
 <template>
   <div class="w-100 h-100 text-center " style="background-color: #333333;">
     <div class="w-50 h-25 m-auto pt-5"/>
-    <div id="login_inputs" class="w-50 h-50 m-auto mt-0 container" v-on:keyup.enter="login()">
+    <div id="login_inputs" class="w-50 h-50 m-auto mt-0 container">
       <router-link
         class="m-0 navbar-brand imi-map-logo"
         :to="{name: 'Home', params: { locale: $route.params.locale }}">
@@ -10,7 +10,7 @@
       <div class="mt-3 text-white">
         Please use your HRZ-Account for logging in.
       </div>
-        <form v-on:submit.prevent="login()" v-on:keyup.enter="login()">
+        <form v-on:submit.prevent>
           <div class="input-group w-auto mt-3 row">
             <div class="col">
               <input
@@ -34,6 +34,7 @@
           <div id="submit" class="mt-3">
             <button
               v-on:click="login()"
+              type="submit"
               class="btn btn-htw-green">
               Login
             </button>

@@ -1,5 +1,6 @@
 <template>
     <div id="form-block4" class="text-left">
+      <form v-on:submit.prevent>
         <h3>Antrag auf Verschiebung des Praktikums</h3>
         <div class="pl-5">
           <div class="row">&nbsp;</div>
@@ -57,6 +58,7 @@
             </div>
           </div>
         </div>
+      </form>
     </div>
 </template>
 
