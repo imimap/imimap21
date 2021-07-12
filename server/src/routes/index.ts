@@ -3,7 +3,7 @@ import exampleRouter from "./example";
 import authRouter from "./auth";
 import internshipModuleRouter from "./internshipModule";
 import studentRouter from "./student";
-
+import postponementRequestRouter from "./postponementRequest";
 
 const router = Router();
 
@@ -14,5 +14,7 @@ router.use("/x", exampleRouter);
 router.use("/internship-modules", internshipModuleRouter);
 
 router.use("/students", studentRouter);
+
+router.use("/postponement-requests", postponementRequestRouter);
 
 export default router;
