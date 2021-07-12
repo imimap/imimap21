@@ -4,12 +4,10 @@ import authMiddleware from "../authentication/middleware";
 import {
   findInternships,
   findInternshipsInSemester,
-  getAllCountries,
   getAllOperationalAreas,
   getAllPaymentTypes,
   getAllProgrammingLanguages,
-  getCities,
-  getInternshipsById
+  getInternshipsById,
 } from "../controllers/internship";
 import { validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
@@ -51,30 +49,6 @@ internshipRouter.get(
 );
 
 /* The following endpoints can be used to provide options to a search form */
-
-internshipRouter.get(
-  "/cities",
-  authMiddleware(),
-  param("id").custom((id) => /[0-9a-f]{24}/.test(id) || id === "my"),
-  validate,
-  asyncHandler(getCities)
-);
-
-internshipRouter.get(
-  "/:country/cities",
-  authMiddleware(),
-  param("id").custom((id) => /[0-9a-f]{24}/.test(id) || id === "my"),
-  validate,
-  asyncHandler(getCities)
-);
-
-internshipRouter.get(
-  "/countries",
-  authMiddleware(),
-  param("id").custom((id) => /[0-9a-f]{24}/.test(id) || id === "my"),
-  validate,
-  asyncHandler(getAllCountries)
-);
 
 internshipRouter.get(
   "/payment-types",
