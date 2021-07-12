@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { param, query } from "express-validator";
 import authMiddleware from "../authentication/middleware";
-import { findInternships, getInternshipsById } from "../controllers/internship";
+import {
+  findInternships,
+  findInternshipsInSemester,
+  getInternshipsById
+} from "../controllers/internship";
 import { validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
 
@@ -11,18 +15,26 @@ internshipRouter.get(
   "/",
   authMiddleware(true),
   query([
-    "companyName",
     "branchName",
+    "companyName",
     "country",
     "industry",
     "mainLanguage",
-    "size",
-    "programmingLanguage",
     "operationalArea",
     "paymentType",
+    "programmingLanguage",
+    "size",
   ]).toUpperCase(),
   validate,
   asyncHandler(findInternships)
+);
+
+internshipRouter.get(
+  "/",
+  authMiddleware(true),
+  query(["semester"]).toUpperCase(),
+  validate,
+  asyncHandler(findInternshipsInSemester)
 );
 
 internshipRouter.get(
