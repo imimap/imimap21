@@ -94,7 +94,11 @@ export async function createPostponementRequest(
   }
   // Successfully created request, return 201 - CREATED
   res.statusCode = constants.HTTP_STATUS_CREATED;
-  res.send();
+  res.json({
+    newSemester: req.body.newSemester,
+    newSemesterOfStudy: req.body.newSemesterOfStudy,
+    reason: req.body.reason,
+  });
 }
 
 export function processPostponementRequest(accept: boolean) {
