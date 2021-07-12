@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/user";
 import { Forbidden, NotFound } from "http-errors";
-import { Internship } from "../models/internship";
+import {IInternship, Internship, PaymentTypes} from "../models/internship";
 import { Semester } from "../helpers/semesterHelper";
 import { InternshipModule } from "../models/internshipModule";
 import { Types } from "mongoose";
 
 const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
-  "_id company tasks operationalArea programminLanguages livingCosts salary paymentTypes";
+  "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes";
 const INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN =
   "startDate endDate workingHoursPerWeek supervisor status";
 
@@ -26,17 +26,26 @@ export async function getInternshipsById(
     .select("isAdmin studentProfile")
     .populate({
       path: "studentProfile.internship",
+      populate: { path: "internships", lean: true },
       lean: true,
     });
 
   if (!user) return next(new NotFound("User not found"));
 
-  if (user.isAdmin || user.studentProfile?.internship.internships.includes(req.params.id)) {
-    const internship = await Internship.findById(req.params.id).lean();
-    if (!internship) return next(new Forbidden("Internship not found"));
+  const internshipId = req.params.id.toString();
+
+  if (
+    user.isAdmin ||
+    user.studentProfile?.internship.internships.some(
+      (internship: IInternship) => internship._id.toString() === internshipId
+    )
+  ) {
+    const internship = await Internship.findById(internshipId).lean();
+    if (!internship) return next(new NotFound("Internship not found"));
     res.json(internship);
-  } else if (user.studentProfile && req.params.id === "my") {
-    res.json(user.studentProfile.internship.populate({ path: "internships", lean: true }));
+  } else if (user.studentProfile && internshipId === "my") {
+    const internships: IInternship[] = user.studentProfile.internship.internships;
+    res.json(internships);
   } else {
     return next(new Forbidden("You may only access your own internship."));
   }
@@ -60,6 +69,8 @@ export async function findInternships(
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  if (req.query.semester) return findInternshipsInSemester(req, res, next);
+
   const user = await User.findOne({ emailAddress: req.user?.email })
     .select("isAdmin studentProfile")
     .populate({
@@ -70,6 +81,8 @@ export async function findInternships(
   if (!user) return next(new NotFound("User not found"));
 
   // Create Options
+  const options: { [k: string]: any } = {};
+
   const companyQueryFields = [
     "companyName",
     "branchName",
@@ -78,16 +91,38 @@ export async function findInternships(
     "mainLanguage",
     "size",
   ];
-  const internshipQueryFields = ["programmingLanguage", "operationalArea", "paymentType"];
-
-  const options: { [k: string]: any } = {};
-
   companyQueryFields.forEach((field) => {
-    if (req.params[field]) options[`company.${field}`] = req.params[field];
+    if (req.query[field])
+      options[`company.${field}`] = {
+        $regex: req.query[field],
+        $options: "i",
+      };
   });
-  internshipQueryFields.forEach((field) => {
-    if (req.params[field]) options[field] = req.params[field];
-  });
+  if (req.query.country) {
+    options["company.address.country"] = {
+      $regex: req.query.country,
+      $options: "i",
+    };
+  }
+  if (req.query.operationalArea) {
+    options.operationalArea = {
+      $regex: req.query.operationalArea,
+      $options: "i",
+    };
+  }
+  if (req.query.programmingLanguage) {
+    options.programmingLanguages = {
+      $regex: req.query.programmingLanguage,
+      $options: "i",
+    };
+  }
+  if (req.query.paymentType) {
+    options.paymentTypes = {
+      $regex: req.query.paymentType,
+      $options: "i",
+    };
+  }
+
   if (!user.isAdmin && user.studentProfile?.internshipsSeen) {
     options["company.excludedFromSearch"] = false;
     if (user.studentProfile.internshipsSeen.length > 0) {
@@ -99,6 +134,9 @@ export async function findInternships(
       };
     }
   }
+
+  console.log(options);
+  // Todo: apparently nested options don't seem to work, eg. company.address.country
 
   // Set select: Which fields to select?
   let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
@@ -121,6 +159,8 @@ export async function findInternships(
     .select(select)
     .limit(limit || 50)
     .skip(offset || 0);
+
+  console.log(internships);
 
   // Query internships that have already been viewed
   options._id = {
@@ -166,13 +206,25 @@ export async function findInternshipsInSemester(
 
   const internshipIds: Types.ObjectId[] = modules.flatMap((module) => module.internships);
 
-  let select = "_id company.address";
+  let select = "_id";
   if (user.isAdmin)
-    select += INTERNSHIP_FIELDS_VISIBLE_FOR_USER + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
+    select +=
+      " " +
+      INTERNSHIP_FIELDS_VISIBLE_FOR_USER +
+      " " +
+      INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
 
-  const internships = internshipIds.map(async (id) => {
-    await Internship.findById(id).lean().select(select);
-  });
+  const internships = await Promise.all(
+    internshipIds.map((id: Types.ObjectId) => {
+      return Internship.findById(id)
+        .populate({
+          path: "company",
+          select: "address",
+        })
+        .lean()
+        .select(select);
+    })
+  );
 
   res.json(internships);
 }
@@ -192,9 +244,7 @@ export async function getAllPaymentTypes(
   const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
   if (!user) return next(new NotFound("User not found"));
 
-  const paymentTypes: string[] = await Internship.distinct("paymentType");
-
-  res.json(paymentTypes);
+  res.json([...Object.values(PaymentTypes)]);
 }
 
 /**

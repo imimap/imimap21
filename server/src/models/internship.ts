@@ -19,6 +19,13 @@ export enum InternshipStatuses {
   PASSED = "passed",
 }
 
+export enum PaymentTypes {
+  UNCHARTED = "uncharted",
+  CASH_BENEFIT = "cash benefit",
+  NONCASH_BENEFIT = "noncash benefit",
+  NO_PAYMENT = "no payment",
+}
+
 export interface IInternship extends Document {
   startDate?: Date;
   endDate?: Date;
@@ -89,8 +96,8 @@ export const InternshipSchema = new Schema<IInternship>({
   },
   paymentTypes: [
     {
-      default: "uncharted",
-      enum: ["uncharted", "cash benefit", "noncash benefit", "no payment"],
+      default: PaymentTypes.UNCHARTED,
+      enum: PaymentTypes,
       type: String,
     },
   ],

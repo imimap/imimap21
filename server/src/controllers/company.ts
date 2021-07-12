@@ -41,9 +41,9 @@ export async function getCities(req: Request, res: Response, next: NextFunction)
   if (!user) return next(new NotFound("User not found"));
 
   const options: { [k: string]: any } = {};
-  if (req.params.country) options.country = req.params.country;
+  if (req.params.country) options["address.country"] = req.params.country;
 
-  const cities: string[] = await Company.find(options).distinct("city");
+  const cities: string[] = await Company.find(options).distinct("address.city");
 
   res.json(cities);
 }
@@ -64,7 +64,7 @@ export async function getAllCountries(
   const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
   if (!user) return next(new NotFound("User not found"));
 
-  const countries: string[] = await Company.distinct("country");
+  const countries: string[] = await Company.distinct("address.country");
 
   res.json(countries);
 }

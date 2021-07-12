@@ -9,7 +9,7 @@ import { getAllCompanies, getAllCountries, getCities } from "../controllers/comp
 
 const companyRouter = Router();
 
-companyRouter.get("/", authMiddleware(), validate, asyncHandler(getAllCompanies));
+companyRouter.get("/", authMiddleware(true), validate, asyncHandler(getAllCompanies));
 
 companyRouter.get("/cities", authMiddleware(), validate, asyncHandler(getCities));
 
