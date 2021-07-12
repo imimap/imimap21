@@ -16,7 +16,7 @@ import Student from '@/views/Student.vue';
 import Help from '@/views/Help.vue';
 import rootStore from '@/store';
 import CreatePostponement from '@/components/postponements/CreatePostponement.vue';
-import PostponementsList from '@/components/postponements/PostponementsList.vue';
+import PostponementsList from '@/components/internship-module/PostponementsList.vue';
 import Postponements from '@/views/Postponements.vue';
 import PageNotFound from '@/views/PageNotFound.vue';
 import InternshipModuleIndex from '@/components/internship-module/InternshipModuleIndex.vue';
