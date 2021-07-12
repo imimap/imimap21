@@ -11,9 +11,9 @@
 
 <script>
 import { defineComponent } from 'vue';
+import http from '@/utils/http-common';
 import NoCompleteInternship from './NoInternshipModule.vue';
 import CompleteInternship from './InternshipModule.vue';
-import http from '../../utils/http-common';
 
 export default defineComponent({
   name: 'InternshipModuleIndex',

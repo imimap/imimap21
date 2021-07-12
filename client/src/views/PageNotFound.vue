@@ -1,5 +1,5 @@
 <template>
-  <div class="container m-auto">
+  <div class="container my-5">
     <h1>Sorry, nichts gefunden unter dieser URL :/</h1>
     <a href="javascript:history.back()">Zurück</a>
   </div>

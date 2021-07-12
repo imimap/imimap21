@@ -12,10 +12,10 @@
           <div class="row">
             <div class="field">
               Ich beantrage eine Verschiebung auf das
-              <select ndata-form-type="other">
-                <option value="2">WS 21/22</option>
-                <option value="1">SS 21</option>
-                <option value="3">WS 20/21</option></select>
+              <select v-model="this.newSemester">
+                <option value="WS2022">WS 21/22</option>
+                <option value="SS21">SS 21</option>
+                <option value="WS2021">WS 20/21</option></select>
             </div>
           </div>
           <div class="row">&nbsp;</div>
@@ -26,11 +26,11 @@
                 Semester of study
               </label>
               <input
+                v-model="this.newSemesterOfStudy"
                 cols="5"
                 class="form-control"
                 type="number"
-                id="postponementSemester"
-                data-form-type="other"/>
+                id="postponementSemester"/>
             </div>
             . Fachsemester sein.
           </div>
@@ -39,16 +39,17 @@
             <div class="form-group">
               <label for="postponementReason">Begründung</label>
               <textarea
+                v-model="this.reason"
                 cols="50"
                 rows="10"
                 class="form-control"
-                id="postponementReason"
-                data-form-type="other"/>
+                id="postponementReason"/>
             </div>
           </div>
           <div class="row">
             <div class="actions">
               <button
+                v-on:click="savePostponement"
                 type="submit"
                 class="btn btn-secondary my-4">
                 Verschiebung beantragen
@@ -61,9 +62,34 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import http from '@/utils/http-common';
+import store from '@/store';
 
 export default defineComponent({
   name: 'CreatePostponement',
+  data() {
+    return {
+      newSemester: null,
+      newSemesterOfStudy: null,
+      reason: '',
+    };
+  },
+  methods: {
+    async savePostponement() {
+      try {
+        const { newSemester, newSemesterOfStudy, reason } = this;
+        await http.post('/postponement-requests', {
+          newSemester,
+          newSemesterOfStudy,
+          reason,
+        });
+        await store.dispatch('addNotification', { text: 'Verschiebung erfolgreich beantragt!', type: 'success' });
+        await this.$router.push({ name: 'PostponementsIndex' });
+      } catch (err) {
+        await store.dispatch('addNotification', { text: err.message, type: 'danger' });
+      }
+    },
+  },
 });
 </script>
 
