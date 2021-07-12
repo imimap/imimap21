@@ -57,12 +57,11 @@ body {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
-  color: #212529;
+  color: $htw-gray-color;
   text-align: left;
   background-color: #fff;
   background: url('/assets/bg.gif');
   font-family: 'Merriweather Sans', sans-serif;
-  color: $black;
 }
 
 @include media-breakpoint-up(md) {
