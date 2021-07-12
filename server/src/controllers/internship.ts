@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/user";
 import { Forbidden, NotFound } from "http-errors";
-import { IInternship, Internship, InternshipStatuses } from "../models/internship";
+import { Internship } from "../models/internship";
 import { Semester } from "../helpers/semesterHelper";
 import { InternshipModule } from "../models/internshipModule";
-import { Document, PopulatedDoc, Schema, Types } from "mongoose";
+import { Types } from "mongoose";
 
 const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
   "_id company tasks operationalArea programminLanguages livingCosts salary paymentTypes";
@@ -105,7 +105,7 @@ export async function findInternships(
   if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
 
   // Set limit: How many internships to return?
-  let limit = 50;
+  let limit = typeof req.query.limit === "string" && parseInt(req.query.limit);
   if (!user.isAdmin && user.studentProfile?.internshipsSeen) {
     limit = 12;
     limit = limit - user.studentProfile.internshipsSeen.length;
@@ -141,7 +141,6 @@ export async function findInternships(
 
 /**
  * Returns information on internships made in a specific semester.
- * Returns information from at maximum 50 modules (default limit), with a default offset of 0.
  * For users only returns the id and company address, for admins returns more information.
  * @param req
  * @param res
@@ -159,18 +158,11 @@ export async function findInternshipsInSemester(
     return next(new NotFound("Invalid Semester String. Needs to be like WS2021 or SS2021."));
   }
 
-  // Set limit: How many internships to return?
-  const limit = 50;
-
-  // Set offset if applicable
-  const offset = typeof req.query.offset === "string" && parseInt(req.query.offset);
-
   const modules = await InternshipModule.find({
     inSemester: req.query.semester.toString(),
   })
-    .select("internships")
-    .limit(limit || 50)
-    .skip(offset || 0);
+    .lean()
+    .select("internships");
 
   const internshipIds: Types.ObjectId[] = modules.flatMap((module) => module.internships);
 
@@ -179,8 +171,111 @@ export async function findInternshipsInSemester(
     select += INTERNSHIP_FIELDS_VISIBLE_FOR_USER + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
 
   const internships = internshipIds.map(async (id) => {
-    await Internship.findById(id).select(select).lean();
+    await Internship.findById(id).lean().select(select);
   });
 
   res.json(internships);
+}
+
+/**
+ * Returns all cities or cities in a specific countries
+ * Returns only cities that are internship locations
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function getCities(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
+  if (!user) return next(new NotFound("User not found"));
+
+  const options: { [k: string]: any } = {};
+  if (req.params.country) options.company.country = req.params.country;
+
+  const cities: string[] = await Internship.find(options).distinct("company.city");
+
+  res.json(cities);
+}
+
+/**
+ * Returns all countries
+ * Returns only countries that are internship locations
+ * Default limit = 50, default offset = 0
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function getAllCountries(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
+  if (!user) return next(new NotFound("User not found"));
+
+  const countries: string[] = await Internship.distinct("company.country");
+
+  res.json(countries);
+}
+
+/**
+ * Returns all paymentTypes
+ * Returns only paymentTypes that exist on internships
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function getAllPaymentTypes(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
+  if (!user) return next(new NotFound("User not found"));
+
+  const paymentTypes: string[] = await Internship.distinct("paymentType");
+
+  res.json(paymentTypes);
+}
+
+/**
+ * Returns all operationalAreas
+ * Returns only operationalAreas that exist on internships
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function getAllOperationalAreas(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
+  if (!user) return next(new NotFound("User not found"));
+
+  const operationalAreas: string[] = await Internship.distinct("operationalArea");
+
+  res.json(operationalAreas);
+}
+
+/**
+ * Returns all operationalAreas
+ * Returns only operationalAreas that exist on internships
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function getAllProgrammingLanguages(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
+  if (!user) return next(new NotFound("User not found"));
+
+  const internships = await Internship.find().lean().select("programmingLanguages");
+  const programmingLanguages: string[] = [
+    ...new Set(internships.flatMap((internship) => internship.programmingLanguages || "")),
+  ];
+
+  res.json(programmingLanguages);
 }
