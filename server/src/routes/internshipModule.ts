@@ -2,11 +2,7 @@ import { Router } from "express";
 import { param, query } from "express-validator";
 import { Semester } from "../helpers/semesterHelper";
 import authMiddleware from "../authentication/middleware";
-import {
-  findInternshipModule,
-  listInternshipModules,
-  listPostponementRequests,
-} from "../controllers/internshipModule";
+import { findInternshipModule, listInternshipModules } from "../controllers/internshipModule";
 import { validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
 
@@ -20,12 +16,6 @@ internshipModuleRouter.get(
     .custom((s) => Semester.isValidSemesterString(s) || !s),
   validate,
   asyncHandler(listInternshipModules)
-);
-
-internshipModuleRouter.get(
-  "/postponements",
-  authMiddleware(true),
-  asyncHandler(listPostponementRequests)
 );
 
 internshipModuleRouter.get(
