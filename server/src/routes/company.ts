@@ -5,9 +5,11 @@ import { param } from "express-validator";
 import { validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
 import { Router } from "express";
-import { getAllCountries, getCities } from "../controllers/company";
+import { getAllCompanies, getAllCountries, getCities } from "../controllers/company";
 
 const companyRouter = Router();
+
+companyRouter.get("/", authMiddleware(), validate, asyncHandler(getAllCompanies));
 
 companyRouter.get("/cities", authMiddleware(), validate, asyncHandler(getCities));
 

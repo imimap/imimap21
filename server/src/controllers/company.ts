@@ -1,7 +1,33 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/user";
-import { NotFound } from "http-errors";
-import { Internship } from "../models/internship";
+import { Forbidden, NotFound } from "http-errors";
+import { Company } from "../models/company";
+
+/**
+ * Returns all companies to admins
+ * limit default = 50, offset default = 0
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function getAllCompanies(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
+  if (!user) return next(new NotFound("User not found"));
+  if (!user.isAdmin) return next(new Forbidden("Only admins may get all companies."));
+
+  const limit = typeof req.query.limit === "string" && parseInt(req.query.limit);
+  const offset = typeof req.query.offset === "string" && parseInt(req.query.offset);
+
+  const companies = await Company.find()
+    .limit(limit || 50)
+    .skip(offset || 0);
+
+  res.json(companies);
+}
 
 /**
  * Returns all cities or cities in a specific countries
@@ -15,9 +41,9 @@ export async function getCities(req: Request, res: Response, next: NextFunction)
   if (!user) return next(new NotFound("User not found"));
 
   const options: { [k: string]: any } = {};
-  if (req.params.country) options.company.country = req.params.country;
+  if (req.params.country) options.country = req.params.country;
 
-  const cities: string[] = await Internship.find(options).distinct("company.city");
+  const cities: string[] = await Company.find(options).distinct("city");
 
   res.json(cities);
 }
@@ -38,7 +64,7 @@ export async function getAllCountries(
   const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
   if (!user) return next(new NotFound("User not found"));
 
-  const countries: string[] = await Internship.distinct("company.country");
+  const countries: string[] = await Company.distinct("country");
 
   res.json(countries);
 }
