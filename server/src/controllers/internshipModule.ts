@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { IInternshipModule, InternshipModule } from "../models/internshipModule";
 import { FilterQuery } from "mongoose";
-import {IUser, User} from "../models/user";
-import {BadRequest, Forbidden, NotFound} from "http-errors";
+import { IUser, User } from "../models/user";
+import { BadRequest, Forbidden, NotFound } from "http-errors";
 import { Role } from "../authentication/user";
-import {Internship} from "../models/internship";
+import { Internship } from "../models/internship";
+import {IEvent} from "../models/event";
 
 export async function findInternshipModule(
   req: Request,
@@ -55,6 +56,56 @@ export async function passAep(req: Request, res: Response, next: NextFunction): 
   res.json(updatedInternship);
 }
 
+export async function updateInternshipModule(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean();
+  if (!user) return next(new NotFound("User not found"));
+  if (!user.isAdmin) return next(new Forbidden("Only admins may edit an Internship Module"));
+
+  if (!req.params.id)
+    return next(
+      new NotFound("Provide an id in the query to say which internship module to update.")
+    );
+  const internshipToUpdate = await InternshipModule.findById(req.params.id);
+  if (!internshipToUpdate) return next(new NotFound("InternshipModule not found"));
+
+  const possibleProperties = [
+    "internships",
+    "inSemester",
+    "inSemesterOfStudy",
+    "aepPassed",
+    "reportPdf",
+    "completeDocumentsPdf",
+    "status",
+  ];
+
+  const changes: { [key: string]: unknown } = {};
+
+  for (const prop of possibleProperties) {
+    if (req.query[prop]) {
+      changes[prop] = req.query[prop];
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      internshipToUpdate[prop] = req.query[prop];
+    }
+  }
+
+  const newEvent: IEvent = {
+    creator: user._id,
+    changes: changes,
+    comment: req.query.comment?.toString() || "Admin forced changes",
+  };
+
+  internshipToUpdate.events.push(newEvent);
+  const internshipSaved = await internshipToUpdate.save();
+
+  res.json(internshipSaved);
+}
+
+/*
 export async function createInternshipModule(
   req: Request,
   res: Response,
@@ -93,3 +144,4 @@ export async function createInternshipModule(
 
   res.json(createdInternshipModule);
 }
+ */
