@@ -22,7 +22,7 @@ jobs:
         with:
           context: ./client
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/client:latest
+          tags: ${{ secrets.DOCKERHUB_USER }}/client:latest
 
   server:
     runs-on: ubuntu-20.04
@@ -33,7 +33,7 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push server
@@ -41,4 +41,4 @@ jobs:
         with:
           context: ./server
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/server:latest
+          tags: ${{ secrets.DOCKERHUB_USER }}/server:latest
