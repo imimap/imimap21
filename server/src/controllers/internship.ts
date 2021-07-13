@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/user";
-import { Forbidden, NotFound } from "http-errors";
-import {IInternship, Internship, PaymentTypes} from "../models/internship";
+import { BadRequest, Forbidden, NotFound } from "http-errors";
+import { IInternship, Internship, PaymentTypes } from "../models/internship";
 import { Semester } from "../helpers/semesterHelper";
 import { InternshipModule } from "../models/internshipModule";
 import { Types } from "mongoose";
+import { ISupervisor } from "../models/supervisor";
 
 const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
   "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes";
@@ -288,4 +289,87 @@ export async function getAllProgrammingLanguages(
   ];
 
   res.json(programmingLanguages);
+}
+
+function getInternshipObject(propsObject: any) {
+  const internshipProps: { [k: string]: any } = {};
+
+  //direct props of internship
+  const directProps = [
+    "startDate",
+    "endDate",
+    "tasks",
+    "operationalArea",
+    "livingCosts",
+    "salary",
+    "workingHoursPerWeek",
+  ];
+  for (const prop of directProps) {
+    if (propsObject[prop]) internshipProps[prop] = propsObject[prop];
+  }
+
+  const directArrayProps = ["programmingLanguages", "paymentTypes"];
+  for (const prop of directArrayProps) {
+    if (propsObject[prop]) internshipProps[prop] = propsObject[prop].toString().split(",");
+  }
+
+  //supervisor props
+  const supervisor: ISupervisor = {
+    fullName: propsObject.supervisorFullName,
+    emailAddress: propsObject.supervisorEmailAddress,
+  };
+  internshipProps.supervisor = supervisor;
+
+  //company
+  if (propsObject.companyId) internshipProps.company = propsObject.companyId;
+
+  return internshipProps;
+}
+
+/**
+ * Creates own internship
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function createInternship(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email })
+    .select("isAdmin studentProfile")
+    .populate({
+      path: "studentProfile.internship",
+      lean: true,
+    });
+
+  if (!user) return next(new NotFound("User not found"));
+  if (!user.studentProfile) return next(new NotFound("User does not appear to be a student"));
+
+  // create new internship
+  const internshipProps = getInternshipObject(req.query);
+  const newInternship = new Internship(internshipProps);
+  newInternship.events = [
+    {
+      creator: user._id,
+      changes: internshipProps,
+      comment: "New internship created",
+    },
+  ];
+  const newlyCreatedInternship = await newInternship.save();
+  if (!newlyCreatedInternship) return next(new BadRequest("Could not create internship"));
+
+  if (!user.studentProfile.internship) {
+    // create new internship module
+    const newInternshipModule = new InternshipModule({
+      internships: [newlyCreatedInternship._id],
+    });
+    const newlyPlannedInternshipModule = await newInternshipModule.plan();
+    user.studentProfile.internship = newlyPlannedInternshipModule._id;
+  } else {
+    user.studentProfile.internship.internships.push(newlyCreatedInternship._id);
+  }
+  await user.save();
+  res.json(newlyCreatedInternship);
 }

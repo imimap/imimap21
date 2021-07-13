@@ -31,16 +31,6 @@ internshipModuleRouter.get(
   asyncHandler(findInternshipModule)
 );
 
-// todo: the following endpoint might not be needed - isn't a module planned as soon as the first internship(part) is created?
-/*
-internshipModuleRouter.post(
-  "/",
-  authMiddleware(),
-  //query("id").custom((id) => /[0-9a-f]{24}/.test(id) || null),
-  validate,
-  asyncHandler(createInternshipModule)
-);*/
-
 internshipModuleRouter.patch(
   "/:id/aep-passed/",
   authMiddleware(true),

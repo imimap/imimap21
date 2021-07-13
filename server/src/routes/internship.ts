@@ -3,11 +3,11 @@ import { param, query } from "express-validator";
 import authMiddleware from "../authentication/middleware";
 import {
   findInternships,
-  findInternshipsInSemester,
   getAllOperationalAreas,
   getAllPaymentTypes,
   getAllProgrammingLanguages,
   getInternshipsById,
+  createInternship,
 } from "../controllers/internship";
 import { validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
@@ -43,6 +43,79 @@ internshipRouter.get(
   validate,
   asyncHandler(getInternshipsById)
 );
+
+internshipRouter.post(
+  "/",
+  authMiddleware(),
+  query([
+    "startDate",
+    "endDate",
+    "tasks",
+    "operationalArea",
+    "livingCosts",
+    "salary",
+    "workingHoursPerWeek",
+    "supervisor",
+    "programmingLanguages", //array
+    "paymentTypes", //enum, array
+    //supervisor
+    "supervisorFullName",
+    "supervisorEmailAddress",
+    "companyId",
+  ]),
+  validate,
+  asyncHandler(createInternship)
+);
+
+/* PDF endpoints */
+/*
+internshipRouter.post(
+  "/pdf/lsfEctsProof",
+  authMiddleware(),
+  validate,
+  asyncHandler(submitLsfEctsProofPdf)
+);
+ */
+/*
+internshipRouter.post(
+  "/pdf/locationJustification",
+  authMiddleware(),
+  validate,
+  asyncHandler(submitlocationJustificationPdf)
+);
+ */
+/*
+internshipRouter.post(
+  "/pdf/contract",
+  authMiddleware(),
+  validate,
+  asyncHandler(submitContractPdf)
+);
+ */
+/*
+internshipRouter.post(
+  "/pdf/bvgTicketExemption",
+  authMiddleware(),
+  validate,
+  asyncHandler(submitBvgTicketExemptionPdf)
+);
+ */
+/*
+internshipRouter.post(
+  "/pdf/certificate",
+  authMiddleware(),
+  validate,
+  asyncHandler(submitCertificatePdf)
+);
+ */
+/*
+internshipRouter.post(
+  "/pdf/reportPdf",
+  authMiddleware(),
+  validate,
+  asyncHandler(submitReportPdf)
+);
+ */
 
 /* The following endpoints can be used to provide options to a search form */
 
