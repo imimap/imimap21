@@ -1,11 +1,13 @@
 /* The following endpoints can be used to provide options to a search form */
 
 import authMiddleware from "../authentication/middleware";
-import { param } from "express-validator";
+import {param, query} from "express-validator";
 import { validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
 import { Router } from "express";
-import { getAllCompanies, getAllCountries, getCities } from "../controllers/company";
+import {createCompany, getAllCompanies, getAllCountries, getCities} from "../controllers/company";
+import {createInternship} from "../controllers/internship";
+import internshipRouter from "./internship";
 
 const companyRouter = Router();
 
@@ -22,5 +24,29 @@ companyRouter.get(
 );
 
 companyRouter.get("/countries", authMiddleware(), validate, asyncHandler(getAllCountries));
+
+companyRouter.post(
+  "/",
+  authMiddleware(),
+  query([
+    //company
+    "companyName",
+    "branchName",
+    "emailAddress",
+    "industry",
+    "website",
+    "mainLanguage", //enum
+    "size", //enum
+    //address
+    "street",
+    "streetNumber",
+    "additionalLines",
+    "zip",
+    "city",
+    "country",
+  ]),
+  validate,
+  asyncHandler(createCompany)
+);
 
 export default companyRouter;

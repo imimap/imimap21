@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/user";
-import { Forbidden, NotFound } from "http-errors";
-import { Company } from "../models/company";
+import {BadRequest, Forbidden, NotFound} from "http-errors";
+import {Company, ICompany} from "../models/company";
+import {Internship} from "../models/internship";
+import {InternshipModule} from "../models/internshipModule";
 
 /**
  * Returns all companies to admins
@@ -67,4 +69,51 @@ export async function getAllCountries(
   const countries: string[] = await Company.distinct("address.country");
 
   res.json(countries);
+}
+
+function getCompanyObject(propsObject: any) {
+  const companyProps: { [k: string]: any } = {};
+
+  //direct props of internship
+  const directProps = [
+    "companyName",
+    "branchName",
+    "emailAddress",
+    "industry",
+    "website",
+    "mainLanguage",
+    "size",
+  ];
+  for (const prop of directProps) {
+    companyProps[prop] = propsObject[prop];
+  }
+
+  //address props
+  const addressProps = ["street", "streetNumber", "additionalLines", "zip", "city", "country"];
+  for (const prop of addressProps) {
+    if (propsObject[prop]) {
+      if (!companyProps.address) companyProps.address = {};
+      companyProps.address[prop] = propsObject[prop];
+    }
+  }
+
+  return companyProps;
+}
+
+/**
+ * Creates new company
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function createCompany(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const companyProps = getCompanyObject(req.query);
+  const newCompany = new Company(companyProps);
+  const savedCompany = await newCompany.save();
+
+  res.json(savedCompany);
 }
