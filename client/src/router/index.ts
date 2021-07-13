@@ -10,14 +10,19 @@ import Layout from '@/layouts/Layout.vue';
 import Home from '@/views/Home.vue';
 import Search from '@/views/Search.vue';
 import InternshipModule from '@/views/InternshipModule.vue';
-import CreateInternshipModule from '@/views/CreateInternshipModule.vue';
+import CreateInternshipModule from '@/components/internship-module/CreateInternshipModule.vue';
 import Login from '@/views/Login.vue';
 import Student from '@/views/Student.vue';
 import Help from '@/views/Help.vue';
 import rootStore from '@/store';
-import CreatePostponement from '@/views/CreatePostponement.vue';
+import CreatePostponement from '@/components/postponements/CreatePostponement.vue';
+import PostponementsList from '@/components/internship-module/PostponementsList.vue';
+import Postponements from '@/views/Postponements.vue';
+import PageNotFound from '@/views/PageNotFound.vue';
+import InternshipModuleIndex from '@/components/internship-module/InternshipModuleIndex.vue';
 import { availableLocales, defaultLocale } from '@/locales/locales';
 
+// @TODO: Router auf Modules aufteilen
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -62,14 +67,24 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           allowAnonymous: false,
         },
-      },
-      {
-        path: 'internship-module/new',
-        name: 'CreateInternshipModule',
-        component: CreateInternshipModule,
-        meta: {
-          allowAnonymous: false,
-        },
+        children: [
+          {
+            path: '',
+            name: 'InternshipModuleIndex',
+            component: InternshipModuleIndex,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+          {
+            path: 'new',
+            name: 'CreateInternshipModule',
+            component: CreateInternshipModule,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+        ],
       },
       {
         path: 'student',
@@ -80,12 +95,30 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: 'postponement/new',
-        name: 'CreatePostponement',
-        component: CreatePostponement,
+        path: 'postponements',
+        name: 'Postponements',
+        component: Postponements,
         meta: {
           allowAnonymous: false,
         },
+        children: [
+          {
+            path: '',
+            name: 'PostponementsIndex',
+            component: PostponementsList,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+          {
+            path: 'new',
+            name: 'CreatePostponement',
+            component: CreatePostponement,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+        ],
       },
       {
         path: 'help',
@@ -97,8 +130,10 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
+  { path: '/:pathMatch(.*)*', component: PageNotFound },
 ];
 
+// @TODO: In Router Middleware auslagern
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,

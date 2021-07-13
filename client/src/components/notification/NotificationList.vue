@@ -1,24 +1,24 @@
 <template>
   <div class="notifications-list">
-    <NotificationComponent
+    <Notification
       v-for="notification in notifications.notifications"
       v-bind:key="notification.id"
       v-bind:id="notification.id"
       v-bind:text="notification.text"
       v-bind:type="notification.type">
-    </NotificationComponent>
+    </Notification>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import NotificationComponent from '@/components/notification/NotificationComponent.vue';
+import Notification from '@/components/notification/Notification.vue';
 import { mapState } from 'vuex';
 
 export default defineComponent({
-  name: 'NotificationListComponent',
+  name: 'NotificationList',
   components: {
-    NotificationComponent,
+    Notification,
   },
   computed: {
     ...mapState(['notifications']),

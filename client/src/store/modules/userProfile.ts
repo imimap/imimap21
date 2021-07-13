@@ -16,6 +16,9 @@ export const getters: GetterTree<UserProfileState, RootState> = {
   getUserProfile(state): UserProfileState {
     return state;
   },
+  getUserInternshipId(state): string | null {
+    return state.studentProfile != null ? state.studentProfile.internship : null;
+  },
 };
 
 export const mutations: MutationTree<UserProfileState> = {

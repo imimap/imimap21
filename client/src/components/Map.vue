@@ -7,7 +7,7 @@ import { defineComponent, PropType } from 'vue';
 import { Map, Marker, TileLayer } from 'leaflet';
 
 export default defineComponent({
-  name: 'MapComponent',
+  name: 'Map',
   props: {
     locations: Array as PropType<{ lat: number; lng: number; city: string }[]>,
   },

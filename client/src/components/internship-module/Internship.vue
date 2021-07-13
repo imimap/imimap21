@@ -133,7 +133,7 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'InternshipComponent',
+  name: 'Internship',
 });
 </script>
 

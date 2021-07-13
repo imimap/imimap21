@@ -47,6 +47,7 @@
               size="50"
               type="text"
               :value="userProfile.firstName"
+
               id="studentFirstName"
             >
           </div>
@@ -98,7 +99,9 @@ export default defineComponent({
   computed: mapState(['userProfile']),
   methods: {
     save() {
+      // @TODO: POST an Student Endpoint
       this.$store.dispatch('addNotification', { text: 'Dein Profil wurde erfolgreich gespeichert!', type: 'success' });
+      // @TODO: Neues Student Profile im Store hinterlegen
     },
   },
 });
