@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-
+// @TODO: Locales
 export default defineComponent({
   name: 'Help',
 });
