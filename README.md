@@ -8,7 +8,7 @@ In the root folder run
 Ctrl + C will stop the containers.
 
 Alternatively use
-`docker-compose -f docker-compose.yml -f docker-compose.local.yml up -d`
+`docker-compose -f docker-compose.yml -f docker-compose.local.yml up -d --build`
 
 In that case, shut down the containers with docker-compose down.
 

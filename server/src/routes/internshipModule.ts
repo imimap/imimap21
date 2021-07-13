@@ -2,7 +2,7 @@ import { Router } from "express";
 import { param, query } from "express-validator";
 import { Semester } from "../helpers/semesterHelper";
 import authMiddleware from "../authentication/middleware";
-import { findInternshipModule, listInternshipModules } from "../controllers/internshipModule";
+import { findInternshipModule, listInternshipModules, passAep, createInternshipModule } from "../controllers/internshipModule";
 import { validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
 
@@ -25,5 +25,62 @@ internshipModuleRouter.get(
   validate,
   asyncHandler(findInternshipModule)
 );
+
+// todo: the following endpoint might not be needed - isn't a module planned as soon as the first internship(part) is created?
+/*
+internshipModuleRouter.post(
+  "/",
+  authMiddleware(),
+  //query("id").custom((id) => /[0-9a-f]{24}/.test(id) || null),
+  validate,
+  asyncHandler(createInternshipModule)
+);*/
+
+internshipModuleRouter.patch(
+  "/:id/aep-passed/",
+  authMiddleware(true),
+  param("id").custom((id) => /[0-9a-f]{24}/.test(id)),
+  validate,
+  asyncHandler(passAep)
+);
+
+/*
+internshipModuleRouter.post(
+  "/:id/pdf/report",
+  authMiddleware(),
+  param("id").custom((id) => /[0-9a-f]{24}/.test(id) || id === "my"),
+  validate,
+  asyncHandler(submitReportPdf)
+);
+ */
+/*
+internshipModuleRouter.patch(
+  "/:id/pdf/report/accepted",
+  authMiddleware(true),
+  param("id").custom((id) => /[0-9a-f]{24}/.test(id)),
+  validate,
+  asyncHandler(acceptReportPdf)
+);
+ */
+/*
+internshipModuleRouter.patch(
+  "/:id/pdf/report/rejected",
+  authMiddleware(true),
+  param("id").custom((id) => /[0-9a-f]{24}/.test(id)),
+  validate,
+  asyncHandler(rejectReportPdf)
+);
+ */
+
+/* Additional admin interface options */
+/*
+internshipModuleRouter.patch(
+  "/:id/",
+  authMiddleware(true),
+  param("id").custom((id) => /[0-9a-f]{24}/.test(id)),
+  validate,
+  asyncHandler(updateInternshipModule)
+);
+ */
 
 export default internshipModuleRouter;
