@@ -17,7 +17,8 @@
                 Semester
               </td>
               <td>
-                SS 21
+                <!-- @TODO: inSemester am internship fehlt -->
+                5
               </td>
             </tr>
             <tr>
@@ -25,7 +26,7 @@
                 Anfangsdatum
               </td>
               <td>
-                25.02.2021
+                {{ startDate }}
               </td>
             </tr>
             <tr>
@@ -33,7 +34,7 @@
                 Enddatum
               </td>
               <td>
-                02.06.2021
+                {{ internship.endDate }}
               </td>
             </tr>
             <tr>
@@ -49,7 +50,7 @@
                 Einsatzgebiet
               </td>
               <td>
-                Future Mining Planner
+                {{ internship.operationalArea }}
               </td>
             </tr>
             <tr>
@@ -57,8 +58,7 @@
                 Aufgaben
               </td>
               <td>
-                According to the legends, the Magratheans lived
-                most of their lives underground.
+                {{ internship.tasks }}
               </td>
             </tr>
             </tbody>
@@ -129,11 +129,19 @@
   </div>
 </template>
 
-<script  lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts">
+import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'Internship',
+  props: {
+    internship: {} as PropType<{[key: string]: any}>,
+  },
+  computed: {
+    startDate(): Date | null {
+      return this.internship != null ? new Date(this.internship.startDate) : null;
+    },
+  },
 });
 </script>
 

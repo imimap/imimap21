@@ -1,5 +1,5 @@
 export interface StudentProfile {
   internship: string;
-  internshipsSeen: [];
+  internshipsSeen: Array<{}>;
   studentId: string;
 }

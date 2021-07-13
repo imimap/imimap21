@@ -8,17 +8,16 @@
             <div class="field" id="field-titles2">
               <div class="form-group" data-children-count="1">
                 <label for="semester-id">Semester</label>
-                <select
-                  class="form-control"
-                  name="semester-id"
-                  id="semester-id"
-                  ref="semester-id"
-                  v-model="semesterId"
-                >
-                <option value="WS 21/22">WS 21/22</option>
-                <option value="SS 21">SS 21</option>
-                <option value="WS 20/21">WS 20/21</option>
-                <option value="WS 19/20">WS 19/20</option></select></div>
+                <select class="form-control"
+                        name="semester-id"
+                        id="semester-id"
+                        ref="semester-id"
+                        v-model="semesterId">
+                  <option value="WS2020">WS 20/21</option>
+                  <option value="WS2021">WS 21/22</option>
+                  <option value="SS2022">SS 22</option>
+                </select>
+              </div>
             </div>
           </div>
           <div class="col-md-4">

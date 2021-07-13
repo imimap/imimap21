@@ -1,8 +1,11 @@
 <template>
-  <div id="form-block4" class="text-left">
-    <h4>Onur Stoll's Praktikum im SS 21 (4. Fachsemester)</h4>
-    <div class="mb-5"></div>
-
+  <div class="container">
+    <div id="form-block4" class="text-left">
+    <h4 class="mb-5">
+      {{  `${userProfile.firstName} ${userProfile.lastName}
+      's Praktikum im ${internshipModule.inSemester}
+      (${internshipModule.inSemesterOfStudy}. Fachsemester)` }}
+    </h4>
     <div class="card mt-3 mb-3">
       <div class="card-body">
         <table class="table table-sm table-borderless">
@@ -39,26 +42,40 @@
     </div>
 
     <div class="card-deck">
-      <InternshipComponent></InternshipComponent>
+      <InternshipComponent
+        v-for="internship in this.internshipModule.internships"
+        v-bind:key="internship._id"
+        v-bind:internship="internship"
+      />
     </div>
-    <div class="mt-3 mb-5"><a href="/de/internships/new">Weiteres Teilpraktikum eintragen.</a></div>
+    <div class="mt-3 mb-5">
+      <router-link :to="{name: 'CreateInternship'}">
+        Weiteres Teilpraktikum eintragen.
+      </router-link>
+    </div>
     <div>
       <a href="/de/complete_internships/80/edit">Bearbeiten</a>
       |
       <a href="javascript:history.back()">Zurück</a>
     </div>
   </div>
+  </div>
 </template>
 
 <script  lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import InternshipComponent from '@/components/internship-module/Internship.vue';
+import { mapState } from 'vuex';
 // @TODO: Intership Informationen als Props entgegennehmen
 export default defineComponent({
   name: 'InternshipModule',
+  props: {
+    internshipModule: {} as PropType<{}>,
+  },
   components: {
     InternshipComponent,
   },
+  computed: mapState(['userProfile']),
 });
 </script>
 
