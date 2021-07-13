@@ -1,0 +1,70 @@
+import { Router } from "express";
+import { param, query } from "express-validator";
+import authMiddleware from "../authentication/middleware";
+import {
+  findInternships,
+  findInternshipsInSemester,
+  getAllOperationalAreas,
+  getAllPaymentTypes,
+  getAllProgrammingLanguages,
+  getInternshipsById,
+} from "../controllers/internship";
+import { validate } from "../helpers/validation";
+import * as asyncHandler from "express-async-handler";
+import { Semester } from "../helpers/semesterHelper";
+
+const internshipRouter = Router();
+
+internshipRouter.get(
+  "/",
+  authMiddleware(),
+  query([
+    "branchName",
+    "companyName",
+    "country",
+    "industry",
+    "mainLanguage",
+    "operationalArea",
+    "paymentType",
+    "programmingLanguage",
+    "size",
+  ]).toUpperCase(),
+  query(["semester"])
+    .toUpperCase()
+    .custom((s) => Semester.isValidSemesterString(s) || !s),
+  validate,
+  asyncHandler(findInternships)
+);
+
+internshipRouter.get(
+  "/:id",
+  authMiddleware(),
+  param("id").custom((id) => /[0-9a-f]{24}/.test(id) || id === "my"),
+  validate,
+  asyncHandler(getInternshipsById)
+);
+
+/* The following endpoints can be used to provide options to a search form */
+
+internshipRouter.get(
+  "/properties/payment-types",
+  authMiddleware(),
+  validate,
+  asyncHandler(getAllPaymentTypes)
+);
+
+internshipRouter.get(
+  "/properties/operational-areas",
+  authMiddleware(),
+  validate,
+  asyncHandler(getAllOperationalAreas)
+);
+
+internshipRouter.get(
+  "/properties/programming-languages",
+  authMiddleware(),
+  validate,
+  asyncHandler(getAllProgrammingLanguages)
+);
+
+export default internshipRouter;
