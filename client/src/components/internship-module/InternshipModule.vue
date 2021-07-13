@@ -53,7 +53,7 @@
 <script  lang="ts">
 import { defineComponent } from 'vue';
 import InternshipComponent from '@/components/internship-module/Internship.vue';
-
+// @TODO: Intership Informationen als Props entgegennehmen
 export default defineComponent({
   name: 'InternshipModule',
   components: {

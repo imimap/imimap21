@@ -22,6 +22,7 @@ import PageNotFound from '@/views/PageNotFound.vue';
 import InternshipModuleIndex from '@/components/internship-module/InternshipModuleIndex.vue';
 import { availableLocales, defaultLocale } from '@/locales/locales';
 
+// @TODO: Router auf Modules aufteilen
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -132,6 +133,7 @@ const routes: Array<RouteRecordRaw> = [
   { path: '/:pathMatch(.*)*', component: PageNotFound },
 ];
 
+// @TODO: In Router Middleware auslagern
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,

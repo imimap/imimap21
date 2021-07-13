@@ -7,7 +7,7 @@
 
 <script>
 import { defineComponent } from 'vue';
-
+// @TODO: Irgendwann mal aufhübschen
 export default defineComponent({
   name: 'PageNotFound',
 });

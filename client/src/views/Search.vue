@@ -564,7 +564,9 @@
 import { defineComponent } from 'vue';
 import 'leaflet/dist/leaflet.css';
 import Map from '@/components/Map.vue';
-
+// @TODO: Internship Search Endpoint abfragen und Mock-Daten ersetzen
+// @TODO: %Count%-Ergebnisse auf vorheriger Suche implementieren und entsprechend darstellen
+// @TODO: Endpoint für verfügbare Locations abfragen
 export default defineComponent({
   name: 'Search',
   components: { Map },

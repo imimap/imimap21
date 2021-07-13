@@ -24,12 +24,7 @@ export default defineComponent({
   components: { Map },
   methods: {
     async getInternshipLocations() {
-      try {
-        const res = await http.get('/internship-modules/', { params: { semester: this.selectedSemester } });
-        console.log(res);
-      } catch (err) {
-        console.log(err);
-      }
+      // @TODO: Intership Locations holen und Mock-Daten ersetzen
     },
   },
   data() {
