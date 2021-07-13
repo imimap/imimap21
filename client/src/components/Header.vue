@@ -88,9 +88,9 @@
                         {{ $t("header.headerLinks.myInternship") }}
                       </router-link>
                     </li>
-                    <li v-if="currentUserIsAdmin()" class="nav-item im-nav-item">
+                    <li v-if="currentUserIsAdmin()" class="nav-item imi-nav-item">
                       <router-link
-                        class="nav-link im-nav-link imi-map-navlink"
+                        class="nav-link imi-nav-link imi-map-navlink admin-link"
                         :to="{name: 'Admin', params: { locale: $route.params.locale }}"
                       >
                         {{ $t("header.headerLinks.administration") }}
@@ -255,7 +255,8 @@ export default defineComponent({
   }
 }
 
-#imi-maps-navbar-main .router-link-exact-active {
+#imi-maps-navbar-main .router-link-exact-active,
+#imi-maps-navbar-main .admin-link.router-link-active {
   text-decoration: none;
   border-bottom: 1px solid #77b900;
 }
