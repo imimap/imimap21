@@ -6,8 +6,6 @@ import { validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
 import { Router } from "express";
 import {createCompany, getAllCompanies, getAllCountries, getCities} from "../controllers/company";
-import {createInternship} from "../controllers/internship";
-import internshipRouter from "./internship";
 
 const companyRouter = Router();
 

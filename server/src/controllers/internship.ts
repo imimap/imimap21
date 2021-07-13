@@ -5,8 +5,7 @@ import { IInternship, Internship, PaymentTypes } from "../models/internship";
 import { Semester } from "../helpers/semesterHelper";
 import { InternshipModule } from "../models/internshipModule";
 import { Types } from "mongoose";
-import {ISupervisor} from "../models/supervisor";
-import {Company, ICompany} from "../models/company";
+import { ISupervisor } from "../models/supervisor";
 
 const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
   "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes";
