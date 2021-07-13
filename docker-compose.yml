@@ -6,7 +6,9 @@ services:
     build: ./client
     image: htwimimap/client:latest
     ports:
-      - "80:80"
+      - "3000:80"
+    environment:
+      - API_HOST=${API_HOST}
 
   server:
     build: ./server

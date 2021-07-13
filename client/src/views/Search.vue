@@ -555,7 +555,7 @@
 
     </div>
     <div id="map-results">
-      <MapComponent v-if="cardToggle" :locations="locations"></MapComponent>
+      <Map v-if="cardToggle" :locations="locations"></Map>
     </div>
   </div>
 </template>
@@ -563,13 +563,13 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import 'leaflet/dist/leaflet.css';
-import MapComponent from '@/components/MapComponent.vue';
-
+import Map from '@/components/Map.vue';
+// @TODO: Internship Search Endpoint abfragen und Mock-Daten ersetzen
+// @TODO: %Count%-Ergebnisse auf vorheriger Suche implementieren und entsprechend darstellen
+// @TODO: Endpoint für verfügbare Locations abfragen
 export default defineComponent({
   name: 'Search',
-  components: {
-    MapComponent,
-  },
+  components: { Map },
   data() {
     return {
       searchResults: [
@@ -630,17 +630,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-#form-block4 {
-  background-color: #FFFFFF;
-  color: #000000;
-  font-weight: 100;
-  height: 96%;
-  margin-bottom: 30px;
-  margin-top: 50px;
-  padding: 30px 50px;
-  box-shadow: 4px 6px 1px 0px rgb(0 0 0 / 30%);
-}
-
 #search_options > * {
   width: auto;
 }

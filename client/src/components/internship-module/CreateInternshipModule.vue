@@ -45,8 +45,7 @@
                 name="commit"
                 class="btn btn-secondary mt-3"
                 data-disable-with="Speichern"
-                v-on:click="save()"
-              >
+                v-on:click="save()">
                 Speichern
               </button>
             </div>
@@ -73,7 +72,7 @@ export default defineComponent({
   methods: {
     save() {
       this.$store.dispatch('addNotification', { text: 'Praktikum erfolgreich angelegt!', type: 'success' });
-      this.$router.push({ name: 'InternshipModule' });
+      this.$router.push({ name: 'InternshipModuleIndex' });
     },
   },
 });
