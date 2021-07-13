@@ -57,6 +57,8 @@ describe("StudentProfile", () => {
       throw "createdUser or one of its properties is null.";
     }
 
+    expect(createdUser.studentProfile.internship).toBeFalsy();
+
     const internshipObjectId: Types.ObjectId = Types.ObjectId(); // mock an object id
 
     createdUser.studentProfile.internship = internshipObjectId;

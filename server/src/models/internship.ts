@@ -6,7 +6,7 @@ import { getWeeksBetween, isValidDateRange, normalizeDate } from "../helpers/dat
 import { ICompany } from "./company";
 import { User } from "./user";
 import { EventSchema, IEvent } from "./event";
-import {imimapAdmin} from "../helpers/imimapAsAdminHelper";
+import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
 
 export enum InternshipStatuses {
   UNKNOWN = "unknown",
@@ -17,6 +17,13 @@ export enum InternshipStatuses {
   OVER = "over",
   READY_FOR_GRADING = "readyForGrading",
   PASSED = "passed",
+}
+
+export enum PaymentTypes {
+  UNCHARTED = "uncharted",
+  CASH_BENEFIT = "cash benefit",
+  NONCASH_BENEFIT = "noncash benefit",
+  NO_PAYMENT = "no payment",
 }
 
 export interface IInternship extends Document {
@@ -52,80 +59,73 @@ export interface IInternship extends Document {
   pass(creator: Types.ObjectId): Promise<IInternship>;
 }
 
-export const InternshipSchema = new Schema<IInternship>(
-  {
-    startDate: {
-      default: Semester.getUpcoming().startDate(),
-      type: Date,
-    },
-    endDate: {
-      type: Date,
-    },
-    company: {
-      ref: "Company",
-      type: Schema.Types.ObjectId,
-    },
-    tasks: {
-      type: String,
-      trim: true,
-    },
-    operationalArea: {
-      type: String,
-      trim: true,
-    },
-    programmingLanguages: [
-      {
-        type: String,
-        trim: true,
-      },
-    ],
-    livingCosts: {
-      min: 0,
-      type: Number,
-    },
-    salary: {
-      default: 0,
-      min: 0,
-      type: Number,
-    },
-    paymentTypes: [
-      {
-        default: "uncharted",
-        enum: ["uncharted", "cash benefit", "noncash benefit", "no payment"],
-        type: String,
-      },
-    ],
-    workingHoursPerWeek: {
-      default: 40,
-      min: 0,
-      type: Number,
-    },
-    supervisor: SupervisorSchema,
-    requestPdf: { type: PdfDocumentSchema, default: { events: [] } },
-    lsfEctsProofPdf: { type: PdfDocumentSchema, default: { events: [] } },
-    locationJustificationPdf: { type: PdfDocumentSchema, default: { events: [] } },
-    contractPdf: { type: PdfDocumentSchema, default: { events: [] } },
-    bvgTicketExemptionPdf: { type: PdfDocumentSchema, default: { events: [] } },
-    certificatePdf: { type: PdfDocumentSchema, default: { events: [] } },
-    reportPdf: { type: PdfDocumentSchema, default: { events: [] } },
-    status: {
-      type: String,
-      required: true,
-      enum: InternshipStatuses,
-      default: InternshipStatuses.UNKNOWN,
-    },
-    events: [
-      {
-        type: EventSchema,
-      },
-    ],
+export const InternshipSchema = new Schema<IInternship>({
+  startDate: {
+    default: Semester.getUpcoming().startDate(),
+    type: Date,
   },
-  {
-    toJSON: {
-      virtuals: true,
+  endDate: {
+    type: Date,
+  },
+  company: {
+    ref: "Company",
+    type: Schema.Types.ObjectId,
+  },
+  tasks: {
+    type: String,
+    trim: true,
+  },
+  operationalArea: {
+    type: String,
+    trim: true,
+  },
+  programmingLanguages: [
+    {
+      type: String,
+      trim: true,
     },
-  }
-);
+  ],
+  livingCosts: {
+    min: 0,
+    type: Number,
+  },
+  salary: {
+    default: 0,
+    min: 0,
+    type: Number,
+  },
+  paymentTypes: [
+    {
+      default: PaymentTypes.UNCHARTED,
+      enum: PaymentTypes,
+      type: String,
+    },
+  ],
+  workingHoursPerWeek: {
+    default: 40,
+    min: 0,
+    type: Number,
+  },
+  supervisor: SupervisorSchema,
+  requestPdf: { type: PdfDocumentSchema, default: { events: [] } },
+  lsfEctsProofPdf: { type: PdfDocumentSchema, default: { events: [] } },
+  locationJustificationPdf: { type: PdfDocumentSchema, default: { events: [] } },
+  contractPdf: { type: PdfDocumentSchema, default: { events: [] } },
+  bvgTicketExemptionPdf: { type: PdfDocumentSchema, default: { events: [] } },
+  certificatePdf: { type: PdfDocumentSchema, default: { events: [] } },
+  reportPdf: { type: PdfDocumentSchema, default: { events: [] } },
+  status: {
+    type: String,
+    required: true,
+    enum: InternshipStatuses,
+    default: InternshipStatuses.UNKNOWN,
+  },
+  events: [
+    {
+      type: EventSchema,
+    },
+  ],
+});
 
 export const requiredFields = [
   "startDate",

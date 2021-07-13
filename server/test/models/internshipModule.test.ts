@@ -59,6 +59,7 @@ afterAll(async () => {
 describe("InternshipModule", () => {
   it("can be created from valid data", async () => {
     const savedInternshipModule = await InternshipModule.findOne();
+    expect(savedInternshipModule).toBeTruthy();
     expect(savedInternshipModule?.aepPassed).toEqual(false);
   });
   it("automatically plans the internship module for the upcoming semester", async () => {
@@ -82,8 +83,8 @@ describe("InternshipModule", () => {
       );
 
       expect(savedInternshipModule?.events.length).toEqual(2);
-      expect(savedInternshipModule?.inSemester).toEqual(newSemester);
-      expect(savedInternshipModule?.inSemesterOfStudy).toEqual(newSemesterOfStudy);
+      expect(savedInternshipModule?.inSemester).not.toEqual(newSemester);
+      expect(savedInternshipModule?.inSemesterOfStudy).not.toEqual(newSemesterOfStudy);
       expect(savedInternshipModule?.status).toEqual(
         InternshipModuleStatuses.POSTPONEMENT_REQUESTED
       );
@@ -114,8 +115,8 @@ describe("InternshipModule", () => {
 
         expect(savedInternshipModule?.events.length).toEqual(3);
         expect(savedInternshipModule?.status).toEqual(InternshipModuleStatuses.PLANNED);
-        expect(savedInternshipModule?.inSemesterOfStudy).toEqual(lastSetSemesterOfStudy);
-        expect(savedInternshipModule?.inSemester).toEqual(lastSetSemester);
+        expect(savedInternshipModule?.inSemesterOfStudy).toEqual(6);
+        expect(savedInternshipModule?.inSemester).toEqual("WS2025");
       });
       it("can be rejected by admin", async () => {
         const internshipModule = await InternshipModule.findOne();
@@ -131,8 +132,8 @@ describe("InternshipModule", () => {
         expect(savedInternshipModule?.status).toEqual(
           InternshipModuleStatuses.POSTPONEMENT_REJECTED
         );
-        expect(savedInternshipModule?.inSemesterOfStudy).not.toEqual(lastSetSemesterOfStudy);
-        expect(savedInternshipModule?.inSemester).not.toEqual(lastSetSemester);
+        expect(savedInternshipModule?.inSemesterOfStudy).toEqual(lastSetSemesterOfStudy);
+        expect(savedInternshipModule?.inSemester).toEqual(lastSetSemester);
       });
       it("can not be accepted or rejected by a normal user", async () => {
         const internshipModule = await InternshipModule.findOne();
