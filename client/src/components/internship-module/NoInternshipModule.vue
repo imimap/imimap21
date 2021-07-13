@@ -5,8 +5,7 @@
     id="consentModal"
     tabindex="-1"
     aria-labelledby="consentModalLabel"
-    aria-hidden="true"
-  >
+    aria-hidden="true">
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
@@ -57,24 +56,23 @@
       <!-- Button trigger modal -->
       <button
         type="button"
-        class="btn btn-htw-green"
+        class="btn btn-htw-green my-3"
         data-bs-toggle="modal"
-        data-bs-target="#consentModal"
-      >
+        data-bs-target="#consentModal">
         Jetzt eintragen
       </button>
     </div>
-    <br>
-    <p class="text-center">ODER </p>
-    <p class="text-center">
-      <a
-        class="m-0 btn btn-outline-htw-green"
+    <div class="text-center">ODER </div>
+    <div class="text-center">
+      <router-link
+        class="mt-3 btn btn-outline-htw-green"
         data-method="get"
         href="/de/postponements/new"
+        :to="{name: 'CreatePostponement', params: { locale: $route.params.locale }}"
       >
         Verschiebung beantragen
-      </a>
-    </p>
+      </router-link>
+    </div>
   </div>
 </template>
 
@@ -82,7 +80,7 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'NoInternshipModuleComponent',
+  name: 'NoInternshipModule',
 });
 </script>
 
