@@ -73,7 +73,10 @@ const InternshipModuleSchema = new Schema<IInternshipModule>({
   },
   inSemester: String,
   inSemesterOfStudy: Number,
-  aepPassed: Boolean,
+  aepPassed: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 /*******************/
@@ -136,21 +139,24 @@ InternshipModuleSchema.methods.acceptPostponement = async function (
   const user = await User.findById(creator);
   if (!user?.isAdmin) throw new Error("Only Admins may accept a postponement.");
 
+  const recentPostponementRequest = this.events
+    .filter((e) => e.changes?.newSemester)
+    .reduce((event, next) => ((event.timestamp ?? 0) > (next.timestamp ?? 0) ? event : next));
+  this.inSemester = recentPostponementRequest.changes?.newSemester as string;
+  this.inSemesterOfStudy = recentPostponementRequest.changes?.newSemesterOfStudy as number;
+
   const event: IEvent = {
     creator: creator,
     accept: true,
     changes: {
+      newSemester: this.inSemester,
+      newSemesterOfStudy: this.inSemesterOfStudy,
       status: InternshipModuleStatuses.PLANNED,
     },
   };
   if (reason) event.comment = reason;
   this.events.push(event);
   this.status = InternshipModuleStatuses.PLANNED;
-  const recentPostponementRequest = this.events
-    .filter((e) => e.changes?.newSemester)
-    .reduce((event, next) => ((event.timestamp ?? 0) > (next.timestamp ?? 0) ? event : next));
-  this.inSemester = recentPostponementRequest.changes?.newSemester as string;
-  this.inSemesterOfStudy = recentPostponementRequest.changes?.newSemesterOfStudy as number;
 
   return this.save();
 };
