@@ -12,7 +12,7 @@ import Search from '@/views/Search.vue';
 import Admin from '@/views/Admin.vue';
 import UsersList from '@/components/admin/UsersList.vue';
 import CompaniesList from '@/components/admin/CompaniesList.vue';
-import PostponementsList from '@/components/admin/PostponementsList.vue';
+import * as AdminPostponementsList from '@/components/admin/PostponementsList.vue';
 import Dashboard from '@/components/admin/Dashboard.vue';
 import InternshipModule from '@/views/InternshipModule.vue';
 import CreateInternshipModule from '@/components/internship-module/CreateInternshipModule.vue';
@@ -161,7 +161,7 @@ const routes: Array<RouteRecordRaw> = [
           {
             path: 'postponements',
             name: 'AdminPostponementsList',
-            component: PostponementsList,
+            component: AdminPostponementsList.default,
           },
         ],
       },
