@@ -1,7 +1,5 @@
 // parse env variables before loading anything else
 import { config as dotenvConfig } from "dotenv";
-dotenvConfig({ path: "../.env" });
-
 import * as cors from "cors";
 import * as express from "express";
 import { NextFunction, Request, Response } from "express";
@@ -11,6 +9,8 @@ import router from "./routes";
 import database from "./database";
 import ldapStrategy from "./authentication/ldapStrategy";
 import localStrategy from "./authentication/localStrategy";
+
+dotenvConfig({ path: "../.env" });
 
 // load database
 (async () => await database())();
@@ -32,7 +32,7 @@ app.use("/api", router);
 
 // Catch 404 and forward to error handler
 app.use((req: Request, res: Response, next: NextFunction) => {
-  next(new NotFound());
+  next(new NotFound(`Path "${req.path}" not found`));
 });
 
 // Error handler
