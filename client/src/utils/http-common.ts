@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 
 const apiClient: AxiosInstance = axios.create({
-  baseURL: 'http://imimap.f4.htw-berlin.de:9000/api',
+  baseURL: 'https://imimap.f4.htw-berlin.de/api-proxy/api',
   headers: {
     'Content-type': 'application/json',
   },
