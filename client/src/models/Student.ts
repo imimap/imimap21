@@ -24,5 +24,5 @@ export default class Student {
     internship: {},
   };
 
-  internshipModule: InternshipModule = new InternshipModule();
+  internshipModule = {} as InternshipModule;
 }

@@ -1,5 +1,9 @@
+import Company from '@/models/Company';
+
 export default class Internship {
-  companyBranch = {};
+  company = '';
+
+  companyDetails = new Company();
 
   description = '';
 
