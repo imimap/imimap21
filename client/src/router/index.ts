@@ -21,6 +21,8 @@ import Postponements from '@/views/Postponements.vue';
 import PageNotFound from '@/views/PageNotFound.vue';
 import InternshipModuleIndex from '@/components/internship-module/InternshipModuleIndex.vue';
 import { availableLocales, defaultLocale } from '@/locales/locales';
+import Internship from '@/views/Internship.vue';
+import CreateInternship from '@/components/internship/CreateInternship.vue';
 
 // @TODO: Router auf Modules aufteilen
 const routes: Array<RouteRecordRaw> = [
@@ -59,6 +61,24 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           allowAnonymous: false,
         },
+      },
+      {
+        path: 'internships',
+        name: 'Internship',
+        component: Internship,
+        meta: {
+          allowAnonymous: false,
+        },
+        children: [
+          {
+            path: 'new',
+            name: 'CreateInternship',
+            component: CreateInternship,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+        ],
       },
       {
         path: 'internship-module',
