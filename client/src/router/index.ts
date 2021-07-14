@@ -20,9 +20,10 @@ import PostponementsList from '@/components/internship-module/PostponementsList.
 import Postponements from '@/views/Postponements.vue';
 import PageNotFound from '@/views/PageNotFound.vue';
 import InternshipModuleIndex from '@/components/internship-module/InternshipModuleIndex.vue';
-import { availableLocales, defaultLocale } from '@/locales/locales';
 import Internship from '@/views/Internship.vue';
 import CreateInternship from '@/components/internship/CreateInternship.vue';
+import EditInternship from '@/components/internship/EditInternship.vue';
+import { availableLocales, defaultLocale } from '@/locales/locales';
 
 // @TODO: Router auf Modules aufteilen
 const routes: Array<RouteRecordRaw> = [
@@ -74,6 +75,14 @@ const routes: Array<RouteRecordRaw> = [
             path: 'new',
             name: 'CreateInternship',
             component: CreateInternship,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+          {
+            path: 'edit/:id',
+            name: 'EditInternship',
+            component: EditInternship,
             meta: {
               allowAnonymous: false,
             },

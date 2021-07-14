@@ -303,14 +303,11 @@ function getInternshipObject(propsObject: any) {
     "livingCosts",
     "salary",
     "workingHoursPerWeek",
+    "programmingLanguages",
+    "paymentTypes",
   ];
   for (const prop of directProps) {
     if (propsObject[prop]) internshipProps[prop] = propsObject[prop];
-  }
-
-  const directArrayProps = ["programmingLanguages", "paymentTypes"];
-  for (const prop of directArrayProps) {
-    if (propsObject[prop]) internshipProps[prop] = propsObject[prop].toString().split(",");
   }
 
   //supervisor props
@@ -348,7 +345,7 @@ export async function createInternship(
   if (!user.studentProfile) return next(new NotFound("User does not appear to be a student"));
 
   // create new internship
-  const internshipProps = getInternshipObject(req.query);
+  const internshipProps = getInternshipObject(req.body);
   const newInternship = new Internship(internshipProps);
   newInternship.events = [
     {

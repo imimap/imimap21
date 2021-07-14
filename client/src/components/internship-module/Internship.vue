@@ -125,6 +125,11 @@
           </table>
         </div>
       </div>
+      <div class="my-3">
+        <router-link :to="{ name: 'EditInternship', params: { id: this.internship._id } }">
+          Bearbeiten
+        </router-link>
+      </div>
     </div>
   </div>
 </template>

@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { param, query } from "express-validator";
+import { body, param, query } from "express-validator";
 import authMiddleware from "../authentication/middleware";
 import {
+  createInternship,
   findInternships,
   getAllOperationalAreas,
   getAllPaymentTypes,
   getAllProgrammingLanguages,
   getInternshipsById,
-  createInternship,
 } from "../controllers/internship";
 import { validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
@@ -36,6 +36,7 @@ internshipRouter.get(
   asyncHandler(findInternships)
 );
 
+// @TODO: Wäre praktisch wenn die Company hier direkt gepopulated werden würde
 internshipRouter.get(
   "/:id",
   authMiddleware(),
@@ -47,7 +48,7 @@ internshipRouter.get(
 internshipRouter.post(
   "/",
   authMiddleware(),
-  query([
+  body([
     "startDate",
     "endDate",
     "tasks",
