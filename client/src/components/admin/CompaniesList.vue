@@ -5,10 +5,15 @@
 
         <div class="row mb-3">
           <div class="col-lg-3 col-md-12">
-            <select class="form-select" aria-label="Sortieren nach">
-              <option selected value="1">Sortieren nach...</option>
-              <option value="2">Name</option>
-              <option value="3">Ort</option>
+            <select class="form-select"
+                    aria-label="Sortieren nach"
+                    v-model="currentSorting"
+                    @change="changeSorting">
+              <option selected value="">Sortieren nach...</option>
+              <option value="companyName">Firmenname</option>
+              <option value="branchName">Zweigname</option>
+              <option value="city">Ort</option>
+              <option value="country">Staat</option>
             </select>
           </div>
         </div>
@@ -24,11 +29,15 @@
                       v-bind:aria-controls="'company-' + row.id">
                 <div class="container">
                   <div class="row">
-                    <div class="col-4">
-                      <h6 class="list-item-label">Name</h6>
+                    <div class="col-3">
+                      <h6 class="list-item-label">Unternehmen</h6>
                       <span class="fw-bold">{{ row.companyName }}</span>
                     </div>
-                    <div class="col-4">
+                    <div class="col-3">
+                      <h6 class="list-item-label">Zweig</h6>
+                      <span class="fw-bold">{{ row.branchName }}</span>
+                    </div>
+                    <div class="col-3">
                       <h6 class="list-item-label">Ort</h6>
                       <span class="fw-bold">
                         {{ row.address.city + ', ' + row.address.country }}
@@ -71,7 +80,7 @@
   </div>
 
   <!--  Company Edit Modal-->
-  <div class="modal fade" id="companyEditModal" tabindex="-1"
+  <div v-if="companies.length > 0" class="modal fade" id="companyEditModal" tabindex="-1"
        aria-labelledby="companyEditModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
@@ -200,63 +209,76 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { getCompaniesList } from '@/utils/gateways';
+import Company from '@/models/Company';
 
 export default defineComponent({
   name: 'CompaniesList',
   data() {
     return {
       currentEditCompanyIndex: 0,
-      companies: [{
-        id: 0,
-        companyName: 'Coding B.V.',
-        branchName: 'Coding B.V. Amsterdam',
-        industry: 'Web Development',
-        website: 'https://coding.nl',
-        mainLanguage: 'english',
-        comment: 'lorem ipsum',
-        excludedFromSearch: true,
-        size: 'LARGE',
-        address: {
-          street: 'Pannekokenstraat',
-          number: '38',
-          zip: '1234',
-          city: 'Amsterdam',
-          country: 'Netherlands',
-          latitude: 52.370216,
-          longitude: 4.895168,
-        },
-      },
-      {
-        id: 1,
-        companyName: '123VeryMuchCoding GmbH',
-        branchName: '123VeryMuchCoding GmbH Berlin',
-        industry: 'Web Development',
-        website: 'https://coding.de',
-        mainLanguage: 'german',
-        comment: '',
-        excludedFromSearch: false,
-        size: 'MEDIUM',
-        address: {
-          street: 'Unter den Linden',
-          number: '192',
-          zip: '12345',
-          city: 'Berlin',
-          country: 'Germany',
-          latitude: 52.520008,
-          longitude: 13.404954,
-        },
-      }],
+      companies: [] as Company[],
+      currentSorting: '',
     };
   },
+  mounted() {
+    this.updateList();
+  },
   methods: {
-    changeCurrentEditCompanyIndex(companyId: number) {
-      this.currentEditCompanyIndex = companyId;
+    updateList() {
+      // API call for GET list with params
+      getCompaniesList()
+        .then((list) => {
+          const companiesList = [] as Company[];
+          list.forEach((company) => {
+            companiesList.push({
+              id: company._id,
+              mainLanguage: company.mainLanguage,
+              excludedFromSearch: company.excludedFromSearch,
+              companyName: company.companyName,
+              branchName: company.branchName,
+              address: {
+                street: company.address.street,
+                streetNumber: company.address.streetNumber,
+                zip: company.address.zip,
+                city: company.address.city,
+                country: company.address.country,
+                additionalLines: company.address.additionalLines,
+                coordinates: {
+                  latitude: company.address.coordinates.latitude,
+                  longitude: company.address.coordinates.longitude,
+                },
+              },
+              emailAddress: company.emailAddress,
+              industry: company.industry,
+              website: company.website,
+              size: company.size,
+              comment: company.comment,
+            });
+          });
+          this.companies = companiesList;
+        }).catch((err) => console.log(err));
+    },
+    changeCurrentEditCompanyIndex(companyId: string) {
+      const index = this.companies.findIndex((x) => x.id === companyId);
+      this.currentEditCompanyIndex = index;
     },
     updateCompany(companyId: number) {
       // API POST call
       // update this.companies[companyId]
       console.log('updated ', this.companies[this.currentEditCompanyIndex].companyName);
       return true;
+    },
+    changeSorting() {
+      if (this.currentSorting === 'companyName' || this.currentSorting === 'branchName') {
+        this.companies
+          .sort((a, b) => a[this.currentSorting]
+            .localeCompare(b[this.currentSorting]));
+      } else if (this.currentSorting === 'city' || this.currentSorting === 'country') {
+        this.companies
+          .sort((a, b) => a.address[this.currentSorting]
+            .localeCompare(b.address[this.currentSorting]));
+      }
     },
   },
 });
