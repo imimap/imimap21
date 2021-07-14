@@ -57,14 +57,17 @@
           <div class="col">
             <label for="livingCosts">Lebensunterhaltskosten</label>
             <input v-model="livingCosts"
-                   type="text"
+                   type="number"
+                   min="0"
                    class="form-control"
                    id="livingCosts"
                    placeholder="Lebensunterhaltskosten"/>
           </div>
           <div class="col">
             <label for="workingHoursPerWeek">Arbeitsstunden pro Woche</label>
-            <input v-model="workingHoursPerWeek" type="text"
+            <input v-model="workingHoursPerWeek"
+                   type="number"
+                   min="0"
                    class="form-control"
                    id="workingHoursPerWeek"
                    placeholder="Arbeitsstunden pro Woche"/>
