@@ -2,12 +2,13 @@ import { Router } from "express";
 import { param, query } from "express-validator";
 import authMiddleware from "../authentication/middleware";
 import {
+  createInternship,
   findInternships,
   getAllOperationalAreas,
   getAllPaymentTypes,
   getAllProgrammingLanguages,
   getInternshipsById,
-  createInternship,
+  submitPdf,
 } from "../controllers/internship";
 import { validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
@@ -68,54 +69,61 @@ internshipRouter.post(
 );
 
 /* PDF endpoints */
-/*
 internshipRouter.post(
-  "/pdf/lsfEctsProof",
+  "/:id/pdf/request",
   authMiddleware(),
+  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
   validate,
-  asyncHandler(submitLsfEctsProofPdf)
+  asyncHandler(submitPdf("requestPdf"))
 );
- */
-/*
+
 internshipRouter.post(
-  "/pdf/locationJustification",
+  "/:id/pdf/lsfEctsProof",
   authMiddleware(),
+  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
   validate,
-  asyncHandler(submitlocationJustificationPdf)
+  asyncHandler(submitPdf("lsfEctsProofPdf"))
 );
- */
-/*
+
 internshipRouter.post(
-  "/pdf/contract",
+  "/:id/pdf/locationJustification",
   authMiddleware(),
+  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
   validate,
-  asyncHandler(submitContractPdf)
+  asyncHandler(submitPdf("locationJustificationPdf"))
 );
- */
-/*
+
 internshipRouter.post(
-  "/pdf/bvgTicketExemption",
+  "/:id/pdf/contract",
   authMiddleware(),
+  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
   validate,
-  asyncHandler(submitBvgTicketExemptionPdf)
+  asyncHandler(submitPdf("contractPdf"))
 );
- */
-/*
+
 internshipRouter.post(
-  "/pdf/certificate",
+  "/:id/pdf/bvgTicketExemption",
   authMiddleware(),
+  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
   validate,
-  asyncHandler(submitCertificatePdf)
+  asyncHandler(submitPdf("bvgTicketExemptionPdf"))
 );
- */
-/*
+
 internshipRouter.post(
-  "/pdf/reportPdf",
+  "/:id/pdf/certificate",
   authMiddleware(),
+  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
   validate,
-  asyncHandler(submitReportPdf)
+  asyncHandler(submitPdf("certificatePdf"))
 );
- */
+
+internshipRouter.post(
+  "/:id/pdf/report",
+  authMiddleware(),
+  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  validate,
+  asyncHandler(submitPdf("reportPdf"))
+);
 
 /* The following endpoints can be used to provide options to a search form */
 
