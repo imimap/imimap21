@@ -8,9 +8,8 @@ import {
   getAllPaymentTypes,
   getAllProgrammingLanguages,
   getInternshipsById,
-  createInternship,
-  updateInternship,
   submitPdf,
+  updateInternship,
 } from "../controllers/internship";
 import { validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
