@@ -5,7 +5,6 @@ import { IInternship, Internship, PaymentTypes } from "../models/internship";
 import { Semester } from "../helpers/semesterHelper";
 import { InternshipModule } from "../models/internshipModule";
 import { Types } from "mongoose";
-import { ISupervisor } from "../models/supervisor";
 
 const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
   "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes";
@@ -60,7 +59,7 @@ export async function getInternshipsById(
  * Returns as many internships as a student has left in their 12-internships contingent
  * All internships returned to students are added to the student's seen internships.
  * Returned internships are selected in order, not randomly - thus, always the same internships are
- * returned for certain query. Todo: add randomness.
+ * returned for certain query.
  * @param req
  * @param res
  * @param next
@@ -82,7 +81,7 @@ export async function findInternships(
   if (!user) return next(new NotFound("User not found"));
 
   // Create Options
-  const options: { [k: string]: any } = {};
+  const options: { [k: string]: unknown } = {};
 
   const companyQueryFields = [
     "companyName",
@@ -136,9 +135,6 @@ export async function findInternships(
     }
   }
 
-  console.log(options);
-  // Todo: apparently nested options don't seem to work, eg. company.address.country
-
   // Set select: Which fields to select?
   let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
   if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
@@ -149,22 +145,60 @@ export async function findInternships(
     limit = 12;
     limit = limit - user.studentProfile.internshipsSeen.length;
   }
-  if (limit <= 0) return next(new BadRequest("search limit reached"));
 
   // Set offset if applicable
   const offset = typeof req.query.offset === "string" && parseInt(req.query.offset);
-
-  // Query new internships
-  // todo: would be nice if it returned random internships out of all possible results
+  // Build projection for only showing specific fields of an internship
   const projection = select.split(" ").reduce((p: { [key: string]: unknown }, field) => {
     p[field] = 1;
     return p;
   }, {});
   projection.company = { $first: "$company" };
-  console.log("projection", projection);
-  console.log("limit", limit);
-  const internships = await Internship.aggregate([
-    // TODO: Add match on internship properties before lookup
+
+  // Query new internships
+  let internships;
+  if (limit <= 0) {
+    internships = [];
+  } else {
+    if (user.isAdmin) {
+      internships = await Internship.aggregate([
+        // TODO: Add match on internship properties before lookup
+        {
+          $lookup: {
+            from: "companies",
+            localField: "company",
+            foreignField: "_id",
+            as: "company",
+          },
+        },
+        { $project: projection },
+        { $match: options },
+      ])
+        .limit(limit || 50)
+        .skip(offset || 0);
+    } else {
+      internships = await Internship.aggregate([
+        {
+          $lookup: {
+            from: "companies",
+            localField: "company",
+            foreignField: "_id",
+            as: "company",
+          },
+        },
+        { $project: projection },
+        { $match: options },
+        { $sample: { size: limit } },
+      ]);
+    }
+  }
+
+  // Query internships that have already been viewed
+  options._id = {
+    $in: user.studentProfile?.internshipsSeen,
+  };
+
+  const internshipsSeenThatFitFilter = await Internship.aggregate([
     {
       $lookup: {
         from: "companies",
@@ -175,15 +209,7 @@ export async function findInternships(
     },
     { $project: projection },
     { $match: options },
-  ])
-    .limit(limit || 50)
-    .skip(offset || 0);
-
-  // Query internships that have already been viewed
-  options._id = {
-    $in: user.studentProfile?.internshipsSeen,
-  };
-  //const internshipsSeenThatFitFilter = await Internship.find(options).lean().select(select);
+  ]);
 
   // Add newly returned internships to internshipsSeen
   if (!user.isAdmin && user.studentProfile?.internshipsSeen && internships.length > 0) {
@@ -193,7 +219,7 @@ export async function findInternships(
 
   // Return all internships that one has already seen and that fit the filter together with as many
   // as possible other internships that one has not yet seen and that fit the filter
-  res.json(internships); //.concat(internshipsSeenThatFitFilter));
+  res.json(internships.concat(internshipsSeenThatFitFilter));
 }
 
 /**
@@ -308,7 +334,7 @@ export async function getAllProgrammingLanguages(
 }
 
 function getInternshipObject(propsObject: any) {
-  const internshipProps: { [k: string]: any } = {};
+  const internshipProps: { [k: string]: unknown } = {};
 
   //direct props of internship
   const directProps = [
@@ -330,11 +356,10 @@ function getInternshipObject(propsObject: any) {
   }
 
   //supervisor props
-  const supervisor: ISupervisor = {
+  internshipProps.supervisor = {
     fullName: propsObject.supervisorFullName,
     emailAddress: propsObject.supervisorEmailAddress,
   };
-  internshipProps.supervisor = supervisor;
 
   //company
   if (propsObject.companyId) internshipProps.company = propsObject.companyId;
