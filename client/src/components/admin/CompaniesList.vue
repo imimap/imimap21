@@ -66,10 +66,13 @@
                   {{ row.address.country }}<br>
                 </p>
 
-                <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                <button type="button" class="btn btn-success me-3" data-bs-toggle="modal"
                         data-bs-target="#companyEditModal"
                         @click="changeCurrentEditCompanyIndex(row.id)">
                   Bearbeiten</button>
+                <button type="button" class="btn btn-danger"
+                        @click="deleteCompany(row.id)">
+                  Löschen</button>
 
               </div>
             </div>
@@ -211,6 +214,7 @@
 import { defineComponent } from 'vue';
 import { getCompaniesList } from '@/utils/gateways';
 import Company from '@/models/Company';
+import store from '@/store';
 
 export default defineComponent({
   name: 'CompaniesList',
@@ -263,10 +267,32 @@ export default defineComponent({
       const index = this.companies.findIndex((x) => x.id === companyId);
       this.currentEditCompanyIndex = index;
     },
-    updateCompany(companyId: number) {
-      // API POST call
-      // update this.companies[companyId]
-      console.log('updated ', this.companies[this.currentEditCompanyIndex].companyName);
+    async updateCompany(companyId: string) {
+      const userDoubleChecked = window.confirm('Unternehmen wirklich aktualisieren?');
+      if (userDoubleChecked) {
+        // API POST call
+        await store.dispatch('addNotification', {
+          text: 'Unternehmen aktualisiert!',
+          type: 'success',
+        });
+        this.updateList();
+      } else {
+        console.log('cancel');
+      }
+      return true;
+    },
+    async deleteCompany(companyId: string) {
+      const userDoubleChecked = window.confirm('Unternehmen wirklich löschen?');
+      if (userDoubleChecked) {
+        // API call delete
+        await store.dispatch('addNotification', {
+          text: 'Unternehmen gelöscht!',
+          type: 'success',
+        });
+        this.updateList();
+      } else {
+        console.log('cancel');
+      }
       return true;
     },
     changeSorting() {
