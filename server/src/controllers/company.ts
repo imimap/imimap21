@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/user";
-import { Forbidden, NotFound} from "http-errors";
-import { Company} from "../models/company";
+import { Forbidden, NotFound } from "http-errors";
+import { Company } from "../models/company";
 
 /**
  * Returns all companies to admins
