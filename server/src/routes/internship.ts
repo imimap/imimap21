@@ -8,6 +8,8 @@ import {
   getAllPaymentTypes,
   getAllProgrammingLanguages,
   getInternshipsById,
+  createInternship,
+  updateInternship,
   submitPdf,
 } from "../controllers/internship";
 import { validate } from "../helpers/validation";
@@ -56,7 +58,6 @@ internshipRouter.post(
     "livingCosts",
     "salary",
     "workingHoursPerWeek",
-    "supervisor",
     "programmingLanguages", //array
     "paymentTypes", //enum, array
     //supervisor
@@ -66,6 +67,28 @@ internshipRouter.post(
   ]),
   validate,
   asyncHandler(createInternship)
+);
+
+internshipRouter.patch(
+  "/:id",
+  authMiddleware(),
+  param("id").custom((id) => /[0-9a-f]{24}/.test(id)),
+  query([
+    "startDate",
+    "endDate",
+    "tasks",
+    "operationalArea",
+    "livingCosts",
+    "salary",
+    "workingHoursPerWeek",
+    "programmingLanguages", //array
+    "paymentTypes", //enum, array
+    //supervisor
+    "supervisorFullName",
+    "supervisorEmailAddress",
+  ]),
+  validate,
+  asyncHandler(updateInternship)
 );
 
 /* PDF endpoints */
