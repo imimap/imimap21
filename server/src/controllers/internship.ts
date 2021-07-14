@@ -367,6 +367,6 @@ export async function createInternship(
   } else {
     user.studentProfile.internship.internships.push(newlyCreatedInternship._id);
   }
-  await user.save();
+  await user.studentProfile.internship.save();
   res.json(newlyCreatedInternship);
 }
