@@ -1,11 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/user";
 import { BadRequest, Forbidden, NotFound } from "http-errors";
-import { IInternship, Internship, PaymentTypes } from "../models/internship";
+import { IInternship, Internship, InternshipStatuses, PaymentTypes } from "../models/internship";
 import { Semester } from "../helpers/semesterHelper";
 import { InternshipModule } from "../models/internshipModule";
 import { Types } from "mongoose";
-import { ISupervisor } from "../models/supervisor";
 
 const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
   "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes";
@@ -60,7 +59,7 @@ export async function getInternshipsById(
  * Returns as many internships as a student has left in their 12-internships contingent
  * All internships returned to students are added to the student's seen internships.
  * Returned internships are selected in order, not randomly - thus, always the same internships are
- * returned for certain query. Todo: add randomness.
+ * returned for certain query.
  * @param req
  * @param res
  * @param next
@@ -82,16 +81,9 @@ export async function findInternships(
   if (!user) return next(new NotFound("User not found"));
 
   // Create Options
-  const options: { [k: string]: any } = {};
+  const options: { [k: string]: unknown } = {};
 
-  const companyQueryFields = [
-    "companyName",
-    "branchName",
-    "country",
-    "industry",
-    "mainLanguage",
-    "size",
-  ];
+  const companyQueryFields = ["companyName", "branchName", "industry", "mainLanguage", "size"];
   companyQueryFields.forEach((field) => {
     if (req.query[field])
       options[`company.${field}`] = {
@@ -136,9 +128,6 @@ export async function findInternships(
     }
   }
 
-  console.log(options);
-  // Todo: apparently nested options don't seem to work, eg. company.address.country
-
   // Set select: Which fields to select?
   let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
   if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
@@ -152,22 +141,68 @@ export async function findInternships(
 
   // Set offset if applicable
   const offset = typeof req.query.offset === "string" && parseInt(req.query.offset);
+  // Build projection for only showing specific fields of an internship
+  const projection = select.split(" ").reduce((p: { [key: string]: unknown }, field) => {
+    p[field] = 1;
+    return p;
+  }, {});
+  projection.company = { $first: "$company" };
 
   // Query new internships
-  // todo: would be nice if it returned random internships out of all possible results
-  const internships = await Internship.find(options)
-    .lean()
-    .select(select)
-    .limit(limit || 50)
-    .skip(offset || 0);
-
-  console.log(internships);
+  let internships;
+  if (limit <= 0) {
+    internships = [];
+  } else {
+    if (user.isAdmin) {
+      internships = await Internship.aggregate([
+        // TODO: Add match on internship properties before lookup
+        {
+          $lookup: {
+            from: "companies",
+            localField: "company",
+            foreignField: "_id",
+            as: "company",
+          },
+        },
+        { $project: projection },
+        { $match: options },
+      ])
+        .limit(limit || 50)
+        .skip(offset || 0);
+    } else {
+      internships = await Internship.aggregate([
+        {
+          $lookup: {
+            from: "companies",
+            localField: "company",
+            foreignField: "_id",
+            as: "company",
+          },
+        },
+        { $project: projection },
+        { $match: options },
+        { $sample: { size: limit } },
+      ]);
+    }
+  }
 
   // Query internships that have already been viewed
   options._id = {
     $in: user.studentProfile?.internshipsSeen,
   };
-  const internshipsSeenThatFitFilter = await Internship.find(options).lean().select(select);
+
+  const internshipsSeenThatFitFilter = await Internship.aggregate([
+    {
+      $lookup: {
+        from: "companies",
+        localField: "company",
+        foreignField: "_id",
+        as: "company",
+      },
+    },
+    { $project: projection },
+    { $match: options },
+  ]);
 
   // Add newly returned internships to internshipsSeen
   if (!user.isAdmin && user.studentProfile?.internshipsSeen && internships.length > 0) {
@@ -292,7 +327,7 @@ export async function getAllProgrammingLanguages(
 }
 
 function getInternshipObject(propsObject: any) {
-  const internshipProps: { [k: string]: any } = {};
+  const internshipProps: { [k: string]: unknown } = {};
 
   //direct props of internship
   const directProps = [
@@ -311,11 +346,10 @@ function getInternshipObject(propsObject: any) {
   }
 
   //supervisor props
-  const supervisor: ISupervisor = {
+  internshipProps.supervisor = {
     fullName: propsObject.supervisorFullName,
     emailAddress: propsObject.supervisorEmailAddress,
   };
-  internshipProps.supervisor = supervisor;
 
   //company
   if (propsObject.companyId) internshipProps.company = propsObject.companyId;
@@ -369,4 +403,68 @@ export async function createInternship(
   }
   await user.studentProfile.internship.save();
   res.json(newlyCreatedInternship);
+}
+
+/**
+ * Updates an internship
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function updateInternship(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email })
+    .select("isAdmin studentProfile")
+    .populate({
+      path: "studentProfile.internship",
+      lean: true,
+    });
+
+  if (!user) return next(new NotFound("User not found"));
+  if (!user.isAdmin) {
+    if (!user.studentProfile) return next(new NotFound("Student not found"));
+    if (!user.studentProfile.internship.internships.includes(req.params.id))
+      return next(new Forbidden("You may only edit your own internship"));
+  }
+
+  const internshipToUpdate = await Internship.findById(req.params.id);
+  if (!internshipToUpdate) return next(new NotFound("Internship not found"));
+
+  const mutableProps = ["salary", "paymentTypes", "livingCosts"];
+  if (
+    !user.isAdmin &&
+    internshipToUpdate.status !== InternshipStatuses.PLANNED &&
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    !Object.keys(req.query).every((prop: string) => mutableProps.includes(prop))
+  ) {
+    return next(
+      new Forbidden(
+        "You may only change certain properties after your internship has been approved. Please contact your internship officer."
+      )
+    );
+  }
+
+  for (const prop in req.query) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    if (req.query[prop]) internshipToUpdate[prop] = req.query[prop];
+  }
+
+  const internshipProps = getInternshipObject(req.query);
+  const updateEvent = {
+    creator: user._id,
+    changes: internshipProps,
+    comment: "Internship updated",
+  };
+
+  internshipToUpdate.events.push(updateEvent);
+
+  const savedInternship = await internshipToUpdate.save();
+  if (!savedInternship) return next(new BadRequest("Could not update internship"));
+
+  res.json(savedInternship);
 }
