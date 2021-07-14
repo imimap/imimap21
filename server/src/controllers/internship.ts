@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/user";
 import { BadRequest, Forbidden, NotFound } from "http-errors";
-import { IInternship, Internship, PaymentTypes } from "../models/internship";
+import { IInternship, Internship, InternshipStatuses, PaymentTypes } from "../models/internship";
 import { Semester } from "../helpers/semesterHelper";
 import { InternshipModule } from "../models/internshipModule";
 import { Types } from "mongoose";
@@ -393,12 +393,27 @@ export async function updateInternship(
   if (!user) return next(new NotFound("User not found"));
   if (!user.isAdmin) {
     if (!user.studentProfile) return next(new NotFound("Student not found"));
-    if (!user.studentProfile.internship.contains(req.params.id))
+    if (!user.studentProfile.internship.internships.includes(req.params.id))
       return next(new Forbidden("You may only edit your own internship"));
   }
 
   const internshipToUpdate = await Internship.findById(req.params.id);
   if (!internshipToUpdate) return next(new NotFound("Internship not found"));
+
+  const mutableProps = ["salary", "paymentTypes", "livingCosts"];
+  if (
+    !user.isAdmin &&
+    internshipToUpdate.status !== InternshipStatuses.PLANNED &&
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    !Object.keys(req.query).every((prop: string) => mutableProps.includes(prop))
+  ) {
+    return next(
+      new Forbidden(
+        "You may only change certain properties after your internship has been approved. Please contact your internship officer."
+      )
+    );
+  }
 
   for (const prop in req.query) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

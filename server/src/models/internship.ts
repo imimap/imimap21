@@ -33,9 +33,9 @@ export interface IInternship extends Document {
   tasks?: string;
   operationalArea?: string;
   programmingLanguages?: string[];
-  livingCosts?: number;
-  salary?: number;
-  paymentTypes?: string[];
+  livingCosts?: number; //änderbar
+  salary?: number; //änderbar
+  paymentTypes?: string[]; //änderbar
   workingHoursPerWeek?: number;
   supervisor?: ISupervisor;
   requestPdf?: IPdfDocument;
