@@ -14,9 +14,9 @@
                     Semester
                   </label>
                   <select class="form-control" id="internship_semester_id">
-                    <option value="2">WS 21/22</option>
-                    <option value="1">SS 21</option>
-                    <option value="3">WS 20/21</option>
+                    <option value="WS2021">WS 21/22</option>
+                    <option value="SS2022">SS 21</option>
+                    <option value="WS2022">WS 20/21</option>
                   </select>
                 </div>
               </div>
@@ -43,6 +43,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
+// @TODO: Companies abfragen, wenn nicht neue erstellen und ID einfügen
+// @TODO: Formularfelder sind optional, Formular macht zum bearbeiten aber dennoch Sinn
 export default defineComponent({
   name: 'CreateInternship',
   methods: {

@@ -10,32 +10,38 @@
       <div class="card-body">
         <table class="table table-sm table-borderless">
           <thead>
-          <tr>
-            <th scope="col" colspan="2">Modulnummer</th>
-            <th scope="col">Modulname</th>
-            <th scope="col">Status</th>
-          </tr>
+            <tr>
+              <th scope="col" colspan="2">Modulnummer</th>
+              <th scope="col">Modulname</th>
+              <th scope="col">Status</th>
+            </tr>
           </thead>
           <tbody>
-          <tr>
-            <th scope="row" colspan="2">B20</th>
-            <td>Praxisphase 1: Fachpraktikum im Ausland</td>
-            <td>
-              noch offen
-            </td>
-          </tr>
-          <tr>
-            <th></th>
-            <th scope="row">B20.1</th>
-            <td>Auswertung von Erfahrungen am Praxisplatz</td>
-            <td>noch offen</td>
-          </tr>
-          <tr>
-            <th></th>
-            <th scope="row">B20.2</th>
-            <td>Fachpraktikum</td>
-            <td>noch offen</td>
-          </tr>
+            <tr>
+              <th scope="row" colspan="2">B20</th>#
+              <!-- @TODO: internshipModule.status-->
+              <td>Praxisphase 1: Fachpraktikum im Ausland</td>
+              <td>
+                noch offen
+              </td>
+            </tr>
+            <tr>
+              <th></th>
+              <th scope="row">B20.1</th>
+              <!-- @TODO: internshipModule.aepPassed-->
+              <td>Auswertung von Erfahrungen am Praxisplatz</td>
+              <td>noch offen</td>
+            </tr>
+            <tr>
+              <th></th>
+              <th scope="row">B20.2</th>
+              <!--
+              @TODO: alle internships die den Status passed
+              @TODO: haben sollen zusammen eine Dauer von >= 16 Wochen haben
+              -->
+              <td>Fachpraktikum</td>
+              <td>noch offen</td>
+            </tr>
           </tbody>
         </table>
       </div>

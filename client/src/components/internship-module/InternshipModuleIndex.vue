@@ -1,18 +1,18 @@
 <template>
   <template v-if="loadingState !== true && internshipModule !== null">
     <!-- Kein Praktikum gefunden -->
-    <template v-if="internshipModule.status === 'unknown' || hasRequestedPostponements">
-      <no-complete-internship></no-complete-internship>
-      <!-- Kein Praktikum aber Verschiebungen -->
-      <postponements-list v-if="hasRequestedPostponements" v-bind:postponements="postponements" />
-    </template>
+    <no-complete-internship v-if="internshipModule.status === 'unknown'"/>
+    <!-- Kein Praktikum aber Verschiebungen -->
+    <postponements-list v-if="hasRequestedPostponements" v-bind:postponements="postponements"/>
     <!-- Praktikum gefunden -->
-    <complete-internship v-else v-bind:internshipModule="internshipModule"></complete-internship>
+    <complete-internship v-if="internshipModuleHasBeenPlanned"
+                         v-bind:internshipModule="internshipModule"/>
   </template>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { InternshipModule } from '@/store/types/InternshipModule';
 import http from '@/utils/http-common';
 import NoCompleteInternship from './NoInternshipModule.vue';
 import CompleteInternship from './InternshipModule.vue';
@@ -25,10 +25,11 @@ export default defineComponent({
     CompleteInternship,
     PostponementsList,
   },
-  data(): any {
+  // @TODO: Type Interfaces deklarieren
+  data() {
     return {
       loadingState: true,
-      internshipModule: null,
+      internshipModule: {} as InternshipModule,
     };
   },
   methods: {
@@ -48,11 +49,22 @@ export default defineComponent({
     this.getUserInternship();
   },
   computed: {
-    postponements(): any {
-      return this.internshipModule.events.filter((event) => event.changes?.newSemester);
+    // @TODO: postponement requested, postponement rejected, ansonsten als planned gekennzeichnet
+    // @TODO: Die Option zum erstelen eines Postponements sollte es immer geben
+    loadingStateComputed() {
+      return this.loadingState;
+    },
+    postponements() {
+      return this.internshipModule.events.filter((event) => event.changes?.status.includes('postponement'));
+    },
+    plannedInternshipModules() {
+      return this.internshipModule.events.filter((event) => event.changes?.status.includes('planned'));
     },
     hasRequestedPostponements(): boolean {
       return this.postponements.length > 0 && this.internshipModule.events.filter((event) => event.changes?.status !== 'planned').length > 0;
+    },
+    internshipModuleHasBeenPlanned(): boolean {
+      return this.plannedInternshipModules.length > 0;
     },
     hasInternships(): boolean {
       return this.internshipModule.internships.length > 0;
