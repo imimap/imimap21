@@ -104,10 +104,9 @@ export default defineComponent({
   methods: {
     getDurationOfPassedInternships(): number[] | null {
       if (this.passedInternships === null) return null;
-      const durations = this.passedInternships.flatMap(
-        (obj) => new Date(obj.startDate).getTime() - new Date(obj.endDate).getTime(),
+      return this.passedInternships.flatMap(
+        (obj) => new Date(obj.endDate).getTime() - new Date(obj.startDate).getTime(),
       );
-      return durations;
     },
   },
 });
