@@ -83,14 +83,7 @@ export async function findInternships(
   // Create Options
   const options: { [k: string]: unknown } = {};
 
-  const companyQueryFields = [
-    "companyName",
-    "branchName",
-    "country",
-    "industry",
-    "mainLanguage",
-    "size",
-  ];
+  const companyQueryFields = ["companyName", "branchName", "industry", "mainLanguage", "size"];
   companyQueryFields.forEach((field) => {
     if (req.query[field])
       options[`company.${field}`] = {
