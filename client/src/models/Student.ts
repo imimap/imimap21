@@ -9,6 +9,8 @@
 //   };
 // };
 
+import InternshipModule from '@/models/InternshipModule';
+
 export default class Student {
   firstName = '';
 
@@ -19,6 +21,8 @@ export default class Student {
   studentProfile = {
     internshipsSeen: [],
     studentId: '',
-    internship: '',
+    internship: {},
   };
+
+  internshipModule: InternshipModule = new InternshipModule();
 }

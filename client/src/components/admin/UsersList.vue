@@ -47,48 +47,6 @@
         </div>
 
         <div class="accordion" id="listAccordion">
-<!--          <div v-for="(row, index) in users" v-bind:key="index" class="accordion-item">-->
-<!--          <h2 class="accordion-header" v-bind:id="index">-->
-<!--            <button class="accordion-button collapsed"-->
-<!--                    type="button"-->
-<!--                    data-bs-toggle="collapse"-->
-<!--                    v-bind:data-bs-target="'#s0' + row.studentProfile.matrikelnummer"-->
-<!--                    aria-expanded="false"-->
-<!--                    v-bind:aria-controls="'s0' + row.studentProfile.matrikelnummer">-->
-<!--              <div class="container">-->
-<!--                <div class="row">-->
-<!--                  <div class="col-2">-->
-<!--                    <h6 class="list-item-label">Name</h6>-->
-<!--                    <span class="fw-bold">{{ row.firstName + " " + row.lastName }}</span>-->
-<!--                  </div>-->
-<!--                  <div class="col-2">-->
-<!--                    <h6 class="list-item-label">Matrikelnr.</h6>-->
-<!--                    <span class="">{{ row.studentProfile.matrikelnummer }}</span>-->
-<!--                  </div>-->
-<!--                  <div class="col-2">-->
-<!--                    <h6 class="list-item-label">Praktika</h6>-->
-<!--                    <span class="">-->
-<!--                        {{ row.studentProfile.internshipModule.internshipParts.length }}-->
-<!--                      </span>-->
-<!--                  </div>-->
-<!--                  <div class="col-2">-->
-<!--                    <h6 class="list-item-label">Gesamtdauer</h6>-->
-<!--                    <span class="">-->
-<!--                        {{ Math.floor(getInternshipModuleDuration(-->
-<!--                      row.studentProfile.internshipModule.internshipParts) / 7) }}-->
-<!--                              Wochen,-->
-<!--                              {{ Math.floor(getInternshipModuleDuration(-->
-<!--                      row.studentProfile.internshipModule.internshipParts)) % 7 }} Tage-->
-<!--                      </span>-->
-<!--                  </div>-->
-<!--                  <div class="col-2 text-center">-->
-<!--                    <h6 class="list-item-label">Status</h6>-->
-<!--                    <span class="badge rounded-pill bg-success">Vollständig</span>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </button>-->
-<!--          </h2>-->
           <div v-for="(row, index) in students" v-bind:key="index" class="accordion-item">
             <h2 class="accordion-header" v-bind:id="index">
               <button class="accordion-button collapsed"
@@ -110,24 +68,25 @@
                     <div class="col-2">
                       <h6 class="list-item-label">Praktika</h6>
                       <span class="">
-<!--      {{ row.studentProfile.internshipModule.internshipParts.length }}-->
-                        -
+                        {{ row.internshipModule.internships.length }}
                       </span>
                     </div>
                     <div class="col-2">
                       <h6 class="list-item-label">Gesamtdauer</h6>
                       <span class="">
-<!--    {{ Math.floor(getInternshipModuleDuration(-->
-<!--    row.studentProfile.internshipModule.internshipParts) / 7) }}-->
-<!--          Wochen,-->
-<!--          {{ Math.floor(getInternshipModuleDuration(-->
-<!--    row.studentProfile.internshipModule.internshipParts)) % 7 }} Tage-->
-                        -
+                        {{ getInternshipModuleDuration(row.internshipModule.internships) }}
                       </span>
                     </div>
                     <div class="col-2 text-center">
                       <h6 class="list-item-label">Status</h6>
-                      <span class="badge rounded-pill bg-success">Vollständig</span>
+                      <span v-if="row.internshipModule.status === 'planned'"
+                            class="badge rounded-pill bg-warning">
+                        {{ row.internshipModule.status }}
+                      </span>
+                      <span v-else
+                            class="badge rounded-pill bg-success">
+                        {{ row.internshipModule.status }}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -138,113 +97,116 @@
                  aria-labelledby="headingOne"
                  data-bs-parent="#listAccordion">
               <div class="accordion-body">
-<!--                <div class="container">-->
-<!--                  <div class="row">-->
-<!--                    <div class="col-8">-->
-<!--                      <h5>Praktika</h5>-->
-<!--                      <div v-for="(internship, internshipIndex) in-->
-<!--                      row.studentProfile.internshipModule.internshipParts"-->
-<!--                           v-bind:key="internshipIndex" class="card mb-3">-->
-<!--                        <div class="card-header">-->
-<!--                          {{ getDateString(internship.startDate) + ' - '-->
-<!--                        + getDateString(internship.endDate) }}-->
-<!--                          <span class="badge rounded-pill bg-secondary float-end">-->
-<!--                            Zugelassen-->
-<!--                          </span>-->
-<!--                        </div>-->
-<!--                        <div class="card-body">-->
-<!--                          <h5 class="card-title">-->
+                <div class="container">
+                  <div class="row">
+                    <div class="col-8">
+                      <h5>Praktika</h5>
+                      <div v-for="(internship, internshipIndex) in
+                      row.internshipModule.internships"
+                           v-bind:key="internshipIndex" class="card mb-3">
+                        <div class="card-header">
+                          {{ getDateString(internship.startDate) + ' - '
+                        + getDateString(internship.endDate) }}
+                          <span class="badge rounded-pill bg-secondary float-end">
+                            Zugelassen
+                          </span>
+                        </div>
+                        <div class="card-body">
+                          <h5 class="card-title">
 <!--                            {{ internship.companyBranch.companyName }}-->
-<!--                          </h5>-->
-<!--                          <h6 class="card-subtitle mb-2 text-muted">-->
+                            {{ internship.company }}
+                          </h5>
+                          <h6 class="card-subtitle mb-2 text-muted">
 <!--                            {{ internship.companyBranch.address.city }},-->
 <!--                            {{ internship.companyBranch.address.country }}-->
-<!--                          </h6>-->
-<!--                          <div class="row">-->
-<!--                            <div class="col-lg-4 col-md-12 mb-2">-->
-<!--                              <span class="fw-bold list-item-label">Dauer</span><br>-->
-<!--                              {{ Math.floor(getTimeDifferenceDays(internship.startDate,-->
-<!--                              internship.endDate) / 7) }}-->
-<!--                              Wochen,-->
-<!--                              {{ Math.floor(getTimeDifferenceDays(internship.startDate,-->
-<!--                              internship.endDate)) % 7 }}-->
-<!--                              Tage-->
-<!--                            </div>-->
-<!--                            <div class="col-lg-8 col-md-12 mb-2 status-internship-part">-->
-<!--                              <span class="fw-bold list-item-label">Status</span><br>-->
+                            {{ internship.company }},
+                            {{ internship.company }}
+                          </h6>
+                          <div class="row">
+                            <div class="col-lg-4 col-md-12 mb-2">
+                              <span class="fw-bold list-item-label">Dauer</span><br>
+                              {{ Math.floor(getTimeDifferenceDays(internship.startDate,
+                              internship.endDate) / 7) }}
+                              Wochen,
+                              {{ Math.floor(getTimeDifferenceDays(internship.startDate,
+                              internship.endDate)) % 7 }}
+                              Tage
+                            </div>
+                            <div class="col-lg-8 col-md-12 mb-2 status-internship-part">
+                              <span class="fw-bold list-item-label">Status</span><br>
 
-<!--                              <ul class="list-group">-->
-<!--                                <li class="list-group-item list-group-item-success">-->
-<!--                                  <svg xmlns="http://www.w3.org/2000/svg" width="16"-->
-<!--                                       height="16" fill="currentColor"-->
-<!--                                       class="bi bi-check-circle-fill" viewBox="0 0 16 16">-->
-<!--                                    <path d="M16 8A8 8 0 1-->
-<!-- 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75-->
-<!--                                    0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06-->
-<!--                                    1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75-->
-<!-- 0 0-->
-<!--                                    0-.01-1.05z"/>-->
-<!--                                  </svg>-->
-<!--                                  Antrag vorhanden</li>-->
-<!--                                <li class="list-group-item list-group-item-success">-->
-<!--                                  <svg xmlns="http://www.w3.org/2000/svg" width="16"-->
-<!--                                       height="16" fill="currentColor"-->
-<!--                                       class="bi bi-check-circle-fill" viewBox="0 0 16 16">-->
-<!--                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1-->
-<!--                                    16 0zm-3.97-3.03a.75.75-->
-<!--                                    0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06-->
-<!--                                    1.06L6.97 11.03a.75.75 0 0 0-->
-<!--                1.079-.02l3.992-4.99a.75.75 0 0-->
-<!--                                    0-.01-1.05z"/>-->
-<!--                                  </svg>-->
-<!--                                  <i class="bi bi-check-circle-fill"></i>-->
-<!--                                  Vertrag vorhanden</li>-->
-<!--                                <li class="list-group-item list-group-item-light">-->
-<!--                                  Zertifikat fehlt</li>-->
-<!--                              </ul>-->
-<!--                            </div>-->
-<!--                          </div>-->
-<!--                        </div>-->
-<!--                        <div class="card-footer">-->
-<!--                          <button class="btn btn-success btn-sm me-2"-->
-<!--                               @click="quickActionApproveApplicationOnInternshipPart(row.id,-->
-<!--                                  internship.id)">-->
-<!--                            Antrag genehmigen</button>-->
-<!--                          <button class="btn btn-success btn-sm me-2"-->
-<!--                                  @click="quickActionMarkAsCompletedOnInternshipPart(row.id,-->
-<!--                                  internship.id)">-->
-<!--                            Anrechenbar markieren</button>-->
-<!--                          <button type="button" class="btn btn-secondary btn-sm me-2"-->
-<!--                                  data-bs-toggle="modal"-->
-<!--                                  data-bs-target="#internshipPartEditModal"-->
-<!--                                  @click="changeCurrentEditInternshipPartIndex(row.id,-->
-<!--                                  internship.id)">-->
-<!--                            Details bearbeiten</button>-->
-<!--                          <button class="btn btn-danger btn-sm me-2"-->
-<!--                                  @click="deleteInternshipPart(row.id, internship.id)">-->
-<!--                            Löschen</button>-->
-<!--                        </div>-->
-<!--                      </div>-->
-<!--                    </div>-->
+                              <ul class="list-group">
+                                <li class="list-group-item list-group-item-success">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                       height="16" fill="currentColor"
+                                       class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                                    <path d="M16 8A8 8 0 1
+ 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75
+                                    0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06
+                                    1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75
+ 0 0
+                                    0-.01-1.05z"/>
+                                  </svg>
+                                  Antrag vorhanden</li>
+                                <li class="list-group-item list-group-item-success">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                       height="16" fill="currentColor"
+                                       class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1
+                                    16 0zm-3.97-3.03a.75.75
+                                    0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06
+                                    1.06L6.97 11.03a.75.75 0 0 0
+                1.079-.02l3.992-4.99a.75.75 0 0
+                                    0-.01-1.05z"/>
+                                  </svg>
+                                  <i class="bi bi-check-circle-fill"></i>
+                                  Vertrag vorhanden</li>
+                                <li class="list-group-item list-group-item-light">
+                                  Zertifikat fehlt</li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="card-footer">
+                          <button class="btn btn-success btn-sm me-2"
+                               @click="quickActionApproveApplicationOnInternshipPart(row.id,
+                                  internship.id)">
+                            Antrag genehmigen</button>
+                          <button class="btn btn-success btn-sm me-2"
+                                  @click="quickActionMarkAsCompletedOnInternshipPart(row.id,
+                                  internship.id)">
+                            Anrechenbar markieren</button>
+                          <button type="button" class="btn btn-secondary btn-sm me-2"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#internshipPartEditModal"
+                                  @click="changeCurrentEditInternshipPartIndex(row.id,
+                                  internship.id)">
+                            Details bearbeiten</button>
+                          <button class="btn btn-danger btn-sm me-2"
+                                  @click="deleteInternshipPart(row.id, internship.id)">
+                            Löschen</button>
+                        </div>
+                      </div>
+                    </div>
 
-<!--                    <div class="col-4">-->
-<!--                      <div class="d-grid gap-2 mt-4 col-8 mx-auto">-->
-<!--                        <button class="btn btn-success" type="button"-->
-<!--                                @click="quickActionMarkAepPassedOnInternshipModule(row.id)">-->
-<!--                          AEP bestanden markieren-->
-<!--                        </button>-->
-<!--                       <button type="button" class="btn btn-secondary" data-bs-toggle="modal"-->
-<!--                                data-bs-target="#internshipModuleEditModal"-->
-<!--                                @click="changeCurrentEditInternshipModuleIndex(row.id)">-->
-<!--                          Details bearbeiten</button>-->
-<!--                        <button class="btn btn-danger" type="button"-->
-<!--                                @click="deleteInternshipModule(row.id)">-->
-<!--                          Löschen-->
-<!--                        </button>-->
-<!--                      </div>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </div>-->
+                    <div class="col-4">
+                      <div class="d-grid gap-2 mt-4 col-8 mx-auto">
+                        <button class="btn btn-success" type="button"
+                                @click="quickActionMarkAepPassedOnInternshipModule(row.id)">
+                          AEP bestanden markieren
+                        </button>
+                       <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
+                                data-bs-target="#internshipModuleEditModal"
+                                @click="changeCurrentEditInternshipModuleIndex(row.id)">
+                          Details bearbeiten</button>
+                        <button class="btn btn-danger" type="button"
+                                @click="deleteInternshipModule(row.id)">
+                          Löschen
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -527,7 +489,7 @@
 import { defineComponent } from 'vue';
 import Internship from '@/models/Internship';
 import Student from '@/models/Student';
-import { getStudentsList } from '@/utils/gateways';
+import { getInternshipModule, getStudentsList } from '@/utils/gateways';
 import store from '@/store';
 
 export default defineComponent({
@@ -926,19 +888,24 @@ export default defineComponent({
       // API call for GET list with params
       getStudentsList()
         .then((list) => {
-          const studentsList = [] as Student[];
           list.forEach((user) => {
-            if ('studentProfile' in user) {
-              studentsList.push({
+            getInternshipModule(user.studentProfile.internship).then((internshipModule) => {
+              this.students.push({
                 firstName: user.firstName,
                 lastName: user.lastName,
                 emailAddress: user.emailAddress,
                 studentProfile: user.studentProfile,
+                internshipModule: {
+                  id: internshipModule._id,
+                  internships: internshipModule.internships,
+                  status: internshipModule.status,
+                  aepPassed: internshipModule.aepPassed,
+                  inSemester: internshipModule.inSemester,
+                  inSemesterOfStudy: internshipModule.inSemesterOfStudy,
+                },
               });
-            }
+            }).catch((err) => console.log(err));
           });
-          this.students = studentsList;
-          console.log(this.students);
         }).catch((err) => console.log(err));
     },
     getDateString(ISODateString: string) {
@@ -950,12 +917,15 @@ export default defineComponent({
       const endDate = new Date(end);
       return (endDate.getTime() - startDate.getTime()) / 1000 / 60 / 60 / 24;
     },
-    getInternshipModuleDuration(internshipParts: Internship[]) {
+    getInternshipModuleDuration(internships: Internship[]) {
       let durationSumInDays = 0;
-      internshipParts.forEach((internship) => {
+      internships.forEach((internship) => {
         durationSumInDays += this.getTimeDifferenceDays(internship.startDate, internship.endDate);
       });
-      return durationSumInDays;
+      const moduleDuration = durationSumInDays > 0
+        ? `${Math.floor(durationSumInDays / 7)} Wochen, ${Math.floor(durationSumInDays) % 7}Tage`
+        : '-';
+      return moduleDuration;
     },
     changeCurrentEditInternshipModuleIndex(internshipModuleId: number) {
       this.currentEditInternshipModuleIndex = internshipModuleId;
