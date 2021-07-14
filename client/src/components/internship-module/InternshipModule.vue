@@ -47,12 +47,19 @@
       </div>
     </div>
 
-    <div class="card-deck">
-      <InternshipComponent
-        v-for="internship in this.internshipModule.internships"
-        v-bind:key="internship._id"
-        v-bind:internship="internship"
-      />
+    <div class="row">
+      <div class="card-deck d-flex">
+        <InternshipComponent
+          v-for="internship in this.internshipModule.internships"
+          v-bind:key="internship._id"
+          v-bind:internship="internship"
+        />
+        <InternshipComponent
+          v-for="internship in this.internshipModule.internships"
+          v-bind:key="internship._id"
+          v-bind:internship="internship"
+        />
+      </div>
     </div>
     <div class="module-internship-options mt-3 mb-5 d-flex">
       <router-link :to="{name: 'CreateInternship'}">
@@ -73,21 +80,50 @@
 import { defineComponent, PropType } from 'vue';
 import InternshipComponent from '@/components/internship-module/Internship.vue';
 import { mapState } from 'vuex';
+import { InternshipModule } from '@/store/types/InternshipModule';
+import { Internship } from '@/store/types/Internship';
 
 export default defineComponent({
   name: 'InternshipModule',
   props: {
-    internshipModule: {} as PropType<{}>,
+    internshipModule: {} as PropType<InternshipModule>,
   },
   components: {
     InternshipComponent,
   },
-  computed: mapState(['userProfile']),
+  computed: {
+    ...mapState(['userProfile']),
+    durations(): number[] | null {
+      return this.getDurationOfPassedInternships();
+    },
+    passedInternships(): Internship[] | null {
+      if (typeof this.internshipModule === 'undefined') return null;
+      return this.internshipModule.internships.filter((internship) => internship.status === 'passed');
+    },
+  },
+  methods: {
+    getDurationOfPassedInternships(): number[] | null {
+      if (this.passedInternships === null) return null;
+      const durations = this.passedInternships.flatMap(
+        (obj) => new Date(obj.startDate).getTime() - new Date(obj.endDate).getTime(),
+      );
+      return durations;
+    },
+  },
 });
 </script>
 
 <style lang="scss">
 .module-internship-options {
   gap: 2rem;
+}
+
+.card-deck {
+  display: flex;
+  flex-direction: column;
+  @include media-breakpoint-up(md) {
+    flex-flow: row wrap;
+    gap: 2rem;
+  }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="card border-htw-green">
+  <div class="card internship-card border-htw-green">
     <div class="card-header">
       <h5 class="card-title " id="h5_block">Praktikum @
         Hasse UG</h5>
@@ -151,5 +151,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-
+.internship-card {
+  flex: 0 0 calc(50% - 1rem);
+}
 </style>
