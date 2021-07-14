@@ -12,7 +12,6 @@ import {
   getCities,
   getCompanyById,
 } from "../controllers/company";
-import { getInternshipsById } from "../controllers/internship";
 
 const companyRouter = Router();
 
