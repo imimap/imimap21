@@ -62,11 +62,11 @@
   </div>
 </template>
 
-<script  lang="ts">
+<script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import InternshipComponent from '@/components/internship-module/Internship.vue';
 import { mapState } from 'vuex';
-// @TODO: Intership Informationen als Props entgegennehmen
+
 export default defineComponent({
   name: 'InternshipModule',
   props: {
