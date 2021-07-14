@@ -4,11 +4,16 @@ import {
   RouteRecordRaw,
 } from 'vue-router';
 import {
-  getAuthToken, getAuthUserProfile, isLoggedIn, storeAuthUser,
+  getAuthToken, getAuthUserProfile, isAdmin, isLoggedIn, storeAuthUser,
 } from '@/utils/auth';
 import Layout from '@/layouts/Layout.vue';
 import Home from '@/views/Home.vue';
 import Search from '@/views/Search.vue';
+import Admin from '@/views/Admin.vue';
+import UsersList from '@/components/admin/UsersList.vue';
+import CompaniesList from '@/components/admin/CompaniesList.vue';
+import * as AdminPostponementsList from '@/components/admin/PostponementsList.vue';
+import Dashboard from '@/components/admin/Dashboard.vue';
 import InternshipModule from '@/views/InternshipModule.vue';
 import CreateInternshipModule from '@/components/internship-module/CreateInternshipModule.vue';
 import Login from '@/views/Login.vue';
@@ -21,6 +26,8 @@ import Postponements from '@/views/Postponements.vue';
 import PageNotFound from '@/views/PageNotFound.vue';
 import InternshipModuleIndex from '@/components/internship-module/InternshipModuleIndex.vue';
 import { availableLocales, defaultLocale } from '@/locales/locales';
+import Internship from '@/views/Internship.vue';
+import CreateInternship from '@/components/internship/CreateInternship.vue';
 
 // @TODO: Router auf Modules aufteilen
 const routes: Array<RouteRecordRaw> = [
@@ -59,6 +66,24 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           allowAnonymous: false,
         },
+      },
+      {
+        path: 'internships',
+        name: 'Internship',
+        component: Internship,
+        meta: {
+          allowAnonymous: false,
+        },
+        children: [
+          {
+            path: 'new',
+            name: 'CreateInternship',
+            component: CreateInternship,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+        ],
       },
       {
         path: 'internship-module',
@@ -128,6 +153,38 @@ const routes: Array<RouteRecordRaw> = [
           allowAnonymous: false,
         },
       },
+      {
+        path: 'admin',
+        name: 'Admin',
+        component: Admin,
+        meta: {
+          allowAnonymous: false,
+        },
+        // Todo: Props for direct filtering on users, companies and postponements when navigating
+        //  from dashboard
+        children: [
+          {
+            path: 'dashboard',
+            name: 'Dashboard',
+            component: Dashboard,
+          },
+          {
+            path: 'users',
+            name: 'AdminUsersList',
+            component: UsersList,
+          },
+          {
+            path: 'companies',
+            name: 'AdminCompaniesList',
+            component: CompaniesList,
+          },
+          {
+            path: 'postponements',
+            name: 'AdminPostponementsList',
+            component: AdminPostponementsList.default,
+          },
+        ],
+      },
     ],
   },
   { path: '/:pathMatch(.*)*', component: PageNotFound },
@@ -143,6 +200,28 @@ router.beforeEach(async (to, from, next) => {
   if (!to.meta.allowAnonymous && !isLoggedIn()) {
     next({
       name: 'Login',
+      params: { locale: to.params.locale },
+    });
+  } else {
+    next();
+  }
+});
+
+router.beforeEach(async (to, from, next) => {
+  if (to.path.includes('admin') && !isAdmin()) {
+    next({
+      name: 'Home',
+      params: { locale: to.params.locale },
+    });
+  } else {
+    next();
+  }
+});
+
+router.beforeEach(async (to, from, next) => {
+  if (to.name === 'Admin' && !to.meta.allowAnonymous && isLoggedIn()) {
+    next({
+      name: 'AdminUsersList',
       params: { locale: to.params.locale },
     });
   } else {

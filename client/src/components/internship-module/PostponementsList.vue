@@ -47,7 +47,7 @@ export default defineComponent({
   methods: {
     getPostponementStatusClass(postponement) {
       if (postponement.changes.status === 'postponement requested') return 'bg-warning';
-      if (postponement.changes.status === 'postponement accepted') return 'bg-success';
+      if (postponement.changes.status === 'planned') return 'bg-success';
       return null;
     },
   },

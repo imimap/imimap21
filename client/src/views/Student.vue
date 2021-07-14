@@ -80,7 +80,7 @@
             data-disable-with="Informationen speichern"
             v-on:click="save()"
           >
-            Infornationen speichern
+            Informationen speichern
           </button>
         </div>
       </div>

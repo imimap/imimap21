@@ -29,6 +29,26 @@ export async function getAllCompanies(
   res.json(companies);
 }
 
+export async function getCompanyById(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
+  if (!user) return next(new NotFound("User not found"));
+  if (!user.isAdmin) return next(new Forbidden("Only admins may get all company details."));
+
+  const companyId = req.params.id.toString();
+
+  if (user.isAdmin) {
+    const company = await Company.findById(companyId).lean();
+    if (!company) return next(new NotFound("Company not found"));
+    res.json(company);
+  } else {
+    return next(new Forbidden("You are not allowed to fetch company details."));
+  }
+}
+
 /**
  * Returns all cities or cities in a specific countries
  * Returns only cities that are internship locations
