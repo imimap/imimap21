@@ -95,6 +95,20 @@
 
                 <h4>Grund</h4>
                 <p>{{ row.studentProfile.internshipModule.events[0].reason }}</p>
+
+                <div class="mt-3">
+                  <button
+                    class="btn btn-success me-3"
+                    @click="() => approvePostponementRequest(1)">
+                    Annehmen
+                  </button>
+
+                  <button
+                    class="btn btn-danger"
+                    @click="() => rejectPostponementRequest(1)">
+                    Ablehnen
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -106,6 +120,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import store from '@/store';
 
 export default defineComponent({
   name: 'PostponementsList',
@@ -143,6 +158,32 @@ export default defineComponent({
     };
   },
   methods: {
+    async approvePostponementRequest(requestId: number) {
+      const userDoubleChecked = window.confirm('Verschiebungsantrag wirklich genehmigen?');
+      if (userDoubleChecked) {
+        console.log('Antrag genehmigt!');
+        await store.dispatch('addNotification', {
+          text: 'Der Antrag wurde genehmigt.',
+          type: 'success',
+        });
+      } else {
+        console.log('cancel');
+      }
+      return true;
+    },
+    async rejectPostponementRequest(requestId: number) {
+      const userDoubleChecked = window.confirm('Verschiebungsantrag wirklich ablehnen?');
+      if (userDoubleChecked) {
+        console.log('Antrag abgelehnt!');
+        await store.dispatch('addNotification', {
+          text: 'Der Antrag wurde abgelehnt.',
+          type: 'success',
+        });
+      } else {
+        console.log('cancel');
+      }
+      return true;
+    },
   },
 });
 </script>
