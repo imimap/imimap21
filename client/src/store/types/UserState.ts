@@ -4,4 +4,5 @@ export interface UserState {
   id: string;
   lastName: string;
   sub: string;
+  role: number;
 }

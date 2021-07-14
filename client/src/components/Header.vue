@@ -88,6 +88,14 @@
                         {{ $t("header.headerLinks.myInternship") }}
                       </router-link>
                     </li>
+                    <li v-if="currentUserIsAdmin()" class="nav-item imi-nav-item">
+                      <router-link
+                        class="nav-link imi-nav-link imi-map-navlink admin-link"
+                        :to="{name: 'Admin', params: { locale: $route.params.locale }}"
+                      >
+                        {{ $t("header.headerLinks.administration") }}
+                      </router-link>
+                    </li>
                   </ul>
                 </div>
               </nav>
@@ -101,7 +109,7 @@
 
 <script  lang="ts">
 import { defineComponent } from 'vue';
-import { logoutUser } from '@/utils/auth';
+import { logoutUser, isAdmin } from '@/utils/auth';
 
 export default defineComponent({
   name: 'Header',
@@ -115,6 +123,9 @@ export default defineComponent({
       this.$store.commit('resetUser');
       this.$store.dispatch('addNotification', { text: 'Du wurdest erfolgreich ausgeloggt!', type: 'success' });
       this.$router.push({ name: 'Login' });
+    },
+    currentUserIsAdmin() {
+      return isAdmin();
     },
   },
 });
@@ -244,7 +255,8 @@ export default defineComponent({
   }
 }
 
-#imi-maps-navbar-main .router-link-exact-active {
+#imi-maps-navbar-main .router-link-exact-active,
+#imi-maps-navbar-main .admin-link.router-link-active {
   text-decoration: none;
   border-bottom: 1px solid #77b900;
 }
