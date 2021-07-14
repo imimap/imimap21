@@ -1,3 +1,4 @@
+import { Route, Router } from 'vue-router';
 import type { DefineComponent } from 'vue';
 import { Store } from 'vuex';
 import VueProgressBar from '@aacassandra/vue3-progressbar';
@@ -5,12 +6,6 @@ import VueProgressBar from '@aacassandra/vue3-progressbar';
 declare module '*.vue' {
   const component: DefineComponent<{}, {}, any>;
   export default component;
-}
-
-declare module '*.vue' {
-  import Vue from 'vue';
-
-  export default Vue;
 }
 
 declare module '@vue-leaflet/vue-leaflet' {

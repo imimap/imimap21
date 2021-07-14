@@ -10,6 +10,7 @@ export const userState: UserState = {
   id: '',
   lastName: '',
   sub: '',
+  role: 0,
 };
 
 export const getters: GetterTree<UserState, RootState> = {

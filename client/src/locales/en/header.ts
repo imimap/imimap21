@@ -3,6 +3,7 @@ const header = {
     start: 'Start',
     internshipSearch: 'Internship Search',
     myInternship: 'My Internship',
+    administration: 'Administration',
   },
 };
 

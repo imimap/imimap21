@@ -45,6 +45,11 @@ export function getUserInfo(): UserState | null {
   return null;
 }
 
+export function isAdmin(): boolean {
+  const user = getUserInfo();
+  return !!user && user.role === 1;
+}
+
 export function logoutUser() {
   clearAuthToken();
 }
