@@ -1,5 +1,6 @@
 <template>
-  <div id="form-block4" class="text-left">
+  <div class="container">
+    <div id="form-block4" class="text-left">
       <h3>Deine beantragten Verschiebungen</h3>
       <div class="row mt-3">
         <table class="table">
@@ -28,6 +29,7 @@
           </tbody>
         </table>
       </div>
+    </div>
   </div>
 </template>
 

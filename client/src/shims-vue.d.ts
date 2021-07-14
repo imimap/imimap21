@@ -7,6 +7,12 @@ declare module '*.vue' {
   export default component;
 }
 
+declare module '*.vue' {
+  import Vue from 'vue';
+
+  export default Vue;
+}
+
 declare module '@vue-leaflet/vue-leaflet' {
   export const LMap: DefineComponent;
   export const LIcon: DefineComponent;

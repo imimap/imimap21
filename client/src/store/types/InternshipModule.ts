@@ -1,3 +1,5 @@
+import { Event } from '@/store/types/Event';
+
 export interface InternshipModule {
   _id: string;
   internships: { [key: string]: unknown }[];
@@ -6,6 +8,6 @@ export interface InternshipModule {
   aepPassed: boolean;
   reportPdf: { [key: string]: unknown };
   completeDocumentsPdf: { [key: string]: unknown };
-  events: { [key: string]: unknown }[];
+  events: Event[];
   status: string;
 }

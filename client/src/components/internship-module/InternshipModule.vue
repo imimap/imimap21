@@ -18,11 +18,11 @@
           </thead>
           <tbody>
             <tr>
-              <th scope="row" colspan="2">B20</th>#
+              <th scope="row" colspan="2">B20</th>
               <!-- @TODO: internshipModule.status-->
               <td>Praxisphase 1: Fachpraktikum im Ausland</td>
               <td>
-                noch offen
+                {{ internshipModule.status !== 'passed' ? 'noch offen' : 'bestanden' }}
               </td>
             </tr>
             <tr>
@@ -30,7 +30,7 @@
               <th scope="row">B20.1</th>
               <!-- @TODO: internshipModule.aepPassed-->
               <td>Auswertung von Erfahrungen am Praxisplatz</td>
-              <td>noch offen</td>
+              <td>{{ internshipModule.aepPassed ? 'bestanden' : 'noch offen'}}</td>
             </tr>
             <tr>
               <th></th>
@@ -54,14 +54,15 @@
         v-bind:internship="internship"
       />
     </div>
-    <div class="mt-3 mb-5">
+    <div class="module-internship-options mt-3 mb-5 d-flex">
       <router-link :to="{name: 'CreateInternship'}">
-        Weiteres Teilpraktikum eintragen.
+        Weiteres Teilpraktikum eintragen
+      </router-link>
+      <router-link :to="{ name: 'CreatePostponement' }">
+        Weitere Verschiebung beantragen
       </router-link>
     </div>
     <div>
-      <a href="/de/complete_internships/80/edit">Bearbeiten</a>
-      |
       <a href="javascript:history.back()">Zurück</a>
     </div>
   </div>
@@ -86,5 +87,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-
+.module-internship-options {
+  gap: 2rem;
+}
 </style>

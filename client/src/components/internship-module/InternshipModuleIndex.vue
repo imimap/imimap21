@@ -13,6 +13,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { InternshipModule } from '@/store/types/InternshipModule';
+import { Event } from '@/store/types/Event';
 import http from '@/utils/http-common';
 import NoCompleteInternship from './NoInternshipModule.vue';
 import CompleteInternship from './InternshipModule.vue';
@@ -51,17 +52,17 @@ export default defineComponent({
   computed: {
     // @TODO: postponement requested, postponement rejected, ansonsten als planned gekennzeichnet
     // @TODO: Die Option zum erstelen eines Postponements sollte es immer geben
-    loadingStateComputed() {
+    loadingStateComputed(): boolean {
       return this.loadingState;
     },
-    postponements() {
-      return this.internshipModule.events.filter((event) => event.changes?.status.includes('postponement'));
+    postponements(): Event[] {
+      return this.internshipModule.events.filter((event) => event.changes.status.includes('postponement'));
     },
-    plannedInternshipModules() {
-      return this.internshipModule.events.filter((event) => event.changes?.status.includes('planned'));
+    plannedInternshipModules(): Event[] {
+      return this.internshipModule.events.filter((event) => event.changes.status.includes('planned'));
     },
     hasRequestedPostponements(): boolean {
-      return this.postponements.length > 0 && this.internshipModule.events.filter((event) => event.changes?.status !== 'planned').length > 0;
+      return this.postponements.length > 0;
     },
     internshipModuleHasBeenPlanned(): boolean {
       return this.plannedInternshipModules.length > 0;
