@@ -13,6 +13,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: "master"
 
       - name: Deploy to Docker remote host
         uses: Kaes3kuch3n/docker-deployment-action@v3
