@@ -46,7 +46,7 @@
           </div>
         </div>
 
-        <div class="accordion" id="listAccordion">
+        <div v-if="!isLoading" class="accordion" id="listAccordion">
           <div v-for="(row, index) in students" v-bind:key="index" class="accordion-item">
             <h2 class="accordion-header" v-bind:id="index">
               <button class="accordion-button collapsed"
@@ -203,6 +203,11 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+        <div v-else class="d-flex justify-content-center">
+          <div class="spinner-border text-htw" role="status">
+            <span class="visually-hidden">Loading...</span>
           </div>
         </div>
       </div>
@@ -529,84 +534,7 @@ export default defineComponent({
                 .company);
           }
         }
-        // studentList.map(async (student) => {
-        //   const studentWithInternshipModule = { ...student };
-        //   studentWithInternshipModule.internshipModule = await getInternshipModule(
-        //     student.studentProfile.internship,
-        //   );
-        //   studentWithInternshipModule.internshipModule.internships.map(async (internship) => {
-        //     const internshipWithCompany = { ...internship };
-        //     internshipWithCompany.companyDetails = await getCompany(internship.company);
-        //     return internshipWithCompany;
-        //   });
-        //   return studentWithInternshipModule;
-        // });
         this.students = studentList;
-        // console.log('internshipModule' in this.students[0]);
-        // console.log(Object.keys(this.students[0]));
-        // console.log(this.students);
-
-        // this.students = studentList;
-        // eslint-disable-next-line no-restricted-syntax,guard-for-in
-        // for (const [student, studentIndex] in studentList) {
-        //   studentList[studentIndex]
-        //     // eslint-disable-next-line no-await-in-loop
-        //     .internshipModule = await getInternshipModule(student.studentProfile.internship);
-        //   // eslint-disable-next-line no-restricted-syntax,guard-for-in
-        //   for (const [internship, internshipIndex] in studentList[studentIndex]
-        //     .internshipModule.internships) {
-        //     studentList[studentIndex]
-        //       .internshipModule
-        //       .internships[internshipIndex]
-        //       // eslint-disable-next-line no-await-in-loop
-        //       .companyDetails = await getCompany(studentList[studentIndex]
-        //         .internshipModule
-        //         .internships[internshipIndex].company);
-        //   }
-        //
-        //   this.students.push({
-        //     firstName: student.firstName,
-        //     lastName: student.lastName,
-        //     emailAddress: student.emailAddress,
-        //     studentProfile: student.studentProfile,
-        //     internshipModule: {
-        //       id: student[studentIndex].internshipModule._id,
-        //       internships: student[studentIndex].internshipModule.internships,
-        //       status: student[studentIndex].internshipModule.status,
-        //       aepPassed: student[studentIndex].internshipModule.aepPassed,
-        //       inSemester: student[studentIndex].internshipModule.inSemester,
-        //       inSemesterOfStudy: student[studentIndex].internshipModule.inSemesterOfStudy,
-        //     },
-        //   });
-        // }
-        // console.log(this.students);
-        // studentList.forEach((student, index) => {
-        // studentList[index]
-        //   .internshipModule = await getInternshipModule(student.studentProfile.internship);
-        // .then(async (internshipModule) => {
-        // const internshipsWithCompany: Internship[] = [];
-        // internshipModule.internships.forEach((internship, index) => {
-        //   internshipsWithCompany[index] = internship;
-        //   internshipsWithCompany[index]
-        //     .companyDetails = getCompany(internship.company);
-        // });
-        // this.students.push({
-        //   firstName: student.firstName,
-        //   lastName: student.lastName,
-        //   emailAddress: student.emailAddress,
-        //   studentProfile: student.studentProfile,
-        //   internshipModule: {
-        //     id: internshipModule._id,
-        //     internships: internshipsWithCompany,
-        //     status: internshipModule.status,
-        //     aepPassed: internshipModule.aepPassed,
-        //     inSemester: internshipModule.inSemester,
-        //     inSemesterOfStudy: internshipModule.inSemesterOfStudy,
-        //   },
-        // });
-        // console.log(this.students);
-        // }).catch((err) => console.log(err));
-        // });
       } catch (err) {
         console.log(err);
       }
@@ -744,6 +672,12 @@ export default defineComponent({
     font-size: 0.8rem;
     color: #666666;
     text-transform: uppercase;
+  }
+
+  .text-htw {
+    color: rgba(119, 185, 0, 1);
+    width: 3rem;
+    height: 3rem;
   }
 
 </style>
