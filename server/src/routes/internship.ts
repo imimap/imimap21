@@ -8,6 +8,7 @@ import {
   getAllProgrammingLanguages,
   getInternshipsById,
   createInternship,
+  updateInternship,
 } from "../controllers/internship";
 import { validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
@@ -55,7 +56,6 @@ internshipRouter.post(
     "livingCosts",
     "salary",
     "workingHoursPerWeek",
-    "supervisor",
     "programmingLanguages", //array
     "paymentTypes", //enum, array
     //supervisor
@@ -65,6 +65,28 @@ internshipRouter.post(
   ]),
   validate,
   asyncHandler(createInternship)
+);
+
+internshipRouter.patch(
+  "/:id",
+  authMiddleware(),
+  param("id").custom((id) => /[0-9a-f]{24}/.test(id)),
+  query([
+    "startDate",
+    "endDate",
+    "tasks",
+    "operationalArea",
+    "livingCosts",
+    "salary",
+    "workingHoursPerWeek",
+    "programmingLanguages", //array
+    "paymentTypes", //enum, array
+    //supervisor
+    "supervisorFullName",
+    "supervisorEmailAddress",
+  ]),
+  validate,
+  asyncHandler(updateInternship)
 );
 
 /* PDF endpoints */
