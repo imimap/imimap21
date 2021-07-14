@@ -149,25 +149,41 @@ export async function findInternships(
     limit = 12;
     limit = limit - user.studentProfile.internshipsSeen.length;
   }
+  if (limit <= 0) return next(new BadRequest("search limit reached"));
 
   // Set offset if applicable
   const offset = typeof req.query.offset === "string" && parseInt(req.query.offset);
 
   // Query new internships
   // todo: would be nice if it returned random internships out of all possible results
-  const internships = await Internship.find(options)
-    .lean()
-    .select(select)
+  const projection = select.split(" ").reduce((p: { [key: string]: unknown }, field) => {
+    p[field] = 1;
+    return p;
+  }, {});
+  projection.company = { $first: "$company" };
+  console.log("projection", projection);
+  console.log("limit", limit);
+  const internships = await Internship.aggregate([
+    // TODO: Add match on internship properties before lookup
+    {
+      $lookup: {
+        from: "companies",
+        localField: "company",
+        foreignField: "_id",
+        as: "company",
+      },
+    },
+    { $project: projection },
+    { $match: options },
+  ])
     .limit(limit || 50)
     .skip(offset || 0);
-
-  console.log(internships);
 
   // Query internships that have already been viewed
   options._id = {
     $in: user.studentProfile?.internshipsSeen,
   };
-  const internshipsSeenThatFitFilter = await Internship.find(options).lean().select(select);
+  //const internshipsSeenThatFitFilter = await Internship.find(options).lean().select(select);
 
   // Add newly returned internships to internshipsSeen
   if (!user.isAdmin && user.studentProfile?.internshipsSeen && internships.length > 0) {
@@ -177,7 +193,7 @@ export async function findInternships(
 
   // Return all internships that one has already seen and that fit the filter together with as many
   // as possible other internships that one has not yet seen and that fit the filter
-  res.json(internships.concat(internshipsSeenThatFitFilter));
+  res.json(internships); //.concat(internshipsSeenThatFitFilter));
 }
 
 /**
