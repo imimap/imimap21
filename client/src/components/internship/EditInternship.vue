@@ -1,6 +1,6 @@
 <template>
   <div class="container clear-top">
-    <div id="form-block4">
+    <div id="form-block4" v-if="!loadingState">
       <h3>Praktikum bearbeiten</h3>
       <form v-on:submit.prevent>
         <div class="row my-4">
@@ -57,14 +57,16 @@
           <div class="col">
             <label for="livingCosts">Lebensunterhaltskosten</label>
             <input v-model="livingCosts"
-                   type="text"
+                   type="number"
+                   min="0"
                    class="form-control"
                    id="livingCosts"
                    placeholder="Lebensunterhaltskosten"/>
           </div>
           <div class="col">
             <label for="workingHoursPerWeek">Arbeitsstunden pro Woche</label>
-            <input v-model="workingHoursPerWeek" type="text"
+            <input v-model="workingHoursPerWeek"
+                   min="0"
                    class="form-control"
                    id="workingHoursPerWeek"
                    placeholder="Arbeitsstunden pro Woche"/>
@@ -153,8 +155,8 @@ export default defineComponent({
     async getInternship() {
       try {
         const res = await http.get(`/internships/${this.$route.params.id}`);
-        this.startDate = new Date(res.data.startDate).toString();
-        this.endDate = new Date(res.data.endDate).toString();
+        this.startDate = new Date(res.data.startDate).toISOString().split('T')[0].toString();
+        this.endDate = new Date(res.data.endDate).toISOString().split('T')[0].toString();
         this.operationalArea = res.data.operationalArea;
         this.programmingLanguages = res.data.programmingLanguages;
         this.salary = res.data.salary;
