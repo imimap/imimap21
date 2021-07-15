@@ -1,4 +1,4 @@
-export default class Internship implements Internship {
+export default class Internship {
   companyBranch = {};
 
   description = '';
