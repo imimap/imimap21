@@ -6,6 +6,7 @@ import studentRouter from "./student";
 import internshipRouter from "./internship";
 import companyRouter from "./company";
 import postponementRequestRouter from "./postponementRequest";
+import infoRouter from "./info";
 
 const router = Router();
 
@@ -22,5 +23,7 @@ router.use("/internships", internshipRouter);
 router.use("/companies", companyRouter);
 
 router.use("/postponement-requests", postponementRequestRouter);
+
+router.use("/info", infoRouter);
 
 export default router;
