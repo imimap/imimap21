@@ -308,17 +308,17 @@ export default defineComponent({
   },
   methods: {
     async save() {
-      if (await this.companyExists()) await this.postInternship();
+      if (this.company !== null || await this.companyExists()) await this.postInternship();
       else this.toggleAddCompanyForm = true;
     },
     async companyExists(): Promise<boolean> {
+      if (this.company === null) return false;
       try {
         const res = await http.get('/companies', { params: { companyName: this.company } });
         if (res.data === 'null') return false;
         this.existingCompany = res.data;
         return true;
       } catch (err) {
-        await this.$store.dispatch('addNotification', { text: err.message, type: 'danger' });
         return false;
       }
     },
