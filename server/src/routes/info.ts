@@ -9,6 +9,7 @@ import {
 import { validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
 import { getAllCountries, getCities } from "../controllers/company";
+import { getSemesters, getUpcomingSemesters } from "../controllers/semester";
 
 const infoRouter = Router();
 
@@ -46,5 +47,14 @@ infoRouter.get(
 );
 
 infoRouter.get("/countries", authMiddleware(), validate, asyncHandler(getAllCountries));
+
+infoRouter.get("/semesters", getSemesters);
+
+infoRouter.get(
+  "/semesters/upcoming",
+  query("count").default(3).isInt(),
+  validate,
+  getUpcomingSemesters
+);
 
 export default infoRouter;
