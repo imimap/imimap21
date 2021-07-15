@@ -11,7 +11,7 @@ export enum PdfDocumentStatuses {
 }
 
 function isValidPdf(path: string) {
-  return /http:\/\/localhost:9000\/pdfs\/s0[0-9]{6}\/[0-9a-f]{24}\/[0-9a-f]{24}\.pdf$/.test(path); //example: http://localhost:9000/pdfs/s0555949/507f1f77bcf86cd799439011/requestPdf-01.pdf
+  return /pdfs\/s0[0-9]{6}\/[0-9a-f]{24}\/[0-9a-f]{24}\.pdf$/.test(path); //example: pdfs/s0555949/507f1f77bcf86cd799439011/requestPdf-01.pdf
 }
 
 export interface IPdfDocument extends Document {
@@ -60,7 +60,7 @@ PdfDocumentSchema.methods.nextPath = function () {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const currentPath = this.path();
-  if (!currentPath) throw new Error("Path for this document is not set.");
+  if (!currentPath) return null;
   const pathParts = currentPath.split("/");
   pathParts.pop();
   return pathParts.join("/") + "/" + Types.ObjectId() + ".pdf";
