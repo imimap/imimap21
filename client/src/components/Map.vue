@@ -5,13 +5,13 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import { Map, Marker, TileLayer } from 'leaflet';
-import { Address } from '@/store/types/Address';
+import { MapLocation } from '@/store/types/MapLocation';
 
 export default defineComponent({
   name: 'Map',
   props: {
     locations: {
-      type: [] as PropType<Address[]>,
+      type: [] as PropType<MapLocation[]>,
       default: [],
     },
   },

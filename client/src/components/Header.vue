@@ -171,7 +171,7 @@ export default defineComponent({
 }
 
 #imi-maps-navbar-main {
-  justify-content: right;
+  justify-content: right !important;
 }
 
 .imi-nav-right {

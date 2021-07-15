@@ -3,15 +3,16 @@
     <div class="mt-1">
       Zeige mir Praktika im
       <select v-model="selectedSemester" v-on:change="search">
-        <option value="" selected="true">All</option>
-        <option value="WS2021">WS 21/22</option>
-        <option value="SS2022">SS 21</option>
-        <option value="WS2022">WS 22/23</option>
-        <option value="SS2023">SS 23</option>
+        <option value="">All</option>
+        <option v-for="(semester, index) in availableSemesters"
+                v-bind:key="index"
+                v-bind:semester="semester">
+          {{ semester }}
+        </option>
       </select>
     </div>
   </div>
-  <Map v-if="!loadingState && locations.length > 0" :locations="locations"></Map>
+  <Map v-if="!loadingState && searchResults.length > 0" :locations="searchResults"></Map>
   <div class="container" v-if="!loadingState && searchResults.length == 0">
     <div id="form-block4">
       <div class="alert alert-primary">
@@ -27,7 +28,6 @@
 import { defineComponent } from 'vue';
 import Map from '@/components/Map.vue';
 import http from '@/utils/http-common';
-import { Address } from '@/store/types/Address';
 import { Internship } from '@/store/types/Internship';
 
 export default defineComponent({
@@ -38,14 +38,8 @@ export default defineComponent({
       selectedSemester: '',
       loadingState: false,
       searchResults: [] as Internship[],
+      availableSemesters: [] as string[],
     };
-  },
-  computed: {
-    locations(): Address[] {
-      return this.searchResults.length > 0
-        ? this.searchResults.map((searchResult) => searchResult.company.address)
-        : [];
-    },
   },
   methods: {
     async search() {
@@ -54,7 +48,7 @@ export default defineComponent({
     async searchInternshipBySemester() {
       this.loadingState = true;
       try {
-        const res = await http.get('/internships', { params: { semester: this.selectedSemester, seen: false } });
+        const res = await http.get('/internships/locations', { params: { semester: this.selectedSemester } });
         this.searchResults = await res.data;
         this.loadingState = false;
       } catch (err) {
@@ -65,8 +59,20 @@ export default defineComponent({
         this.loadingState = false;
       }
     },
+    async getAvailableSemesters() {
+      try {
+        const res = await http.get('/info/semesters/upcoming');
+        this.availableSemesters = await res.data;
+      } catch (err) {
+        await this.$store.dispatch('addNotification', {
+          text: `Fehler beim Abfragen der verfügbaren semester [ERROR: ${err.message}]`,
+          type: 'danger',
+        });
+      }
+    },
   },
   async created() {
+    await this.getAvailableSemesters();
     await this.searchInternshipBySemester();
   },
 });

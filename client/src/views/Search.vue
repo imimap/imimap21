@@ -195,9 +195,8 @@ import 'leaflet/dist/leaflet.css';
 import Map from '@/components/Map.vue';
 import http from '@/utils/http-common';
 import { Internship } from '@/store/types/Internship';
-import { Address } from '@/store/types/Address';
+import { MapLocation } from '@/store/types/MapLocation';
 
-// @TODO: Evtl. Countries kurzfristig gegen Mockdaten austauschen da aktuell Fehler geworfen wird
 export default defineComponent({
   name: 'Search',
   components: { Map },
@@ -224,9 +223,14 @@ export default defineComponent({
     resultCount(): number {
       return this.searchResults.length;
     },
-    locations(): Address[] | null {
+    locations(): MapLocation[] | null {
       if (this.searchResults.length === 0) return null;
-      return this.searchResults.map((searchResult) => searchResult.company.address);
+      return this.searchResults.map(
+        (searchResult) => ({
+          city: searchResult.company.address.city,
+          coordinates: searchResult.company.address.coordinates,
+        }),
+      );
     },
   },
   methods: {

@@ -5,7 +5,7 @@ export default class InternshipModule {
 
   internships = [] as Internship[];
 
-  status = '';
+  status = '' as string;
 
   aepPassed = false;
 
