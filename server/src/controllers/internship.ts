@@ -1,10 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/user";
-import { BadRequest, Forbidden, NotFound } from "http-errors";
+import { BadRequest, Forbidden, InternalServerError, NotFound } from "http-errors";
 import { IInternship, Internship, InternshipStatuses, PaymentTypes } from "../models/internship";
 import { Semester } from "../helpers/semesterHelper";
 import { InternshipModule } from "../models/internshipModule";
 import { Types } from "mongoose";
+import { UploadedFile } from "express-fileupload";
+import * as fsPromises from "fs/promises";
 
 const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
   "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes";
@@ -470,4 +472,49 @@ export async function updateInternship(
   if (!savedInternship) return next(new BadRequest("Could not update internship"));
 
   res.json(savedInternship);
+}
+
+export function submitPdf(
+  pdfProperty: string
+): (req: Request, res: Response, next: NextFunction) => Promise<void> {
+  return async function (req: Request, res: Response, next: NextFunction): Promise<void> {
+    // Check if file was uploaded
+    if (!req.files || Object.keys(req.files).length === 0)
+      return next(new BadRequest("No files were uploaded"));
+
+    // Get internship and check if it belongs to user or user is admin
+    const internship = await Internship.findById(req.params.id);
+    if (!internship) return next(new NotFound("Internship not found"));
+    const user = await User.findOne({ emailAddress: req.user?.email }).populate({
+      path: "studentProfile.internship",
+      lean: true,
+    });
+    if (!user) return next(new NotFound("User not found"));
+    if (
+      user.studentProfile &&
+      user.studentProfile.internship.internships.indexOf(internship._id) === -1
+    )
+      return next(new Forbidden("Students may only modify their own internships"));
+
+    // Save uploaded file
+    const pdf = req.files.pdf as UploadedFile;
+    const uploadPath =
+      internship.get(pdfProperty).nextPath() ??
+      `pdfs/${user.studentProfile?.studentId}/${Types.ObjectId()}/${Types.ObjectId()}.pdf`;
+    const uploadPathParts = uploadPath.split("/");
+    uploadPathParts.pop();
+    const uploadDir = uploadPathParts.join("/");
+
+    try {
+      await fsPromises.mkdir(uploadDir, { recursive: true });
+      await pdf.mv(process.cwd() + "/" + uploadPath);
+    } catch (e) {
+      return next(new InternalServerError(e.message));
+    }
+
+    await internship.get(pdfProperty).submit(user._id, uploadPath);
+    await internship.save();
+
+    res.json({ path: uploadPath });
+  };
 }
