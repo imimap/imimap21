@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login, profile } from "../controllers/auth";
+import { editProfile, login, profile } from "../controllers/auth";
 import * as asyncHandler from "express-async-handler";
 import { body } from "express-validator";
 import { validate } from "../helpers/validation";
@@ -19,5 +19,13 @@ authRouter.post(
 );
 
 authRouter.get("/profile", authMiddleware(), asyncHandler(profile));
+
+authRouter.patch(
+  "/profile",
+  authMiddleware(),
+  body(["firstName", "lastName"]).optional().isString(),
+  validate,
+  asyncHandler(editProfile)
+);
 
 export default authRouter;
