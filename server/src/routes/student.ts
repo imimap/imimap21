@@ -3,8 +3,7 @@ import { param } from "express-validator";
 import authMiddleware from "../authentication/middleware";
 import { isObjectId, validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
-import { getStudentById, getStudents } from "../controllers/student";
-import { clearInternshipSearchHistory, getStudents } from "../controllers/student";
+import { clearInternshipSearchHistory, getStudents, getStudentById } from "../controllers/student";
 
 const studentRouter = Router();
 
