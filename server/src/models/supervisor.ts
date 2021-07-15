@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { isValidEmail, normalizeEmail } from "../helpers/emailAddressHelper";
+import { isValidEmail } from "../helpers/emailAddressHelper";
 
 export interface ISupervisor {
   fullName?: string;

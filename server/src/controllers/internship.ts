@@ -5,6 +5,8 @@ import { IInternship, Internship, InternshipStatuses, PaymentTypes } from "../mo
 import { Semester } from "../helpers/semesterHelper";
 import { InternshipModule } from "../models/internshipModule";
 import { Types } from "mongoose";
+import * as pdf from "html-pdf";
+import * as fsPromises from "fs/promises";
 
 const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
   "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes";
@@ -434,4 +436,66 @@ export async function updateInternship(
   if (!savedInternship) return next(new BadRequest("Could not update internship"));
 
   res.json(savedInternship);
+}
+
+export async function generateRequestPdf(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email }).populate({
+    path: "studentProfile.internship",
+    lean: true,
+  });
+  // Check if user exists and has permissions to generate request PDF for requested internship
+  if (!user) return next(new NotFound("User not found"));
+  if (!user.isAdmin && user.studentProfile?.internship.internships.indexOf(req.params.id) === -1)
+    return next(new Forbidden("Students may only generate request PDFs for their own internships"));
+  // Load internship
+  const internship = await Internship.findById(req.params.id)
+    .populate({ path: "company", lean: true })
+    .lean();
+  if (!internship) return next(new NotFound("Internship not found"));
+
+  // Build PDF template
+  const dateFormatter = new Intl.DateTimeFormat("de");
+  const contentHtml = await fsPromises.readFile(`${process.cwd()}/pdf-templates/request.html`);
+  const html = contentHtml.toString();
+  const template = html
+    .replace("{{semester}}", user.studentProfile?.internship.inSemester ?? "")
+    .replace("{{studentId}}", user.studentProfile?.studentId ?? "")
+    .replace("{{firstName}}", user.firstName ?? "")
+    .replace("{{lastName}}", user.lastName ?? "")
+    .replace("{{emailAddress}}", user.emailAddress ?? "")
+    .replace("{{company}}", internship.company.companyName ?? "")
+    .replace(
+      "{{street}}",
+      `${internship.company.address.street ?? ""} ${internship.company.address.streetNumber ?? ""}`
+    )
+    .replace("{{zipCode}}", internship.company.address.zip ?? "")
+    .replace("{{city}}", internship.company.address.city ?? "")
+    .replace("{{country}}", internship.company.address.country ?? "")
+    .replace("{{supervisor}}", internship.supervisor?.fullName ?? "")
+    .replace("{{supervisor.emailAddress}}", internship.supervisor?.emailAddress ?? "")
+    .replace(
+      "{{startDate}}",
+      internship.startDate ? dateFormatter.format(internship.startDate) : ""
+    )
+    .replace("{{endDate}}", internship.endDate ? dateFormatter.format(internship.endDate) : "")
+    .replace("{{semesterOfStudy}}", user.studentProfile?.internship.inSemesterOfStudy ?? "")
+    .replace("{{operationalArea}}", internship.operationalArea ?? "")
+    .replace("{{tasks}}", internship.tasks ?? "")
+    .replace("{{programmingLanguages}}", internship.programmingLanguages?.join(", ") ?? "");
+
+  try {
+    pdf
+      .create(template, { format: "A4", border: "20px", header: { height: "50px" } })
+      .toStream((err, stream) => {
+        if (err) throw err;
+        res.setHeader("Content-Type", "application/pdf");
+        stream.pipe(res);
+      });
+  } catch (e) {
+    next(new BadRequest(e));
+  }
 }

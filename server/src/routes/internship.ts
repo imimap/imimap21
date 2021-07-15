@@ -2,12 +2,13 @@ import { Router } from "express";
 import { param, query } from "express-validator";
 import authMiddleware from "../authentication/middleware";
 import {
+  createInternship,
   findInternships,
+  generateRequestPdf,
   getAllOperationalAreas,
   getAllPaymentTypes,
   getAllProgrammingLanguages,
   getInternshipsById,
-  createInternship,
   updateInternship,
 } from "../controllers/internship";
 import { validate } from "../helpers/validation";
@@ -160,6 +161,14 @@ internshipRouter.get(
   authMiddleware(),
   validate,
   asyncHandler(getAllProgrammingLanguages)
+);
+
+internshipRouter.get(
+  "/:id/generate/request",
+  authMiddleware(),
+  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  validate,
+  asyncHandler(generateRequestPdf)
 );
 
 export default internshipRouter;
