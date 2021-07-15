@@ -78,7 +78,7 @@ export async function getRandomInternship(
   let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
   if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
 
-  let maxOffset = await Internship.count();;
+  let maxOffset = await Internship.count();
   const options: { [k: string]: unknown } = {};
   if (user.studentProfile?.internship) {
     if (user.studentProfile.internshipsSeen && user.studentProfile.internshipsSeen.length >= 12) {
@@ -138,6 +138,16 @@ export async function findInternships(
 
   // Create Options
   const options: { [k: string]: unknown } = {};
+
+  if (
+    req.query.seen === "true" &&
+    user.studentProfile?.internshipsSeen &&
+    user.studentProfile.internshipsSeen.length > 0
+  ) {
+    options._id = {
+      $in: user.studentProfile.internshipsSeen,
+    };
+  }
 
   const companyQueryFields = ["companyName", "branchName", "industry", "mainLanguage", "size"];
   companyQueryFields.forEach((field) => {
