@@ -79,12 +79,9 @@
                     </div>
                     <div class="col-2 text-center">
                       <h6 class="list-item-label">Status</h6>
-                      <span v-if="row.internshipModule.status === 'planned'"
-                            class="badge rounded-pill bg-warning">
-                        {{ row.internshipModule.status }}
-                      </span>
-                      <span v-else
-                            class="badge rounded-pill bg-success">
+<!--                      <span class="badge rounded-pill bg-warning">-->
+                      <span :class="`badge rounded-pill ${internshipModuleStatusColors[row
+                      .internshipModule.status]}`">
                         {{ row.internshipModule.status }}
                       </span>
                     </div>
@@ -494,6 +491,7 @@ import { getCompany, getInternshipModule, getStudentsList } from '@/utils/gatewa
 import { getDateString, getInternshipModuleDuration, getTimeDifferenceDays } from '@/utils/admin';
 import Company from '@/models/Company';
 import InternshipModule from '@/models/InternshipModule';
+import internshipModuleStatusColors from '@/models/InternshipModuleStatus';
 
 export default defineComponent({
   name: 'UsersList',
@@ -507,6 +505,7 @@ export default defineComponent({
       currentSearch: '',
       students: [] as Student[],
       isLoading: false,
+      internshipModuleStatusColors,
     };
   },
   mounted() {

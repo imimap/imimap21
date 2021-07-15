@@ -68,7 +68,8 @@
               <div class="accordion-body">
                 <h4>Hochschulsemester</h4>
                 <p>Verschiebung auf
-                  <b>{{ row.newSemesterOfStudy }}</b>
+                  <b>{{ row.newSemesterOfStudy }}.</b>
+                  Fachsemester
                 </p>
 
                 <h4>Fachsemester</h4>
