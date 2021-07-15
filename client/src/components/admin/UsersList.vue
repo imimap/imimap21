@@ -496,8 +496,6 @@ import { defineComponent } from 'vue';
 import Student from '@/models/Student';
 import {
   clearStudentSearch,
-  getCompany,
-  getInternshipModule,
   getStudentsList,
   markAepPassedOnInternshipModule,
 } from '@/utils/gateways';
@@ -549,7 +547,6 @@ export default defineComponent({
     async updateList() {
       this.isLoading = true;
       const studentList = await getStudentsList(this.currentFilterSemester) as Student[];
-      console.log(studentList);
       this.students = studentList;
       this.isLoading = false;
     },
@@ -557,7 +554,6 @@ export default defineComponent({
       const userDoubleChecked = window.confirm(`Suchanfragen für ${studentName} zurücksetzen?`);
       if (userDoubleChecked) {
         const apiResponse = await clearStudentSearch(studentId);
-        console.log(apiResponse);
         if ('status' in apiResponse && apiResponse.status === 204) {
           await store.dispatch('addNotification', {
             text: `Die Suche wurde für ${studentName} zurückgesetzt.`,
@@ -569,8 +565,6 @@ export default defineComponent({
             type: 'danger',
           });
         }
-      } else {
-        console.log('cancel');
       }
       return true;
     },
@@ -582,7 +576,6 @@ export default defineComponent({
         + 'als bestanden markieren?');
       if (userDoubleChecked) {
         const apiResponse = await markAepPassedOnInternshipModule(internshipModuleId);
-        console.log(apiResponse);
         if ('status' in apiResponse && apiResponse.status === 200) {
           await store.dispatch('addNotification', {
             text: `Das AEP für ${studentName} als bestanden markiert.`,
@@ -594,8 +587,6 @@ export default defineComponent({
             type: 'danger',
           });
         }
-      } else {
-        console.log('cancel');
       }
       return true;
     },
@@ -665,8 +656,6 @@ export default defineComponent({
         // API call delete
         console.log('InternshipPart mit internshipModuleId: ', internshipModuleId, ' und '
           + 'internshipPartId: ', internshipPartId, 'gelöscht');
-      } else {
-        console.log('cancel');
       }
       return true;
     },
