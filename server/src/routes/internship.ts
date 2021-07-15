@@ -41,6 +41,7 @@ internshipRouter.get(
   asyncHandler(findInternships)
 );
 
+// @TODO: Wäre praktisch wenn die Company hier direkt gepopulated werden würde
 internshipRouter.get(
   "/locations",
   authMiddleware(),

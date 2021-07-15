@@ -28,6 +28,7 @@ import InternshipModuleIndex from '@/components/internship-module/InternshipModu
 import { availableLocales, defaultLocale } from '@/locales/locales';
 import Internship from '@/views/Internship.vue';
 import CreateInternship from '@/components/internship/CreateInternship.vue';
+import EditInternship from '@/components/internship/EditInternship.vue';
 
 // @TODO: Router auf Modules aufteilen
 const routes: Array<RouteRecordRaw> = [
@@ -83,6 +84,14 @@ const routes: Array<RouteRecordRaw> = [
               allowAnonymous: false,
             },
           },
+          {
+            path: 'edit/:id',
+            name: 'EditInternship',
+            component: EditInternship,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
         ],
       },
       {
@@ -127,14 +136,6 @@ const routes: Array<RouteRecordRaw> = [
           allowAnonymous: false,
         },
         children: [
-          {
-            path: '',
-            name: 'PostponementsIndex',
-            component: PostponementsList,
-            meta: {
-              allowAnonymous: false,
-            },
-          },
           {
             path: 'new',
             name: 'CreatePostponement',

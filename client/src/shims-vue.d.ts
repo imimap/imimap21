@@ -1,3 +1,4 @@
+import { Route, Router } from 'vue-router';
 import type { DefineComponent } from 'vue';
 import { Store } from 'vuex';
 import VueProgressBar from '@aacassandra/vue3-progressbar';

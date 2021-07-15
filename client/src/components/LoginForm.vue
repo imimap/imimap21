@@ -60,6 +60,7 @@ export default defineComponent({
     };
   },
   methods: {
+    // @TODO: Genauere Fehler beim Login angeben
     async login() {
       if (await login(this.username, this.password)) {
         await this.$router.push({ name: 'Index' });

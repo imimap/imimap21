@@ -10,11 +10,9 @@
         </p>
       </div>
     </div>
-
     <div class="container" style="max-width: 100vw;">
       <form role="form"
             v-on:submit.prevent>
-        <input type="hidden" name="authenticity_token">
         <div id="search_options" class="row ps-3 row-cols-lg-auto g-3 align-items-center">
           <i18n-t keypath="search.form.info"
                   tag="div"
@@ -59,14 +57,13 @@
                 {{ $t("search.form.orientation") }}
               </label>
               <select class="form-select mx-2 my-2 w-auto h-auto"
-                      v-model="this.orientationFilter"
+                      v-model="this.operationalAreaFilter"
                       id="search_orientation_id">
                 <option :value="null">{{ $t("search.form.fun") }}</option>
-                <template v-if="this.availableOrientations != null">
-                  <option
-                    v-for="(orientation, index) in this.availableOrientations"
-                    v-bind:key="index"
-                    :value="orientation">
+                <template v-if="this.availableOperationalAreas != null">
+                  <option v-for="(orientation, index) in this.availableOperationalAreas"
+                          v-bind:key="index"
+                          :value="orientation">
                     {{ orientation }}
                   </option>
                 </template>
@@ -81,11 +78,10 @@
                       id="search_programming_language_id">
                 <option :value="null">{{ $t("search.form.interested") }}</option>
                 <template v-if="this.availableLanguages != null">
-                  <option
-                    v-for="(language, index) in this.availableLanguages"
-                    v-bind:key="index"
-                    :value="this.availableLanguages[index]">
-                    {{ language }}
+                  <option v-for="(language, index) in this.availableLanguages"
+                          v-bind:key="index"
+                          :value="this.availableLanguages[index]">
+                          {{ language }}
                   </option>
                 </template>
               </select>
@@ -98,8 +94,8 @@
               {{ $t("search.form.search") }}
             </button>
           </div>
-          <form role="form" class="new_search" action="/de/shuffle" method="post">
-            <input type="hidden" name="authenticity_token" value="">
+          <!-- @TODO: Zufallsorschlag implementieren -->
+          <form role="form" v-on:submit.prevent v-if="false">
             <div class="field">
               <button class="btn btn-htw-green">
                 {{ $t("search.form.random") }}
@@ -110,15 +106,13 @@
       </form>
     </div>
   </div>
-
+  <!-- @TODO: Modal mit Hinweis auf begrenzte Suchergebnisanzahl (12) implementieren -->
   <!-- Search Results -->
-  <div id="form-block4" class="mx-3 my-3">
+  <div id="form-block4" class="mx-3 my-3" v-if="!loadingState && searchResults.length > 0">
     <div class="text-center">
-      <button
-        type="button"
-        class="btn btn-htw-green text-white mb-3"
-        v-on:click="cardToggle = !cardToggle"
-      >
+      <button type="button"
+              class="btn btn-htw-green text-white mb-3"
+              v-on:click="cardToggle = !cardToggle">
         {{ $t("search.showMap") }}
       </button>
     </div>
@@ -127,7 +121,8 @@
         <p class="text-center p-1">
           {{ $tc("search.results.resultCount", resultCount) }}
         </p>
-        <p class="text-center p-1">
+        <!-- @TODO: %count% Ergebnisse aus vorherigen suchen implementieren-->
+        <p class="text-center p-1" v-if="false">
           {{ $tc("search.results.previousResultCount", resultCount) }}
         </p>
         <table class="table table-striped table-sm table-borderless text-left">
@@ -139,58 +134,54 @@
             <td class="font-weight-bold"></td>
           </tr>
           <!-- Result Loop -->
-          <template
-            v-for="(searchResult, index) in searchResults"
-            v-bind:key="searchResult.id"
-            v-bind:index="index"
-          >
-            <tr>
-              <td>{{ searchResult.company.name }}</td>
-              <td> {{ searchResult.company.companyLocation.city }}</td>
-              <td> {{ searchResult.department }}</td>
-              <td>
-                <button
-                  class="btn btn-outline-htw-green float-right"
-                  data-bs-toggle="collapse"
-                  :data-bs-target="'#collapseResult' + searchResult.id"
-                  aria-expanded="false"
-                  :aria-controls="'#collapseResult' + searchResult.id"
-                >
-                  Details
-                </button>
-              </td>
-            </tr>
-            <tr class="collapse" :id="'collapseResult' + searchResult.id">
-              <td colspan="7">
-                <p class="pl-3">
-                  <strong>{{ $t("search.tookPlace") }}</strong>
-                  {{ searchResult.semester }}
-                </p>
-                <p class="pl-3">
-                  <strong>{{ $t("search.programmingLanguages") }}</strong>
-                  {{ searchResult.skills }}
-                </p>
-                <p class="pl-3">
-                  <strong>{{ $t("search.website") }}</strong>
-                  <a :href="searchResult.website" target="_blank">
-                    {{ searchResult.website }}
-                  </a>
-                </p>
-                <p class="pl-3">
-                  <strong>{{ $t("search.tasks") }}</strong>
-                  {{ searchResult.tasks }}
-                </p>
-                <p class="pl-3">
-                  <strong>{{ $t("search.contact") }}</strong>
-                  {{ searchResult.contact }}
-                </p>
-              </td>
-            </tr>
+          <template  v-if="searchResults.length > 0">
+            <template v-for="(searchResult) in searchResults"
+                      v-bind:key="searchResult._id">
+              <tr>
+                <td>{{ searchResult.company.companyName }}</td>
+                <td> {{ searchResult.company.address.city }}</td>
+                <td> {{ searchResult.operationalArea }}</td>
+                <td>
+                  <button class="btn btn-outline-htw-green float-right"
+                          data-bs-toggle="collapse"
+                          :data-bs-target="'#collapseResult' + searchResult._id"
+                          aria-expanded="false"
+                          :aria-controls="'#collapseResult' + searchResult._id">
+                    Details
+                  </button>
+                </td>
+              </tr>
+              <tr class="collapse" :id="'collapseResult' + searchResult._id">
+                <td colspan="7">
+                  <p class="pl-3">
+                    <strong>{{ $t("search.programmingLanguages") }}</strong>
+                    {{
+                      searchResult.programmingLanguages.length > 0
+                        ? searchResult.programmingLanguages.toString()
+                        :  'Keine Angabe'
+                    }}
+                  </p>
+                  <p class="pl-3">
+                    <strong>{{ $t("search.website") }}</strong>
+                    <a :href="searchResult.company.website" target="_blank">
+                      {{ searchResult.company.website }}
+                    </a>
+                  </p>
+                  <p class="pl-3">
+                    <strong>{{ $t("search.tasks") }}</strong>
+                    {{ searchResult.tasks }}
+                  </p>
+                  <p class="pl-3">
+                    <strong>{{ $t("search.contact") }}</strong>
+                    {{ searchResult.company.emailAddress }}
+                  </p>
+                </td>
+              </tr>
+            </template>
           </template>
           </tbody>
         </table>
       </div>
-
     </div>
     <div id="map-results">
       <Map v-if="cardToggle" :locations="locations"></Map>
@@ -203,112 +194,105 @@ import { defineComponent } from 'vue';
 import 'leaflet/dist/leaflet.css';
 import Map from '@/components/Map.vue';
 import http from '@/utils/http-common';
-// @TODO: Internship Search Endpoint abfragen und Mock-Daten ersetzen
-// @TODO: %Count%-Ergebnisse auf vorheriger Suche implementieren und entsprechend darstellen
-// @TODO: Endpoint für verfügbare Locations abfragen
+import { Internship } from '@/store/types/Internship';
+import { Address } from '@/store/types/Address';
+
+// @TODO: Evtl. Countries kurzfristig gegen Mockdaten austauschen da aktuell Fehler geworfen wird
 export default defineComponent({
   name: 'Search',
   components: { Map },
   data() {
     return {
+      // Available filters after query
       availableCountries: null,
       availablePaymentOptions: null,
-      availableOrientations: null,
+      availableOperationalAreas: null,
       availableLanguages: null,
-      searchResults: [
-        {
-          id: 1,
-          company: {
-            name: 'Testfirma #1',
-            companyLocation: {
-              city: 'Friedrichstraßen 17, 10961 Berlin',
-              lat: 52.498605,
-              lng: 13.391799,
-            },
-          },
-          department: 'Javascript, Html, Css',
-          tasks: 'Testung / Front-End Entwicklung Epikur Version 5',
-          skills: 'Java',
-          semester: 'WS 19/20',
-          website: ' www.epikur.de',
-          contact: 'Krister Helbing, khelbing@epikur.de',
-        },
-        {
-          id: 2,
-          company: {
-            name: 'Testfirma #2',
-            companyLocation: {
-              city: 'Bad Timmberg, Irland',
-              lat: 74.21327053768769,
-              lng: 13.116135124688158,
-            },
-          },
-          department: 'Python, C##, Java',
-          tasks: 'Hier stehen noch mehr aufgaben',
-          skills: 'Java und mehr',
-          semester: 'WS 18/19',
-          website: ' www.google.de',
-          contact: 'Ronny Rüpel, Ronny@rüpel.to',
-        },
-      ],
+      // Searchresults after query
+      searchResults: [] as Internship[],
+      // Selected filters
       paymentFilter: null,
       countryFilter: null,
       languageFilter: null,
-      orientationFilter: null,
+      operationalAreaFilter: null,
+      // Component state
       cardToggle: false,
+      loadingState: true,
     };
   },
   computed: {
     resultCount(): number {
       return this.searchResults.length;
     },
-    locations(): Array<{city: string; lat: number; lng: number}> {
-      const locations: Array<{city: string; lat: number; lng: number}> = [];
-      this.searchResults.forEach((searchResult) => {
-        locations.push(searchResult.company.companyLocation);
-      });
-      return locations;
+    locations(): Address[] | null {
+      if (this.searchResults.length === 0) return null;
+      return this.searchResults.map((searchResult) => searchResult.company.address);
     },
   },
   methods: {
     async getAvailableCountries() {
       try {
-        const res = await http.get('/companies/countries');
-        this.availableCountries = res.data;
+        const res = await http.get('/info/countries');
+        this.availableCountries = await res.data;
       } catch (err) {
-        console.log(err.message);
+        await this.$store.dispatch('addNotification', {
+          text: `Fehler beim laden der verfügbaren Länder [ERROR: ${err.message}]`,
+          type: 'danger',
+        });
       }
     },
     async getAvailablePaymentOptions() {
       try {
-        const res = await http.get('/internships/properties/payment-types');
+        const res = await http.get('/info/payment-types');
         this.availablePaymentOptions = res.data;
       } catch (err) {
-        console.log(err.message);
+        await this.$store.dispatch('addNotification', {
+          text: `Fehler beim laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`,
+          type: 'danger',
+        });
       }
     },
     async getAvailableOrientations() {
       try {
-        const res = await http.get('/internships/properties/operational-areas');
-        this.availableOrientations = res.data;
+        const res = await http.get('/info/operational-areas');
+        this.availableOperationalAreas = res.data;
       } catch (err) {
-        console.log(err.message);
+        await this.$store.dispatch('addNotification', {
+          text: `Fehler beim laden der verfügbaren Bereiche [ERROR: ${err.message}]`,
+          type: 'danger',
+        });
       }
     },
     async getAvailableLanguages() {
       try {
-        const res = await http.get('/internships/properties/programming-languages');
+        const res = await http.get('/info/programming-languages');
         this.availableLanguages = res.data;
       } catch (err) {
-        console.log(err.message);
+        await this.$store.dispatch('addNotification', {
+          text: `Fehler beim laden der verfügbaren Programmiersprachen [ERROR: ${err.message}]`,
+          type: 'danger',
+        });
       }
     },
     async searchRequest() {
+      this.loadingState = true;
       try {
-        const res = await http.get('/internships');
-        console.log(res);
+        const res = await http.get('/internships', {
+          params: {
+            country: this.countryFilter,
+            operationalArea: this.operationalAreaFilter,
+            programmingLanguage: this.languageFilter,
+            paymentType: this.paymentFilter,
+            seen: false,
+          },
+        });
+        this.searchResults = await res.data;
+        this.loadingState = false;
       } catch (err) {
-        console.log(err.message);
+        await this.$store.dispatch('addNotification', {
+          text: `Fehler beim Suchen nach Praktika [ERROR: ${err.message}]`,
+          type: 'danger',
+        });
       }
     },
   },

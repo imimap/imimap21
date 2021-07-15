@@ -5,11 +5,15 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import { Map, Marker, TileLayer } from 'leaflet';
+import { Address } from '@/store/types/Address';
 
 export default defineComponent({
   name: 'Map',
   props: {
-    locations: Array as PropType<{ lat: number; lng: number; city: string }[]>,
+    locations: {
+      type: [] as PropType<Address[]>,
+      default: [],
+    },
   },
   data() {
     return {
@@ -47,7 +51,7 @@ export default defineComponent({
     addLocationMarkers() {
       if (!this.locations) return;
       this.locations.forEach((location) => {
-        const marker = new Marker([location.lat, location.lng])
+        const marker = new Marker([location.coordinates.latitude, location.coordinates.longitude])
           .bindPopup(location.city)
           .addTo(this.map as Map);
         this.markers.push(marker);

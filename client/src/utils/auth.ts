@@ -81,7 +81,7 @@ export async function getAuthUserProfile() {
     const res = await http.get('/auth/profile');
     await storeAuthUserProfile(res.data);
   } catch (err) {
-    await store.dispatch('addNotification', { text: err.message, type: 'danger' });
+    await store.dispatch('addNotification', { text: `Fehler beim Laden des Nutzerprofils [ERROR: ${err.message}]`, type: 'danger' });
   }
 }
 
@@ -94,7 +94,9 @@ export async function login(username: string, password: string): Promise<boolean
       return true;
     }
   } catch (err) {
-    await store.dispatch('addNotification', { text: err.message, type: 'danger' });
+    const errors = err.response.data.error.errors.map((error) => `${error.msg}: ${error.param}`);
+    console.log(errors);
+    await store.dispatch('addNotification', { text: `${errors.join(' & ')}`, type: 'danger' });
     return false;
   }
   return false;

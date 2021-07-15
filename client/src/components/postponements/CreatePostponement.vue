@@ -14,9 +14,9 @@
             <div class="field">
               Ich beantrage eine Verschiebung auf das
               <select v-model="this.newSemester">
-                <option value="WS2022">WS 21/22</option>
-                <option value="SS21">SS 21</option>
-                <option value="WS2021">WS 20/21</option></select>
+                <option value="WS2021">WS 21/22</option>
+                <option value="SS2022">SS 22</option>
+                <option value="WS2022">WS 22/223</option></select>
             </div>
           </div>
           <div class="row">&nbsp;</div>
@@ -86,9 +86,9 @@ export default defineComponent({
           reason,
         });
         await store.dispatch('addNotification', { text: 'Verschiebung erfolgreich beantragt!', type: 'success' });
-        await this.$router.push({ name: 'PostponementsIndex' });
+        await this.$router.push({ name: 'InternshipModuleIndex' });
       } catch (err) {
-        await store.dispatch('addNotification', { text: err.message, type: 'danger' });
+        await this.$store.dispatch('addNotification', { text: `Fehler beim Beantragen der Verschiebung [ERROR: ${err.message}]`, type: 'danger' });
       }
     },
   },
