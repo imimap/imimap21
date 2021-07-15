@@ -17,6 +17,6 @@ export const getInternshipModuleDuration = (internships: Internship[]): string =
     durationSumInDays += getTimeDifferenceDays(internship.startDate, internship.endDate);
   });
   return durationSumInDays > 0
-    ? `${Math.floor(durationSumInDays / 7)} Wochen, ${Math.floor(durationSumInDays) % 7}Tage`
+    ? `${Math.floor(durationSumInDays / 7)} Wochen, ${Math.floor(durationSumInDays) % 7} Tage`
     : '-';
 };

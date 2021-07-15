@@ -14,6 +14,13 @@ export const getUser = async (id) => apiClient.get(`/students/${id}`)
     return [];
   });
 
+export const clearStudentSearch = async (id) => apiClient.patch(`/students/${id}/clear-search`)
+  .then((res) => res)
+  .catch((err) => {
+    console.log(err);
+    return [];
+  });
+
 export const getInternshipModulesList = async () => apiClient.get('/internship-modules')
   .then((res) => res.data)
   .catch((err) => {
@@ -23,6 +30,13 @@ export const getInternshipModulesList = async () => apiClient.get('/internship-m
 
 export const getInternshipModule = async (id) => apiClient.get(`/internship-modules/${id}`)
   .then((res) => res.data)
+  .catch((err) => {
+    console.log(err);
+    return [];
+  });
+
+export const markAepPassedOnInternshipModule = async (id) => apiClient.patch(`/internship-modules/${id}/aep-passed`)
+  .then((res) => res)
   .catch((err) => {
     console.log(err);
     return [];

@@ -12,7 +12,6 @@
               <option selected value="">Sortieren nach...</option>
               <option value="lastName">Nachname</option>
               <option value="studentId">Matrikelnummer</option>
-<!--              <option value="status">Status</option>-->
             </select>
           </div>
           <div class="col-lg-3 col-md-12 mb-3">
@@ -47,7 +46,7 @@
         </div>
 
         <div v-if="!isLoading" class="accordion" id="listAccordion">
-          <div v-for="(row, index) in students" v-bind:key="index" class="accordion-item">
+          <div v-for="(row, index) in studentsWithSearch" v-bind:key="index" class="accordion-item">
             <h2 class="accordion-header" v-bind:id="index">
               <button class="accordion-button collapsed"
                       type="button"
@@ -130,30 +129,20 @@
                               <span class="fw-bold list-item-label">Status</span><br>
 
                               <ul class="list-group">
-                                <li class="list-group-item list-group-item-success">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                       height="16" fill="currentColor"
-                                       class="bi bi-check-circle-fill" viewBox="0 0 16 16">
-                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75
-                                    0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06
-                                    1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0
-                                    0-.01-1.05z"/>
-                                  </svg>
-                                  Antrag vorhanden</li>
-                                <li class="list-group-item list-group-item-success">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                       height="16" fill="currentColor"
-                                       class="bi bi-check-circle-fill" viewBox="0 0 16 16">
-                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1
-                                    16 0zm-3.97-3.03a.75.75
-                                    0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06
-                                    1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0
-                                    0-.01-1.05z"/>
-                                  </svg>
-                                  <i class="bi bi-check-circle-fill"></i>
-                                  Vertrag vorhanden</li>
-                                <li class="list-group-item list-group-item-light">
-                                  Zertifikat fehlt</li>
+                                <UsersListStatusItem text="Antrag"
+                                                     :item="internship.requestPdf"/>
+                                <UsersListStatusItem text="ECTS-Nachweis"
+                                                     :item="internship.lsfEctsProofPdf"/>
+                                <UsersListStatusItem text="Ortsnachweis"
+                                                     :item="internship.locationJustificationPdf"/>
+                                <UsersListStatusItem text="Praktikumsvertrag"
+                                                     :item="internship.contractPdf"/>
+                                <UsersListStatusItem text="BVG Ticket Ausnahme"
+                                                     :item="internship.bvgTicketExemptionPdf"/>
+                                <UsersListStatusItem text="Praktikumszeugnis"
+                                                     :item="internship.certificatePdf"/>
+                                <UsersListStatusItem text="Praktikumsbericht"
+                                                     :item="internship.reportPdf"/>
                               </ul>
                             </div>
                           </div>
@@ -182,10 +171,20 @@
 
                     <div class="col-4">
                       <div class="d-grid gap-2 mt-4 col-8 mx-auto">
-                        <button class="btn btn-success" type="button"
-                                @click="quickActionMarkAepPassedOnInternshipModule(row.id)">
+                        <button class="btn btn-secondary"
+                                type="button"
+                                :disabled="row.internshipModule.aepPassed"
+                                @click="quickActionMarkAepPassedOnInternshipModule(
+                                  row.internshipModule._id,
+                                  `${row.firstName} ${row.lastName}`)">
                           AEP bestanden markieren
                         </button>
+                        <button type="button"
+                                class="btn btn-secondary"
+                                :disabled="row.studentProfile.internshipsSeen.length === 0"
+                                @click="clearSearch(row._id,
+                                `${row.firstName} ${row.lastName}`)">
+                          Suchanfragen zurücksetzen</button>
                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
                                 data-bs-target="#internshipModuleEditModal"
                                 @click="changeCurrentEditInternshipModuleIndex(row.id)">
@@ -485,16 +484,24 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Internship from '@/models/Internship';
 import Student from '@/models/Student';
-import { getCompany, getInternshipModule, getStudentsList } from '@/utils/gateways';
+import {
+  clearStudentSearch,
+  getCompany,
+  getInternshipModule,
+  getStudentsList,
+  markAepPassedOnInternshipModule,
+} from '@/utils/gateways';
 import { getDateString, getInternshipModuleDuration, getTimeDifferenceDays } from '@/utils/admin';
-import Company from '@/models/Company';
-import InternshipModule from '@/models/InternshipModule';
 import internshipModuleStatusColors from '@/models/InternshipModuleStatus';
+import store from '@/store';
+import UsersListStatusItem from '@/components/admin/UsersListStatusItem.vue';
 
 export default defineComponent({
   name: 'UsersList',
+  components: {
+    UsersListStatusItem,
+  },
   data() {
     return {
       currentEditInternshipModuleIndex: 0,
@@ -507,6 +514,20 @@ export default defineComponent({
       isLoading: false,
       internshipModuleStatusColors,
     };
+  },
+  computed: {
+    studentsWithSearch(): Student[] {
+      return this.students.filter((student) => student.firstName.toLowerCase()
+        .includes(this.currentSearch.toLowerCase())
+        || student
+          .lastName
+          .toLowerCase()
+          .includes(this.currentSearch.toLowerCase())
+        || student
+          .studentProfile.studentId
+          .toLowerCase()
+          .includes(this.currentSearch.toLowerCase()));
+    },
   },
   mounted() {
     this.updateList();
@@ -534,10 +555,57 @@ export default defineComponent({
           }
         }
         this.students = studentList;
+        console.log(studentList);
       } catch (err) {
         console.log(err);
       }
       this.isLoading = false;
+    },
+    async clearSearch(studentId: string, studentName: string) {
+      const userDoubleChecked = window.confirm(`Suchanfragen für ${studentName} zurücksetzen?`);
+      if (userDoubleChecked) {
+        const apiResponse = await clearStudentSearch(studentId);
+        console.log(apiResponse);
+        if ('status' in apiResponse && apiResponse.status === 204) {
+          await store.dispatch('addNotification', {
+            text: `Die Suche wurde für ${studentName} zurückgesetzt.`,
+            type: 'success',
+          });
+        } else {
+          await store.dispatch('addNotification', {
+            text: 'Die Suche konnte nicht zurückgesetzt werden.',
+            type: 'danger',
+          });
+        }
+      } else {
+        console.log('cancel');
+      }
+      return true;
+    },
+    async quickActionMarkAepPassedOnInternshipModule(
+      internshipModuleId: string,
+      studentName: string,
+    ) {
+      const userDoubleChecked = window.confirm('AEP zum Praktikumsmodul wirklich '
+        + 'als bestanden markieren?');
+      if (userDoubleChecked) {
+        const apiResponse = await markAepPassedOnInternshipModule(internshipModuleId);
+        console.log(apiResponse);
+        if ('status' in apiResponse && apiResponse.status === 200) {
+          await store.dispatch('addNotification', {
+            text: `Das AEP für ${studentName} als bestanden markiert.`,
+            type: 'success',
+          });
+        } else {
+          await store.dispatch('addNotification', {
+            text: 'Das AEP konnte nicht als bestanden markiert werden.',
+            type: 'danger',
+          });
+        }
+      } else {
+        console.log('cancel');
+      }
+      return true;
     },
     changeCurrentEditInternshipModuleIndex(internshipModuleId: number) {
       this.currentEditInternshipModuleIndex = internshipModuleId;
@@ -552,21 +620,6 @@ export default defineComponent({
     updateIntershipPart(internshipModuleId: number, internshipPartId: number) {
       return true;
     },
-    // async quickActionMarkAepPassedOnInternshipModule(internshipModuleId: number) {
-    //   const userDoubleChecked = window.confirm('AEP zum Praktikumsmodul wirklich '
-    //     + 'als bestanden markieren?');
-    //   if (userDoubleChecked) {
-    //     this.users[internshipModuleId].studentProfile.internshipModule.AepPassed = true;
-    //     // this.updateIntershipModule(internshipModuleId)
-    //     await store.dispatch('addNotification', {
-    //       text: 'AEP als bestanden markiert',
-    //       type: 'success',
-    //     });
-    //   } else {
-    //     console.log('cancel');
-    //   }
-    //   return true;
-    // },
     // async quickActionApproveApplicationOnInternshipPart(internshipModuleId: number,
     //   internshipPartId: number) {
     //   const userDoubleChecked = window.confirm('Antrag zum Praktikum wirklich genehmigen?');
