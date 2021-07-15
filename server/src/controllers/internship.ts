@@ -335,7 +335,54 @@ export async function findInternshipsInSemester(
     })
   );
 
-  res.json(internships.filter(internship => internship ?? false));
+  res.json(internships.filter((internship) => internship ?? false));
+}
+
+export async function getInternshipLocations(req: Request, res: Response): Promise<void> {
+  const matcher: any = { internships: { $ne: [] } };
+  if (req.query.semester) matcher.inSemester = req.query.semester;
+
+  const locations = await InternshipModule.aggregate([
+    { $match: matcher },
+    { $unwind: "$internships" },
+    {
+      $lookup: {
+        from: "internships",
+        localField: "internships",
+        foreignField: "_id",
+        as: "internship",
+      },
+    },
+    {
+      $project: {
+        internship: { $first: "$internship" },
+      },
+    },
+    {
+      $lookup: {
+        from: "companies",
+        localField: "internship.company",
+        foreignField: "_id",
+        as: "company",
+      },
+    },
+    {
+      $project: {
+        company: { $first: "$company" },
+      },
+    },
+    {
+      $replaceRoot: {
+        newRoot: {
+          city: "$company.address.city",
+          country: "$company.address.country",
+          coordinates: "$company.address.coordinates",
+        },
+      },
+    },
+  ]);
+
+  res.json(locations);
 }
 
 /**
