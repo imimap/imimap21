@@ -16,11 +16,15 @@ function isValidPdf(path: string) {
 
 export interface IPdfDocument extends Document {
   events: IEvent[];
-  path(): string;
+  path: string;
   status: string;
+
   nextPath(): string;
+
   submit(creator: Types.ObjectId, newPath: string): Promise<IPdfDocument>;
+
   accept(creator: Types.ObjectId, newPath?: string): Promise<IPdfDocument>;
+
   reject(creator: Types.ObjectId): Promise<IPdfDocument>;
 }
 
