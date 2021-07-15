@@ -33,6 +33,7 @@ export async function findInternshipModule(
 export async function listInternshipModules(req: Request, res: Response): Promise<void> {
   const filter: FilterQuery<IInternshipModule> = {};
   if (req.query.semester) filter.inSemester = req.query.semester as string;
+  if (req.query.status) filter.status = req.query.status as string;
   res.json(await InternshipModule.find(filter).lean());
 }
 
