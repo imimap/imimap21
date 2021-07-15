@@ -614,8 +614,14 @@ export function submitPdf(
     }
 
     // Check if file was uploaded
-    if (!req.files || Object.keys(req.files).length === 0)
+    if (!req.files || Object.keys(req.files).length === 0) {
+      // Check if user is admin and file was accepted
+      if (user.isAdmin && req.body.accept) {
+        res.json(await internship.get(pdfProperty).accept(user._id));
+        return;
+      }
       return next(new BadRequest("No files were uploaded"));
+    }
 
     // Save uploaded file
     const pdf = req.files.pdf as UploadedFile;
