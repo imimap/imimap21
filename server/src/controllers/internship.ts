@@ -336,7 +336,7 @@ export async function findInternshipsInSemester(
 export async function getInternshipLocations(req: Request, res: Response): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const matcher: any = { internships: { $ne: [] } };
-  if (req.query.semester) matcher.inSemester = req.query.semester;
+  if (req.query.semester && req.query.semester !== "") matcher.inSemester = req.query.semester;
 
   const locations = await InternshipModule.aggregate([
     { $match: matcher },
@@ -378,7 +378,7 @@ export async function getInternshipLocations(req: Request, res: Response): Promi
     },
   ]);
 
-  res.json(locations);
+  res.json(locations.filter((l) => Object.keys(l).length > 0));
 }
 
 /**
