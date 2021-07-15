@@ -17,10 +17,16 @@
           <div class="col-lg-3 col-md-12 mb-3">
             <select class="form-select"
                     aria-label="Sortieren nach"
-                    v-model="currentFilterDuration">
-              <option selected value="">Dauer...</option>
-              <option value="uncomplete">&lt; 16 Wochen</option>
-              <option value="complete">&#8925; 16 Wochen</option>
+                    v-model="currentFilterSemester"
+                    @change="() => {updateList()}">
+              <option value="SS2019">SS2019</option>
+              <option value="WS2019">WS2019</option>
+              <option value="SS2020">SS2020</option>
+              <option value="WS2020">WS2020</option>
+              <option value="SS2021">SS2021</option>
+              <option selected value="WS2021">WS2021</option>
+              <option value="SS2022">SS2022</option>
+              <option value="WS2022">WS2022</option>
             </select>
           </div>
           <div class="col-lg-3 col-md-12 mb-3">
@@ -28,9 +34,11 @@
                     aria-label="Sortieren nach"
                     v-model="currentFilterStatus">
               <option selected value="">Status...</option>
-              <option value="uncomplete">Unvollständig</option>
-              <option value="complete">Vollständig</option>
-              <option value="passed">Bestanden</option>
+              <option value="unknown">unknown</option>
+              <option value="planned">planned</option>
+              <option value="postponement requested">postponement requested</option>
+              <option value="postponement rejected">postponement rejected</option>
+              <option value="passed">passed</option>
             </select>
           </div>
           <div class="col-lg-3 col-md-12 mb-3">
@@ -46,7 +54,8 @@
         </div>
 
         <div v-if="!isLoading" class="accordion" id="listAccordion">
-          <div v-for="(row, index) in studentsWithSearch" v-bind:key="index" class="accordion-item">
+          <div v-for="(row, index) in studentsWithSearchAndFilter" v-bind:key="index"
+               class="accordion-item">
             <h2 class="accordion-header" v-bind:id="index">
               <button class="accordion-button collapsed"
                       type="button"
@@ -67,21 +76,21 @@
                     <div class="col-2">
                       <h6 class="list-item-label">Praktika</h6>
                       <span class="">
-                        {{ row.internshipModule.internships.length }}
+                        {{ row.studentProfile.internship.internships.length }}
                       </span>
                     </div>
                     <div class="col-2">
                       <h6 class="list-item-label">Gesamtdauer</h6>
                       <span class="">
-                        {{ getInternshipModuleDuration(row.internshipModule.internships) }}
+                        {{ getInternshipModuleDuration(row.studentProfile.internship.internships) }}
                       </span>
                     </div>
                     <div class="col-2 text-center">
                       <h6 class="list-item-label">Status</h6>
 <!--                      <span class="badge rounded-pill bg-warning">-->
                       <span :class="`badge rounded-pill ${internshipModuleStatusColors[row
-                      .internshipModule.status]}`">
-                        {{ row.internshipModule.status }}
+                      .studentProfile.internship.status]}`">
+                        {{ row.studentProfile.internship.status }}
                       </span>
                     </div>
                   </div>
@@ -98,7 +107,7 @@
                     <div class="col-8">
                       <h5>Praktika</h5>
                       <div v-for="(internship, internshipIndex) in
-                      row.internshipModule.internships"
+                      row.studentProfile.internship.internships"
                            v-bind:key="internshipIndex" class="card mb-3">
                         <div class="card-header">
                           {{ getDateString(internship.startDate) + ' - '
@@ -109,11 +118,11 @@
                         </div>
                         <div class="card-body">
                           <h5 class="card-title">
-                            {{ internship.companyDetails.companyName }}
+                            {{ internship.company.companyName }}
                           </h5>
                           <h6 class="card-subtitle mb-2 text-muted">
-                            {{ internship.companyDetails.address.city }},
-                            {{ internship.companyDetails.address.country }}
+                            {{ internship.company.address.city }},
+                            {{ internship.company.address.country }}
                           </h6>
                           <div class="row">
                             <div class="col-lg-4 col-md-12 mb-2">
@@ -173,9 +182,9 @@
                       <div class="d-grid gap-2 mt-4 col-8 mx-auto">
                         <button class="btn btn-secondary"
                                 type="button"
-                                :disabled="row.internshipModule.aepPassed"
+                                :disabled="row.studentProfile.internship.aepPassed"
                                 @click="quickActionMarkAepPassedOnInternshipModule(
-                                  row.internshipModule._id,
+                                  row.studentProfile.internship._id,
                                   `${row.firstName} ${row.lastName}`)">
                           AEP bestanden markieren
                         </button>
@@ -507,7 +516,7 @@ export default defineComponent({
       currentEditInternshipModuleIndex: 0,
       currentEditInternshipPartIndex: 0,
       currentSorting: '',
-      currentFilterDuration: '',
+      currentFilterSemester: 'WS2021',
       currentFilterStatus: '',
       currentSearch: '',
       students: [] as Student[],
@@ -516,8 +525,8 @@ export default defineComponent({
     };
   },
   computed: {
-    studentsWithSearch(): Student[] {
-      return this.students.filter((student) => student.firstName.toLowerCase()
+    studentsWithSearchAndFilter(): Student[] {
+      return this.students.filter((student) => (student.firstName.toLowerCase()
         .includes(this.currentSearch.toLowerCase())
         || student
           .lastName
@@ -526,7 +535,8 @@ export default defineComponent({
         || student
           .studentProfile.studentId
           .toLowerCase()
-          .includes(this.currentSearch.toLowerCase()));
+          .includes(this.currentSearch.toLowerCase())) && student.studentProfile.internship.status
+        .includes(this.currentFilterStatus));
     },
   },
   mounted() {
@@ -538,27 +548,9 @@ export default defineComponent({
     getTimeDifferenceDays,
     async updateList() {
       this.isLoading = true;
-      try {
-        const studentList = await getStudentsList() as Student[];
-        for (let i = 0; i < studentList.length; i += 1) {
-          // eslint-disable-next-line no-await-in-loop
-          studentList[i].internshipModule = await getInternshipModule(studentList[i]
-            .studentProfile.internship);
-          for (let k = 0; k < studentList[i].internshipModule.internships.length; k += 1) {
-            studentList[i]
-              .internshipModule
-              .internships[k]
-              // eslint-disable-next-line no-await-in-loop
-              .companyDetails = await getCompany(studentList[i].internshipModule
-                .internships[k]
-                .company);
-          }
-        }
-        this.students = studentList;
-        console.log(studentList);
-      } catch (err) {
-        console.log(err);
-      }
+      const studentList = await getStudentsList(this.currentFilterSemester) as Student[];
+      console.log(studentList);
+      this.students = studentList;
       this.isLoading = false;
     },
     async clearSearch(studentId: string, studentName: string) {
