@@ -1,18 +1,20 @@
 import { Router } from "express";
-import { param, query } from "express-validator";
-import { Semester } from "../helpers/semesterHelper";
+import { param } from "express-validator";
 import authMiddleware from "../authentication/middleware";
-import { validate } from "../helpers/validation";
+import { isObjectId, validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
-import { getStudents } from "../controllers/student";
+import { clearInternshipSearchHistory, getStudents } from "../controllers/student";
 
 const studentRouter = Router();
 
-studentRouter.get(
-  "/",
+studentRouter.get("/", authMiddleware(true), validate, asyncHandler(getStudents));
+
+studentRouter.patch(
+  "/:id/clear-search",
   authMiddleware(true),
+  param("id").custom(isObjectId),
   validate,
-  asyncHandler(getStudents)
+  asyncHandler(clearInternshipSearchHistory)
 );
 
 export default studentRouter;
