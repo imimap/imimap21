@@ -18,7 +18,7 @@
           </div>
         </div>
 
-        <div class="accordion" id="listAccordion">
+        <div v-if="!isLoading" class="accordion" id="listAccordion">
           <div v-for="(row, index) in companies" v-bind:key="index" class="accordion-item">
             <h2 class="accordion-header" v-bind:id="index">
               <button class="accordion-button collapsed"
@@ -76,6 +76,11 @@
 
               </div>
             </div>
+          </div>
+        </div>
+        <div v-else class="d-flex justify-content-center">
+          <div class="spinner-border text-htw" role="status">
+            <span class="visually-hidden">Loading...</span>
           </div>
         </div>
       </div>
@@ -223,6 +228,7 @@ export default defineComponent({
       currentEditCompanyIndex: 0,
       companies: [] as Company[],
       currentSorting: '',
+      isLoading: false,
     };
   },
   mounted() {
@@ -231,6 +237,7 @@ export default defineComponent({
   methods: {
     updateList() {
       // API call for GET list with params
+      this.isLoading = true;
       getCompaniesList()
         .then((list) => {
           const companiesList = [] as Company[];
@@ -261,6 +268,7 @@ export default defineComponent({
             });
           });
           this.companies = companiesList;
+          this.isLoading = false;
         }).catch((err) => console.log(err));
     },
     changeCurrentEditCompanyIndex(companyId: string) {
@@ -341,6 +349,12 @@ export default defineComponent({
     font-size: 0.8rem;
     color: #666666;
     text-transform: uppercase;
+  }
+
+  .text-htw {
+    color: rgba(119, 185, 0, 1);
+    width: 3rem;
+    height: 3rem;
   }
 
 </style>

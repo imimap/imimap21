@@ -1,5 +1,5 @@
 export default class Company {
-  _id = '';
+  id = '';
 
   mainLanguage = '';
 

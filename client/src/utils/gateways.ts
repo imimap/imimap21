@@ -7,7 +7,7 @@ export const getStudentsList = async () => apiClient.get('/students')
     return [];
   });
 
-export const getUser = async (id) => apiClient.get(`/users/${id}`)
+export const getUser = async (id) => apiClient.get(`/students/${id}`)
   .then((res) => res.data)
   .catch((err) => {
     console.log(err);
@@ -42,15 +42,29 @@ export const getCompany = async (id) => apiClient.get(`/companies/${id}`)
     return [];
   });
 
-export const getPostponementsList = async () => apiClient.get('/internship-modules/postponements')
+export const getPostponementsList = async () => apiClient.get('/postponement-requests')
   .then((res) => res.data)
   .catch((err) => {
     console.log(err);
     return [];
   });
 
-export const getPostponement = async (id) => apiClient.get(`/internship-modules/postponements/${id}`)
+export const getPostponement = async (id) => apiClient.get(`/postponement-requests/${id}`)
   .then((res) => res.data)
+  .catch((err) => {
+    console.log(err);
+    return [];
+  });
+
+export const acceptPostponement = async (id) => apiClient.patch(`/postponement-requests/${id}/accept`)
+  .then((res) => res)
+  .catch((err) => {
+    console.log(err);
+    return [];
+  });
+
+export const rejectPostponement = async (id) => apiClient.patch(`/postponement-requests/${id}/reject`)
+  .then((res) => res)
   .catch((err) => {
     console.log(err);
     return [];
