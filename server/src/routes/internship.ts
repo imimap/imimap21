@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { param, query } from "express-validator";
+import { body, param, query } from "express-validator";
 import authMiddleware from "../authentication/middleware";
 import {
   createInternship,
@@ -60,7 +60,7 @@ internshipRouter.get(
 internshipRouter.post(
   "/",
   authMiddleware(),
-  query([
+  body([
     "startDate",
     "endDate",
     "tasks",
