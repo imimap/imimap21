@@ -8,7 +8,8 @@
         <img width="130" height="130" alt="" src="/assets/plane.gif">
       </router-link>
       <div class="mt-3 text-white">
-        Please use your HRZ-Account for logging in.
+        This is a staging environment set up for demonstration purposes only.
+        It is only meant to be used for showcasing the MEVN-IMI-Map during the showtime.
       </div>
         <form v-on:submit.prevent>
           <div class="input-group w-auto mt-3 row">
@@ -47,9 +48,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import {
-  login,
-} from '@/utils/auth';
+import { login } from '@/utils/auth';
 
 export default defineComponent({
   name: 'LoginComponent',
