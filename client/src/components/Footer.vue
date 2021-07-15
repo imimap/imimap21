@@ -5,8 +5,9 @@
         <div class="imi_logo"></div>
         <div class="htw_logo"></div>
         <div class="footer-text my-3">
-          <p>IMI-Maps @ V 1.4.1, production - Projekt im Studiengang
-            Internationale Medieninformatik der HTW Berlin.</p>
+          <p>Die neue IMIMAP 2021, production Environment - Projekt im Studiengang
+            Internationale Medieninformatik der HTW Berlin. Mehr Informationen zum Projekt
+            auf der Webseite der HTW <a href="https://showtime.f4.htw-berlin.de/">Showtime</a></p>
         </div>
         <div class="footer-text"><a href="https://www.htw-berlin.de/datenschutz/" target="_blank">Datenschutz</a></div>
       </div>

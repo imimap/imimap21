@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/user";
+import { constants } from "http2";
 import { Forbidden, NotFound } from "http-errors";
 
 export async function getStudents(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -31,4 +32,19 @@ export async function getStudentById(
   } else {
     return next(new Forbidden("You are not allowed to fetch student details."));
   }
+}
+
+export async function clearInternshipSearchHistory(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findById(req.params.id);
+  if (!user || !user.studentProfile)
+    return next(new NotFound(`Student with id ${req.params.id} not found`));
+
+  user.studentProfile.internshipsSeen = [];
+  await user.save();
+  res.statusCode = constants.HTTP_STATUS_NO_CONTENT;
+  res.send();
 }

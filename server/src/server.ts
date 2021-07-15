@@ -9,6 +9,7 @@ import router from "./routes";
 import database from "./database";
 import ldapStrategy from "./authentication/ldapStrategy";
 import localStrategy from "./authentication/localStrategy";
+import * as fileUpload from "express-fileupload";
 
 dotenvConfig({ path: "../.env" });
 
@@ -23,6 +24,7 @@ const app = express();
 // Configure middlewares
 app.use(cors());
 app.use(express.json());
+app.use(fileUpload());
 app.use(passport.initialize());
 passport.use(ldapStrategy);
 if (process.env.NODE_ENV === "development" && process.env.BYPASS_LDAP) passport.use(localStrategy);

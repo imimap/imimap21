@@ -2,16 +2,17 @@ import { Router } from "express";
 import { param, query } from "express-validator";
 import authMiddleware from "../authentication/middleware";
 import {
-  findInternships,
-  getAllOperationalAreas,
-  getAllPaymentTypes,
-  getAllProgrammingLanguages,
-  getInternshipsById,
   createInternship,
+  findInternships,
+  getInternshipsById,
+  submitPdf,
+  updateInternship,
 } from "../controllers/internship";
-import { validate } from "../helpers/validation";
+import { isObjectId, validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
 import { Semester } from "../helpers/semesterHelper";
+import validator from "validator";
+import isBoolean = validator.isBoolean;
 
 const internshipRouter = Router();
 
@@ -29,9 +30,12 @@ internshipRouter.get(
     "programmingLanguage",
     "size",
   ]).toUpperCase(),
-  query(["semester"])
+  query("semester")
     .toUpperCase()
     .custom((s) => Semester.isValidSemesterString(s) || !s),
+  query("seen")
+    .toLowerCase()
+    .custom((s) => s ? isBoolean(s) : true),
   validate,
   asyncHandler(findInternships)
 );
@@ -39,7 +43,7 @@ internshipRouter.get(
 internshipRouter.get(
   "/:id",
   authMiddleware(),
-  param("id").custom((id) => /[0-9a-f]{24}/.test(id) || id === "my"),
+  param("id").custom((id) => isObjectId(id) || id === "my" || id === "random"),
   validate,
   asyncHandler(getInternshipsById)
 );
@@ -55,7 +59,6 @@ internshipRouter.post(
     "livingCosts",
     "salary",
     "workingHoursPerWeek",
-    "supervisor",
     "programmingLanguages", //array
     "paymentTypes", //enum, array
     //supervisor
@@ -67,77 +70,83 @@ internshipRouter.post(
   asyncHandler(createInternship)
 );
 
+internshipRouter.patch(
+  "/:id",
+  authMiddleware(),
+  param("id").custom(isObjectId),
+  query([
+    "startDate",
+    "endDate",
+    "tasks",
+    "operationalArea",
+    "livingCosts",
+    "salary",
+    "workingHoursPerWeek",
+    "programmingLanguages", //array
+    "paymentTypes", //enum, array
+    //supervisor
+    "supervisorFullName",
+    "supervisorEmailAddress",
+  ]),
+  validate,
+  asyncHandler(updateInternship)
+);
+
 /* PDF endpoints */
-/*
 internshipRouter.post(
-  "/pdf/lsfEctsProof",
+  "/:id/pdf/request",
   authMiddleware(),
+  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
   validate,
-  asyncHandler(submitLsfEctsProofPdf)
-);
- */
-/*
-internshipRouter.post(
-  "/pdf/locationJustification",
-  authMiddleware(),
-  validate,
-  asyncHandler(submitlocationJustificationPdf)
-);
- */
-/*
-internshipRouter.post(
-  "/pdf/contract",
-  authMiddleware(),
-  validate,
-  asyncHandler(submitContractPdf)
-);
- */
-/*
-internshipRouter.post(
-  "/pdf/bvgTicketExemption",
-  authMiddleware(),
-  validate,
-  asyncHandler(submitBvgTicketExemptionPdf)
-);
- */
-/*
-internshipRouter.post(
-  "/pdf/certificate",
-  authMiddleware(),
-  validate,
-  asyncHandler(submitCertificatePdf)
-);
- */
-/*
-internshipRouter.post(
-  "/pdf/reportPdf",
-  authMiddleware(),
-  validate,
-  asyncHandler(submitReportPdf)
-);
- */
-
-/* The following endpoints can be used to provide options to a search form */
-
-internshipRouter.get(
-  "/properties/payment-types",
-  authMiddleware(),
-  validate,
-  asyncHandler(getAllPaymentTypes)
+  asyncHandler(submitPdf("requestPdf"))
 );
 
-internshipRouter.get(
-  "/properties/operational-areas",
+internshipRouter.post(
+  "/:id/pdf/lsfEctsProof",
   authMiddleware(),
+  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
   validate,
-  asyncHandler(getAllOperationalAreas)
+  asyncHandler(submitPdf("lsfEctsProofPdf"))
 );
 
-internshipRouter.get(
-  "/properties/programming-languages",
+internshipRouter.post(
+  "/:id/pdf/locationJustification",
   authMiddleware(),
+  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
   validate,
-  asyncHandler(getAllProgrammingLanguages)
+  asyncHandler(submitPdf("locationJustificationPdf"))
+);
+
+internshipRouter.post(
+  "/:id/pdf/contract",
+  authMiddleware(),
+  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  validate,
+  asyncHandler(submitPdf("contractPdf"))
+);
+
+internshipRouter.post(
+  "/:id/pdf/bvgTicketExemption",
+  authMiddleware(),
+  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  validate,
+  asyncHandler(submitPdf("bvgTicketExemptionPdf"))
+);
+
+internshipRouter.post(
+  "/:id/pdf/certificate",
+  authMiddleware(),
+  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  validate,
+  asyncHandler(submitPdf("certificatePdf"))
+);
+
+internshipRouter.post(
+  "/:id/pdf/report",
+  authMiddleware(),
+  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  validate,
+  asyncHandler(submitPdf("reportPdf"))
 );
 
 export default internshipRouter;

@@ -17,7 +17,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Map from '@/components/Map.vue';
-import http from '@/utils/http-common';
 
 export default defineComponent({
   name: 'Home',

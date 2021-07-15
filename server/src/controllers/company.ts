@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/user";
-import { Forbidden, NotFound } from "http-errors";
+import { Forbidden, NotFound, BadRequest } from "http-errors";
 import { Company } from "../models/company";
 
 /**
@@ -15,6 +15,8 @@ export async function getAllCompanies(
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  if (req.query.companyName || req.query.branchName) return searchCompanyByName(req, res, next);
+
   const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
   if (!user) return next(new NotFound("User not found"));
   if (!user.isAdmin) return next(new Forbidden("Only admins may get all companies."));
@@ -47,6 +49,44 @@ export async function getCompanyById(
   } else {
     return next(new Forbidden("You are not allowed to fetch company details."));
   }
+}
+
+/**
+ * Returns a companies that fits a certain company name and optionally branch name
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function searchCompanyByName(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
+  if (!user) return next(new NotFound("User not found"));
+
+  const searchOptions: { [k: string]: any } = {};
+
+  if (req.query.companyName) {
+    searchOptions.companyName = {
+      $regex: req.query.companyName,
+      $options: "i",
+    };
+  }
+
+  if (req.query.branchName) {
+    searchOptions.branchName = {
+      $regex: req.query.branchName,
+      $options: "i",
+    };
+  }
+
+  let select = null;
+  if (!user.isAdmin) select = "companyName branchName address.country";
+
+  const companies = await Company.findOne(searchOptions).select(select).lean();
+
+  res.json(companies);
 }
 
 /**
@@ -103,15 +143,14 @@ function getCompanyObject(propsObject: any) {
     "size",
   ];
   for (const prop of directProps) {
-    companyProps[prop] = propsObject[prop];
+    if(propsObject[prop]) companyProps[prop] = propsObject[prop];
   }
 
   //address props
   const addressProps = ["street", "streetNumber", "additionalLines", "zip", "city", "country"];
   for (const prop of addressProps) {
     if (propsObject[prop]) {
-      if (!companyProps.address) companyProps.address = {};
-      companyProps.address[prop] = propsObject[prop];
+      companyProps[`address.${prop}`] = propsObject[prop];
     }
   }
 
@@ -132,6 +171,37 @@ export async function createCompany(
   const companyProps = getCompanyObject(req.query);
   const newCompany = new Company(companyProps);
   const savedCompany = await newCompany.save();
+
+  res.json(savedCompany);
+}
+
+/**
+ * Update company
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function updateCompany(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
+  if (!user) return next(new NotFound("User not found"));
+  if (!user.isAdmin) return next(new Forbidden("Only admins may edit companies"));
+
+  if (!req.params.id) return next(new BadRequest("Please provide a company id."));
+  const companyToUpdate = await Company.findById(req.params.id);
+  if (!companyToUpdate) return next(new NotFound("Company not found"));
+
+  const companyProps = getCompanyObject(req.query);
+  for (const prop in companyProps) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    companyToUpdate[prop] = companyProps[prop];
+  }
+
+  const savedCompany = await companyToUpdate.save();
 
   res.json(savedCompany);
 }

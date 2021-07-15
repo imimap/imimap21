@@ -53,3 +53,13 @@ export async function profile(req: Request, res: Response, next: NextFunction): 
   if (!user) return next(new NotFound("User not found"));
   res.json(user);
 }
+
+export async function editProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email });
+  if (!user) return next(new NotFound("User not found"));
+
+  if (req.body.firstName) user.firstName = req.body.firstName;
+  if (req.body.lastName) user.lastName = req.body.lastName;
+
+  res.json(await user.save());
+}

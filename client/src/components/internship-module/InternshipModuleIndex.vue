@@ -1,17 +1,17 @@
 <template>
   <template v-if="loadingState !== true && internshipModule !== null">
     <!-- Kein Praktikum gefunden -->
-    <no-complete-internship
-      v-if="internshipModule.status === 'unknown' || hasPostponements"
-    ></no-complete-internship>
-    <!-- Kein Praktikum aber Verschiebungen -->
-    <postponements-list v-if="hasPostponements" v-bind:postponements="postponements" />
+    <template v-if="internshipModule.status === 'unknown' || hasRequestedPostponements">
+      <no-complete-internship></no-complete-internship>
+      <!-- Kein Praktikum aber Verschiebungen -->
+      <postponements-list v-if="hasRequestedPostponements" v-bind:postponements="postponements" />
+    </template>
     <!-- Praktikum gefunden -->
-    <complete-internship v-else></complete-internship>
+    <complete-internship v-else v-bind:internshipModule="internshipModule"></complete-internship>
   </template>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
 import NoCompleteInternship from './NoInternshipModule.vue';
@@ -25,7 +25,7 @@ export default defineComponent({
     CompleteInternship,
     PostponementsList,
   },
-  data() {
+  data(): any {
     return {
       loadingState: true,
       internshipModule: null,
@@ -48,11 +48,14 @@ export default defineComponent({
     this.getUserInternship();
   },
   computed: {
-    postponements() {
+    postponements(): any {
       return this.internshipModule.events.filter((event) => event.changes?.newSemester);
     },
-    hasPostponements() {
-      return this.postponements.length > 0;
+    hasRequestedPostponements(): boolean {
+      return this.postponements.length > 0 && this.internshipModule.events.filter((event) => event.changes?.status !== 'planned').length > 0;
+    },
+    hasInternships(): boolean {
+      return this.internshipModule.internships.length > 0;
     },
   },
 });
