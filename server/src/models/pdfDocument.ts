@@ -63,7 +63,7 @@ PdfDocumentSchema.virtual("path").get(function () {
 PdfDocumentSchema.methods.nextPath = function () {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const currentPath = this.path();
+  const currentPath = this.path;
   if (!currentPath) return null;
   const pathParts = currentPath.split("/");
   pathParts.pop();
