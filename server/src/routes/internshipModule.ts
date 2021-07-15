@@ -10,6 +10,7 @@ import {
 } from "../controllers/internshipModule";
 import { isObjectId, validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
+import { InternshipModuleStatuses } from "../models/internshipModule";
 
 const internshipModuleRouter = Router();
 
@@ -19,6 +20,9 @@ internshipModuleRouter.get(
   query("semester")
     .toUpperCase()
     .custom((s) => Semester.isValidSemesterString(s) || !s),
+  query("status")
+    .optional()
+    .custom((s) => Object.values(InternshipModuleStatuses).indexOf(s) !== -1),
   validate,
   asyncHandler(listInternshipModules)
 );
