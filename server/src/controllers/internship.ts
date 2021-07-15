@@ -25,6 +25,8 @@ export async function getInternshipsById(
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  if (req.params.id === "random") return getRandomInternship(req, res, next);
+
   const user = await User.findOne({ emailAddress: req.user?.email })
     .select("isAdmin studentProfile")
     .populate({
@@ -52,6 +54,57 @@ export async function getInternshipsById(
   } else {
     return next(new Forbidden("You may only access your own internship."));
   }
+}
+
+/**
+ * Returns all information on certain internship for admin or on own internship for student.
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function getRandomInternship(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email })
+    .select("isAdmin studentProfile")
+    .populate({
+      path: "studentProfile.internship",
+      lean: true,
+    });
+  if (!user) return next(new NotFound("User not found"));
+
+  let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
+  if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
+
+  let maxOffset = await Internship.count();;
+  const options: { [k: string]: unknown } = {};
+  if (user.studentProfile?.internship) {
+    if (user.studentProfile.internshipsSeen && user.studentProfile.internshipsSeen.length >= 12) {
+      options._id = {
+        $in: user.studentProfile.internshipsSeen,
+      };
+      maxOffset = user.studentProfile.internshipsSeen.length;
+    } else {
+      options._id = {
+        $nin: user.studentProfile.internship.internships,
+      };
+    }
+  }
+  const randomOffset = Math.floor(Math.random() * maxOffset);
+
+  const internship = await Internship.findOne(options).select(select).skip(randomOffset).lean();
+
+  if (!internship) return next(new NotFound("Internship not found"));
+
+  if (user.studentProfile) {
+    if (!user.studentProfile.internshipsSeen) user.studentProfile.internshipsSeen = [];
+    user.studentProfile.internshipsSeen.push(internship._id);
+    await user.save();
+  }
+
+  res.json(internship);
 }
 
 /**

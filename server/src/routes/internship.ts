@@ -42,7 +42,7 @@ internshipRouter.get(
 internshipRouter.get(
   "/:id",
   authMiddleware(),
-  param("id").custom((id) => /[0-9a-f]{24}/.test(id) || id === "my"),
+  param("id").custom((id) => /[0-9a-f]{24}/.test(id) || id === "my" || id === "random"),
   validate,
   asyncHandler(getInternshipsById)
 );
