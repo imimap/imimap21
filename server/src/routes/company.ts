@@ -8,11 +8,8 @@ import { Router } from "express";
 import {
   createCompany,
   getAllCompanies,
-  getAllCountries,
-  getCities,
   getCompanyById,
 } from "../controllers/company";
-import { getInternshipsById } from "../controllers/internship";
 
 const companyRouter = Router();
 
@@ -31,18 +28,6 @@ companyRouter.get(
   validate,
   asyncHandler(getCompanyById)
 );
-
-companyRouter.get("/cities", authMiddleware(), validate, asyncHandler(getCities));
-
-companyRouter.get(
-  "/:country/cities",
-  authMiddleware(),
-  param("country"),
-  validate,
-  asyncHandler(getCities)
-);
-
-companyRouter.get("/countries", authMiddleware(), validate, asyncHandler(getAllCountries));
 
 companyRouter.post(
   "/",
