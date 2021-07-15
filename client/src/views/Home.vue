@@ -41,7 +41,7 @@ export default defineComponent({
     async searchInternshipBySemester() {
       this.loadingState = true;
       try {
-        const res = await http.get('/internships', { params: { semester: this.selectedSemester } });
+        const res = await http.get('/internships', { params: { semester: this.selectedSemester, seen: false } });
         this.searchResults = await res.data;
         this.loadingState = false;
       } catch (err) {
