@@ -320,7 +320,12 @@ export async function findInternshipsInSemester(
 
   const internships = await Promise.all(
     internshipIds.map((id: Types.ObjectId) => {
-      return Internship.findById(id)
+      return Internship.findOne({
+        _id: id,
+        company: {
+          $ne: null,
+        },
+      })
         .populate({
           path: "company",
           select: "address",
@@ -330,7 +335,7 @@ export async function findInternshipsInSemester(
     })
   );
 
-  res.json(internships);
+  res.json(internships.filter(internship => internship ?? false));
 }
 
 /**
