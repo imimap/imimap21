@@ -136,11 +136,12 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
+import { Internship } from '@/store/types/Internship';
 
 export default defineComponent({
   name: 'Internship',
   props: {
-    internship: {} as PropType<{[key: string]: any}>,
+    internship: {} as PropType<Internship>,
   },
   computed: {
     startDate(): Date | null {

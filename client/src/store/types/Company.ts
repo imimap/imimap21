@@ -1,5 +1,6 @@
 export interface Company {
   _id: string;
+  id: string;
   mainLanguage: string;
   excludedFromSearch: boolean;
   companyName: string;
