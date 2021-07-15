@@ -36,9 +36,9 @@ const search = {
   orientation: 'Bereich',
   tookPlace: 'Fand statt in: ',
   payment: 'Bezahlung: ',
-  website: 'Website',
-  tasks: 'Aufgaben',
-  contact: 'Kontakt',
+  website: 'Website: ',
+  tasks: 'Aufgaben: ',
+  contact: 'Kontakt: ',
   programmingLanguages: 'Programmiersprachen: ',
 };
 

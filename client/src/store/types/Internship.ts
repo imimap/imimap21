@@ -1,7 +1,9 @@
 import { Event } from '@/store/types/Event';
+import { Company } from '@/store/types/Company';
 
 export interface Internship {
-  companyBranch: {[key: string]: any};
+  _id: string;
+  company: Company;
   description: string;
   tasks: string;
   operationalArea: string;
