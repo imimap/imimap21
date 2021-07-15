@@ -490,8 +490,8 @@ import Student from '@/models/Student';
 import { getCompany, getInternshipModule, getStudentsList } from '@/utils/gateways';
 import { getDateString, getInternshipModuleDuration, getTimeDifferenceDays } from '@/utils/admin';
 import Company from '@/models/Company';
-import InternshipModule from '@/models/InternshipModule';
 import internshipModuleStatusColors from '@/models/InternshipModuleStatus';
+import { InternshipModule } from '@/store/types/InternshipModule';
 
 export default defineComponent({
   name: 'UsersList',

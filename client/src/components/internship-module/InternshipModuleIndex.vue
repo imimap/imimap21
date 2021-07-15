@@ -6,7 +6,8 @@
     <postponements-list v-if="hasRequestedPostponements" v-bind:postponements="postponements"/>
     <!-- Praktikum gefunden -->
     <complete-internship v-if="internshipModuleHasBeenPlanned"
-                         v-bind:internshipModule="internshipModule"/>
+                         v-bind:internshipModule="internshipModule"
+                          v-on:replaceInternship="replaceInternship"/>
   </template>
 </template>
 
@@ -15,6 +16,7 @@ import { defineComponent } from 'vue';
 import { InternshipModule } from '@/store/types/InternshipModule';
 import { Event } from '@/store/types/Event';
 import http from '@/utils/http-common';
+import { Internship } from '@/store/types/Internship';
 import NoCompleteInternship from './NoInternshipModule.vue';
 import CompleteInternship from './InternshipModule.vue';
 import PostponementsList from './PostponementsList.vue';
@@ -43,6 +45,20 @@ export default defineComponent({
         this.loadingState = false;
       } catch (err) {
         console.log(err);
+      }
+    },
+    replaceInternship(newInternship: Internship) {
+      console.log(newInternship);
+      if (typeof this.internshipModule !== 'undefined') {
+        const index = this.internshipModule.internships.findIndex(
+          (internship) => internship._id === newInternship._id,
+        );
+        console.log(index);
+        this.internshipModule.internships.splice(
+          index,
+          1,
+          newInternship,
+        );
       }
     },
   },

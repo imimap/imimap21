@@ -53,11 +53,7 @@
           v-for="internship in this.internshipModule.internships"
           v-bind:key="internship._id"
           v-bind:internship="internship"
-        />
-        <InternshipComponent
-          v-for="internship in this.internshipModule.internships"
-          v-bind:key="internship._id"
-          v-bind:internship="internship"
+          v-on:updateInternship="replaceInternship"
         />
       </div>
     </div>
@@ -91,22 +87,31 @@ export default defineComponent({
   components: {
     InternshipComponent,
   },
+  emits: ['replaceInternship'],
   computed: {
     ...mapState(['userProfile']),
     durations(): number[] | null {
-      return this.getDurationOfPassedInternships();
+      if (this.passedInternships === null) return null;
+      return this.passedInternships.flatMap(
+        (obj) => (
+          (new Date(obj.endDate).getTime()
+            - new Date(obj.startDate).getTime()) / 1000
+        ),
+      );
     },
     passedInternships(): Internship[] | null {
       if (typeof this.internshipModule === 'undefined') return null;
-      return this.internshipModule.internships.filter((internship) => internship.status === 'passed');
+      return this.internshipModule.internships.filter(
+        (internship) => internship.status === 'planned'
+          && typeof internship.startDate !== 'undefined'
+          && typeof internship.endDate !== 'undefined'
+          && (new Date(internship.endDate) > new Date(internship.startDate)),
+      );
     },
   },
   methods: {
-    getDurationOfPassedInternships(): number[] | null {
-      if (this.passedInternships === null) return null;
-      return this.passedInternships.flatMap(
-        (obj) => new Date(obj.endDate).getTime() - new Date(obj.startDate).getTime(),
-      );
+    replaceInternship(newInternship: Internship) {
+      this.$emit('replaceInternship', newInternship);
     },
   },
 });

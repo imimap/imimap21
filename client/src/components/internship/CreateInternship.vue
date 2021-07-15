@@ -35,36 +35,49 @@
                    type="text"
                    class="form-control"
                    id="programmingLanguages"
-                   placeholder="Java C++ Assembly"/>
+                   placeholder="Java, C++, Assembly"/>
           </div>
         </div>
 
         <div class="row my-4">
           <div class="col">
-            <label for="salary">Gehalt</label>
+            <label for="salary">Gehalt in Euro</label>
             <input v-model="salary"
                    type="number"
                    min="0"
+                   step="50"
                    class="form-control"
                    id="salary"
                    placeholder="Gehalt"/>
           </div>
           <div class="col">
-            <label for="payment">Bezahlungsart</label>
-            <input v-model="payment"
-                   type="text"
-                   class="form-control"
-                   id="payment"
-                   placeholder="Bezahlungsart"/>
+            <label for="paymentType">Gehaltsmodell</label>
+            <div class="form-group d-flex internship-payment-options">
+              <div class="form-check internship-payment-option"
+                   v-for="(paymentType, index) in availablePaymentTypes"
+                   v-bind:key="index"
+                   v-bind:paymentType="paymentType"
+                    id="paymentType">
+                <input class="form-check-input"
+                       type="checkbox"
+                       :value="paymentType"
+                       :id="`checkbox-${paymentType}`"
+                       v-model="payment"/>
+                <label class="form-check-label" :for="`checkbox-${paymentType}`">
+                  {{ paymentType }}
+                </label>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="row my-4">
           <div class="col">
-            <label for="livingCosts">Lebensunterhaltskosten</label>
+            <label for="livingCosts">Lebensunterhaltskosten in Euro</label>
             <input v-model="livingCosts"
                    type="number"
                    min="0"
+                   step="50"
                    class="form-control"
                    id="livingCosts"
                    placeholder="Lebensunterhaltskosten"/>
@@ -179,8 +192,12 @@
                       id="newCompanyMainLanguage"
                       class="form-control">
                 <option value="">Bitte auswählen</option>
-                <option value="de">Deutsch</option>
-                <option value="en">Englisch</option>
+                <option v-for="(language, index) in languages"
+                        v-bind:key="index"
+                        v-bind:language="language"
+                        :value="language.language">
+                  {{ language.languageName }}
+                </option>
               </select>
             </div>
             <div class="col">
@@ -256,13 +273,12 @@
               </button>
             </div>
             <div class="col-md-2">
-              <button v-on:click="toggleAddCompanyForm = false" class="btn btn-danger">
+              <button v-on:click="abortCompanyCreation" class="btn btn-danger">
                 Abbrechen
               </button>
             </div>
           </div>
         </div>
-
         <div class="row my-4" v-if="!toggleAddCompanyForm">
           <div class="col-md-4">
             <button v-on:click="save" class="btn btn-secondary">
@@ -309,18 +325,32 @@ export default defineComponent({
       operationalArea: null,
       programmingLanguages: null,
       salary: null,
-      payment: null,
+      payment: [] as string[],
       livingCosts: null,
       workingHoursPerWeek: null,
       company: null,
       supervisorFullName: null,
       supervisorEmailAddress: null,
       tasks: null,
+      // Form Select Field Options
+      availableLanguages: {} as {[key: string]: {name: string; nativeName: string}},
+      availablePaymentTypes: [] as string[],
       // Company Object after check for existing Company or after creating a new company
       existingCompany: {} as Company,
       // Component State
       toggleAddCompanyForm: false,
     };
+  },
+  created() {
+    this.getAvailableLanguages();
+    this.getAvailablePaymentTypes();
+  },
+  computed: {
+    languages(): {language: string; languageName: string}[] {
+      return Object.keys(this.availableLanguages).flatMap(
+        (lang) => ({ language: lang, languageName: this.availableLanguages[lang].name }),
+      );
+    },
   },
   methods: {
     async save() {
@@ -331,8 +361,7 @@ export default defineComponent({
       if (this.company === null) return false;
       try {
         const res = await http.get('/companies', { params: { companyName: this.company } });
-        console.log(res);
-        if (res.data === 'null') return false;
+        if (res.data === null) return false;
         this.existingCompany = res.data;
         return true;
       } catch (err) {
@@ -340,9 +369,8 @@ export default defineComponent({
       }
     },
     async createNewCompany() {
-      if (!await this.companyExists()) {
+      if (await this.companyExists()) {
         this.toggleAddCompanyForm = !this.toggleAddCompanyForm;
-        await this.$store.dispatch('addNotification', { text: 'Firma erfolgreich angelegt!', type: 'success' });
       } else {
         try {
           const res = await http.post('/companies', null, {
@@ -365,6 +393,7 @@ export default defineComponent({
           this.existingCompany = res.data;
           await this.$store.dispatch('addNotification', { text: 'Firma erfolgreich angelegt!', type: 'success' });
           this.toggleAddCompanyForm = false;
+          this.clearNewCompanyForm();
         } catch (err) {
           await this.$store.dispatch('addNotification', { text: `Fehler beim Speichern der Firma [ERROR: ${err.message}]`, type: 'danger' });
         }
@@ -380,10 +409,10 @@ export default defineComponent({
             this.programmingLanguages,
           ),
           salary: this.salary,
-          payment: this.convertStringToArray(this.payment),
+          payment: this.payment,
           livingCosts: this.livingCosts,
           workingHoursPerWeek: this.workingHoursPerWeek,
-          company: this.existingCompany._id,
+          companyId: this.existingCompany._id,
           supervisorFullName: this.supervisorFullName,
           supervisorEmailAddress: this.supervisorEmailAddress,
           tasks: this.tasks,
@@ -393,18 +422,58 @@ export default defineComponent({
         await this.$store.dispatch('addNotification', { text: `Fehler beim Anlegen des Praktikums [ERROR: ${err.message}]`, type: 'danger' });
       }
     },
+    async getAvailableLanguages() {
+      try {
+        const res = await http.get('/info/languages');
+        this.availableLanguages = res.data;
+      } catch (err) {
+        await this.$store.dispatch('addNotification', {
+          text: `Fehler beim laden der verfügbaren Sprachen [ERROR: ${err.message}]`,
+          type: 'danger',
+        });
+      }
+    },
+    async getAvailablePaymentTypes() {
+      try {
+        const res = await http.get('/info/payment-types');
+        this.availablePaymentTypes = res.data;
+      } catch (err) {
+        await this.$store.dispatch('addNotification', {
+          text: `Fehler beim laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`,
+          type: 'danger',
+        });
+      }
+    },
+    abortCompanyCreation() {
+      this.toggleAddCompanyForm = false;
+      this.clearNewCompanyForm();
+    },
+    clearNewCompanyForm() {
+      this.newCompanyBranchName = null;
+      this.newCompanyEmailAddress = null;
+      this.newCompanyIndustry = null;
+      this.newCompanyWebsite = null;
+      this.newCompanyMainLanguage = '';
+      this.newCompanySize = '';
+      this.newCompanyStreet = null;
+      this.newCompanyStreetNumber = null;
+      this.newCompanyAdditionalLines = null;
+      this.newCompanyZip = null;
+      this.newCompanyCity = null;
+      this.newCompanyCountry = null;
+    },
     convertStringToArray(string: string | null): string[] | null {
       if (string === null) return string;
-      const result: string[] = [];
-      string.split(' ').forEach((value) => {
-        result.push(value.toString());
-      });
-      return result;
+      return string.split(', ').map((subStr) => subStr);
     },
   },
 });
 </script>
 
 <style scoped>
-
+.internship-payment-options {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: .25rem;
+}
 </style>

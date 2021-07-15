@@ -1,5 +1,6 @@
 import { Event } from '@/store/types/Event';
 import { Company } from '@/store/types/Company';
+import { PdfDocument } from '@/store/types/PdfDocument';
 
 export interface Internship {
   _id: string;
@@ -16,12 +17,13 @@ export interface Internship {
   workingHoursPerWeek: number;
   supervisor: {fullName: string; email: string};
   comment: string;
-  requestPdf: string;
-  lsfEctsProofPdf?: string;
-  locationJustificationPdfs?: string[];
-  contractPdf?: string;
-  bvgTicketExemptionRequestPdf?: string;
-  certificatePdf: string;
+  reportPdf: PdfDocument;
+  requestPdf: PdfDocument;
+  lsfEctsProofPdf: PdfDocument;
+  locationJustificationPdf: PdfDocument;
+  contractPdf: PdfDocument;
+  bvgTicketExemptionRequestPdf: PdfDocument;
+  certificatePdf: PdfDocument;
   events: Event[];
   status: string;
 }
