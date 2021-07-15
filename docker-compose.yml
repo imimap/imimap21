@@ -26,6 +26,7 @@ services:
       - AUTH_SECRET=${AUTH_SECRET}
       - BYPASS_LDAP=${BYPASS_LDAP}
       - API_HOST=${API_HOST}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
 
   db:
     image: mongo:bionic

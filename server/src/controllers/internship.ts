@@ -31,7 +31,7 @@ export async function getInternshipsById(
     .select("isAdmin studentProfile")
     .populate({
       path: "studentProfile.internship",
-      populate: { path: "internships", lean: true },
+      populate: { path: "internships", lean: true, populate: { path: "company", lean: true } },
       lean: true,
     });
 
@@ -45,7 +45,9 @@ export async function getInternshipsById(
       (internship: IInternship) => internship._id.toString() === internshipId
     )
   ) {
-    const internship = await Internship.findById(internshipId).lean();
+    const internship = await Internship.findById(internshipId)
+      .populate({ path: "company", lean: true })
+      .lean();
     if (!internship) return next(new NotFound("Internship not found"));
     res.json(internship);
   } else if (user.studentProfile && internshipId === "my") {
