@@ -351,14 +351,13 @@ function getInternshipObject(propsObject: any) {
     if (propsObject[prop]) internshipProps[prop] = propsObject[prop].toString().split(",");
   }
 
-  //supervisor props
-  internshipProps.supervisor = {
-    fullName: propsObject.supervisorFullName,
-    emailAddress: propsObject.supervisorEmailAddress,
-  };
-
-  //company
   if (propsObject.companyId) internshipProps.company = propsObject.companyId;
+
+  //supervisor props
+  if (propsObject.supervisorFullName)
+    internshipProps["supervisor.fullName"] = propsObject.supervisorFullName;
+  if (propsObject.supervisorEmailAddress)
+    internshipProps["supervisor.emailAddress"] = propsObject.supervisorEmailAddress;
 
   return internshipProps;
 }
@@ -457,7 +456,7 @@ export async function updateInternship(
   for (const prop in req.query) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    if (req.query[prop]) internshipToUpdate[prop] = req.query[prop];
+    internshipToUpdate[prop] = req.query[prop];
   }
 
   const internshipProps = getInternshipObject(req.query);
