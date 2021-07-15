@@ -10,7 +10,6 @@
         </p>
       </div>
     </div>
-
     <div class="container" style="max-width: 100vw;">
       <form role="form"
             v-on:submit.prevent>
@@ -111,11 +110,9 @@
   <!-- Search Results -->
   <div id="form-block4" class="mx-3 my-3" v-if="!loadingState && searchResults.length > 0">
     <div class="text-center">
-      <button
-        type="button"
-        class="btn btn-htw-green text-white mb-3"
-        v-on:click="cardToggle = !cardToggle"
-      >
+      <button type="button"
+              class="btn btn-htw-green text-white mb-3"
+              v-on:click="cardToggle = !cardToggle">
         {{ $t("search.showMap") }}
       </button>
     </div>
@@ -145,13 +142,11 @@
                 <td> {{ searchResult.company.address.city }}</td>
                 <td> {{ searchResult.operationalArea }}</td>
                 <td>
-                  <button
-                    class="btn btn-outline-htw-green float-right"
-                    data-bs-toggle="collapse"
-                    :data-bs-target="'#collapseResult' + searchResult._id"
-                    aria-expanded="false"
-                    :aria-controls="'#collapseResult' + searchResult._id"
-                  >
+                  <button class="btn btn-outline-htw-green float-right"
+                          data-bs-toggle="collapse"
+                          :data-bs-target="'#collapseResult' + searchResult._id"
+                          aria-expanded="false"
+                          :aria-controls="'#collapseResult' + searchResult._id">
                     Details
                   </button>
                 </td>
@@ -187,7 +182,6 @@
           </tbody>
         </table>
       </div>
-
     </div>
     <div id="map-results">
       <Map v-if="cardToggle" :locations="locations"></Map>
@@ -291,7 +285,7 @@ export default defineComponent({
             paymentType: this.paymentFilter,
           },
         });
-        res.data.forEach((internship) => this.searchResults.push(internship));
+        this.searchResults = await res.data;
         this.loadingState = false;
       } catch (err) {
         await this.$store.dispatch('addNotification', {

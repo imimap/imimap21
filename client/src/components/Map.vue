@@ -10,7 +10,10 @@ import { Address } from '@/store/types/Address';
 export default defineComponent({
   name: 'Map',
   props: {
-    locations: [] as PropType<Address[]>,
+    locations: {
+      type: [] as PropType<Address[]>,
+      default: [],
+    },
   },
   data() {
     return {
