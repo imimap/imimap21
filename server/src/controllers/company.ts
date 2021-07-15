@@ -15,6 +15,8 @@ export async function getAllCompanies(
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  if (req.query.companyName || req.query.branchName) return searchCompanyByName(req, res, next);
+
   const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
   if (!user) return next(new NotFound("User not found"));
   if (!user.isAdmin) return next(new Forbidden("Only admins may get all companies."));
@@ -47,6 +49,44 @@ export async function getCompanyById(
   } else {
     return next(new Forbidden("You are not allowed to fetch company details."));
   }
+}
+
+/**
+ * Returns a companies that fits a certain company name and optionally branch name
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function searchCompanyByName(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
+  if (!user) return next(new NotFound("User not found"));
+
+  const searchOptions: { [k: string]: any } = {};
+
+  if (req.query.companyName) {
+    searchOptions.companyName = {
+      $regex: req.query.companyName,
+      $options: "i",
+    };
+  }
+
+  if (req.query.branchName) {
+    searchOptions.branchName = {
+      $regex: req.query.branchName,
+      $options: "i",
+    };
+  }
+
+  let select = null;
+  if (!user.isAdmin) select = "companyName branchName address.country";
+
+  const companies = await Company.findOne(searchOptions).select(select).lean();
+
+  res.json(companies);
 }
 
 /**

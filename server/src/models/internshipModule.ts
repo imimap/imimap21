@@ -19,7 +19,6 @@ export interface IInternshipModule extends Document {
   inSemester: string;
   inSemesterOfStudy: number;
   aepPassed: boolean;
-  reportPdf?: IPdfDocument;
   completeDocumentsPdf?: IPdfDocument;
   events: IEvent[];
   status: string;
@@ -49,9 +48,6 @@ const InternshipModuleSchema = new Schema<IInternshipModule>({
       type: Schema.Types.ObjectId,
     },
   ],
-  reportPdf: {
-    type: PdfDocumentSchema,
-  },
   completeDocumentsPdf: {
     type: PdfDocumentSchema,
   },
