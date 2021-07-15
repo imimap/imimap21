@@ -15,15 +15,19 @@
             </select>
           </div>
           <div class="col-lg-3 col-md-12">
-            <input type="text" class="form-control" placeholder="Suche..."
-                   aria-label="Suche" aria-describedby="suche">
+            <input type="text"
+                   class="form-control"
+                   placeholder="Suche..."
+                   aria-label="Suche"
+                   aria-describedby="suche"
+                   v-model="currentSearch">
             <div id="emailHelp" class="form-text">
               Matrikelnummer oder Nachname</div>
           </div>
         </div>
 
         <div v-if="!isLoading" class="accordion" id="listAccordion">
-          <div v-for="(row, index) in postponementRequests"
+          <div v-for="(row, index) in postponementRequestsWithSearch"
                v-bind:key="index"
                class="accordion-item">
             <h2 class="accordion-header" v-bind:id="index">
@@ -114,6 +118,7 @@ import {
   acceptPostponement, rejectPostponement, getPostponementsList, getUser,
 } from '@/utils/gateways';
 import Postponement from '@/models/Postponement';
+import Student from '@/models/Student';
 
 export default defineComponent({
   name: 'PostponementsList',
@@ -122,8 +127,20 @@ export default defineComponent({
       currentEditCompanyIndex: 0,
       postponementRequests: [] as Postponement[],
       currentSorting: '',
+      currentSearch: '',
       isLoading: false,
     };
+  },
+  computed: {
+    postponementRequestsWithSearch(): Postponement[] {
+      return this.postponementRequests.filter((postponement) => postponement
+        .user.firstName.toLowerCase()
+        .includes(this.currentSearch.toLowerCase())
+        || postponement.user.lastName.toLowerCase()
+          .includes(this.currentSearch.toLowerCase())
+        || postponement.user.studentId.toLowerCase()
+          .includes(this.currentSearch.toLowerCase()));
+    },
   },
   mounted() {
     this.updateList();

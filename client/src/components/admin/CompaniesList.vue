@@ -16,10 +16,22 @@
               <option value="country">Staat</option>
             </select>
           </div>
+          <div class="col-lg-3 col-md-12">
+            <input type="text"
+                   class="form-control"
+                   placeholder="Suche..."
+                   aria-label="Suche"
+                   aria-describedby="suche"
+                   v-model="currentSearch">
+            <div id="emailHelp" class="form-text">
+              Name, Zweig oder Ort
+            </div>
         </div>
+      </div>
 
         <div v-if="!isLoading" class="accordion" id="listAccordion">
-          <div v-for="(row, index) in companies" v-bind:key="index" class="accordion-item">
+          <div v-for="(row, index) in companiesWithSearch" v-bind:key="index"
+               class="accordion-item">
             <h2 class="accordion-header" v-bind:id="index">
               <button class="accordion-button collapsed"
                       type="button"
@@ -220,6 +232,7 @@ import { defineComponent } from 'vue';
 import { getCompaniesList } from '@/utils/gateways';
 import Company from '@/models/Company';
 import store from '@/store';
+import Postponement from '@/models/Postponement';
 
 export default defineComponent({
   name: 'CompaniesList',
@@ -228,8 +241,22 @@ export default defineComponent({
       currentEditCompanyIndex: 0,
       companies: [] as Company[],
       currentSorting: '',
+      currentSearch: '',
       isLoading: false,
     };
+  },
+  computed: {
+    companiesWithSearch(): Company[] {
+      return this.companies.filter((company) => company
+        .companyName.toLowerCase()
+        .includes(this.currentSearch.toLowerCase())
+        || company.branchName.toLowerCase()
+          .includes(this.currentSearch.toLowerCase())
+        || company.address.country.toLowerCase()
+          .includes(this.currentSearch.toLowerCase())
+        || company.address.city.toLowerCase()
+          .includes(this.currentSearch.toLowerCase()));
+    },
   },
   mounted() {
     this.updateList();
