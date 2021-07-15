@@ -25,6 +25,8 @@ export async function getInternshipsById(
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  if (req.params.id === "random") return getRandomInternship(req, res, next);
+
   const user = await User.findOne({ emailAddress: req.user?.email })
     .select("isAdmin studentProfile")
     .populate({
@@ -52,6 +54,57 @@ export async function getInternshipsById(
   } else {
     return next(new Forbidden("You may only access your own internship."));
   }
+}
+
+/**
+ * Returns all information on certain internship for admin or on own internship for student.
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function getRandomInternship(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email })
+    .select("isAdmin studentProfile")
+    .populate({
+      path: "studentProfile.internship",
+      lean: true,
+    });
+  if (!user) return next(new NotFound("User not found"));
+
+  let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
+  if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
+
+  let maxOffset = await Internship.count();
+  const options: { [k: string]: unknown } = {};
+  if (user.studentProfile?.internship) {
+    if (user.studentProfile.internshipsSeen && user.studentProfile.internshipsSeen.length >= 12) {
+      options._id = {
+        $in: user.studentProfile.internshipsSeen,
+      };
+      maxOffset = user.studentProfile.internshipsSeen.length;
+    } else {
+      options._id = {
+        $nin: user.studentProfile.internship.internships,
+      };
+    }
+  }
+  const randomOffset = Math.floor(Math.random() * maxOffset);
+
+  const internship = await Internship.findOne(options).select(select).skip(randomOffset).lean();
+
+  if (!internship) return next(new NotFound("Internship not found"));
+
+  if (user.studentProfile) {
+    if (!user.studentProfile.internshipsSeen) user.studentProfile.internshipsSeen = [];
+    user.studentProfile.internshipsSeen.push(internship._id);
+    await user.save();
+  }
+
+  res.json(internship);
 }
 
 /**
@@ -85,6 +138,16 @@ export async function findInternships(
 
   // Create Options
   const options: { [k: string]: unknown } = {};
+
+  if (
+    req.query.seen === "true" &&
+    user.studentProfile?.internshipsSeen &&
+    user.studentProfile.internshipsSeen.length > 0
+  ) {
+    options._id = {
+      $in: user.studentProfile.internshipsSeen,
+    };
+  }
 
   const companyQueryFields = ["companyName", "branchName", "industry", "mainLanguage", "size"];
   companyQueryFields.forEach((field) => {
@@ -341,21 +404,23 @@ function getInternshipObject(propsObject: any) {
     "livingCosts",
     "salary",
     "workingHoursPerWeek",
-    "programmingLanguages",
-    "paymentTypes",
   ];
   for (const prop of directProps) {
     if (propsObject[prop]) internshipProps[prop] = propsObject[prop];
   }
 
-  //supervisor props
-  internshipProps.supervisor = {
-    fullName: propsObject.supervisorFullName,
-    emailAddress: propsObject.supervisorEmailAddress,
-  };
+  const directArrayProps = ["programmingLanguages", "paymentTypes"];
+  for (const prop of directArrayProps) {
+    if (propsObject[prop]) internshipProps[prop] = propsObject[prop].toString().split(",");
+  }
 
-  //company
   if (propsObject.companyId) internshipProps.company = propsObject.companyId;
+
+  //supervisor props
+  if (propsObject.supervisorFullName)
+    internshipProps["supervisor.fullName"] = propsObject.supervisorFullName;
+  if (propsObject.supervisorEmailAddress)
+    internshipProps["supervisor.emailAddress"] = propsObject.supervisorEmailAddress;
 
   return internshipProps;
 }
@@ -382,7 +447,7 @@ export async function createInternship(
   if (!user.studentProfile) return next(new NotFound("User does not appear to be a student"));
 
   // create new internship
-  const internshipProps = getInternshipObject(req.body);
+  const internshipProps = getInternshipObject(req.query);
   const newInternship = new Internship(internshipProps);
   newInternship.events = [
     {
@@ -404,7 +469,7 @@ export async function createInternship(
   } else {
     user.studentProfile.internship.internships.push(newlyCreatedInternship._id);
   }
-  await user.studentProfile.internship.save();
+  await user.save();
   res.json(newlyCreatedInternship);
 }
 
@@ -454,7 +519,7 @@ export async function updateInternship(
   for (const prop in req.query) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    if (req.query[prop]) internshipToUpdate[prop] = req.query[prop];
+    internshipToUpdate[prop] = req.query[prop];
   }
 
   const internshipProps = getInternshipObject(req.query);
