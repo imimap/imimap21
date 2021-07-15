@@ -16,9 +16,7 @@
     <div id="form-block4">
       <div class="alert alert-primary">
         <small>
-          <strong>Achtung!</strong> Du hast einen Firmennamen angegeben, welcher noch nicht in
-          der Datenbank existiert. Bitte gib zunächst ergänzende Informationen zur Firma
-          an und speichere anschließend dein Praktikum!
+          <strong>Achtung!</strong> Es wurden keine Praktika gefunden
         </small>
       </div>
     </div>

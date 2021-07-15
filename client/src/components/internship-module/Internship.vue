@@ -48,6 +48,7 @@
       </div>
     </div>
   </div>
+
   <div class="card internship-card border-htw-green">
     <div class="card-header">
       <h5 class="card-title " id="h5_block">Praktikum @
@@ -147,7 +148,8 @@
                 <template v-if="contractPdfState === 'unknown'">
                   <button class="btn btn-htw-green"
                           data-bs-toggle="modal"
-                          data-bs-target="#requestPdfModal">
+                          data-bs-target="#requestPdfModal"
+                          disabled>
                     Praktikumsvertrag hochladen
                   </button>
                 </template>
@@ -164,7 +166,8 @@
                 <template v-if="reportPdfState === 'unknown'">
                   <button class="btn btn-htw-green"
                           data-bs-toggle="modal"
-                          data-bs-target="#requestPdfModal">
+                          data-bs-target="#requestPdfModal"
+                          disabled>
                     Praktikumsbericht hochladen
                   </button>
                 </template>
@@ -181,7 +184,8 @@
                 <template v-if="certificatePdfState === 'unknown'">
                   <button class="btn btn-htw-green"
                           data-bs-toggle="modal"
-                          data-bs-target="#requestPdfModal">
+                          data-bs-target="#requestPdfModal"
+                          disabled>
                     Praktikumszertifikat hochladen
                   </button>
                 </template>
