@@ -48,11 +48,11 @@ export const PdfDocumentSchema = new Schema<IPdfDocument>(
   }
 );
 
-PdfDocumentSchema.methods.path = function () {
+PdfDocumentSchema.virtual("path").get(function () {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return getRecentValueForPropSetByEvent("newPath", this);
-};
+});
 
 // when generating the next pdf path, this method should be used
 // it makes sure that the versioning is correct

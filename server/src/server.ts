@@ -10,6 +10,7 @@ import database from "./database";
 import ldapStrategy from "./authentication/ldapStrategy";
 import localStrategy from "./authentication/localStrategy";
 import * as fileUpload from "express-fileupload";
+import authMiddleware, { pdfFileAuthMiddleware } from "./authentication/middleware";
 
 dotenvConfig({ path: "../.env" });
 
@@ -31,6 +32,10 @@ if (process.env.NODE_ENV === "development" && process.env.BYPASS_LDAP) passport.
 
 // Defining route middleware
 app.use("/api", router);
+// Defining static pdf host middleware
+app.use("/pdfs", authMiddleware());
+app.use("/pdfs", pdfFileAuthMiddleware);
+app.use("/pdfs", express.static(`${process.cwd()}/pdfs`));
 
 // Catch 404 and forward to error handler
 app.use((req: Request, res: Response, next: NextFunction) => {
