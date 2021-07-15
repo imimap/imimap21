@@ -27,11 +27,15 @@ services:
       - BYPASS_LDAP=${BYPASS_LDAP}
       - API_HOST=${API_HOST}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    networks:
+      - backend
 
   db:
     image: mongo:bionic
     volumes:
       - db-data:/data/db
+    networks:
+      - backend
 
   db-gui:
     image: mongo-express
@@ -41,6 +45,11 @@ services:
       - ME_CONFIG_MONGODB_SERVER=db
       - ME_CONFIG_BASICAUTH_USERNAME=${ME_USER}
       - ME_CONFIG_BASICAUTH_PASSWORD=${ME_PASS}
+    networks:
+      - backend
 
 volumes:
   db-data:
+
+networks:
+  backend:
