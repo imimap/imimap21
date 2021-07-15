@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { param, query } from "express-validator";
+import { body, param, query } from "express-validator";
 import authMiddleware from "../authentication/middleware";
 import {
   createInternship,
@@ -106,6 +106,8 @@ internshipRouter.post(
   "/:id/pdf/request",
   authMiddleware(),
   param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  body("accept").optional().isBoolean(),
+  body("reject").optional().isBoolean(),
   validate,
   asyncHandler(submitPdf("requestPdf"))
 );
@@ -114,6 +116,8 @@ internshipRouter.post(
   "/:id/pdf/lsfEctsProof",
   authMiddleware(),
   param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  body("accept").optional().isBoolean(),
+  body("reject").optional().isBoolean(),
   validate,
   asyncHandler(submitPdf("lsfEctsProofPdf"))
 );
@@ -122,6 +126,8 @@ internshipRouter.post(
   "/:id/pdf/locationJustification",
   authMiddleware(),
   param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  body("accept").optional().isBoolean(),
+  body("reject").optional().isBoolean(),
   validate,
   asyncHandler(submitPdf("locationJustificationPdf"))
 );
@@ -130,6 +136,8 @@ internshipRouter.post(
   "/:id/pdf/contract",
   authMiddleware(),
   param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  body("accept").optional().isBoolean(),
+  body("reject").optional().isBoolean(),
   validate,
   asyncHandler(submitPdf("contractPdf"))
 );
@@ -138,6 +146,8 @@ internshipRouter.post(
   "/:id/pdf/bvgTicketExemption",
   authMiddleware(),
   param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  body("accept").optional().isBoolean(),
+  body("reject").optional().isBoolean(),
   validate,
   asyncHandler(submitPdf("bvgTicketExemptionPdf"))
 );
@@ -146,6 +156,8 @@ internshipRouter.post(
   "/:id/pdf/certificate",
   authMiddleware(),
   param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  body("accept").optional().isBoolean(),
+  body("reject").optional().isBoolean(),
   validate,
   asyncHandler(submitPdf("certificatePdf"))
 );
@@ -154,6 +166,8 @@ internshipRouter.post(
   "/:id/pdf/report",
   authMiddleware(),
   param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  body("accept").optional().isBoolean(),
+  body("reject").optional().isBoolean(),
   validate,
   asyncHandler(submitPdf("reportPdf"))
 );
