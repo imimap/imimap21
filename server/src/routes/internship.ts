@@ -60,7 +60,7 @@ internshipRouter.get(
 internshipRouter.post(
   "/",
   authMiddleware(),
-  query([
+  body([
     "startDate",
     "endDate",
     "tasks",

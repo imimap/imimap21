@@ -459,23 +459,20 @@ function getInternshipObject(propsObject: any) {
     "livingCosts",
     "salary",
     "workingHoursPerWeek",
+    "programmingLanguages",
+    "paymentTypes",
   ];
   for (const prop of directProps) {
     if (propsObject[prop]) internshipProps[prop] = propsObject[prop];
   }
 
-  const directArrayProps = ["programmingLanguages", "paymentTypes"];
-  for (const prop of directArrayProps) {
-    if (propsObject[prop]) internshipProps[prop] = propsObject[prop].toString().split(",");
-  }
-
   if (propsObject.companyId) internshipProps.company = propsObject.companyId;
 
   //supervisor props
-  if (propsObject.supervisorFullName)
-    internshipProps["supervisor.fullName"] = propsObject.supervisorFullName;
-  if (propsObject.supervisorEmailAddress)
-    internshipProps["supervisor.emailAddress"] = propsObject.supervisorEmailAddress;
+  internshipProps["supervisor"] = {
+    fullName: propsObject.supervisorFullName,
+    emailAddress: propsObject.supervisorEmailAddress,
+  };
 
   return internshipProps;
 }
@@ -502,7 +499,7 @@ export async function createInternship(
   if (!user.studentProfile) return next(new NotFound("User does not appear to be a student"));
 
   // create new internship
-  const internshipProps = getInternshipObject(req.query);
+  const internshipProps = getInternshipObject(req.body);
   const newInternship = new Internship(internshipProps);
   newInternship.events = [
     {
@@ -614,7 +611,7 @@ export function submitPdf(
     }
 
     // Check if file was uploaded
-    if (!req.files || Object.keys(req.files).length === 0) {
+    if (!req.files?.pdf) {
       // Check if user is admin and file was accepted
       if (user.isAdmin && req.body.accept) {
         res.json(await internship.get(pdfProperty).accept(user._id));
