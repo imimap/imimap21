@@ -127,7 +127,8 @@ export async function findInternships(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  if (req.query.semester) return findInternshipsInSemester(req, res, next);
+  if (Semester.isValidSemesterString(req.query.semester as string))
+    return findInternshipsInSemester(req, res, next);
 
   const user = await User.findOne({ emailAddress: req.user?.email })
     .select("isAdmin studentProfile")
@@ -216,50 +217,7 @@ export async function findInternships(
   }, {});
   projection.company = { $first: "$company" };
 
-  // Query new internships
-  let internships;
-  if (limit <= 0) {
-    internships = [];
-  } else {
-    if (user.isAdmin) {
-      internships = await Internship.aggregate([
-        // TODO: Add match on internship properties before lookup
-        {
-          $lookup: {
-            from: "companies",
-            localField: "company",
-            foreignField: "_id",
-            as: "company",
-          },
-        },
-        { $project: projection },
-        { $match: options },
-      ])
-        .limit(limit || 50)
-        .skip(offset || 0);
-    } else {
-      internships = await Internship.aggregate([
-        {
-          $lookup: {
-            from: "companies",
-            localField: "company",
-            foreignField: "_id",
-            as: "company",
-          },
-        },
-        { $project: projection },
-        { $match: options },
-        { $sample: { size: limit } },
-      ]);
-    }
-  }
-
-  // Query internships that have already been viewed
-  options._id = {
-    $in: user.studentProfile?.internshipsSeen,
-  };
-
-  const internshipsSeenThatFitFilter = await Internship.aggregate([
+  const pipeline: unknown[] = [
     {
       $lookup: {
         from: "companies",
@@ -269,8 +227,45 @@ export async function findInternships(
       },
     },
     { $project: projection },
-    { $match: options },
-  ]);
+  ];
+
+  if (Object.keys(options).length > 0) pipeline.push({ $match: options });
+
+  // Query new internships
+  let internships;
+  if (user.isAdmin) {
+    internships = await Internship.aggregate(pipeline)
+      .limit(limit || 50)
+      .skip(offset || 0);
+  } else {
+    if (limit <= 0) {
+      internships = [];
+    } else {
+      pipeline.push({ $sample: { size: limit } });
+      internships = await Internship.aggregate(pipeline);
+    }
+  }
+
+  // Query internships that have already been viewed
+  let internshipsSeenThatFitFilter = [];
+  if (user.studentProfile) {
+    options._id = {
+      $in: user.studentProfile?.internshipsSeen,
+    };
+
+    internshipsSeenThatFitFilter = await Internship.aggregate([
+      {
+        $lookup: {
+          from: "companies",
+          localField: "company",
+          foreignField: "_id",
+          as: "company",
+        },
+      },
+      { $project: projection },
+      { $match: options },
+    ]);
+  }
 
   // Add newly returned internships to internshipsSeen
   if (!user.isAdmin && user.studentProfile?.internshipsSeen && internships.length > 0) {
@@ -341,7 +336,7 @@ export async function findInternshipsInSemester(
 export async function getInternshipLocations(req: Request, res: Response): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const matcher: any = { internships: { $ne: [] } };
-  if (req.query.semester) matcher.inSemester = req.query.semester;
+  if (req.query.semester && req.query.semester !== "") matcher.inSemester = req.query.semester;
 
   const locations = await InternshipModule.aggregate([
     { $match: matcher },
@@ -383,7 +378,7 @@ export async function getInternshipLocations(req: Request, res: Response): Promi
     },
   ]);
 
-  res.json(locations);
+  res.json(locations.filter((l) => Object.keys(l).length > 0));
 }
 
 /**

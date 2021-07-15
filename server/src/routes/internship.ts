@@ -45,7 +45,10 @@ internshipRouter.get(
 internshipRouter.get(
   "/locations",
   authMiddleware(),
-  query("semester").toUpperCase().optional().custom(Semester.isValidSemesterString),
+  query("semester")
+    .toUpperCase()
+    .optional()
+    .custom((s) => Semester.isValidSemesterString(s) || s === ""),
   validate,
   asyncHandler(getInternshipLocations)
 );
