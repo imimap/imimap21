@@ -283,6 +283,7 @@ export default defineComponent({
             operationalArea: this.operationalAreaFilter,
             programmingLanguage: this.languageFilter,
             paymentType: this.paymentFilter,
+            seen: false,
           },
         });
         this.searchResults = await res.data;
