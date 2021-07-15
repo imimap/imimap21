@@ -129,30 +129,20 @@
                               <span class="fw-bold list-item-label">Status</span><br>
 
                               <ul class="list-group">
-                                <li class="list-group-item list-group-item-success">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                       height="16" fill="currentColor"
-                                       class="bi bi-check-circle-fill" viewBox="0 0 16 16">
-                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75
-                                    0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06
-                                    1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0
-                                    0-.01-1.05z"/>
-                                  </svg>
-                                  Antrag vorhanden</li>
-                                <li class="list-group-item list-group-item-success">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                       height="16" fill="currentColor"
-                                       class="bi bi-check-circle-fill" viewBox="0 0 16 16">
-                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1
-                                    16 0zm-3.97-3.03a.75.75
-                                    0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06
-                                    1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0
-                                    0-.01-1.05z"/>
-                                  </svg>
-                                  <i class="bi bi-check-circle-fill"></i>
-                                  Vertrag vorhanden</li>
-                                <li class="list-group-item list-group-item-light">
-                                  Zertifikat fehlt</li>
+                                <UsersListStatusItem text="Antrag"
+                                                     :item="internship.requestPdf"/>
+                                <UsersListStatusItem text="ECTS-Nachweis"
+                                                     :item="internship.lsfEctsProofPdf"/>
+                                <UsersListStatusItem text="Ortsnachweis"
+                                                     :item="internship.locationJustificationPdf"/>
+                                <UsersListStatusItem text="Praktikumsvertrag"
+                                                     :item="internship.contractPdf"/>
+                                <UsersListStatusItem text="BVG Ticket Ausnahme"
+                                                     :item="internship.bvgTicketExemptionPdf"/>
+                                <UsersListStatusItem text="Praktikumszeugnis"
+                                                     :item="internship.certificatePdf"/>
+                                <UsersListStatusItem text="Praktikumsbericht"
+                                                     :item="internship.reportPdf"/>
                               </ul>
                             </div>
                           </div>
@@ -494,7 +484,6 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Internship from '@/models/Internship';
 import Student from '@/models/Student';
 import {
   clearStudentSearch,
@@ -504,13 +493,15 @@ import {
   markAepPassedOnInternshipModule,
 } from '@/utils/gateways';
 import { getDateString, getInternshipModuleDuration, getTimeDifferenceDays } from '@/utils/admin';
-import Company from '@/models/Company';
-import InternshipModule from '@/models/InternshipModule';
 import internshipModuleStatusColors from '@/models/InternshipModuleStatus';
 import store from '@/store';
+import UsersListStatusItem from '@/components/admin/UsersListStatusItem.vue';
 
 export default defineComponent({
   name: 'UsersList',
+  components: {
+    UsersListStatusItem,
+  },
   data() {
     return {
       currentEditInternshipModuleIndex: 0,
