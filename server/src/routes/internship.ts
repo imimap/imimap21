@@ -4,6 +4,7 @@ import authMiddleware from "../authentication/middleware";
 import {
   createInternship,
   findInternships,
+  generateRequestPdf,
   getAllOperationalAreas,
   getAllPaymentTypes,
   getAllProgrammingLanguages,
@@ -168,6 +169,14 @@ internshipRouter.get(
   authMiddleware(),
   validate,
   asyncHandler(getAllProgrammingLanguages)
+);
+
+internshipRouter.get(
+  "/:id/generate/request",
+  authMiddleware(),
+  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  validate,
+  asyncHandler(generateRequestPdf)
 );
 
 export default internshipRouter;
