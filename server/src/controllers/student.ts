@@ -29,7 +29,7 @@ export async function getStudents(req: Request, res: Response): Promise<void> {
         },
       }
     );
-    console.log("user", user.firstName);
+    console.log("user", user?.firstName ?? "null");
     users.push(user);
   }
 
