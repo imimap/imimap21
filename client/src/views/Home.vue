@@ -2,16 +2,27 @@
   <div class="d-flex justify-content-center pb-3">
     <div class="mt-1">
       Zeige mir Praktika im
-      <select v-model="selectedSemester" v-on:change="searchInternshipBySemester">
-        <option value="">All</option>
-        <option value="WS2020">WS 20/21</option>
-        <option value="SS2020">SS 20</option>
+      <select v-model="selectedSemester" v-on:change="search">
+        <option value="" selected="true">All</option>
         <option value="WS2021">WS 21/22</option>
         <option value="SS2022">SS 21</option>
+        <option value="WS2022">WS 22/23</option>
+        <option value="SS2023">SS 23</option>
       </select>
     </div>
   </div>
   <Map v-if="!loadingState && locations.length > 0" :locations="locations"></Map>
+  <div class="container" v-if="!loadingState && searchResults.length == 0">
+    <div id="form-block4">
+      <div class="alert alert-primary">
+        <small>
+          <strong>Achtung!</strong> Du hast einen Firmennamen angegeben, welcher noch nicht in
+          der Datenbank existiert. Bitte gib zunächst ergänzende Informationen zur Firma
+          an und speichere anschließend dein Praktikum!
+        </small>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -26,18 +37,22 @@ export default defineComponent({
   components: { Map },
   data() {
     return {
-      selectedSemester: null,
-      loadingState: true,
+      selectedSemester: '',
+      loadingState: false,
       searchResults: [] as Internship[],
     };
   },
   computed: {
-    locations(): Address[] | null {
-      if (this.searchResults.length === 0) return null;
-      return this.searchResults.map((searchResult) => searchResult.company.address);
+    locations(): Address[] {
+      return this.searchResults.length > 0
+        ? this.searchResults.map((searchResult) => searchResult.company.address)
+        : [];
     },
   },
   methods: {
+    async search() {
+      await this.searchInternshipBySemester();
+    },
     async searchInternshipBySemester() {
       this.loadingState = true;
       try {
@@ -49,6 +64,7 @@ export default defineComponent({
           text: `Fehler beim Suchen der Praktika [ERROR: ${err.message}]`,
           type: 'danger',
         });
+        this.loadingState = false;
       }
     },
   },

@@ -233,7 +233,7 @@ export default defineComponent({
     async getAvailableCountries() {
       try {
         const res = await http.get('/info/countries');
-        this.availableCountries = res.data;
+        this.availableCountries = await res.data;
       } catch (err) {
         await this.$store.dispatch('addNotification', {
           text: `Fehler beim laden der verfügbaren Länder [ERROR: ${err.message}]`,

@@ -137,14 +137,6 @@ const routes: Array<RouteRecordRaw> = [
         },
         children: [
           {
-            path: '',
-            name: 'PostponementsIndex',
-            component: PostponementsList,
-            meta: {
-              allowAnonymous: false,
-            },
-          },
-          {
             path: 'new',
             name: 'CreatePostponement',
             component: CreatePostponement,

@@ -126,7 +126,16 @@
               an und speichere anschließend dein Praktikum!
             </small>
           </div>
-
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label>Name der Firma</label>
+              <input v-model="company"
+                     type="text"
+                     class="form-control"
+                     id="newCompanyName"
+                     placeholder="Firma"/>
+            </div>
+          </div>
           <div class="row mb-3">
             <div class="col">
               <label for="newCompanyBranchName">Name der Zweigstelle</label>
@@ -166,21 +175,23 @@
           <div class="row mb-3">
             <div class="col">
               <label for="newCompanyMainLanguage">Hauptsprache</label>
-              <input v-model="newCompanyMainLanguage"
-                     type="text"
-                     class="form-control"
-                     id="newCompanyMainLanguage"
-                     placeholder="Hauptsprache"/>
+              <select v-model="newCompanyMainLanguage"
+                      id="newCompanyMainLanguage"
+                      class="form-control">
+                <option value="">Bitte auswählen</option>
+                <option value="de">Deutsch</option>
+                <option value="en">Englisch</option>
+              </select>
             </div>
             <div class="col">
               <label for="newCompanySize">Größe</label>
               <select v-model="newCompanySize"
                       id="newCompanySize"
-                      class="form-control"
-                      placeholder="Bitte auswählen">
-                <option value=">= 250 employees">mehr als 250 Angestellte</option>
-                <option value="< 250 employees">weniger als 250 Angestellte</option>
-                <option value="<50 employees">weniger als 50 Angestellte</option>
+                      class="form-control">
+                <option value="">Bitte auswählen</option>
+                <option value="big">mehr als 250 Angestellte</option>
+                <option value="medium">weniger als 250 Angestellte</option>
+                <option value="small">weniger als 50 Angestellte</option>
               </select>
             </div>
           </div>
@@ -239,9 +250,14 @@
             </div>
           </div>
           <div class="row my-2">
-            <div class="col-md-4">
+            <div class="col-md-2">
               <button v-on:click="createNewCompany" class="btn btn-secondary">
                 Firma Speichern
+              </button>
+            </div>
+            <div class="col-md-2">
+              <button v-on:click="toggleAddCompanyForm = false" class="btn btn-danger">
+                Abbrechen
               </button>
             </div>
           </div>
@@ -279,8 +295,8 @@ export default defineComponent({
       newCompanyEmailAddress: null,
       newCompanyIndustry: null,
       newCompanyWebsite: null,
-      newCompanyMainLanguage: null,
-      newCompanySize: null,
+      newCompanyMainLanguage: '',
+      newCompanySize: '',
       newCompanyStreet: null,
       newCompanyStreetNumber: null,
       newCompanyAdditionalLines: null,
@@ -308,13 +324,14 @@ export default defineComponent({
   },
   methods: {
     async save() {
-      if (this.company !== null || await this.companyExists()) await this.postInternship();
+      if (this.company !== null && await this.companyExists()) await this.postInternship();
       else this.toggleAddCompanyForm = true;
     },
     async companyExists(): Promise<boolean> {
       if (this.company === null) return false;
       try {
         const res = await http.get('/companies', { params: { companyName: this.company } });
+        console.log(res);
         if (res.data === 'null') return false;
         this.existingCompany = res.data;
         return true;
@@ -323,32 +340,39 @@ export default defineComponent({
       }
     },
     async createNewCompany() {
-      try {
-        const res = await http.post('/companies', {
-          companyName: this.company,
-          branchName: this.newCompanyBranchName,
-          emailAddress: this.newCompanyEmailAddress,
-          industry: this.newCompanyIndustry,
-          website: this.newCompanyWebsite,
-          mainLanguage: this.newCompanyMainLanguage,
-          size: this.newCompanySize,
-          street: this.newCompanyStreet,
-          streetNumber: this.newCompanyStreetNumber,
-          additionalLines: this.newCompanyAdditionalLines,
-          zip: this.newCompanyZip,
-          city: this.newCompanyCity,
-          country: this.newCompanyCountry,
-        });
-        this.existingCompany = res.data;
+      if (!await this.companyExists()) {
+        this.toggleAddCompanyForm = !this.toggleAddCompanyForm;
         await this.$store.dispatch('addNotification', { text: 'Firma erfolgreich angelegt!', type: 'success' });
-        this.toggleAddCompanyForm = false;
-      } catch (err) {
-        await this.$store.dispatch('addNotification', { text: `Fehler beim Speichern der Firma [ERROR: ${err.message}]`, type: 'danger' });
+      } else {
+        try {
+          const res = await http.post('/companies', null, {
+            params: {
+              companyName: this.company,
+              branchName: this.newCompanyBranchName,
+              emailAddress: this.newCompanyEmailAddress,
+              industry: this.newCompanyIndustry,
+              website: this.newCompanyWebsite,
+              mainLanguage: this.newCompanyMainLanguage,
+              size: this.newCompanySize,
+              street: this.newCompanyStreet,
+              streetNumber: this.newCompanyStreetNumber,
+              additionalLines: this.newCompanyAdditionalLines,
+              zip: this.newCompanyZip,
+              city: this.newCompanyCity,
+              country: this.newCompanyCountry,
+            },
+          });
+          this.existingCompany = res.data;
+          await this.$store.dispatch('addNotification', { text: 'Firma erfolgreich angelegt!', type: 'success' });
+          this.toggleAddCompanyForm = false;
+        } catch (err) {
+          await this.$store.dispatch('addNotification', { text: `Fehler beim Speichern der Firma [ERROR: ${err.message}]`, type: 'danger' });
+        }
       }
     },
     async postInternship() {
       try {
-        const res = await http.post('/internships', {
+        await http.post('/internships', {
           startDate: this.startDate,
           endDate: this.endDate,
           operationalArea: this.operationalArea,
@@ -359,7 +383,7 @@ export default defineComponent({
           payment: this.convertStringToArray(this.payment),
           livingCosts: this.livingCosts,
           workingHoursPerWeek: this.workingHoursPerWeek,
-          company: this.existingCompany.id,
+          company: this.existingCompany._id,
           supervisorFullName: this.supervisorFullName,
           supervisorEmailAddress: this.supervisorEmailAddress,
           tasks: this.tasks,
