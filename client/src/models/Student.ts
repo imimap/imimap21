@@ -21,8 +21,6 @@ export default class Student {
   studentProfile = {
     internshipsSeen: [],
     studentId: '',
-    internship: {},
+    internship: {} as InternshipModule,
   };
-
-  internshipModule = {} as InternshipModule;
 }
