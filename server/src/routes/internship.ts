@@ -4,6 +4,7 @@ import authMiddleware from "../authentication/middleware";
 import {
   createInternship,
   findInternships,
+  getInternshipLocations,
   getInternshipsById,
   submitPdf,
   updateInternship,
@@ -35,12 +36,20 @@ internshipRouter.get(
     .custom((s) => Semester.isValidSemesterString(s) || !s),
   query("seen")
     .toLowerCase()
-    .custom((s) => s ? isBoolean(s) : true),
+    .custom((s) => (s ? isBoolean(s) : true)),
   validate,
   asyncHandler(findInternships)
 );
 
 // @TODO: Wäre praktisch wenn die Company hier direkt gepopulated werden würde
+internshipRouter.get(
+  "/locations",
+  authMiddleware(),
+  query("semester").toUpperCase().optional().custom(Semester.isValidSemesterString),
+  validate,
+  asyncHandler(getInternshipLocations)
+);
+
 internshipRouter.get(
   "/:id",
   authMiddleware(),
