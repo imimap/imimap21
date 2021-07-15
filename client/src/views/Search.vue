@@ -232,7 +232,7 @@ export default defineComponent({
   methods: {
     async getAvailableCountries() {
       try {
-        const res = await http.get('/companies/countries');
+        const res = await http.get('/info/countries');
         this.availableCountries = res.data;
       } catch (err) {
         await this.$store.dispatch('addNotification', {
@@ -243,7 +243,7 @@ export default defineComponent({
     },
     async getAvailablePaymentOptions() {
       try {
-        const res = await http.get('/internships/properties/payment-types');
+        const res = await http.get('/info/payment-types');
         this.availablePaymentOptions = res.data;
       } catch (err) {
         await this.$store.dispatch('addNotification', {
@@ -254,7 +254,7 @@ export default defineComponent({
     },
     async getAvailableOrientations() {
       try {
-        const res = await http.get('/internships/properties/operational-areas');
+        const res = await http.get('/info/operational-areas');
         this.availableOperationalAreas = res.data;
       } catch (err) {
         await this.$store.dispatch('addNotification', {
@@ -265,7 +265,7 @@ export default defineComponent({
     },
     async getAvailableLanguages() {
       try {
-        const res = await http.get('/internships/properties/programming-languages');
+        const res = await http.get('/info/programming-languages');
         this.availableLanguages = res.data;
       } catch (err) {
         await this.$store.dispatch('addNotification', {
