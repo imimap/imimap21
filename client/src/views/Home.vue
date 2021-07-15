@@ -5,7 +5,7 @@
       <select v-model="selectedSemester" v-on:change="searchInternshipBySemester">
         <option value="">All</option>
         <option value="WS2020">WS 20/21</option>
-        <option value="SS2020">WS 19/20</option>
+        <option value="SS2020">SS 20</option>
         <option value="WS2021">WS 21/22</option>
         <option value="SS2022">SS 21</option>
       </select>

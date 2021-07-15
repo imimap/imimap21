@@ -339,13 +339,11 @@ export default defineComponent({
           city: this.newCompanyCity,
           country: this.newCompanyCountry,
         });
-        this.existingCompany = {
-          ...res.data,
-        };
+        this.existingCompany = res.data;
         await this.$store.dispatch('addNotification', { text: 'Firma erfolgreich angelegt!', type: 'success' });
         this.toggleAddCompanyForm = false;
       } catch (err) {
-        await this.$store.dispatch('addNotification', { text: err.message, type: 'danger' });
+        await this.$store.dispatch('addNotification', { text: `Fehler beim Speichern der Firma [ERROR: ${err.message}]`, type: 'danger' });
       }
     },
     async postInternship() {
@@ -367,9 +365,8 @@ export default defineComponent({
           tasks: this.tasks,
         });
         await this.$store.dispatch('addNotification', { text: 'Praktikum erfolgreich angelegt!', type: 'success' });
-        console.log(res);
       } catch (err) {
-        await this.$store.dispatch('addNotification', { text: err.message, type: 'danger' });
+        await this.$store.dispatch('addNotification', { text: `Fehler beim Anlegen des Praktikums [ERROR: ${err.message}]`, type: 'danger' });
       }
     },
     convertStringToArray(string: string | null): string[] | null {
