@@ -35,7 +35,7 @@ internshipRouter.get(
     .custom((s) => Semester.isValidSemesterString(s) || !s),
   query("seen")
     .toLowerCase()
-    .custom((s) => isBoolean(s)),
+    .custom((s) => s ? isBoolean(s) : true),
   validate,
   asyncHandler(findInternships)
 );
