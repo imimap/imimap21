@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { User } from "../models/user";
+import { IUser, User } from "../models/user";
 import { BadRequest, Forbidden, InternalServerError, NotFound } from "http-errors";
 import { IInternship, Internship, InternshipStatuses, PaymentTypes } from "../models/internship";
 import { Semester } from "../helpers/semesterHelper";
 import { InternshipModule } from "../models/internshipModule";
-import { Types } from "mongoose";
+import { LeanDocument, Types } from "mongoose";
 import { UploadedFile } from "express-fileupload";
 import * as fsPromises from "fs/promises";
 import * as pdf from "html-pdf";
@@ -594,45 +594,98 @@ export function submitPdf(
   pdfProperty: string
 ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
   return async function (req: Request, res: Response, next: NextFunction): Promise<void> {
-    // Check if file was uploaded
-    if (!req.files || Object.keys(req.files).length === 0)
-      return next(new BadRequest("No files were uploaded"));
-
     // Get internship and check if it belongs to user or user is admin
     const internship = await Internship.findById(req.params.id);
     if (!internship) return next(new NotFound("Internship not found"));
-    const user = await User.findOne({ emailAddress: req.user?.email }).populate({
-      path: "studentProfile.internship",
-      lean: true,
-    });
-    if (!user) return next(new NotFound("User not found"));
-    if (
-      user.studentProfile &&
-      user.studentProfile.internship.internships.indexOf(internship._id) === -1
-    )
-      return next(new Forbidden("Students may only modify their own internships"));
+    let user;
+    try {
+      user = await getAuthorizedUser(req.user?.email, internship._id);
+    } catch (e) {
+      return next(e);
+    }
+
+    // Check if user is admin and pdf document was rejected
+    if (user.isAdmin && req.body.reject) {
+      res.json(await internship.get(pdfProperty).reject(user._id));
+      return;
+    }
+
+    // Check if file was uploaded
+    if (!req.files || Object.keys(req.files).length === 0) {
+      // Check if user is admin and file was accepted
+      if (user.isAdmin && req.body.accept) {
+        res.json(await internship.get(pdfProperty).accept(user._id));
+        return;
+      }
+      return next(new BadRequest("No files were uploaded"));
+    }
 
     // Save uploaded file
     const pdf = req.files.pdf as UploadedFile;
     const uploadPath =
       internship.get(pdfProperty).nextPath() ??
       `pdfs/${user.studentProfile?.studentId}/${Types.ObjectId()}/${Types.ObjectId()}.pdf`;
-    const uploadPathParts = uploadPath.split("/");
-    uploadPathParts.pop();
-    const uploadDir = uploadPathParts.join("/");
+    const error = await saveFile(pdf, uploadPath);
+    if (error) return next(new InternalServerError(error.message));
 
-    try {
-      await fsPromises.mkdir(uploadDir, { recursive: true });
-      await pdf.mv(process.cwd() + "/" + uploadPath);
-    } catch (e) {
-      return next(new InternalServerError(e.message));
-    }
-
-    await internship.get(pdfProperty).submit(user._id, uploadPath);
+    // Add pdf path to internship
+    let updatedPdf;
+    if (user.isAdmin && req.body.accept)
+      updatedPdf = await internship.get(pdfProperty).accept(user._id, uploadPath);
+    else updatedPdf = await internship.get(pdfProperty).submit(user._id, uploadPath);
     await internship.save();
 
-    res.json({ path: uploadPath });
+    res.json(updatedPdf);
   };
+}
+
+/**
+ * Returns the authorized user with the specified email address.
+ * @throws NotFound If the user was not found
+ * @throws Forbidden If the user id not authorized to access the internship with the provided id.
+ * @param emailAddress The email address of the user to find.
+ * @param internshipId The internship id to use for the authorization check.
+ * @returns IUser The authorized user
+ */
+async function getAuthorizedUser(
+  emailAddress: string | undefined,
+  internshipId: Types.ObjectId
+): Promise<IUser> {
+  const user = await User.findOne({ emailAddress: emailAddress }).populate({
+    path: "studentProfile.internship",
+    lean: true,
+  });
+  if (!user) throw new NotFound("User not found");
+  if (
+    user.studentProfile &&
+    user.studentProfile.internship.internships.indexOf(internshipId) === -1
+  )
+    throw new Forbidden("Students may only modify their own internships");
+  return user;
+}
+
+/**
+ * Saves an uploaded file to the disk.
+ * @param file The file to save
+ * @param path The path to save the file to
+ * @returns Error|null Returns null if saving the file was successful, otherwise returns error
+ */
+async function saveFile(file: UploadedFile, path: string): Promise<Error | null> {
+  // Get path without filename
+  const uploadPathParts = path.split("/");
+  uploadPathParts.pop();
+  const uploadDir = uploadPathParts.join("/");
+
+  try {
+    // Create parent directories if necessary
+    await fsPromises.mkdir(uploadDir, { recursive: true });
+    // Save file
+    await file.mv(process.cwd() + "/" + path);
+  } catch (e) {
+    return e;
+  }
+
+  return null;
 }
 
 export async function generateRequestPdf(
@@ -654,11 +707,37 @@ export async function generateRequestPdf(
     .lean();
   if (!internship) return next(new NotFound("Internship not found"));
 
-  // Build PDF template
+  // Build PDF file
+  const template = await buildHtmlTemplate("request.html", user, internship);
+  try {
+    pdf
+      .create(template, { format: "A4", border: "20px", header: { height: "50px" } })
+      .toStream((err, stream) => {
+        if (err) throw err;
+        res.setHeader("Content-Type", "application/pdf");
+        stream.pipe(res);
+      });
+  } catch (e) {
+    next(new BadRequest(e));
+  }
+}
+
+/**
+ * Loads a HTML file template and replaces the placeholders with the user's actual data.
+ * @param fileName The file to load the template from
+ * @param user The user to use for filling in the data
+ * @param internship The internship to use for filling in the data
+ * @returns string The generated HTML template
+ */
+async function buildHtmlTemplate(
+  fileName: string,
+  user: LeanDocument<IUser>,
+  internship: LeanDocument<IInternship>
+): Promise<string> {
   const dateFormatter = new Intl.DateTimeFormat("de");
-  const contentHtml = await fsPromises.readFile(`${process.cwd()}/pdf-templates/request.html`);
+  const contentHtml = await fsPromises.readFile(`${process.cwd()}/pdf-templates/${fileName}`);
   const html = contentHtml.toString();
-  const template = html
+  return html
     .replace("{{semester}}", user.studentProfile?.internship.inSemester ?? "")
     .replace("{{studentId}}", user.studentProfile?.studentId ?? "")
     .replace("{{firstName}}", user.firstName ?? "")
@@ -683,16 +762,4 @@ export async function generateRequestPdf(
     .replace("{{operationalArea}}", internship.operationalArea ?? "")
     .replace("{{tasks}}", internship.tasks ?? "")
     .replace("{{programmingLanguages}}", internship.programmingLanguages?.join(", ") ?? "");
-
-  try {
-    pdf
-      .create(template, { format: "A4", border: "20px", header: { height: "50px" } })
-      .toStream((err, stream) => {
-        if (err) throw err;
-        res.setHeader("Content-Type", "application/pdf");
-        stream.pipe(res);
-      });
-  } catch (e) {
-    next(new BadRequest(e));
-  }
 }

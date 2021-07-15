@@ -60,4 +60,17 @@ function authMiddleware(adminOnly = false): (RequestHandler | ErrorRequestHandle
   return middleware;
 }
 
+/**
+ * Checks if the authenticated user is admin or if the
+ * requested path starts with the user's student id.
+ * @param req The express request
+ * @param res The express response
+ * @param next The next middleware
+ */
+export function pdfFileAuthMiddleware(req: Request, res: Response, next: NextFunction): void {
+  const studentId = req.path.substr(1, 8);
+  if (req.user?.role === Role.INSTRUCTOR || req.user?.id === studentId) return next();
+  else return next(new Forbidden("You are not permitted to access this resource"));
+}
+
 export default authMiddleware;
