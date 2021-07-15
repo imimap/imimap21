@@ -8,7 +8,7 @@ import {
   submitPdf,
   updateInternship,
 } from "../controllers/internship";
-import { validate } from "../helpers/validation";
+import { isObjectId, validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
 import { Semester } from "../helpers/semesterHelper";
 import validator from "validator";
@@ -35,7 +35,7 @@ internshipRouter.get(
     .custom((s) => Semester.isValidSemesterString(s) || !s),
   query("seen")
     .toLowerCase()
-    .custom((s) => isBoolean(s)),
+    .custom((s) => s ? isBoolean(s) : true),
   validate,
   asyncHandler(findInternships)
 );
@@ -44,7 +44,7 @@ internshipRouter.get(
 internshipRouter.get(
   "/:id",
   authMiddleware(),
-  param("id").custom((id) => /[0-9a-f]{24}/.test(id) || id === "my" || id === "random"),
+  param("id").custom((id) => isObjectId(id) || id === "my" || id === "random"),
   validate,
   asyncHandler(getInternshipsById)
 );
@@ -74,7 +74,7 @@ internshipRouter.post(
 internshipRouter.patch(
   "/:id",
   authMiddleware(),
-  param("id").custom((id) => /[0-9a-f]{24}/.test(id)),
+  param("id").custom(isObjectId),
   query([
     "startDate",
     "endDate",

@@ -8,7 +8,7 @@ import {
   passAep,
   updateInternshipModule,
 } from "../controllers/internshipModule";
-import { validate } from "../helpers/validation";
+import { isObjectId, validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
 
 const internshipModuleRouter = Router();
@@ -26,7 +26,7 @@ internshipModuleRouter.get(
 internshipModuleRouter.get(
   "/:id",
   authMiddleware(),
-  param("id").custom((id) => /[0-9a-f]{24}/.test(id) || id === "my"),
+  param("id").custom((id) => isObjectId(id) || id === "my"),
   validate,
   asyncHandler(findInternshipModule)
 );
@@ -34,7 +34,7 @@ internshipModuleRouter.get(
 internshipModuleRouter.patch(
   "/:id/aep-passed/",
   authMiddleware(true),
-  param("id").custom((id) => /[0-9a-f]{24}/.test(id)),
+  param("id").custom(isObjectId),
   validate,
   asyncHandler(passAep)
 );
@@ -89,7 +89,7 @@ internshipModuleRouter.get(
 internshipModuleRouter.patch(
   "/:id/",
   authMiddleware(true),
-  param("id").custom((id) => /[0-9a-f]{24}/.test(id)),
+  param("id").custom(isObjectId),
   query([
     "internships",
     "inSemester",
