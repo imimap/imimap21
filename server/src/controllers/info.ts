@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Semester } from "../helpers/semesterHelper";
 import { InternshipModule } from "../models/internshipModule";
+import { isoLanguages } from "../helpers/isoLanguages";
 
 /**
  * Returns a list of upcoming semesters, containing the current
@@ -24,4 +25,8 @@ export function getUpcomingSemesters(req: Request, res: Response): void {
  */
 export async function getSemesters(req: Request, res: Response): Promise<void> {
   res.json(await InternshipModule.distinct("inSemester").lean());
+}
+
+export function getLanguages(req: Request, res: Response): void {
+  res.json(isoLanguages);
 }
