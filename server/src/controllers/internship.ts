@@ -339,6 +339,7 @@ export async function findInternshipsInSemester(
 }
 
 export async function getInternshipLocations(req: Request, res: Response): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const matcher: any = { internships: { $ne: [] } };
   if (req.query.semester) matcher.inSemester = req.query.semester;
 
