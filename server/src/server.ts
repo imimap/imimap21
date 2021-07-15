@@ -1,5 +1,7 @@
 // parse env variables before loading anything else
 import { config as dotenvConfig } from "dotenv";
+dotenvConfig({ path: "../.env" });
+
 import * as cors from "cors";
 import * as express from "express";
 import { NextFunction, Request, Response } from "express";
@@ -11,8 +13,6 @@ import ldapStrategy from "./authentication/ldapStrategy";
 import localStrategy from "./authentication/localStrategy";
 import * as fileUpload from "express-fileupload";
 import authMiddleware, { pdfFileAuthMiddleware } from "./authentication/middleware";
-
-dotenvConfig({ path: "../.env" });
 
 // load database
 (async () => await database())();
