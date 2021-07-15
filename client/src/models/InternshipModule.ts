@@ -1,7 +1,9 @@
+import Internship from '@/models/Internship';
+
 export default class InternshipModule {
   id = '';
 
-  internships = [];
+  internships = [] as Internship[];
 
   status = '';
 
