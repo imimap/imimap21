@@ -11,6 +11,7 @@ export async function getStudents(req: Request, res: Response): Promise<void> {
   })
     .limit(Number.parseInt(req.query.count as string) ?? 50)
     .skip(Number.parseInt(req.query.offset as string) ?? 0);
+  console.log("modules", internshipModules.length);
   // Get users belonging to the found internship modules
   const users = [];
   for (const internshipModule of internshipModules) {
@@ -28,6 +29,7 @@ export async function getStudents(req: Request, res: Response): Promise<void> {
         },
       }
     );
+    console.log("user", user.firstName);
     users.push(user);
   }
 
