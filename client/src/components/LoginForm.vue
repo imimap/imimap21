@@ -48,7 +48,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { login, } from '@/utils/auth';
+import { login } from '@/utils/auth';
 
 export default defineComponent({
   name: 'LoginComponent',
