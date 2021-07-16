@@ -168,8 +168,8 @@
                           <button type="button" class="btn btn-secondary btn-sm me-2"
                                   data-bs-toggle="modal"
                                   data-bs-target="#internshipPartEditModal"
-                                  @click="changeCurrentEditInternshipPartIndex(row.id,
-                                  internship.id)">
+                                  @click="changeCurrentEditInternshipPartIndex(index,
+                                  internshipIndex)">
                             Details bearbeiten</button>
                           <button class="btn btn-danger btn-sm me-2"
                                   @click="deleteInternshipPart(row.id, internship.id)">
@@ -275,217 +275,216 @@
     </div>
   </div>
 
-  <!-- InternshipPart Modal -->
-<!--  <div class="modal fade" id="internshipPartEditModal" tabindex="-1"-->
-<!--       aria-labelledby="internshipPartEditModalLabel" aria-hidden="true">-->
-<!--    <div class="modal-dialog modal-xl">-->
-<!--      <div class="modal-content">-->
-<!--        <div class="modal-header">-->
-<!--          <h5 class="modal-title" id="internshipPartEditModalLabel">-->
-<!--            Teilpraktikum bearbeiten</h5>-->
-<!--          <button type="button" class="btn-close" data-bs-dismiss="modal"-->
-<!--                  aria-label="Close">-->
-<!--          </button>-->
-<!--        </div>-->
-<!--        <div class="modal-body">-->
-<!--          <p>Praktikum von-->
-<!--            {{ users[currentEditInternshipModuleIndex].firstName }}-->
-<!--            {{ users[currentEditInternshipModuleIndex].lastName }}-->
-<!--            ({{users[currentEditInternshipModuleIndex].studentProfile.matrikelnummer}})-->
-<!--            bei-->
-<!--            {{ users[currentEditInternshipModuleIndex]-->
-<!--              .studentProfile-->
-<!--              .internshipModule-->
-<!--              .internshipParts[currentEditInternshipPartIndex]-->
-<!--              .companyBranch-->
-<!--              .companyName }}-->
-<!--            in-->
-<!--            {{ users[currentEditInternshipModuleIndex]-->
-<!--              .studentProfile-->
-<!--              .internshipModule-->
-<!--              .internshipParts[currentEditInternshipPartIndex]-->
-<!--              .companyBranch-->
-<!--              .address-->
-<!--              .city}}-->
-<!--          </p>-->
+<!--   InternshipPart Modal -->
+  <div v-if="students.length > 0 && students[currentEditInternshipModuleIndex]
+                   .studentProfile
+                   .internship
+                   .internships"
+       class="modal fade" id="internshipPartEditModal" tabindex="-1"
+       aria-labelledby="internshipPartEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="internshipPartEditModalLabel">
+            Teilpraktikum bearbeiten</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"
+                  aria-label="Close">
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Praktikum von
+            {{ students[currentEditInternshipModuleIndex].firstName }}
+            {{ students[currentEditInternshipModuleIndex].lastName }}
+            ({{students[currentEditInternshipModuleIndex].studentProfile.studentId}})
+            bei
+            {{ students[currentEditInternshipModuleIndex]
+              .studentProfile
+              .internship
+              .internships[currentEditInternshipPartIndex]?.company?.companyName }}
+            in
+            {{ students[currentEditInternshipModuleIndex]
+              .studentProfile
+              .internship
+              .internships[currentEditInternshipPartIndex]?.company?.address?.city }}
+          </p>
 
-<!--          <div class="mb-3">-->
-<!--            <label for="description" class="form-label">Beschreibung</label>-->
-<!--            <input type="text" class="form-control" id="description"-->
-<!--                   aria-describedby="inSemester"-->
-<!--                   v-model="users[currentEditInternshipModuleIndex]-->
-<!--                   .studentProfile-->
-<!--                   .internshipModule-->
-<!--                   .internshipParts[currentEditInternshipPartIndex]-->
-<!--                   .description" />-->
-<!--          </div>-->
+          <div class="mb-3">
+            <label for="description" class="form-label">Beschreibung</label>
+            <input type="text" class="form-control" id="description"
+                   aria-describedby="inSemester"
+                   v-model="students[currentEditInternshipModuleIndex]
+                   .studentProfile
+                   .internship
+                   .internships[currentEditInternshipPartIndex]
+                   .description" />
+          </div>
 
-<!--          <div class="mb-3">-->
-<!--            <label for="tasks" class="form-label">Aufgaben</label>-->
-<!--            <input type="text" class="form-control" id="tasks"-->
-<!--                   aria-describedby="tasks"-->
-<!--                   v-model="users[currentEditInternshipModuleIndex]-->
-<!--                   .studentProfile-->
-<!--                   .internshipModule-->
-<!--                   .internshipParts[currentEditInternshipPartIndex]-->
-<!--                   .tasks" />-->
-<!--          </div>-->
+          <div class="mb-3">
+            <label for="tasks" class="form-label">Aufgaben</label>
+            <input type="text" class="form-control" id="tasks"
+                   aria-describedby="tasks"
+                   v-model="students[currentEditInternshipModuleIndex]
+                   .studentProfile
+                   .internship
+                   .internships[currentEditInternshipPartIndex]
+                   .tasks" />
+          </div>
 
-<!--          <div class="mb-3">-->
-<!--            <label for="operationalArea" class="form-label">Tätigkeitsbereich</label>-->
-<!--            <input type="text" class="form-control" id="operationalArea"-->
-<!--                   aria-describedby="operationalArea"-->
-<!--                   v-model="users[currentEditInternshipModuleIndex]-->
-<!--                   .studentProfile-->
-<!--                   .internshipModule-->
-<!--                   .internshipParts[currentEditInternshipPartIndex]-->
-<!--                   .operationalArea" />-->
-<!--          </div>-->
+          <div class="mb-3">
+            <label for="operationalArea" class="form-label">Tätigkeitsbereich</label>
+            <input type="text" class="form-control" id="operationalArea"
+                   aria-describedby="operationalArea"
+                   v-model="students[currentEditInternshipModuleIndex]
+                   .studentProfile
+                   .internship
+                   .internships[currentEditInternshipPartIndex]
+                   .operationalArea" />
+          </div>
 
-<!--          <div class="mb-3">-->
-<!--            <label for="programmingLanguages" class="form-label">Programmiersprachen</label>-->
-<!--            <input type="text" class="form-control" id="programmingLanguages"-->
-<!--                   aria-describedby="programmingLanguages"-->
-<!--                   v-model="users[currentEditInternshipModuleIndex]-->
-<!--                   .studentProfile-->
-<!--                   .internshipModule-->
-<!--                   .internshipParts[currentEditInternshipPartIndex]-->
-<!--                   .programmingLanguages" />-->
-<!--          </div>-->
+          <div class="mb-3">
+            <label for="programmingLanguages" class="form-label">Programmiersprachen</label>
+            <input type="text" class="form-control" id="programmingLanguages"
+                   aria-describedby="programmingLanguages"
+                   v-model="students[currentEditInternshipModuleIndex]
+                   .studentProfile
+                   .internship
+                   .internships[currentEditInternshipPartIndex]
+                   .programmingLanguages" />
+          </div>
 
-<!--          <div class="mb-3">-->
-<!--            <label for="livingCosts" class="form-label">Lebenshaltungskosten</label>-->
-<!--            <input type="text" class="form-control" id="livingCosts"-->
-<!--                   aria-describedby="livingCosts"-->
-<!--                   v-model="users[currentEditInternshipModuleIndex]-->
-<!--                   .studentProfile-->
-<!--                   .internshipModule-->
-<!--                   .internshipParts[currentEditInternshipPartIndex]-->
-<!--                   .livingCosts" />-->
-<!--          </div>-->
+          <div class="mb-3">
+            <label for="livingCosts" class="form-label">Lebenshaltungskosten</label>
+            <input type="text" class="form-control" id="livingCosts"
+                   aria-describedby="livingCosts"
+                   v-model="students[currentEditInternshipModuleIndex]
+                   .studentProfile
+                   .internship
+                   .internships[currentEditInternshipPartIndex]
+                   .livingCosts" />
+          </div>
 
-<!--          <div class="mb-3">-->
-<!--            <label for="salary" class="form-label">Gehalt</label>-->
-<!--            <input type="text" class="form-control" id="salary"-->
-<!--                   aria-describedby="salary"-->
-<!--                   v-model="users[currentEditInternshipModuleIndex]-->
-<!--                   .studentProfile-->
-<!--                   .internshipModule-->
-<!--                   .internshipParts[currentEditInternshipPartIndex]-->
-<!--                   .salary" />-->
-<!--          </div>-->
+          <div class="mb-3">
+            <label for="salary" class="form-label">Gehalt</label>
+            <input type="text" class="form-control" id="salary"
+                   aria-describedby="salary"
+                   v-model="students[currentEditInternshipModuleIndex]
+                   .studentProfile
+                   .internship
+                   .internships[currentEditInternshipPartIndex]
+                   .salary" />
+          </div>
 
-<!--          <div class="mb-3">-->
-<!--            <label for="salary" class="form-label">-->
-<!--              Bezahlungsart (Mehrfachauswahl möglich)</label>-->
-<!--            <select class="form-select" multiple aria-label="multiple select example"-->
-<!--                    v-model="users[currentEditInternshipModuleIndex]-->
-<!--                   .studentProfile-->
-<!--                   .internshipModule-->
-<!--                   .internshipParts[currentEditInternshipPartIndex]-->
-<!--                   .paymentType">-->
-<!--              <option value="uncharted" selected>Unbekannt</option>-->
-<!--              <option value="cash benefit">Cash Gehalt</option>-->
-<!--              <option value="noncash benefit">Non-Cash Gehalt</option>-->
-<!--              <option value="no payment">Unbezahlt</option>-->
-<!--            </select>-->
-<!--          </div>-->
+          <div class="mb-3">
+            <label for="salary" class="form-label">
+              Bezahlungsart (Mehrfachauswahl möglich)</label>
+            <select class="form-select" multiple aria-label="multiple select example"
+                    v-model="students[currentEditInternshipModuleIndex]
+                   .studentProfile
+                   .internship
+                   .internships[currentEditInternshipPartIndex]
+                   .paymentType">
+              <option value="uncharted" selected>Unbekannt</option>
+              <option value="cash benefit">Cash Gehalt</option>
+              <option value="noncash benefit">Non-Cash Gehalt</option>
+              <option value="no payment">Unbezahlt</option>
+            </select>
+          </div>
 
-<!--          <div class="mb-3">-->
-<!--            <label for="startDate" class="form-label">Startdatum</label>-->
-<!--            <input type="date" class="form-control" id="startDate"-->
-<!--                   aria-describedby="startDate"-->
-<!--                   v-model="users[currentEditInternshipModuleIndex]-->
-<!--                   .studentProfile-->
-<!--                   .internshipModule-->
-<!--                   .internshipParts[currentEditInternshipPartIndex]-->
-<!--                   .startDate" />-->
-<!--          </div>-->
+          <div class="mb-3">
+            <label for="startDate" class="form-label">Startdatum</label>
+            <input type="date" class="form-control" id="startDate"
+                   aria-describedby="startDate"
+                   v-model="students[currentEditInternshipModuleIndex]
+                   .studentProfile
+                   .internship
+                   .internships[currentEditInternshipPartIndex]
+                   .startDate" />
+          </div>
 
-<!--          <div class="mb-3">-->
-<!--            <label for="endDate" class="form-label">Enddatum</label>-->
-<!--            <input type="date" class="form-control" id="endDate"-->
-<!--                   aria-describedby="endDate"-->
-<!--                   v-model="users[currentEditInternshipModuleIndex]-->
-<!--                   .studentProfile-->
-<!--                   .internshipModule-->
-<!--                   .internshipParts[currentEditInternshipPartIndex]-->
-<!--                   .endDate" />-->
-<!--          </div>-->
+          <div class="mb-3">
+            <label for="endDate" class="form-label">Enddatum</label>
+            <input type="date" class="form-control" id="endDate"
+                   aria-describedby="endDate"
+                   v-model="students[currentEditInternshipModuleIndex]
+                   .studentProfile
+                   .internship
+                   .internships[currentEditInternshipPartIndex]
+                   .endDate" />
+          </div>
 
-<!--          <div class="mb-3">-->
-<!--            <label for="workingHoursPerWeek" class="form-label">-->
-<!--              Arbeitsstunden pro Woche</label>-->
-<!--            <input type="number" min="0" class="form-control" id="workingHoursPerWeek"-->
-<!--                   aria-describedby="workingHoursPerWeek"-->
-<!--                   v-model="users[currentEditInternshipModuleIndex]-->
-<!--                   .studentProfile-->
-<!--                   .internshipModule-->
-<!--                   .internshipParts[currentEditInternshipPartIndex]-->
-<!--                   .workingHoursPerWeek" />-->
-<!--          </div>-->
+          <div class="mb-3">
+            <label for="workingHoursPerWeek" class="form-label">
+              Arbeitsstunden pro Woche</label>
+            <input type="number" min="0" class="form-control" id="workingHoursPerWeek"
+                   aria-describedby="workingHoursPerWeek"
+                   v-model="students[currentEditInternshipModuleIndex]
+                   .studentProfile
+                   .internship
+                   .internships[currentEditInternshipPartIndex]
+                   .workingHoursPerWeek" />
+          </div>
 
-<!--          <div class="mb-3">-->
-<!--            <label for="supervisorFirstName" class="form-label">Supervisor</label>-->
-<!--            <div class="mb-2 row g-2 align-items-center">-->
-<!--              <div class="col-6">-->
-<!--                <input type="text" class="form-control" id="supervisorFirstName"-->
-<!--                       aria-describedby="supervisorFirstName" placeholder="Vorname"-->
-<!--                       v-model="users[currentEditInternshipModuleIndex]-->
-<!--                   .studentProfile-->
-<!--                   .internshipModule-->
-<!--                   .internshipParts[currentEditInternshipPartIndex]-->
-<!--                   .supervisor-->
-<!--                   .firstName" />-->
-<!--              </div>-->
+          <div class="mb-3">
+            <label for="supervisorFirstName" class="form-label">Supervisor</label>
+            <div class="mb-2 row g-2 align-items-center">
+              <div class="col-6">
+                <input type="text" class="form-control" id="supervisorFirstName"
+                       aria-describedby="supervisorFirstName" placeholder="Vorname"
+                       v-model="students[currentEditInternshipModuleIndex]
+                   .studentProfile
+                   .internship
+                   .internships[currentEditInternshipPartIndex]
+                   .supervisor
+                   .firstName" />
+              </div>
 
-<!--              <div class="col-6">-->
-<!--                <input type="text" class="form-control" id="supervisorLastName"-->
-<!--                       aria-describedby="supervisorLastName" placeholder="Nachname"-->
-<!--                       v-model="users[currentEditInternshipModuleIndex]-->
-<!--                   .studentProfile-->
-<!--                   .internshipModule-->
-<!--                   .internshipParts[currentEditInternshipPartIndex]-->
-<!--                   .supervisor-->
-<!--                   .lastName" />-->
-<!--              </div>-->
+              <div class="col-6">
+                <input type="text" class="form-control" id="supervisorLastName"
+                       aria-describedby="supervisorLastName" placeholder="Nachname"
+                       v-model="students[currentEditInternshipModuleIndex]
+                   .studentProfile
+                   .internship
+                   .internships[currentEditInternshipPartIndex]
+                   .supervisor
+                   .lastName" />
+              </div>
 
-<!--              <div class="col-12">-->
-<!--                <input type="text" class="form-control" id="supervisorEmail"-->
-<!--                       aria-describedby="supervisorEmail" placeholder="E-Mail"-->
-<!--                       v-model="users[currentEditInternshipModuleIndex]-->
-<!--                   .studentProfile-->
-<!--                   .internshipModule-->
-<!--                   .internshipParts[currentEditInternshipPartIndex]-->
-<!--                   .supervisor-->
-<!--                   .emailAddress" />-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
+              <div class="col-12">
+                <input type="text" class="form-control" id="supervisorEmail"
+                       aria-describedby="supervisorEmail" placeholder="E-Mail"
+                       v-model="students[currentEditInternshipModuleIndex]
+                   .studentProfile
+                   .internship
+                   .internships[currentEditInternshipPartIndex]
+                   .supervisor
+                   .emailAddress" />
+              </div>
+            </div>
+          </div>
 
-<!--          <div class="mb-3">-->
-<!--            <label for="comment" class="form-label">Kommentar</label>-->
-<!--            <textarea class="form-control" id="comment"-->
-<!--                   aria-describedby="comment"-->
-<!--                   v-model="users[currentEditInternshipModuleIndex]-->
-<!--                   .studentProfile-->
-<!--                   .internshipModule-->
-<!--                   .internshipParts[currentEditInternshipPartIndex]-->
-<!--                   .comment"></textarea>-->
-<!--          </div>-->
+          <div class="mb-3">
+            <label for="comment" class="form-label">Kommentar</label>
+            <textarea class="form-control" id="comment"
+                   aria-describedby="comment"
+                   v-model="students[currentEditInternshipModuleIndex]
+                   .studentProfile
+                   .internship
+                   .internships[currentEditInternshipPartIndex]
+                   .comment"></textarea>
+          </div>
 
-<!--        </div>-->
-<!--        <div class="modal-footer">-->
-<!--          <button type="button" class="btn btn-secondary"-->
-<!--                  data-bs-dismiss="modal">Schließen</button>-->
-<!--          <button type="button"-->
-<!--                  class="btn btn-success"-->
-<!--                  @click="updateIntershipPart(currentEditInternshipModuleIndex)"-->
-<!--          >Speichern</button>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary"
+                  data-bs-dismiss="modal">Schließen</button>
+          <button type="button"
+                  class="btn btn-success"
+                  @click="updateIntershipPart(currentEditInternshipModuleIndex)"
+          >Speichern</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
