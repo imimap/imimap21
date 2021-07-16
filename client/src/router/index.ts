@@ -222,7 +222,7 @@ router.beforeEach(async (to, from, next) => {
 router.beforeEach(async (to, from, next) => {
   if (to.name === 'Admin' && !to.meta.allowAnonymous && isLoggedIn()) {
     next({
-      name: 'AdminUsersList',
+      name: 'Dashboard',
       params: { locale: to.params.locale },
     });
   } else {
