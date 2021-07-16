@@ -6,107 +6,117 @@
         <div class="row my-4">
           <div class="col">
             <label for="startDate">Startdatum</label>
-            <input v-model="startDate" type="date" id="startDate" class="form-control">
+            <input v-model="newStartDate"
+                   type="date"
+                   id="startDate"
+                   class="form-control"/>
           </div>
           <div class="col">
             <label for="startDate">Enddatum</label>
-            <input v-model="endDate" type="date" id="endDate" class="form-control">
+            <input v-model="newEndDate"
+                   type="date"
+                   id="endDate"
+                   class="form-control"/>
           </div>
         </div>
 
         <div class="row my-4">
           <div class="col">
             <label for="operationalArea">Bereich</label>
-            <input v-model="operationalArea"
+            <input v-model="newOperationalArea"
                    type="text"
                    class="form-control"
                    id="operationalArea"
-                   placeholder="Bereich"/>
+                   :placeholder="operationalArea"/>
           </div>
           <div class="col">
             <label for="programmingLanguages">Programmiersprachen</label>
-            <input v-model="programmingLanguages"
+            <input v-model="newProgrammingLanguages"
                    type="text"
                    class="form-control"
                    id="programmingLanguages"
-                   placeholder="Programmiersprachen"/>
+                   :placeholder="programmingLanguages"/>
           </div>
         </div>
 
         <div class="row my-4">
           <div class="col">
             <label for="salary">Gehalt</label>
-            <input v-model="salary"
+            <input v-model="newSalary"
                    type="number"
                    min="0"
                    class="form-control"
                    id="salary"
-                   placeholder="Gehalt"/>
+                   :placeholder="salary"/>
           </div>
           <div class="col">
-            <label for="payment">Bezahlungsart</label>
-            <input v-model="payment"
-                   type="text"
-                   class="form-control"
-                   id="payment"
-                   placeholder="Bezahlungsart"/>
+            <label for="paymentType">Gehaltsmodell</label>
+            <div class="form-group d-flex internship-payment-options">
+              <div class="form-check internship-payment-option"
+                   v-for="(paymentType, index) in availablePaymentTypes"
+                   v-bind:key="index"
+                   v-bind:paymentType="paymentType"
+                   id="paymentType">
+                <input class="form-check-input"
+                       type="checkbox"
+                       :value="paymentType"
+                       :id="`checkbox-${paymentType}`"
+                       v-model="newPayment"/>
+                <label class="form-check-label" :for="`checkbox-${paymentType}`">
+                  {{ paymentType }}
+                </label>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="row my-4">
           <div class="col">
             <label for="livingCosts">Lebensunterhaltskosten</label>
-            <input v-model="livingCosts"
+            <input v-model="newLivingCosts"
                    type="number"
                    min="0"
                    class="form-control"
                    id="livingCosts"
-                   placeholder="Lebensunterhaltskosten"/>
+                   :placeholder="livingCosts"/>
           </div>
           <div class="col">
             <label for="workingHoursPerWeek">Arbeitsstunden pro Woche</label>
-            <input v-model="workingHoursPerWeek"
+            <input v-model="newWorkingHoursPerWeek"
                    min="0"
                    class="form-control"
                    id="workingHoursPerWeek"
-                   placeholder="Arbeitsstunden pro Woche"/>
+                   :placeholder="workingHoursPerWeek"/>
           </div>
         </div>
 
         <div class="row my-4">
           <div class="col">
             <div class="mb-3">
-              <label for="company">Firma</label>
-              <input v-model="company"
-                     type="text"
-                     class="form-control"
-                     id="company"
-                     placeholder="Firma"/>
-            </div>
-            <div class="mb-3">
               <label for="supervisorFullName">Name der Betreuer*in</label>
-              <input v-model="supervisorFullName"
+              <input v-model="newSupervisorFullName"
                      type="text"
                      class="form-control"
                      id="supervisorFullName"
-                     placeholder="Name des Betreuers"/>
+                     :placeholder="supervisorFullName"/>
             </div>
             <div>
               <label for="supervisorEmail">Email der Betreuer*in</label>
-              <input v-model="supervisorEmail"
+              <input v-model="newSupervisorEmail"
                      type="text"
                      class="form-control"
                      id="supervisorEmail"
-                     placeholder="Email des Betreuers"/>
+                     :placeholder="supervisorEmail"/>
             </div>
           </div>
           <div class="col">
             <label for="tasks">Aufgaben</label>
-            <textarea v-model="tasks"
+            <textarea v-model="newTasks"
                       class="form-control"
                       id="tasks"
                       cols="30"
-                      rows="6"/>
+                      rows="6"
+                      :placeholder="tasks"/>
           </div>
         </div>
 
@@ -142,13 +152,27 @@ export default defineComponent({
       payment: null,
       livingCosts: null,
       workingHoursPerWeek: null,
-      company: null,
       supervisorFullName: null,
       supervisorEmail: null,
       tasks: null,
+
+      newStartDate: '',
+      newEndDate: '',
+      newOperationalArea: null,
+      newProgrammingLanguages: null,
+      newSalary: null,
+      newPayment: [] as string[],
+      newLivingCosts: null,
+      newWorkingHoursPerWeek: null,
+      newSupervisorFullName: null,
+      newSupervisorEmail: null,
+      newTasks: null,
+
+      availablePaymentTypes: [] as string[],
     };
   },
   async created() {
+    await this.getAvailablePaymentTypes();
     await this.getInternship();
   },
   methods: {
@@ -158,54 +182,67 @@ export default defineComponent({
         this.startDate = new Date(res.data.startDate).toISOString().split('T')[0].toString();
         this.endDate = new Date(res.data.endDate).toISOString().split('T')[0].toString();
         this.operationalArea = res.data.operationalArea;
-        this.programmingLanguages = res.data.programmingLanguages;
+        this.programmingLanguages = res.data.programmingLanguages.toString().split(',').join(', ');
         this.salary = res.data.salary;
         this.payment = res.data.paymentTypes;
         this.livingCosts = res.data.livingCosts;
         this.workingHoursPerWeek = res.data.workingHoursPerWeek;
-        this.company = res.data.company;
         this.supervisorFullName = res.data.supervisor.fullName;
         this.supervisorEmail = res.data.supervisor.emailAddress;
         this.tasks = res.data.tasks;
         this.loadingState = false;
-        console.log(res);
       } catch (err) {
         console.log(err.message);
       }
     },
     async save() {
       try {
-        await http.put(`/internships/${this.$route.params.id}`, {
-          startDate: this.startDate,
-          endDate: this.endDate,
-          operationalArea: this.operationalArea,
-          programmingLanguages: this.convertStringToArray(this.programmingLanguages),
-          salary: this.salary,
-          payment: this.convertStringToArray(this.payment),
-          livingCosts: this.livingCosts,
-          workingHoursPerWeek: this.workingHoursPerWeek,
-          company: this.company,
-          supervisorFullName: this.supervisorFullName,
-          supervisorEmail: this.supervisorEmail,
-          tasks: this.tasks,
+        const res = await http.patch(`/internships/${this.$route.params.id}`, null, {
+          params: {
+            startDate: this.newStartDate,
+            endDate: this.newEndDate,
+            operationalArea: this.newOperationalArea,
+            programmingLanguages: this.convertStringToArray(this.programmingLanguages),
+            salary: this.salary,
+            payment: this.newPayment,
+            livingCosts: this.newLivingCosts,
+            workingHoursPerWeek: this.newWorkingHoursPerWeek,
+            supervisorFullName: this.newSupervisorFullName,
+            supervisorEmail: this.newSupervisorEmail,
+            tasks: this.newTasks,
+          },
         });
+        this.$data = {
+          ...res.data,
+        };
         await this.$store.dispatch('addNotification', { text: 'Praktikum erfolgreich gespeichert!', type: 'success' });
       } catch (err) {
-        console.log(err.message);
+        await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
+      }
+    },
+    async getAvailablePaymentTypes() {
+      try {
+        const res = await http.get('/info/payment-types');
+        this.availablePaymentTypes = res.data;
+      } catch (err) {
+        await this.$store.dispatch('addNotification', {
+          text: `Fehler beim laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`,
+          type: 'danger',
+        });
       }
     },
     convertStringToArray(string: string | null): string[] | null {
       if (string === null) return string;
-      const result: string[] = [];
-      string.split(',').forEach((value) => {
-        result.push(value.toString());
-      });
-      return result;
+      return string.split(', ').map((subStr) => subStr);
     },
   },
 });
 </script>
 
 <style scoped>
-
+.internship-payment-options {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: .25rem;
+}
 </style>
