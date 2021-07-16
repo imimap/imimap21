@@ -50,6 +50,7 @@ export default defineComponent({
     replaceInternship(newInternship: Internship) {
       console.log(newInternship);
       if (typeof this.internshipModule !== 'undefined') {
+        console.log(newInternship._id);
         const index = this.internshipModule.internships.findIndex(
           (internship) => internship._id === newInternship._id,
         );

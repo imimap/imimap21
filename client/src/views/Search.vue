@@ -134,13 +134,13 @@
             <td class="font-weight-bold"></td>
           </tr>
           <!-- Result Loop -->
-          <template  v-if="searchResults.length > 0">
+          <template  v-if="searchResults?.length > 0">
             <template v-for="(searchResult) in searchResults"
                       v-bind:key="searchResult._id">
               <tr>
-                <td>{{ searchResult.company.companyName }}</td>
-                <td> {{ searchResult.company.address.city }}</td>
-                <td> {{ searchResult.operationalArea }}</td>
+                <td>{{ searchResult?.company?.companyName }}</td>
+                <td> {{ searchResult?.company?.address?.city }}</td>
+                <td> {{ searchResult?.operationalArea }}</td>
                 <td>
                   <button class="btn btn-outline-htw-green float-right"
                           data-bs-toggle="collapse"
@@ -156,24 +156,24 @@
                   <p class="pl-3">
                     <strong>{{ $t("search.programmingLanguages") }}</strong>
                     {{
-                      searchResult.programmingLanguages.length > 0
-                        ? searchResult.programmingLanguages.toString()
+                      searchResult.programmingLanguages?.length > 0
+                        ? searchResult.programmingLanguages?.toString()
                         :  'Keine Angabe'
                     }}
                   </p>
                   <p class="pl-3">
                     <strong>{{ $t("search.website") }}</strong>
-                    <a :href="searchResult.company.website" target="_blank">
-                      {{ searchResult.company.website }}
+                    <a :href="searchResult?.company?.website" target="_blank">
+                      {{ searchResult?.company?.website }}
                     </a>
                   </p>
                   <p class="pl-3">
                     <strong>{{ $t("search.tasks") }}</strong>
-                    {{ searchResult.tasks }}
+                    {{ searchResult?.tasks }}
                   </p>
                   <p class="pl-3">
                     <strong>{{ $t("search.contact") }}</strong>
-                    {{ searchResult.company.emailAddress }}
+                    {{ searchResult?.company?.emailAddress }}
                   </p>
                 </td>
               </tr>
