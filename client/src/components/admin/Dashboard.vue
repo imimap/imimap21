@@ -1,14 +1,57 @@
 <template>
   <div class="container">
     <div class="row">
-      <div class="col-lg-4">
+      <div class="col-lg-4 col-md-6">
         <div class="card text-center">
           <div class="card-body">
-            <p class="large-number">5</p>
+            <p v-if="!loadingInternshipModuleCount" class="large-number">
+              {{ internshipModuleCount }}
+            </p>
+            <div v-else class="d-flex justify-content-center m-4">
+              <div class="spinner-border text-htw" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
             <p class="card-text">unvollständige Praktika</p>
 
             <router-link class="btn btn-success text-white"
                          to="users">Praktika bearbeiten</router-link>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="card text-center">
+          <div class="card-body">
+            <p v-if="!loadingPostponementsCount" class="large-number">
+              {{ postponementsCount }}
+            </p>
+            <div v-else class="d-flex justify-content-center m-4">
+              <div class="spinner-border text-htw" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+            <p class="card-text">Offene Verschiebungsanträge</p>
+
+            <router-link class="btn btn-success text-white"
+                         to="postponements">Verschiebungen bearbeiten</router-link>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="card text-center">
+          <div class="card-body">
+            <p v-if="!loadingCompaniesCount" class="large-number">
+              {{ companiesCount }}
+            </p>
+            <div v-else class="d-flex justify-content-center m-4">
+              <div class="spinner-border text-htw" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+            <p class="card-text">Eingetragene Unternehmen</p>
+
+            <router-link class="btn btn-success text-white"
+                         to="companies">Unternehmen bearbeiten</router-link>
           </div>
         </div>
       </div>
@@ -18,23 +61,44 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { getCompaniesList, getPostponementsList, getStudentsList } from '@/utils/gateways';
 
 export default defineComponent({
   name: 'Dashboard',
   data() {
     return {
       internshipModuleCount: 0,
+      loadingInternshipModuleCount: false,
+      postponementsCount: 0,
+      loadingPostponementsCount: false,
+      companiesCount: 0,
+      loadingCompaniesCount: false,
     };
   },
+  mounted() {
+    this.getInternshipModuleCount();
+    this.getPostponementCount();
+    this.getCompaniesCount();
+  },
   methods: {
-    getInternshipModuleCount(filterStatus: string, filterDuration: string) {
-      return true;
+    async getInternshipModuleCount() {
+      this.loadingInternshipModuleCount = true;
+      const students = await getStudentsList('WS2021');
+      this.internshipModuleCount = students.filter((student) => student.studentProfile.internship
+        .status === 'planned').length;
+      this.loadingInternshipModuleCount = false;
     },
-    getCompaniesCount() {
-      return true;
+    async getPostponementCount() {
+      this.loadingPostponementsCount = true;
+      const postponements = await getPostponementsList();
+      this.postponementsCount = postponements.length;
+      this.loadingPostponementsCount = false;
     },
-    getPostponementCount(filterStatus: string, filterDuration: string) {
-      return true;
+    async getCompaniesCount() {
+      this.loadingCompaniesCount = true;
+      const companies = await getCompaniesList();
+      this.companiesCount = companies.length;
+      this.loadingCompaniesCount = false;
     },
   },
 });
@@ -61,6 +125,12 @@ export default defineComponent({
 
   .table-nav button {
     margin-right: 20px;
+  }
+
+  .text-htw {
+    color: rgba(119, 185, 0, 1);
+    width: 5rem;
+    height: 5rem;
   }
 
 </style>
