@@ -52,7 +52,7 @@
                     <div class="col-3">
                       <h6 class="list-item-label">Ort</h6>
                       <span class="fw-bold">
-                        {{ row.address.city + ', ' + row.address.country }}
+                        {{ row.address.city + ', ' + row.address.country}}
                       </span>
                     </div>
                   </div>
@@ -65,9 +65,9 @@
                  data-bs-parent="#listAccordion">
               <div class="accordion-body">
                 <h2>{{ row.companyName }}</h2>
-                <h3>{{ row.address.city + ', ' + row.address.country }}</h3>
+                <h3>{{ row.address.city + ', ' + row.address.country}}</h3>
                 <p>
-                  <b>Industrie:</b> {{ row.industry }}<br>
+                  <b>Industrie:</b> {{ row.industry}}<br>
                   <b>Website:</b> <a :href="row.website" target="_blank">
                   {{ row.website }}</a><br>
                   <b>Sprache:</b> {{ row.mainLanguage }}<br>
@@ -271,27 +271,27 @@ export default defineComponent({
           list.forEach((company) => {
             companiesList.push({
               id: company._id,
-              mainLanguage: company.mainLanguage,
-              excludedFromSearch: company.excludedFromSearch,
               companyName: company.companyName,
-              branchName: company.branchName,
+              mainLanguage: company.mainLanguage ? company.mainLanguage : '',
+              excludedFromSearch: company.excludedFromSearch ? company.excludedFromSearch : '',
+              branchName: company.branchName ? company.branchName : '',
               address: {
-                street: company.address.street,
-                streetNumber: company.address.streetNumber,
-                zip: company.address.zip,
-                city: company.address.city,
-                country: company.address.country,
-                additionalLines: company.address.additionalLines,
+                street: company.address ? company.address.street : '',
+                streetNumber: company.address ? company.address.streetNumber : '',
+                zip: company.address ? company.address.zip : '',
+                city: company.address ? company.address.city : '',
+                country: company.address ? company.address.country : '',
+                additionalLines: company.address ? company.address.additionalLines : '',
                 coordinates: {
-                  latitude: company.address.coordinates.latitude,
-                  longitude: company.address.coordinates.longitude,
+                  latitude: company.address ? company.address.coordinates.latitude : '',
+                  longitude: company.address ? company.address.coordinates.longitude : '',
                 },
               },
-              emailAddress: company.emailAddress,
-              industry: company.industry,
-              website: company.website,
-              size: company.size,
-              comment: company.comment,
+              emailAddress: company.emailAddress ? company.emailAddress : '',
+              industry: company.industry ? company.industry : '',
+              website: company.website ? company.website : '',
+              size: company.size ? company.size : '',
+              comment: company.comment ? company.comment : '',
             });
           });
           this.companies = companiesList;
