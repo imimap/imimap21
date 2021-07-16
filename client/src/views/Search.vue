@@ -291,6 +291,7 @@ export default defineComponent({
           },
         });
         this.searchResults = await res.data;
+        this.searchResults = this.searchResults.filter((internship) => typeof internship.company.address !== 'undefined');
         this.loadingState = false;
       } catch (err) {
         await this.$store.dispatch('addNotification', {
