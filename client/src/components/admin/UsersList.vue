@@ -121,8 +121,8 @@
                             {{ internship.company.companyName }}
                           </h5>
                           <h6 class="card-subtitle mb-2 text-muted">
-                            {{ internship.company.address.city }},
-                            {{ internship.company.address.country }}
+                            {{ internship.company.address?.city }},
+                            {{ internship.company.address?.country }}
                           </h6>
                           <div class="row">
                             <div class="col-lg-4 col-md-12 mb-2">
@@ -494,11 +494,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Student from '@/models/Student';
-import {
-  clearStudentSearch,
-  getStudentsList,
-  markAepPassedOnInternshipModule,
-} from '@/utils/gateways';
+import { clearStudentSearch, getStudentsList, markAepPassedOnInternshipModule, } from '@/utils/gateways';
 import { getDateString, getInternshipModuleDuration, getTimeDifferenceDays } from '@/utils/admin';
 import internshipModuleStatusColors from '@/models/InternshipModuleStatus';
 import store from '@/store';
