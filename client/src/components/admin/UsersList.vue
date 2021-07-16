@@ -196,7 +196,7 @@
                           Suchanfragen zurücksetzen</button>
                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
                                 data-bs-target="#internshipModuleEditModal"
-                                @click="changeCurrentEditInternshipModuleIndex(row.id)">
+                                @click="changeCurrentEditInternshipModuleIndex(index)">
                           Details bearbeiten</button>
                         <button class="btn btn-danger" type="button"
                                 @click="deleteInternshipModule(row.id)">
@@ -219,64 +219,61 @@
     </div>
   </div>
 
-  <!-- InternshipModule Modal -->
-<!--  <div class="modal fade" id="internshipModuleEditModal" tabindex="-1"-->
-<!--       aria-labelledby="internshipModuleEditModalLabel" aria-hidden="true">-->
-<!--    <div class="modal-dialog modal-xl">-->
-<!--      <div class="modal-content">-->
-<!--        <div class="modal-header">-->
-<!--          <h5 class="modal-title" id="internshipModuleEditModalLabel">-->
-<!--            Praktikumsmodul bearbeiten</h5>-->
-<!--          <button type="button" class="btn-close" data-bs-dismiss="modal"-->
-<!--                  aria-label="Close">-->
-<!--          </button>-->
-<!--        </div>-->
-<!--        <div class="modal-body">-->
-<!--          <p>für {{ users[currentEditInternshipModuleIndex].firstName }}-->
-<!--             {{ users[currentEditInternshipModuleIndex].lastName }}-->
-<!--            ({{users[currentEditInternshipModuleIndex].studentProfile.matrikelnummer}})</p>-->
+<!--   InternshipModule Modal -->
+  <div v-if="students.length > 0" class="modal fade" id="internshipModuleEditModal" tabindex="-1"
+       aria-labelledby="internshipModuleEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="internshipModuleEditModalLabel">
+            Praktikumsmodul bearbeiten</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"
+                  aria-label="Close">
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>für {{ students[currentEditInternshipModuleIndex].firstName }}
+             {{ students[currentEditInternshipModuleIndex].lastName }}
+            ({{students[currentEditInternshipModuleIndex].studentProfile.studentId}})</p>
 
-<!--          <div class="mb-3">-->
-<!--            <label for="inSemester" class="form-label">Fachsemester</label>-->
-<!--            <input type="text" class="form-control" id="inSemester"-->
-<!--                   aria-describedby="inSemester"-->
-<!--                   v-model="users[currentEditInternshipModuleIndex]-->
-<!--                   .studentProfile.internshipModule.inSemester" />-->
-<!--          </div>-->
+          <div class="mb-3">
+            <label for="inSemester" class="form-label">Fachsemester</label>
+            <input type="text" class="form-control" id="inSemester"
+                   aria-describedby="inSemester"
+                   v-model="students[currentEditInternshipModuleIndex].studentProfile
+                   .internship.inSemester" />
+          </div>
 
-<!--          <div class="mb-3">-->
-<!--            <label for="inSemesterOfStudy" class="form-label">Hochschulsemester</label>-->
-<!--            <input type="text" class="form-control" id="inSemesterOfStudy"-->
-<!--                   aria-describedby="inSemesterOfStudy"-->
-<!--                   v-model="users[currentEditInternshipModuleIndex]-->
-<!--                   .studentProfile-->
-<!--                   .internshipModule-->
-<!--                   .inSemesterOfStudy" />-->
-<!--          </div>-->
+          <div class="mb-3">
+            <label for="inSemesterOfStudy" class="form-label">Hochschulsemester</label>
+            <input type="text" class="form-control" id="inSemesterOfStudy"
+                   aria-describedby="inSemesterOfStudy"
+                   v-model="students[currentEditInternshipModuleIndex].studentProfile
+                   .internship
+                   .inSemesterOfStudy" />
+          </div>
 
-<!--          <div class="mb-3">-->
-<!--            <label for="AepPassed" class="form-label">AEP bestanden</label>-->
-<!--            <div class="form-check form-switch">-->
-<!--              <input class="form-check-input" type="checkbox" id="AepPassed"-->
-<!--                     v-model="users[currentEditInternshipModuleIndex]-->
-<!--                   .studentProfile-->
-<!--                   .internshipModule-->
-<!--                   .AepPassed">-->
-<!--            </div>-->
-<!--          </div>-->
+          <div class="mb-3">
+            <label for="AepPassed" class="form-label">AEP bestanden</label>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="AepPassed"
+                     v-model="students[currentEditInternshipModuleIndex].studentProfile
+                   .internship.aepPassed">
+            </div>
+          </div>
 
-<!--        </div>-->
-<!--        <div class="modal-footer">-->
-<!--          <button type="button" class="btn btn-secondary"-->
-<!--                  data-bs-dismiss="modal">Schließen</button>-->
-<!--          <button type="button"-->
-<!--                  class="btn btn-success"-->
-<!--                  @click="updateIntershipModule(currentEditInternshipModuleIndex)"-->
-<!--          >Speichern</button>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary"
+                  data-bs-dismiss="modal">Schließen</button>
+          <button type="button"
+                  class="btn btn-success"
+                  @click="updateIntershipModule(currentEditInternshipModuleIndex)"
+          >Speichern</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- InternshipPart Modal -->
 <!--  <div class="modal fade" id="internshipPartEditModal" tabindex="-1"-->
@@ -494,7 +491,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Student from '@/models/Student';
-import { clearStudentSearch, getStudentsList, markAepPassedOnInternshipModule, } from '@/utils/gateways';
+import { clearStudentSearch, getStudentsList, markAepPassedOnInternshipModule } from '@/utils/gateways';
 import { getDateString, getInternshipModuleDuration, getTimeDifferenceDays } from '@/utils/admin';
 import internshipModuleStatusColors from '@/models/InternshipModuleStatus';
 import store from '@/store';
