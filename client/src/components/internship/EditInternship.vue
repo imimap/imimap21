@@ -175,7 +175,7 @@ export default defineComponent({
     },
     async save() {
       try {
-        const res = await http.put(`/internships/${this.$route.params.id}`, {
+        await http.put(`/internships/${this.$route.params.id}`, {
           startDate: this.startDate,
           endDate: this.endDate,
           operationalArea: this.operationalArea,
@@ -190,7 +190,6 @@ export default defineComponent({
           tasks: this.tasks,
         });
         await this.$store.dispatch('addNotification', { text: 'Praktikum erfolgreich gespeichert!', type: 'success' });
-        console.log(res);
       } catch (err) {
         console.log(err.message);
       }

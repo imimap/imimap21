@@ -395,7 +395,7 @@ export default defineComponent({
           this.toggleAddCompanyForm = false;
           this.clearNewCompanyForm();
         } catch (err) {
-          await this.$store.dispatch('addNotification', { text: `Fehler beim Speichern der Firma [ERROR: ${err.message}]`, type: 'danger' });
+          await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
         }
       }
     },
@@ -419,7 +419,7 @@ export default defineComponent({
         });
         await this.$store.dispatch('addNotification', { text: 'Praktikum erfolgreich angelegt!', type: 'success' });
       } catch (err) {
-        await this.$store.dispatch('addNotification', { text: `Fehler beim Anlegen des Praktikums [ERROR: ${err.message}]`, type: 'danger' });
+        await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
       }
     },
     async getAvailableLanguages() {

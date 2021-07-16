@@ -22,7 +22,7 @@ export const getters: GetterTree<UserProfileState, RootState> = {
 };
 
 export const mutations: MutationTree<UserProfileState> = {
-  updateUserProfile(state, userProfile: UserProfileState) {
+  async updateUserProfile(state, userProfile: UserProfileState) {
     state.emailAddress = userProfile.emailAddress;
     state.firstName = userProfile.firstName;
     state.lastName = userProfile.lastName;

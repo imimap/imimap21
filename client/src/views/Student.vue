@@ -27,29 +27,19 @@
           {{ userProfile.emailAddress }}
         </span>
       </div>
-      <div class="col-md-4">
-        <div class="field">
-          <div class="form-group" data-children-count="1">
-            <label for="studentPrivateEmail">Private E-Mail</label>
-            <input class="form-control" type="text" id="studentPrivateEmail">
-          </div>
-        </div>
-      </div>
     </div>
     <div class="row mb-3">
       <div class="col-md-4">
         <div class="field">
           <div class="form-group" data-children-count="1">
             <label class="required_application" for="studentFirstName">Vorname</label>
-            <input
-              maxlength="50"
-              class="form-control"
-              size="50"
-              type="text"
-              :value="userProfile.firstName"
-
-              id="studentFirstName"
-            >
+            <input maxlength="50"
+                   class="form-control"
+                   size="50"
+                   type="text"
+                   v-model="newFirstName"
+                   :placeholder="userProfile.firstName"
+                  id="studentFirstName"/>
           </div>
         </div>
       </div>
@@ -62,7 +52,8 @@
               class="form-control"
               size="50"
               type="text"
-              :value="userProfile.lastName"
+              v-model="newLastName"
+              :placeholder="userProfile.lastName"
               id="studentLastName"
             >
           </div>
@@ -93,15 +84,28 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { mapState } from 'vuex';
+import http from '@/utils/http-common';
 
 export default defineComponent({
   name: 'Student',
+  data() {
+    return {
+      newFirstName: null,
+      newLastName: null,
+      newPrivateEmail: null,
+    };
+  },
   computed: mapState(['userProfile']),
   methods: {
-    save() {
+    async save() {
       // @TODO: POST an Student Endpoint
-      this.$store.dispatch('addNotification', { text: 'Dein Profil wurde erfolgreich gespeichert!', type: 'success' });
-      // @TODO: Neues Student Profile im Store hinterlegen
+      try {
+        const res = await http.patch('/auth/profile', { firstName: this.newFirstName, lastName: this.newLastName });
+        await this.$store.dispatch('setUserProfile', { ...res });
+        await this.$store.dispatch('addNotification', { text: 'Dein Profil wurde erfolgreich gespeichert!', type: 'success' });
+      } catch (err) {
+        await this.$store.dispatch('addNotification', { text: 'Dein Profil wurde erfolgreich gespeichert!', type: 'success' });
+      }
     },
   },
 });
