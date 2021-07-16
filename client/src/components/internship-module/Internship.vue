@@ -51,8 +51,7 @@
 
   <div class="card internship-card border-htw-green">
     <div class="card-header">
-      <h5 class="card-title " id="h5_block">Praktikum @
-        Hasse UG</h5>
+      <h5 class="card-title">Praktikum</h5>
     </div>
     <div class="card-body">
       <div class="card mb-3 p-0">
