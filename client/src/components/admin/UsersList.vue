@@ -494,7 +494,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Student from '@/models/Student';
-import { clearStudentSearch, getStudentsList, markAepPassedOnInternshipModule, } from '@/utils/gateways';
+import { clearStudentSearch, getStudentsList, markAepPassedOnInternshipModule } from '@/utils/gateways';
 import { getDateString, getInternshipModuleDuration, getTimeDifferenceDays } from '@/utils/admin';
 import internshipModuleStatusColors from '@/models/InternshipModuleStatus';
 import store from '@/store';
