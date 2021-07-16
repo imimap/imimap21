@@ -13,6 +13,7 @@ import ldapStrategy from "./authentication/ldapStrategy";
 import localStrategy from "./authentication/localStrategy";
 import * as fileUpload from "express-fileupload";
 import authMiddleware, { pdfFileAuthMiddleware } from "./authentication/middleware";
+import * as morgan from "morgan";
 
 // load database
 (async () => await database())();
@@ -23,6 +24,7 @@ const port = process.env.PORT || 9000;
 const app = express();
 
 // Configure middlewares
+app.use(morgan("common"));
 app.use(cors());
 app.use(express.json());
 app.use(fileUpload());
