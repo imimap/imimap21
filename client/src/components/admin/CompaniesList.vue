@@ -52,7 +52,7 @@
                     <div class="col-3">
                       <h6 class="list-item-label">Ort</h6>
                       <span class="fw-bold">
-                        {{ row.address.city + ', ' + row.address.country}}
+                        {{ row.address?.city + ', ' + row.address?.country }}
                       </span>
                     </div>
                   </div>
@@ -65,17 +65,17 @@
                  data-bs-parent="#listAccordion">
               <div class="accordion-body">
                 <h2>{{ row.companyName }}</h2>
-                <h3>{{ row.address.city + ', ' + row.address.country}}</h3>
+                <h3>{{ row.address?.city + ', ' + row.address?.country }}</h3>
                 <p>
-                  <b>Industrie:</b> {{ row.industry}}<br>
+                  <b>Industrie:</b> {{ row.industry }}<br>
                   <b>Website:</b> <a :href="row.website" target="_blank">
                   {{ row.website }}</a><br>
                   <b>Sprache:</b> {{ row.mainLanguage }}<br>
                   <b>Größe:</b> {{ row.size.toLocaleLowerCase() }}<br>
                   <b>Adresse:</b><br>
-                  {{ row.address.street + ' ' + row.address.number }}<br>
-                  {{ row.address.zip + ' ' + row.address.city }}<br>
-                  {{ row.address.country }}<br>
+                  {{ row.address?.street + ' ' + row.address?.number }}<br>
+                  {{ row.address?.zip + ' ' + row.address?.city }}<br>
+                  {{ row.address?.country }}<br>
                 </p>
 
                 <button type="button" class="btn btn-success me-3" data-bs-toggle="modal"
@@ -232,7 +232,6 @@ import { defineComponent } from 'vue';
 import { getCompaniesList } from '@/utils/gateways';
 import Company from '@/models/Company';
 import store from '@/store';
-import Postponement from '@/models/Postponement';
 
 export default defineComponent({
   name: 'CompaniesList',
