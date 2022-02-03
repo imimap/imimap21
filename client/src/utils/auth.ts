@@ -80,7 +80,7 @@ export async function getAuthUserProfile() {
   try {
     const res = await http.get('/auth/profile');
     await storeAuthUserProfile(res.data);
-  } catch (err) {
+  } catch (err: any) {
     await store.dispatch('addNotification', { text: `Fehler beim Laden des Nutzerprofils [ERROR: ${err.message}]`, type: 'danger' });
   }
 }
@@ -93,10 +93,14 @@ export async function login(username: string, password: string): Promise<boolean
       await store.dispatch('addNotification', { text: 'Du wurdest erfolgreich eingeloggt!', type: 'success' });
       return true;
     }
-  } catch (err) {
-    const errors = err.response.data.error.errors.map((error) => `${error.msg}: ${error.param}`);
-    console.log(errors);
-    await store.dispatch('addNotification', { text: `${errors.join(' & ')}`, type: 'danger' });
+  } catch (err: any) {
+    if (err.response?.data?.error?.errors) {
+      const errors = err.response.data.error.errors.map((error) => `${error.msg}: ${error.param}, ${error.message}`);
+      await store.dispatch('addNotification', { text: `${errors.join(' & ')}`, type: 'danger' });
+    } else {
+      await store.dispatch('addNotification', { text: `${err.message}`, type: 'danger' });
+    }
+
     return false;
   }
   return false;
