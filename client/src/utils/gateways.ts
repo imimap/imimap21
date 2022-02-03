@@ -84,3 +84,18 @@ export const rejectPostponement = async (id) => apiClient.patch(`/postponement-r
     console.log(err);
     return [];
   });
+
+// here ask for the existing questions in DB
+export const getQuestionsList = async () => apiClient.get('/questions')
+  .then((res) => res.data)
+  .catch((err) => {
+    console.log(err);
+    return [];
+  });
+
+export const getEvaluationsList = async () => apiClient.get('/evaluations')
+  .then((res) => res.data)
+  .catch((err) => {
+    console.log(err);
+    return [];
+  });

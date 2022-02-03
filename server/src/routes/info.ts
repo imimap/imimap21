@@ -9,7 +9,7 @@ import {
 import { validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
 import { getAllCountries, getCities } from "../controllers/company";
-import { getLanguages, getSemesters, getUpcomingSemesters } from "../controllers/info";
+import { getLanguages, getSemesters, getUpcomingSemesters, getPossibleSemester } from "../controllers/info";
 
 const infoRouter = Router();
 
@@ -58,5 +58,12 @@ infoRouter.get(
 );
 
 infoRouter.get("/languages", getLanguages);
+
+infoRouter.get(
+  "/possibleSemesters",
+  authMiddleware(),
+  validate,
+  getPossibleSemester
+);
 
 export default infoRouter;

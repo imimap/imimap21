@@ -29,6 +29,13 @@ import { availableLocales, defaultLocale } from '@/locales/locales';
 import Internship from '@/views/Internship.vue';
 import CreateInternship from '@/components/internship/CreateInternship.vue';
 import EditInternship from '@/components/internship/EditInternship.vue';
+// Nima -------------------------------------------------------
+import AepDashboard from '@/components/admin/AepDashboard.vue';
+import QuestionsList from '@/components/question/QuestionsList.vue';
+import CreateQuestion from '@/components/question/CreateQuestion.vue';
+import EditQuestion from '@/components/question/EditQuestion.vue';
+import CreateEvaluation from '@/components/evaluation/CreateEvaluation.vue';
+import EvaluationsList from '@/components/evaluation/EvaluationsList.vue';
 
 // @TODO: Router auf Modules aufteilen
 const routes: Array<RouteRecordRaw> = [
@@ -183,6 +190,51 @@ const routes: Array<RouteRecordRaw> = [
             path: 'postponements',
             name: 'AdminPostponementsList',
             component: AdminPostponementsList.default,
+          },
+          {
+            path: 'aepDashboard',
+            name: 'AepDashboard',
+            component: AepDashboard,
+          },
+          {
+            path: 'questions',
+            name: 'QuestionsList',
+            component: QuestionsList,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+          {
+            path: 'editQuestion/:id',
+            name: 'EditQuestion',
+            component: EditQuestion,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+          {
+            path: 'newQuestion',
+            name: 'CreateQuestion',
+            component: CreateQuestion,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+          {
+            path: 'evaluations',
+            name: 'EvaluationsList',
+            component: EvaluationsList,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+          {
+            path: 'newEvaluation',
+            name: 'CreateEvaluation',
+            component: CreateEvaluation,
+            meta: {
+              allowAnonymous: false,
+            },
           },
         ],
       },

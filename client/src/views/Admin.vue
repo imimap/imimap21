@@ -17,6 +17,10 @@
         <router-link class="nav-link" :class="{ active: isPostponementsRoute }"
                      to="postponements">Verschiebungen</router-link>
       </li>
+      <li class="nav-item me-2">
+        <router-link class="nav-link" :class="{ active: isAEPModuleRoute }"
+                     to="aepDashboard">AEP Dashboard</router-link>
+      </li>
     </ul>
   </div>
 
@@ -45,6 +49,9 @@ export default defineComponent({
     },
     isPostponementsRoute() {
       return this.$router.currentRoute.value.path.includes('postponements');
+    },
+    isAEPModuleRoute() {
+      return this.$router.currentRoute.value.path.includes('aepDashboard');
     },
   },
 });

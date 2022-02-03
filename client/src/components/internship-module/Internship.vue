@@ -75,7 +75,7 @@
                 Anfangsdatum
               </td>
               <td>
-                {{ startDate }}
+                {{ getDateString(internship.startDate) }}
               </td>
             </tr>
             <tr>
@@ -83,7 +83,7 @@
                 Enddatum
               </td>
               <td>
-                {{ internship.endDate }}
+                {{ getDateString(internship.endDate) }}
               </td>
             </tr>
             <tr>
@@ -213,17 +213,33 @@
           </table>
         </div>
       </div>
-      <div class="my-3">
-        <router-link :to="{ name: 'EditInternship', params: { id: this.internship._id } }">
-          Bearbeiten
-        </router-link>
-      </div>
+      <fieldset class="form-group border p-3 rounded-3">
+        <div class="card-body pt-3 pb-0">
+          <div class="row">
+            <div class="col m-2">
+              <router-link :to="{ name: 'EditInternship', params: { id: this.internship._id } }">
+                Bearbeiten
+              </router-link>
+            </div>
+            <div class="col">
+              <router-link to="../admin/questions">
+                <button type="button"
+                        class="btn btn-htw-green float-end">
+                  Evaluation
+                </button>
+              </router-link>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
+import { getDateString } from '@/utils/admin';
 import { Internship } from '@/store/types/Internship';
 import http from '@/utils/http-common';
 
@@ -265,6 +281,7 @@ export default defineComponent({
     },
   },
   methods: {
+    getDateString,
     previewRequestPdf(file) {
       this.requestPdf = file;
     },
