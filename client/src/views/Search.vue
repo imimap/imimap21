@@ -240,7 +240,7 @@ export default defineComponent({
       try {
         const res = await http.get('/info/countries');
         this.availableCountries = await res.data;
-      } catch (err) {
+      } catch (err) { // Todo: Ersetzen durch util showErrorMessage
         await this.$store.dispatch('addNotification', {
           text: `Fehler beim laden der verfügbaren Länder [ERROR: ${err.message}]`,
           type: 'danger',
@@ -292,7 +292,7 @@ export default defineComponent({
             seen: false,
           },
         });
-        this.searchResults = await res.data;
+        this.searchResults = res.data;
         this.searchResults = this.searchResults.filter((internship) => typeof internship.company.address !== 'undefined');
         this.loadingState = false;
       } catch (err) {
