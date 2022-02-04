@@ -12,7 +12,7 @@ const router = Router();
 
 router.use("/auth", authRouter);
 
-router.use("/x", exampleRouter);
+if (process.env.NODE_ENV === "development") router.use("/x", exampleRouter);
 
 router.use("/internship-modules", internshipModuleRouter);
 

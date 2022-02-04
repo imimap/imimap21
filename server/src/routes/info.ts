@@ -15,12 +15,7 @@ const infoRouter = Router();
 
 /* The following endpoints can be used to provide options to a search form */
 
-infoRouter.get(
-  "/payment-types",
-  authMiddleware(),
-  validate,
-  asyncHandler(getAllPaymentTypes)
-);
+infoRouter.get("/payment-types", authMiddleware(), validate, asyncHandler(getAllPaymentTypes));
 
 infoRouter.get(
   "/operational-areas",
