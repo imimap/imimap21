@@ -21,7 +21,6 @@ import Student from '@/views/Student.vue';
 import Help from '@/views/Help.vue';
 import rootStore from '@/store';
 import CreatePostponement from '@/components/postponements/CreatePostponement.vue';
-import PostponementsList from '@/components/internship-module/PostponementsList.vue';
 import Postponements from '@/views/Postponements.vue';
 import PageNotFound from '@/views/PageNotFound.vue';
 import InternshipModuleIndex from '@/components/internship-module/InternshipModuleIndex.vue';
@@ -243,10 +242,9 @@ router.beforeEach(async (to, from, next) => {
 
 router.beforeEach(async (to, from, next) => {
   if (isLoggedIn() && rootStore.getters.getUser.id === '') {
-    if (await storeAuthUser(getAuthToken())) {
-      await getAuthUserProfile();
-      next();
-    }
+    const token = getAuthToken();
+    await storeAuthUser(token);
+    await getAuthUserProfile();
   } else {
     next();
   }

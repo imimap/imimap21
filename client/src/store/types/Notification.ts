@@ -1,4 +1,4 @@
-enum notificationTypes {
+export enum notificationTypes {
   danger = 'danger',
   success = 'success',
 }
