@@ -180,7 +180,7 @@ describe("InternshipModule", () => {
 
       // fake that report has been submitted
       const user = await User.findOne({ isAdmin: false });
-      const path = `http://localhost:9000/pdfs/${
+      const path = `${process.env.API_HOST}/pdfs/${
         user?.studentProfile?.studentId
       }/${Types.ObjectId()}/${Types.ObjectId()}.pdf`;
       await internship?.reportPdf?.submit(USER_ID, path);

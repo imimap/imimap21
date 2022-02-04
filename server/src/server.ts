@@ -20,6 +20,7 @@ import * as morgan from "morgan";
 
 // Configuring port
 const port = process.env.PORT || 9000;
+const BASE_URL = `${process.env.API_HOST || `http://localhost:${port}`}/api`;
 
 const app = express();
 
@@ -62,4 +63,4 @@ app.use(function (error: unknown, request: Request, response: Response, next: Ne
 
 // Listening to port
 app.listen(port);
-console.log(`Listening on http://localhost:${port}/api`);
+console.log(`Listening on ${BASE_URL}`);
