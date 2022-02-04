@@ -107,10 +107,12 @@
     </div>
   </div>
   <!-- Search Results -->
-  <div id="form-block4" class="mx-3 my-3" v-if="!loadingState && searchResults.length <= 0">
+  <div id="form-block4" class="mx-3 my-3"
+       v-if="!loadingState && searchResults.length <= 0 && previousSearchResults.length <= 0">
     {{ $t("search.results.noResults") }}
   </div>
-  <div id="form-block4" class="mx-3 my-3" v-if="!loadingState && searchResults.length > 0">
+  <div id="form-block4" class="mx-3 my-3"
+       v-if="!loadingState && (searchResults.length > 0 || previousSearchResults.length > 0)">
     <div class="text-center">
       <button type="button"
               class="btn btn-htw-green text-white mb-3"
@@ -118,12 +120,15 @@
         {{ $t("search.showMap") }}
       </button>
     </div>
-    <div id="search-results" class="search_results" v-if="!cardToggle">
+    <div id="search-results" class="search_results" v-if="!cardToggle && searchResults.length > 0">
       <SearchResultList
         :result-count="resultCount"
         :search-results="searchResults"
         result-count-text="search.results.resultCount">
       </SearchResultList>
+    </div>
+    <div id="previous-search-results" class="search_results"
+         v-if="!cardToggle && previousSearchResults.length > 0">
       <SearchResultList
         :result-count="previousResultCount"
         :search-results="previousSearchResults"
@@ -242,6 +247,7 @@ export default defineComponent({
           type: 'danger',
         });
       }
+      console.log(this.searchResults.length);
       try {
         this.previousSearchResults = await this.getSearchResults(true);
       } catch (e: any) {
@@ -250,6 +256,7 @@ export default defineComponent({
           type: 'danger',
         });
       }
+      console.log(this.previousSearchResults.length);
       this.loadingState = false;
     },
     async getSearchResults(seen: boolean) {

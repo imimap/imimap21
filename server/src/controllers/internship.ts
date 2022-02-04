@@ -142,16 +142,6 @@ export async function findInternships(
   // Create Options
   const options: { [k: string]: unknown } = {};
 
-  if (
-    req.query.seen === "true" &&
-    user.studentProfile?.internshipsSeen &&
-    user.studentProfile.internshipsSeen.length > 0
-  ) {
-    options._id = {
-      $in: user.studentProfile.internshipsSeen,
-    };
-  }
-
   const companyQueryFields = ["companyName", "branchName", "industry", "mainLanguage", "size"];
   companyQueryFields.forEach((field) => {
     if (req.query[field])
@@ -187,12 +177,21 @@ export async function findInternships(
 
   if (!user.isAdmin && user.studentProfile?.internshipsSeen) {
     options["company.excludedFromSearch"] = false;
-    if (user.studentProfile.internshipsSeen.length > 0) {
-      const internshipsExcludedFromQuery = user.studentProfile?.internshipsSeen.concat(
-        user.studentProfile.internship.internships
-      );
+    let excludedInternships = user.studentProfile.internship.internships;
+    let internshipsSeen = [];
+    if (
+      (!req.query.seen || req.query.seen === "false") &&
+      user.studentProfile.internshipsSeen?.length > 0
+    ) {
+      internshipsSeen = user.studentProfile.internshipsSeen;
+      excludedInternships = excludedInternships.concat(internshipsSeen);
+    }
+    options._id = {
+      $nin: excludedInternships,
+    };
+    if (req.query.seen === "true") {
       options._id = {
-        $nin: internshipsExcludedFromQuery,
+        $in: user.studentProfile.internshipsSeen,
       };
     }
   }
@@ -205,7 +204,7 @@ export async function findInternships(
   let limit = typeof req.query.limit === "string" && parseInt(req.query.limit);
   if (!user.isAdmin && user.studentProfile?.internshipsSeen) {
     limit = 12;
-    limit = limit - user.studentProfile.internshipsSeen.length;
+    if (req.query.seen !== "true") limit = limit - user.studentProfile.internshipsSeen.length;
   }
 
   // Set offset if applicable
@@ -247,6 +246,7 @@ export async function findInternships(
   }
 
   // Query internships that have already been viewed
+  /*
   let internshipsSeenThatFitFilter = [];
   if (user.studentProfile) {
     options._id = {
@@ -265,17 +265,25 @@ export async function findInternships(
       { $project: projection },
       { $match: options },
     ]);
-  }
+  }*/
 
   // Add newly returned internships to internshipsSeen
-  if (!user.isAdmin && user.studentProfile?.internshipsSeen && internships.length > 0) {
+  if (
+    req.query.seen !== "true" &&
+    !user.isAdmin &&
+    user.studentProfile?.internshipsSeen &&
+    internships.length > 0
+  ) {
     user.studentProfile.internshipsSeen.push(...internships.map((internship) => internship._id));
     await user.save();
   }
 
   // Return all internships that one has already seen and that fit the filter together with as many
   // as possible other internships that one has not yet seen and that fit the filter
-  res.json(internships.concat(internshipsSeenThatFitFilter));
+  // res.json(internships.concat(internshipsSeenThatFitFilter));
+  console.log("Internships " + req.query.seen);
+  console.log(internships.length);
+  res.json(internships);
 }
 
 /**
