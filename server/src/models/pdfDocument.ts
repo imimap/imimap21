@@ -54,18 +54,18 @@ export const PdfDocumentSchema = new Schema<IPdfDocument>(
   }
 );
 
-PdfDocumentSchema.virtual("path").get(function () {
+PdfDocumentSchema.methods.path = function () {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return getRecentValueForPropSetByEvent("newPath", this);
-});
+};
 
 // when generating the next pdf path, this method should be used
 // it makes sure that the versioning is correct
 PdfDocumentSchema.methods.nextPath = function () {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const currentPath: string = this.path;
+  const currentPath: string = this.path();
   if (!currentPath) return null;
   const pathParts = currentPath.split("/");
   pathParts.pop();
