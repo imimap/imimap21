@@ -245,28 +245,6 @@ export async function findInternships(
     }
   }
 
-  // Query internships that have already been viewed
-  /*
-  let internshipsSeenThatFitFilter = [];
-  if (user.studentProfile) {
-    options._id = {
-      $in: user.studentProfile?.internshipsSeen,
-    };
-
-    internshipsSeenThatFitFilter = await Internship.aggregate([
-      {
-        $lookup: {
-          from: "companies",
-          localField: "company",
-          foreignField: "_id",
-          as: "company",
-        },
-      },
-      { $project: projection },
-      { $match: options },
-    ]);
-  }*/
-
   // Add newly returned internships to internshipsSeen
   if (
     req.query.seen !== "true" &&
@@ -280,9 +258,6 @@ export async function findInternships(
 
   // Return all internships that one has already seen and that fit the filter together with as many
   // as possible other internships that one has not yet seen and that fit the filter
-  // res.json(internships.concat(internshipsSeenThatFitFilter));
-  console.log("Internships " + req.query.seen);
-  console.log(internships.length);
   res.json(internships);
 }
 

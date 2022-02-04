@@ -247,7 +247,6 @@ export default defineComponent({
           type: 'danger',
         });
       }
-      console.log(this.searchResults.length);
       try {
         this.previousSearchResults = await this.getSearchResults(true);
       } catch (e: any) {
@@ -256,7 +255,6 @@ export default defineComponent({
           type: 'danger',
         });
       }
-      console.log(this.previousSearchResults.length);
       this.loadingState = false;
     },
     async getSearchResults(seen: boolean) {
