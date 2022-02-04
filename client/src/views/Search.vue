@@ -106,8 +106,10 @@
       </form>
     </div>
   </div>
-  <!-- @TODO: Modal mit Hinweis auf begrenzte Suchergebnisanzahl (12) implementieren -->
   <!-- Search Results -->
+  <div id="form-block4" class="mx-3 my-3" v-if="!loadingState && searchResults.length <= 0">
+    {{ $t("search.results.noResults") }}
+  </div>
   <div id="form-block4" class="mx-3 my-3" v-if="!loadingState && searchResults.length > 0">
     <div class="text-center">
       <button type="button"
