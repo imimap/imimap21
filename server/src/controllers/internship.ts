@@ -8,6 +8,7 @@ import { LeanDocument, Types } from "mongoose";
 import { UploadedFile } from "express-fileupload";
 import * as fsPromises from "fs/promises";
 import * as pdf from "html-pdf";
+import {Evaluation} from "../models/evaluation";
 
 const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
   "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes";
@@ -49,6 +50,16 @@ export async function getInternshipsById(
       .populate({ path: "company", lean: true })
       .lean();
     if (!internship) return next(new NotFound("Internship not found"));
+    console.log('in controller');
+    console.log(internship.evaluationFile);
+    if(internship.evaluationFile == undefined) {
+      // @ts-ignore
+      const inSemester = user.studentProfile.internship.inSemester;
+      const evaluation = await Evaluation.findOne({inSemester: inSemester});
+      // @ts-ignore
+      internship.evaluationFile = evaluation;
+      // await Internship.updateOne(internship);
+    }
     res.json(internship);
   } else if (user.studentProfile && internshipId === "my") {
     const internships: IInternship[] = user.studentProfile.internship.internships;
@@ -456,6 +467,7 @@ function getInternshipObject(propsObject: any) {
     "workingHoursPerWeek",
     "programmingLanguages",
     "paymentTypes",
+    "evaluationFile",
   ];
   for (const prop of directProps) {
     if (propsObject[prop]) internshipProps[prop] = propsObject[prop];

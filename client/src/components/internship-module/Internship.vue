@@ -222,7 +222,7 @@
               </router-link>
             </div>
             <div class="col">
-              <router-link to="../admin/questions">
+              <router-link :to="{ name: 'ShowEvaluation', params: { id: this.internship._id } }">
                 <button type="button"
                         class="btn btn-htw-green float-end">
                   Evaluation

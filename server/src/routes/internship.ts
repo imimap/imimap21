@@ -78,6 +78,7 @@ internshipRouter.post(
     "supervisorFullName",
     "supervisorEmailAddress",
     "companyId",
+    "evaluationFile",
   ]),
   validate,
   asyncHandler(createInternship)
@@ -100,6 +101,7 @@ internshipRouter.patch(
     //supervisor
     "supervisorFullName",
     "supervisorEmailAddress",
+    "evaluationFile",
   ]),
   validate,
   asyncHandler(updateInternship)

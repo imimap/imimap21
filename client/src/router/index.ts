@@ -36,6 +36,7 @@ import CreateQuestion from '@/components/question/CreateQuestion.vue';
 import EditQuestion from '@/components/question/EditQuestion.vue';
 import CreateEvaluation from '@/components/evaluation/CreateEvaluation.vue';
 import EvaluationsList from '@/components/evaluation/EvaluationsList.vue';
+import EvaluationFormStudent from '@/components/evaluation/EvaluationFormStudent.vue';
 
 // @TODO: Router auf Modules aufteilen
 const routes: Array<RouteRecordRaw> = [
@@ -95,6 +96,14 @@ const routes: Array<RouteRecordRaw> = [
             path: 'edit/:id',
             name: 'EditInternship',
             component: EditInternship,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+          {
+            path: 'evaluation/:id',
+            name: 'ShowEvaluation',
+            component: EvaluationFormStudent,
             meta: {
               allowAnonymous: false,
             },

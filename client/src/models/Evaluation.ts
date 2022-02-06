@@ -1,4 +1,4 @@
-import Question from "@/models/Question";
+import Question from '@/models/Question';
 
 export default class Evaluation {
   id = '';
@@ -12,6 +12,4 @@ export default class Evaluation {
   createdAt= '';
 
   updatedAt= '';
-
 }
-

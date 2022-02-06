@@ -16,9 +16,8 @@ export const EvaluationSchema = new Schema({
       required: true,
       validate: {
         validator: (value: [IQuestion]) => value.length > 0,
-        message: "To create an evaluation form, submit at least one event.",
+        message: "To create an evaluation form, submit at least one question.",
       },
-      // _id: false,
     }
   ],
   isPublished: {

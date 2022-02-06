@@ -1,6 +1,7 @@
 import { Event } from '@/store/types/Event';
 import { Company } from '@/store/types/Company';
 import { PdfDocument } from '@/store/types/PdfDocument';
+import { Evaluation } from "@/store/types/Evaluation";
 
 export interface Internship {
   _id: string;
@@ -26,4 +27,5 @@ export interface Internship {
   certificatePdf: PdfDocument;
   events: Event[];
   status: string;
+  evaluationFile: Evaluation,
 }

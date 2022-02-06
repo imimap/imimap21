@@ -42,4 +42,6 @@ export default class Internship {
   certificatePdf = '';
 
   events = [];
+
+  evaluationFile = '';
 }
