@@ -177,10 +177,10 @@ export async function findInternships(
   }
 
   if (!user.isAdmin) {
+    options["company.excludedFromSearch"] = false;
     options.status = InternshipStatuses.PASSED;
     if (user.studentProfile?.internshipsSeen) {
-      options["company.excludedFromSearch"] = false;
-      let excludedInternships = user.studentProfile.internship.internships;
+      let excludedInternships = user.studentProfile.internship.internships || [];
       let internshipsSeen = [];
       if (
         (!req.query.seen || req.query.seen === "false") &&

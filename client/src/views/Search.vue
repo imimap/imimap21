@@ -238,9 +238,7 @@ export default defineComponent({
     async searchRequest() {
       this.loadingState = true;
       try {
-        this.searchResults = await this.getSearchResults(false);
-        // this.searchResults = this.searchResults.filter((internship) =>
-        // typeof internship.company.address !== 'undefined');
+        this.previousSearchResults = await this.getSearchResults(true);
       } catch (e: any) {
         await this.$store.dispatch('addNotification', {
           text: e.message,
@@ -248,7 +246,9 @@ export default defineComponent({
         });
       }
       try {
-        this.previousSearchResults = await this.getSearchResults(true);
+        this.searchResults = await this.getSearchResults(false);
+        // this.searchResults = this.searchResults.filter((internship) =>
+        // typeof internship.company.address !== 'undefined');
       } catch (e: any) {
         await this.$store.dispatch('addNotification', {
           text: e.message,
