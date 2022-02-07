@@ -80,11 +80,11 @@ export async function getRandomInternship(
   let maxOffset = await Internship.count();
   const options: { [k: string]: unknown } = {};
   if (user.studentProfile?.internship) {
+    options["status"] = InternshipStatuses.PASSED;
     if (user.studentProfile.internshipsSeen && user.studentProfile.internshipsSeen.length >= 12) {
       options._id = {
         $in: user.studentProfile.internshipsSeen,
       };
-      options.status = InternshipStatuses.PASSED;
       maxOffset = user.studentProfile.internshipsSeen.length;
     } else {
       options._id = {
