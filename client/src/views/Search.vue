@@ -195,7 +195,7 @@ export default defineComponent({
       try {
         const res = await http.get('/info/countries');
         this.availableCountries = await res.data;
-      } catch (err) { // Todo: Ersetzen durch util showErrorMessage
+      } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
         await this.$store.dispatch('addNotification', {
           text: `Fehler beim laden der verfügbaren Länder [ERROR: ${err.message}]`,
           type: 'danger',
@@ -206,7 +206,7 @@ export default defineComponent({
       try {
         const res = await http.get('/info/payment-types');
         this.availablePaymentOptions = res.data;
-      } catch (err) {
+      } catch (err: any) {
         await this.$store.dispatch('addNotification', {
           text: `Fehler beim laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`,
           type: 'danger',
@@ -217,7 +217,7 @@ export default defineComponent({
       try {
         const res = await http.get('/info/operational-areas');
         this.availableOperationalAreas = res.data;
-      } catch (err) {
+      } catch (err: any) {
         await this.$store.dispatch('addNotification', {
           text: `Fehler beim laden der verfügbaren Bereiche [ERROR: ${err.message}]`,
           type: 'danger',
@@ -228,7 +228,7 @@ export default defineComponent({
       try {
         const res = await http.get('/info/programming-languages');
         this.availableLanguages = res.data;
-      } catch (err) {
+      } catch (err: any) {
         await this.$store.dispatch('addNotification', {
           text: `Fehler beim laden der verfügbaren Programmiersprachen [ERROR: ${err.message}]`,
           type: 'danger',
@@ -269,7 +269,7 @@ export default defineComponent({
           },
         });
         return res.data;
-      } catch (err) {
+      } catch (err: any) {
         throw new Error(`Fehler beim Suchen nach Praktika [ERROR: ${err.message}]`);
       }
     },

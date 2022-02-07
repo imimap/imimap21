@@ -659,7 +659,7 @@ async function saveFile(file: UploadedFile, path: string): Promise<Error | null>
     await fsPromises.mkdir(uploadDir, { recursive: true });
     // Save file
     await file.mv(process.cwd() + "/" + path);
-  } catch (e) {
+  } catch (e: any) {
     return e;
   }
 
@@ -695,7 +695,7 @@ export async function generateRequestPdf(
         res.setHeader("Content-Type", "application/pdf");
         stream.pipe(res);
       });
-  } catch (e) {
+  } catch (e: any) {
     next(new BadRequest(e));
   }
 }
