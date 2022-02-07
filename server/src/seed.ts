@@ -1,6 +1,6 @@
 import { IUser, User } from "./models/user";
 import * as faker from "faker";
-import { Schema } from "mongoose";
+import {Schema, Types} from "mongoose";
 import { IInternship, Internship } from "./models/internship";
 import { Company } from "./models/company";
 import { companySizes } from "./helpers/companySizes";
@@ -11,8 +11,11 @@ function generateRange(size: number, start?: number): number[] {
   return [...Array(size).keys()].map((i) => i + (start ?? 0));
 }
 
+const ADMIN_USER_ID = Types.ObjectId("0000a0000000000000000000");
+
 async function createAdmin(): Promise<IUser> {
   return await User.create({
+    _id: ADMIN_USER_ID,
     firstName: "Test",
     lastName: "Admin",
     emailAddress: "admin@htw-berlin.de",
@@ -66,7 +69,7 @@ async function createInternship(): Promise<IInternship> {
     comment: faker.lorem.words(10),
   });
 
-  return await Internship.create({
+  const internship = await Internship.create({
     startDate: faker.date.recent(120, "2020-01-01"),
     endDate: faker.date.soon(50, "2021-05-01"),
     company: company.id,
@@ -93,6 +96,11 @@ async function createInternship(): Promise<IInternship> {
       emailAddress: faker.internet.email(),
     },
   });
+
+  // create random number
+  const r = Math.random();
+  if (r < 0.5) return internship.pass(ADMIN_USER_ID);
+  else return internship;
 }
 
 async function generateStudents(
