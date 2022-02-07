@@ -1,6 +1,6 @@
 import { IUser, User } from "./models/user";
 import * as faker from "faker";
-import {Schema, Types} from "mongoose";
+import { Schema, Types } from "mongoose";
 import { IInternship, Internship } from "./models/internship";
 import { Company } from "./models/company";
 import { companySizes } from "./helpers/companySizes";
