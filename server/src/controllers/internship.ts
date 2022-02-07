@@ -10,9 +10,9 @@ import * as fsPromises from "fs/promises";
 import * as pdf from "html-pdf";
 
 const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
-  "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes";
+  "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes status";
 const INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN =
-  "startDate endDate workingHoursPerWeek supervisor status";
+  "startDate endDate workingHoursPerWeek supervisor";
 
 /**
  * Returns all information on certain internship for admin or on own internship for student.
@@ -77,9 +77,6 @@ export async function getRandomInternship(
     });
   if (!user) return next(new NotFound("User not found"));
 
-  let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
-  if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
-
   let maxOffset = await Internship.count();
   const options: { [k: string]: unknown } = {};
   if (user.studentProfile?.internship) {
@@ -87,6 +84,7 @@ export async function getRandomInternship(
       options._id = {
         $in: user.studentProfile.internshipsSeen,
       };
+      options.status = InternshipStatuses.PASSED;
       maxOffset = user.studentProfile.internshipsSeen.length;
     } else {
       options._id = {
@@ -94,7 +92,11 @@ export async function getRandomInternship(
       };
     }
   }
+
   const randomOffset = Math.floor(Math.random() * maxOffset);
+
+  let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
+  if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
 
   const internship = await Internship.findOne(options).select(select).skip(randomOffset).lean();
 
@@ -136,7 +138,6 @@ export async function findInternships(
       path: "studentProfile.internship",
       lean: true,
     });
-
   if (!user) return next(new NotFound("User not found"));
 
   // Create Options
@@ -175,28 +176,32 @@ export async function findInternships(
     };
   }
 
-  if (!user.isAdmin && user.studentProfile?.internshipsSeen) {
-    options["company.excludedFromSearch"] = false;
-    let excludedInternships = user.studentProfile.internship.internships;
-    let internshipsSeen = [];
-    if (
-      (!req.query.seen || req.query.seen === "false") &&
-      user.studentProfile.internshipsSeen?.length > 0
-    ) {
-      internshipsSeen = user.studentProfile.internshipsSeen;
-      excludedInternships = excludedInternships.concat(internshipsSeen);
-    }
-    options._id = {
-      $nin: excludedInternships,
-    };
-    if (req.query.seen === "true") {
+  if (!user.isAdmin) {
+    options.status = InternshipStatuses.PASSED;
+    if (user.studentProfile?.internshipsSeen) {
+      options["company.excludedFromSearch"] = false;
+      let excludedInternships = user.studentProfile.internship.internships;
+      let internshipsSeen = [];
+      if (
+        (!req.query.seen || req.query.seen === "false") &&
+        user.studentProfile.internshipsSeen?.length > 0
+      ) {
+        internshipsSeen = user.studentProfile.internshipsSeen;
+        excludedInternships = excludedInternships.concat(internshipsSeen);
+      }
       options._id = {
-        $in: user.studentProfile.internshipsSeen,
+        $nin: excludedInternships,
       };
+      if (req.query.seen === "true") {
+        options._id = {
+          $in: user.studentProfile.internshipsSeen,
+        };
+      }
     }
   }
 
   // Set select: Which fields to select?
+  // we add status here because otherwise we select only those internships with status == passed
   let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
   if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
 
