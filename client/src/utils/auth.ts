@@ -26,7 +26,7 @@ export function getAuthToken(): string | null {
   return token;
 }
 
-function setAuthToken(token) {
+function setAuthToken(token: string) {
   http.defaults.headers.common.Authorization = `Bearer ${token}`;
   localStorage.setItem(AUTH_TOKEN_KEY, token);
 }
@@ -59,7 +59,7 @@ export function logoutUser() {
   clearAuthToken();
 }
 
-export async function storeAuthUser(decodedToken) {
+export async function storeAuthUser(decodedToken: UserState): Promise<void> {
   await store.dispatch('setUser', {
     email: decodedToken.email,
     firstName: decodedToken.firstName,
@@ -69,7 +69,7 @@ export async function storeAuthUser(decodedToken) {
   });
 }
 
-async function storeAuthUserProfile(userProfile) {
+async function storeAuthUserProfile(userProfile: UserState): Promise<void> {
   await store.dispatch('setUserProfile', {
     ...userProfile,
   });
