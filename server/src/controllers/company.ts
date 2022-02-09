@@ -81,6 +81,8 @@ export async function searchCompanyByName(
     };
   }
 
+  searchOptions.excludedFromSearch = false;
+
   let select = null;
   if (!user.isAdmin) select = "companyName branchName address.country";
 

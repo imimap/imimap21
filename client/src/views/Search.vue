@@ -106,9 +106,13 @@
       </form>
     </div>
   </div>
-  <!-- @TODO: Modal mit Hinweis auf begrenzte Suchergebnisanzahl (12) implementieren -->
   <!-- Search Results -->
-  <div id="form-block4" class="mx-3 my-3" v-if="!loadingState && searchResults.length > 0">
+  <div id="form-block4" class="mx-3 my-3"
+       v-if="!loadingState && searchResults.length <= 0 && previousSearchResults.length <= 0">
+    {{ $t("search.results.noResults") }}
+  </div>
+  <div id="form-block4" class="mx-3 my-3"
+       v-if="!loadingState && (searchResults.length > 0 || previousSearchResults.length > 0)">
     <div class="text-center">
       <button type="button"
               class="btn btn-htw-green text-white mb-3"
@@ -116,72 +120,20 @@
         {{ $t("search.showMap") }}
       </button>
     </div>
-    <div id="search-results" class="search_results" v-if="!cardToggle">
-      <div class="container" style="max-width: 100vw;">
-        <p class="text-center p-1">
-          {{ $tc("search.results.resultCount", resultCount) }}
-        </p>
-        <!-- @TODO: %count% Ergebnisse aus vorherigen suchen implementieren-->
-        <p class="text-center p-1" v-if="false">
-          {{ $tc("search.results.previousResultCount", resultCount) }}
-        </p>
-        <table class="table table-striped table-sm table-borderless text-left">
-          <tbody>
-          <tr>
-            <td class="font-weight-bold">{{ $t("search.company") }}</td>
-            <td class="font-weight-bold">{{ $t("search.location") }}</td>
-            <td class="font-weight-bold">{{ $t("search.orientation") }}</td>
-            <td class="font-weight-bold"></td>
-          </tr>
-          <!-- Result Loop -->
-          <template  v-if="searchResults?.length > 0">
-            <template v-for="(searchResult) in searchResults"
-                      v-bind:key="searchResult._id">
-              <tr>
-                <td>{{ searchResult?.company?.companyName }}</td>
-                <td> {{ searchResult?.company?.address?.city }}</td>
-                <td> {{ searchResult?.operationalArea }}</td>
-                <td>
-                  <button class="btn btn-outline-htw-green float-right"
-                          data-bs-toggle="collapse"
-                          :data-bs-target="'#collapseResult' + searchResult._id"
-                          aria-expanded="false"
-                          :aria-controls="'#collapseResult' + searchResult._id">
-                    Details
-                  </button>
-                </td>
-              </tr>
-              <tr class="collapse" :id="'collapseResult' + searchResult._id">
-                <td colspan="7">
-                  <p class="pl-3">
-                    <strong>{{ $t("search.programmingLanguages") }}</strong>
-                    {{
-                      searchResult.programmingLanguages?.length > 0
-                        ? searchResult.programmingLanguages?.toString()
-                        :  'Keine Angabe'
-                    }}
-                  </p>
-                  <p class="pl-3">
-                    <strong>{{ $t("search.website") }}</strong>
-                    <a :href="searchResult?.company?.website" target="_blank">
-                      {{ searchResult?.company?.website }}
-                    </a>
-                  </p>
-                  <p class="pl-3">
-                    <strong>{{ $t("search.tasks") }}</strong>
-                    {{ searchResult?.tasks }}
-                  </p>
-                  <p class="pl-3">
-                    <strong>{{ $t("search.contact") }}</strong>
-                    {{ searchResult?.company?.emailAddress }}
-                  </p>
-                </td>
-              </tr>
-            </template>
-          </template>
-          </tbody>
-        </table>
-      </div>
+    <div id="search-results" class="search_results" v-if="!cardToggle && searchResults.length > 0">
+      <SearchResultList
+        :result-count="resultCount"
+        :search-results="searchResults"
+        result-count-text="search.results.resultCount">
+      </SearchResultList>
+    </div>
+    <div id="previous-search-results" class="search_results"
+         v-if="!cardToggle && previousSearchResults.length > 0">
+      <SearchResultList
+        :result-count="previousResultCount"
+        :search-results="previousSearchResults"
+        result-count-text="search.results.previousResultCount">
+      </SearchResultList>
     </div>
     <div id="map-results">
       <Map v-if="cardToggle" :locations="locations"></Map>
@@ -196,10 +148,11 @@ import Map from '@/components/Map.vue';
 import http from '@/utils/http-common';
 import { Internship } from '@/store/types/Internship';
 import { MapLocation } from '@/store/types/MapLocation';
+import SearchResultList from '@/components/search/SearchResultList.vue';
 
 export default defineComponent({
   name: 'Search',
-  components: { Map },
+  components: { SearchResultList, Map },
   data() {
     return {
       // Available filters after query
@@ -209,6 +162,7 @@ export default defineComponent({
       availableLanguages: null,
       // Searchresults after query
       searchResults: [] as Internship[],
+      previousSearchResults: [] as Internship[],
       // Selected filters
       paymentFilter: null,
       countryFilter: null,
@@ -222,6 +176,9 @@ export default defineComponent({
   computed: {
     resultCount(): number {
       return this.searchResults.length;
+    },
+    previousResultCount(): number {
+      return this.previousSearchResults.length;
     },
     locations(): MapLocation[] | null {
       if (this.searchResults.length === 0) return null;
@@ -238,7 +195,7 @@ export default defineComponent({
       try {
         const res = await http.get('/info/countries');
         this.availableCountries = await res.data;
-      } catch (err) {
+      } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
         await this.$store.dispatch('addNotification', {
           text: `Fehler beim laden der verfügbaren Länder [ERROR: ${err.message}]`,
           type: 'danger',
@@ -249,7 +206,7 @@ export default defineComponent({
       try {
         const res = await http.get('/info/payment-types');
         this.availablePaymentOptions = res.data;
-      } catch (err) {
+      } catch (err: any) {
         await this.$store.dispatch('addNotification', {
           text: `Fehler beim laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`,
           type: 'danger',
@@ -260,7 +217,7 @@ export default defineComponent({
       try {
         const res = await http.get('/info/operational-areas');
         this.availableOperationalAreas = res.data;
-      } catch (err) {
+      } catch (err: any) {
         await this.$store.dispatch('addNotification', {
           text: `Fehler beim laden der verfügbaren Bereiche [ERROR: ${err.message}]`,
           type: 'danger',
@@ -271,7 +228,7 @@ export default defineComponent({
       try {
         const res = await http.get('/info/programming-languages');
         this.availableLanguages = res.data;
-      } catch (err) {
+      } catch (err: any) {
         await this.$store.dispatch('addNotification', {
           text: `Fehler beim laden der verfügbaren Programmiersprachen [ERROR: ${err.message}]`,
           type: 'danger',
@@ -281,23 +238,39 @@ export default defineComponent({
     async searchRequest() {
       this.loadingState = true;
       try {
+        this.previousSearchResults = await this.getSearchResults(true);
+      } catch (e: any) {
+        await this.$store.dispatch('addNotification', {
+          text: e.message,
+          type: 'danger',
+        });
+      }
+      try {
+        this.searchResults = await this.getSearchResults(false);
+        // this.searchResults = this.searchResults.filter((internship) =>
+        // typeof internship.company.address !== 'undefined');
+      } catch (e: any) {
+        await this.$store.dispatch('addNotification', {
+          text: e.message,
+          type: 'danger',
+        });
+      }
+      this.loadingState = false;
+    },
+    async getSearchResults(seen: boolean) {
+      try {
         const res = await http.get('/internships', {
           params: {
             country: this.countryFilter,
             operationalArea: this.operationalAreaFilter,
             programmingLanguage: this.languageFilter,
             paymentType: this.paymentFilter,
-            seen: false,
+            seen,
           },
         });
-        this.searchResults = await res.data;
-        this.searchResults = this.searchResults.filter((internship) => typeof internship.company.address !== 'undefined');
-        this.loadingState = false;
-      } catch (err) {
-        await this.$store.dispatch('addNotification', {
-          text: `Fehler beim Suchen nach Praktika [ERROR: ${err.message}]`,
-          type: 'danger',
-        });
+        return res.data;
+      } catch (err: any) {
+        throw new Error(`Fehler beim Suchen nach Praktika [ERROR: ${err.message}]`);
       }
     },
   },
