@@ -51,7 +51,7 @@ export default defineComponent({
         const res = await http.get('/internships/locations', { params: { semester: this.selectedSemester } });
         this.searchResults = await res.data;
         this.loadingState = false;
-      } catch (err) {
+      } catch (err: any) {
         await this.$store.dispatch('addNotification', {
           text: `Fehler beim Suchen der Praktika [ERROR: ${err.message}]`,
           type: 'danger',
@@ -63,7 +63,7 @@ export default defineComponent({
       try {
         const res = await http.get('/info/semesters/upcoming');
         this.availableSemesters = await res.data;
-      } catch (err) {
+      } catch (err: any) {
         await this.$store.dispatch('addNotification', {
           text: `Fehler beim Abfragen der verfügbaren semester [ERROR: ${err.message}]`,
           type: 'danger',

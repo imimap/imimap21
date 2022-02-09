@@ -87,7 +87,7 @@ export default defineComponent({
         });
         await store.dispatch('addNotification', { text: 'Verschiebung erfolgreich beantragt!', type: 'success' });
         await this.$router.push({ name: 'InternshipModuleIndex' });
-      } catch (err) {
+      } catch (err: any) {
         await this.$store.dispatch('addNotification', { text: `Fehler beim Beantragen der Verschiebung [ERROR: ${err.message}]`, type: 'danger' });
       }
     },

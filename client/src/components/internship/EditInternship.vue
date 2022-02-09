@@ -191,7 +191,7 @@ export default defineComponent({
         this.supervisorEmail = res.data.supervisor.emailAddress;
         this.tasks = res.data.tasks;
         this.loadingState = false;
-      } catch (err) {
+      } catch (err: any) {
         console.log(err.message);
       }
     },
@@ -216,7 +216,7 @@ export default defineComponent({
           ...res.data,
         };
         await this.$store.dispatch('addNotification', { text: 'Praktikum erfolgreich gespeichert!', type: 'success' });
-      } catch (err) {
+      } catch (err: any) {
         await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
       }
     },
@@ -224,7 +224,7 @@ export default defineComponent({
       try {
         const res = await http.get('/info/payment-types');
         this.availablePaymentTypes = res.data;
-      } catch (err) {
+      } catch (err: any) {
         await this.$store.dispatch('addNotification', {
           text: `Fehler beim laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`,
           type: 'danger',
