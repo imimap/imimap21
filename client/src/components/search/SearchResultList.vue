@@ -44,12 +44,5 @@ export default defineComponent({
     resultCountText: String,
     searchResults: [],
   },
-  data() {
-    return {
-    };
-  },
-  methods: {
-
-  },
 });
 </script>

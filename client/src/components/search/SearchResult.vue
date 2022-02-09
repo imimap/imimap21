@@ -56,13 +56,6 @@ export default defineComponent({
     operationalArea: String,
     programmingLanguages: [String],
   },
-  data() {
-    return {
-    };
-  },
-  methods: {
-
-  },
 });
 </script>
 
