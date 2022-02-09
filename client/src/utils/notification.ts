@@ -1,10 +1,10 @@
 import store from '@/store';
-import { notificationTypes } from '@/store/types/Notification';
+import { NotificationTypes } from '@/store/types/Notification';
 
 export async function showErrorNotification(message: string) {
-  await store.dispatch('addNotification', { text: message, type: notificationTypes.danger });
+  await store.dispatch('addNotification', { text: message, type: NotificationTypes.danger });
 }
 
 export async function showSuccessNotification(message: string) {
-  await store.dispatch('addNotification', { text: message, type: notificationTypes.success });
+  await store.dispatch('addNotification', { text: message, type: NotificationTypes.success });
 }

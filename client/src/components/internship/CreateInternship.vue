@@ -364,7 +364,7 @@ export default defineComponent({
         if (res.data === null) return false;
         this.existingCompany = res.data;
         return true;
-      } catch (err) {
+      } catch (err: any) {
         return false;
       }
     },
@@ -394,7 +394,7 @@ export default defineComponent({
           await this.$store.dispatch('addNotification', { text: 'Firma erfolgreich angelegt!', type: 'success' });
           this.toggleAddCompanyForm = false;
           this.clearNewCompanyForm();
-        } catch (err) {
+        } catch (err: any) {
           await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
         }
       }
@@ -418,7 +418,7 @@ export default defineComponent({
           tasks: this.tasks,
         });
         await this.$store.dispatch('addNotification', { text: 'Praktikum erfolgreich angelegt!', type: 'success' });
-      } catch (err) {
+      } catch (err: any) {
         await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
       }
     },
@@ -426,7 +426,7 @@ export default defineComponent({
       try {
         const res = await http.get('/info/languages');
         this.availableLanguages = res.data;
-      } catch (err) {
+      } catch (err: any) {
         await this.$store.dispatch('addNotification', {
           text: `Fehler beim laden der verfügbaren Sprachen [ERROR: ${err.message}]`,
           type: 'danger',
@@ -437,7 +437,7 @@ export default defineComponent({
       try {
         const res = await http.get('/info/payment-types');
         this.availablePaymentTypes = res.data;
-      } catch (err) {
+      } catch (err: any) {
         await this.$store.dispatch('addNotification', {
           text: `Fehler beim laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`,
           type: 'danger',
