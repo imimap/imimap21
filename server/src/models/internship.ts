@@ -7,7 +7,7 @@ import { ICompany } from "./company";
 import { User } from "./user";
 import { EventSchema, IEvent } from "./event";
 import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
-import {Evaluation, EvaluationSchema, IEvaluation} from "./evaluation";
+import { EvaluationSchema, IEvaluation} from "./evaluation";
 
 export enum InternshipStatuses {
   UNKNOWN = "unknown",

@@ -385,12 +385,10 @@ export default defineComponent({
         }
       }
       if (!checkboxOrder.checked) {
-        console.log('I am here');
         this.questions.sort((questionOne, questionTwo) => new
         Date(questionOne.dateToPublishQuestion).valueOf()
           - new Date(questionTwo.dateToPublishQuestion).valueOf());
       }
-      console.log(this.questions);
       // here creates the table to show in Modal
       // learnt the basics from this tutorial and customized
       // https://www.delftstack.com/de/howto/javascript/create-table-javascript/

@@ -4,7 +4,7 @@
       <div class="col-12">
         <fieldset class="form-group border p-3">
           <div v-if="!isLoading" class="accordion rounded-3" id="listAccordion">
-            <div v-if="evaluationFile.questions.length == 0">
+            <div v-if="evaluationFile.questions.length === 0">
               <hr>
               <h5>
                 <span class="alert alert-warning d-flex justify-content-center align-items-center">
@@ -14,16 +14,16 @@
             </div>
             <div v-for="(row, index) in evaluationFile.questions" v-bind:key="index"
                  class="accordion-item">
-              <h2 class="accordion-header rounded-3"
-                  style="border-color: #77b900;border-style: solid;" v-bind:id="index">
-                <button class="accordion-button collapsed"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        v-bind:data-bs-target="'#question-' + row._id"
-                        aria-expanded="false"
-                        v-bind:aria-controls="'question-' + row._id">
-                  <div class="container rounded-3">
-                    <div class="row">
+<!--              <div v-if="compareDates(row.dateToPublishQuestion)">-->
+                <h2 class="accordion-header rounded-3"
+                    style="border-color: #77b900;border-style: solid;" v-bind:id="index">
+                  <button class="accordion-button collapsed"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          v-bind:data-bs-target="'#question-' + row._id"
+                          aria-expanded="false"
+                          v-bind:aria-controls="'question-' + row._id">
+                    <div class="row container rounded-3">
                       <div class="col-8">
                         <h6 class="list-item-label">
                           {{ $t("evaluationFormStudent.header.title") }}
@@ -34,12 +34,12 @@
                         <h6 class="list-item-label">
                           {{ $t("evaluationFormStudent.body.answerReviewed") }}
                         </h6>
-                        <div v-if="row.isAnswerReviewed == true">
+                        <div v-if="row.isAnswerReviewed === true">
                           <span class="fw-bold">
                             {{ $t("evaluationFormStudent.body.yes") }}
                           </span>
                         </div>
-                        <div v-else-if="row.isAnswerReviewed == false">
+                        <div v-else-if="row.isAnswerReviewed === false">
                           <span class="fw-bold">
                             {{ $t("evaluationFormStudent.body.no") }}
                           </span>
@@ -52,36 +52,51 @@
                         <span class="fw-bold">{{ getDateString(row.dateToPublishQuestion) }}</span>
                       </div>
                     </div>
-                  </div>
-                </button>
-              </h2>
-              <div v-bind:id="'question-' + row._id"
-                   class="accordion-collapse collapse"
-                   aria-labelledby="headingOne"
-                   data-bs-parent="#listAccordion">
-                <div class="accordion-body">
-                  <textarea type="text"
-                            id="textContent"
-                            class="form-control" rows="10"
-                            v-model="row.textContent" readonly/>
-                  <br>
-                  <div class="row">
-                    <div class="col-sm-1" style="margin-right: 20px !important;">
-                      <router-link
-                        class="btn btn-success text-white me-3"
-                        :to="{ path: `editQuestion/${row._id}` }">
-                        Bearbeiten
-                      </router-link>
+                  </button>
+                </h2>
+                <div v-bind:id="'question-' + row._id"
+                     class="accordion-collapse collapse"
+                     aria-labelledby="headingOne"
+                     data-bs-parent="#listAccordion">
+                  <div class="accordion-body">
+                    <div class="row">
+                    <span v-html="row.textContent">
+                    </span>
                     </div>
-<!--                    <div class="col-md-10">-->
-<!--                      <button type="button" class="btn btn-danger me-3"-->
-<!--                              id="deleteButton" @click="deleteQuestion(row.id)">-->
-<!--                        Löschen-->
-<!--                      </button>-->
-<!--                    </div>-->
+                    <br>
+                    <div style="display: none">
+                      {{ setEditorContent(row.answerTextContent) }}
+                    </div>
+                    <div>
+                      <editor v-model="content"/>
+                    </div>
+                    <br>
+                    <div class="row">
+                      <div class="col-sm-1" style="margin-right: 20px !important;">
+                        <router-link
+                          class="btn btn-success text-white me-3"
+                          :to="{ path: `editQuestion/${row._id}` }">
+                          {{ $t("evaluationFormStudent.footer.buttonPost") }}
+                        </router-link>
+                      </div>
+                      <div class="col-md-10">
+                        <input class="form-check-input" type="checkbox"
+                               value="0" id="checkboxForPublish" v-model="isPublished">
+                        <label for="checkboxForPublish">
+                          &nbsp; {{ $t("evaluationFormStudent.footer.checkboxPermission") }}
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+<!--              </div>-->
+<!--              <div v-else>-->
+<!--                <h6>-->
+<!--                  Die Frage wird erst ab-->
+<!--                  {{ getDateString(row.dateToPublishQuestion) }}-->
+<!--                  freigeschaltet.-->
+<!--                </h6>-->
+<!--              </div>-->
             </div>
           </div>
           <div v-else class="d-flex justify-content-center">
@@ -100,6 +115,7 @@ import { defineComponent } from 'vue';
 import { getDateString } from '@/utils/admin';
 import http from '@/utils/http-common';
 import Evaluation from '@/models/Evaluation';
+import Editor from '../Editor.vue';
 
 export default defineComponent({
   name: 'evaluationFormStudent',
@@ -109,30 +125,38 @@ export default defineComponent({
       endDate: '',
       inSemester: '',
       evaluationFile: new Evaluation(),
+      isPublished: false,
       isLoading: false,
+      content: '',
     };
+  },
+  components: {
+    Editor,
   },
   mounted() {
     this.getInternship();
   },
   methods: {
-    switchLocale(locale: string) {
-      this.$i18n.locale = locale;
-      this.$router.push({ params: { locale } });
-    },
     getDateString,
-    // switchLocale(locale: string) {
-    //   this.$i18n.locale = locale;
-    //   this.$router.push({ params: { locale } });
-    // },
+    setEditorContent(content) {
+      console.log(content);
+      this.content = content;
+    },
+    compareDates(date) {
+      const receivedDate = new Date(date);
+      const receivedDateInMs = receivedDate.getTime();
+      const getDateNow = Date.now();
+      if ((receivedDateInMs - getDateNow) <= 0) {
+        return true;
+      }
+      return false;
+    },
     async getInternship() {
-      console.log('0');
       try {
         const res = await http.get(`/internships/${this.$route.params.id}`);
         this.startDate = new Date(res.data.startDate).toISOString().split('T')[0].toString();
         this.endDate = new Date(res.data.endDate).toISOString().split('T')[0].toString();
         this.evaluationFile = res.data.evaluationFile;
-        console.log(this.evaluationFile.questions);
       } catch (err) {
         await this.$store.dispatch('addNotification', {
           text: `Konnte kein Praktikum gefunden werden. [ERROR: ${err.message}]`,
@@ -170,6 +194,10 @@ template {
 
 .accordion-header button {
   color: #000000;
+}
+
+.accordion .accordion-body {
+  background-color: #FFFFFF;
 }
 
 .list-item-label {

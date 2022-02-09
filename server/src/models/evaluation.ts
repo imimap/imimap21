@@ -5,6 +5,7 @@ export interface IEvaluation {
   inSemester: string,
   createdAt: Date;
   updatedAt: Date;
+  isPublished: boolean;
 }
 
 export const EvaluationSchema = new Schema({

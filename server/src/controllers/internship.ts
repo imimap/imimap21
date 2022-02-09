@@ -50,15 +50,18 @@ export async function getInternshipsById(
       .populate({ path: "company", lean: true })
       .lean();
     if (!internship) return next(new NotFound("Internship not found"));
-    console.log('in controller');
-    console.log(internship.evaluationFile);
+
     if(internship.evaluationFile == undefined) {
       // @ts-ignore
       const inSemester = user.studentProfile.internship.inSemester;
-      const evaluation = await Evaluation.findOne({inSemester: inSemester});
       // @ts-ignore
-      internship.evaluationFile = evaluation;
-      // await Internship.updateOne(internship);
+      internship.evaluationFile = await Evaluation.findOne({"inSemester": inSemester, "isPublished": true});
+      if(internship.evaluationFile) {
+        const internshipEvalFile = Internship.hydrate({ _id: internshipId, type: 'evaluationFile' });
+        internshipEvalFile.evaluationFile = internship.evaluationFile;
+        await internshipEvalFile.save();
+      }
+      console.log(internship.evaluationFile);
     }
     res.json(internship);
   } else if (user.studentProfile && internshipId === "my") {
