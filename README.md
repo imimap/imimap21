@@ -12,7 +12,7 @@
 * To see the logs: `docker logs -f NAME` (`NAME` is one of \[`imimap21_client_1`, `imimap21_server_1`, `imimap21_db_1`, `imimap21_db-gui_1`\])
 
 To test the app manually, open `http://localhost:8080/`.
-If you seeded the database: Login with the username "s010000@htw-berlin.de" or "admin" and the password you chose in `BYPASS_LDAP` in the env file.
+If you seeded the database: Login with the username "s0100000@htw-berlin.de" or "admin" and the password you chose in `BYPASS_LDAP` in the env file.
 Else: Try the user "imimap@htw-berlin.de" with the same password.
 
 Inspect database at `mongodb://127.0.0.1:27017` with [mongodb-compass](https://docs.mongodb.com/compass/master/connect/).

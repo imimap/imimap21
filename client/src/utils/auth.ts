@@ -88,6 +88,7 @@ export async function login(username: string, password: string): Promise<boolean
   try {
     res = await http.post('/auth/login', { username, password });
   } catch (err: any) {
+    // TODO: Differentiate between errors
     await showErrorNotification(`Falsche Emailadresse oder Passwort: ${err.message}`);
     return false;
   }
