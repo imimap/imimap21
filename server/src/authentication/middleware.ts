@@ -11,12 +11,10 @@ import { Role } from "./user";
  */
 function getAuthTokenFromHeader(request: Request) {
   if (!request.headers.authorization) return null;
-
   const authHeader = request.headers.authorization.split(" ");
   if (authHeader.length === 2 && authHeader[0] === "Bearer") {
     return authHeader[1];
   }
-
   return null;
 }
 
