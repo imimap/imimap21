@@ -41,7 +41,7 @@ export function isLoggedIn(): boolean {
   return !!authToken && !isTokenExpired(authToken);
 }
 
-function getUserInfo(): UserState {
+export function getUserInfo(): UserState {
   if (!isLoggedIn()) throw new Error('User konnte nicht authentifiziert werden: Kein User ist eingeloggt. Bitte einloggen!');
   const token: string | null = getAuthToken();
   if (!token) throw new Error('User konnte nicht authentifiziert werden: Token konnte nicht gefunden werden.');
@@ -59,7 +59,7 @@ export function logoutUser() {
   clearAuthToken();
 }
 
-export async function storeAuthUser(decodedToken: UserState): Promise<void> {
+export async function storeAuthUser(decodedToken): Promise<void> {
   await store.dispatch('setUser', {
     email: decodedToken.email,
     firstName: decodedToken.firstName,
@@ -69,7 +69,7 @@ export async function storeAuthUser(decodedToken: UserState): Promise<void> {
   });
 }
 
-async function storeAuthUserProfile(userProfile: UserState): Promise<void> {
+export async function storeAuthUserProfile(userProfile: UserState): Promise<void> {
   await store.dispatch('setUserProfile', {
     ...userProfile,
   });

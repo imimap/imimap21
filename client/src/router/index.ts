@@ -4,7 +4,12 @@ import {
   RouteRecordRaw,
 } from 'vue-router';
 import {
-  getAuthToken, getAuthUserProfile, isAdmin, isLoggedIn, storeAuthUser,
+  getAuthUserProfile,
+  getUserInfo,
+  isAdmin,
+  isLoggedIn,
+  storeAuthUser,
+  storeAuthUserProfile,
 } from '@/utils/auth';
 import Layout from '@/layouts/Layout.vue';
 import Home from '@/views/Home.vue';
@@ -28,6 +33,7 @@ import { availableLocales, defaultLocale } from '@/locales/locales';
 import Internship from '@/views/Internship.vue';
 import CreateInternship from '@/components/internship/CreateInternship.vue';
 import EditInternship from '@/components/internship/EditInternship.vue';
+import { showErrorNotification } from '@/utils/notification';
 
 // @TODO: Router auf Modules aufteilen
 const routes: Array<RouteRecordRaw> = [
@@ -242,9 +248,16 @@ router.beforeEach(async (to, from, next) => {
 
 router.beforeEach(async (to, from, next) => {
   if (isLoggedIn() && rootStore.getters.getUser.id === '') {
-    const token = getAuthToken();
-    await storeAuthUser(token);
-    await getAuthUserProfile();
+    let decodedToken;
+    try {
+      decodedToken = getUserInfo();
+      await storeAuthUser(decodedToken);
+      const res = await getAuthUserProfile();
+      await storeAuthUserProfile(res.data);
+      next();
+    } catch (err: any) {
+      await showErrorNotification('User konnte nicht identifiziert werden. Logge dich nochmal aus und wieder ein.');
+    }
   } else {
     next();
   }

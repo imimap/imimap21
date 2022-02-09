@@ -6,5 +6,5 @@ export enum NotificationTypes {
 export interface Notification {
   id: string;
   text: string;
-  type: notificationTypes;
+  type: NotificationTypes;
 }
