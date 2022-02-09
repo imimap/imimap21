@@ -1,18 +1,24 @@
 import { NextFunction, Request, Response } from "express";
-import { IUser, User } from "../models/user";
 import { BadRequest, Forbidden, InternalServerError, NotFound } from "http-errors";
-import { IInternship, Internship, InternshipStatuses, PaymentTypes } from "../models/internship";
+import { Internship, InternshipStatuses, PaymentTypes } from "../models/internship";
 import { Semester } from "../helpers/semesterHelper";
 import { InternshipModule } from "../models/internshipModule";
-import { LeanDocument, Types } from "mongoose";
+import { Types } from "mongoose";
 import { UploadedFile } from "express-fileupload";
-import * as fsPromises from "fs/promises";
 import * as pdf from "html-pdf";
+import {
+  getUserWithInternshipModule,
+  getAuthorizedUser,
+  getAuthorizedUserWithInternshipModule,
+  getUser,
+} from "../helpers/userHelper";
+import { buildHtmlTemplate, saveFile } from "../helpers/pdfHelper";
+import { User } from "../models/user";
 
 const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
-  "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes";
+  "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes status";
 const INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN =
-  "startDate endDate workingHoursPerWeek supervisor status";
+  "startDate endDate workingHoursPerWeek supervisor";
 
 /**
  * Returns all information on certain internship for admin or on own internship for student.
@@ -25,37 +31,36 @@ export async function getInternshipsById(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  if (req.params.id === "random") return getRandomInternship(req, res, next);
-
-  const user = await User.findOne({ emailAddress: req.user?.email })
-    .select("isAdmin studentProfile")
-    .populate({
-      path: "studentProfile.internship",
-      populate: { path: "internships", lean: true, populate: { path: "company", lean: true } },
-      lean: true,
-    });
-
-  if (!user) return next(new NotFound("User not found"));
-
   const internshipId = req.params.id.toString();
 
-  if (
-    user.isAdmin ||
-    user.studentProfile?.internship.internships.some(
-      (internship: IInternship) => internship._id.toString() === internshipId
-    )
-  ) {
-    const internship = await Internship.findById(internshipId)
+  if (internshipId === "random") return getRandomInternship(req, res, next);
+
+  let user;
+  try {
+    user = await User.findOne({ emailAddress: req.user?.email })
+      .select("isAdmin studentProfile")
+      .populate({
+        path: "studentProfile.internship",
+        populate: { path: "internships", lean: true, populate: { path: "company", lean: true } },
+        lean: true,
+      });
+    if (!user) throw new NotFound("User not found");
+  } catch (e: any) {
+    return next(e);
+  }
+
+  let result;
+  if (user.isAdmin || user.hasOwnInternship(internshipId)) {
+    result = await Internship.findById(internshipId)
       .populate({ path: "company", lean: true })
       .lean();
-    if (!internship) return next(new NotFound("Internship not found"));
-    res.json(internship);
+    if (!result) return next(new NotFound("Internship not found"));
   } else if (user.studentProfile && internshipId === "my") {
-    const internships: IInternship[] = user.studentProfile.internship.internships;
-    res.json(internships);
+    result = user.studentProfile.internship.internships;
   } else {
     return next(new Forbidden("You may only access your own internship."));
   }
+  res.json(result);
 }
 
 /**
@@ -69,20 +74,17 @@ export async function getRandomInternship(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const user = await User.findOne({ emailAddress: req.user?.email })
-    .select("isAdmin studentProfile")
-    .populate({
-      path: "studentProfile.internship",
-      lean: true,
-    });
-  if (!user) return next(new NotFound("User not found"));
-
-  let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
-  if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
+  let user;
+  try {
+    user = await getUserWithInternshipModule(req.user?.email);
+  } catch (e: any) {
+    return next(e);
+  }
 
   let maxOffset = await Internship.count();
   const options: { [k: string]: unknown } = {};
   if (user.studentProfile?.internship) {
+    options["status"] = InternshipStatuses.PASSED;
     if (user.studentProfile.internshipsSeen && user.studentProfile.internshipsSeen.length >= 12) {
       options._id = {
         $in: user.studentProfile.internshipsSeen,
@@ -94,13 +96,17 @@ export async function getRandomInternship(
       };
     }
   }
+
   const randomOffset = Math.floor(Math.random() * maxOffset);
+
+  let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
+  if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
 
   const internship = await Internship.findOne(options).select(select).skip(randomOffset).lean();
 
   if (!internship) return next(new NotFound("Internship not found"));
 
-  if (user.studentProfile) {
+  if (!user.isAdmin && user.studentProfile) {
     if (!user.studentProfile.internshipsSeen) user.studentProfile.internshipsSeen = [];
     user.studentProfile.internshipsSeen.push(internship._id);
     await user.save();
@@ -130,27 +136,15 @@ export async function findInternships(
   if (Semester.isValidSemesterString(req.query.semester as string))
     return findInternshipsInSemester(req, res, next);
 
-  const user = await User.findOne({ emailAddress: req.user?.email })
-    .select("isAdmin studentProfile")
-    .populate({
-      path: "studentProfile.internship",
-      lean: true,
-    });
-
-  if (!user) return next(new NotFound("User not found"));
+  let user;
+  try {
+    user = await getUserWithInternshipModule(req.user?.email);
+  } catch (e: any) {
+    return next(e);
+  }
 
   // Create Options
   const options: { [k: string]: unknown } = {};
-
-  if (
-    req.query.seen === "true" &&
-    user.studentProfile?.internshipsSeen &&
-    user.studentProfile.internshipsSeen.length > 0
-  ) {
-    options._id = {
-      $in: user.studentProfile.internshipsSeen,
-    };
-  }
 
   const companyQueryFields = ["companyName", "branchName", "industry", "mainLanguage", "size"];
   companyQueryFields.forEach((field) => {
@@ -185,19 +179,32 @@ export async function findInternships(
     };
   }
 
-  if (!user.isAdmin && user.studentProfile?.internshipsSeen) {
+  if (!user.isAdmin) {
     options["company.excludedFromSearch"] = false;
-    if (user.studentProfile.internshipsSeen.length > 0) {
-      const internshipsExcludedFromQuery = user.studentProfile?.internshipsSeen.concat(
-        user.studentProfile.internship.internships
-      );
+    options.status = InternshipStatuses.PASSED;
+    if (user.studentProfile?.internshipsSeen) {
+      let excludedInternships = user.studentProfile.internship.internships || [];
+      let internshipsSeen = [];
+      if (
+        (!req.query.seen || req.query.seen === "false") &&
+        user.studentProfile.internshipsSeen?.length > 0
+      ) {
+        internshipsSeen = user.studentProfile.internshipsSeen;
+        excludedInternships = excludedInternships.concat(internshipsSeen);
+      }
       options._id = {
-        $nin: internshipsExcludedFromQuery,
+        $nin: excludedInternships,
       };
+      if (req.query.seen === "true") {
+        options._id = {
+          $in: user.studentProfile.internshipsSeen,
+        };
+      }
     }
   }
 
   // Set select: Which fields to select?
+  // we add status here because otherwise we select only those internships with status == passed
   let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
   if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
 
@@ -205,7 +212,7 @@ export async function findInternships(
   let limit = typeof req.query.limit === "string" && parseInt(req.query.limit);
   if (!user.isAdmin && user.studentProfile?.internshipsSeen) {
     limit = 12;
-    limit = limit - user.studentProfile.internshipsSeen.length;
+    if (req.query.seen !== "true") limit = limit - user.studentProfile.internshipsSeen.length;
   }
 
   // Set offset if applicable
@@ -246,36 +253,14 @@ export async function findInternships(
     }
   }
 
-  // Query internships that have already been viewed
-  let internshipsSeenThatFitFilter = [];
-  if (user.studentProfile) {
-    options._id = {
-      $in: user.studentProfile?.internshipsSeen,
-    };
-
-    internshipsSeenThatFitFilter = await Internship.aggregate([
-      {
-        $lookup: {
-          from: "companies",
-          localField: "company",
-          foreignField: "_id",
-          as: "company",
-        },
-      },
-      { $project: projection },
-      { $match: options },
-    ]);
-  }
-
   // Add newly returned internships to internshipsSeen
-  if (!user.isAdmin && user.studentProfile?.internshipsSeen && internships.length > 0) {
+  if (req.query.seen !== "true" && !user.isAdmin && user.studentProfile && internships.length > 0) {
+    if (!user.studentProfile.internshipsSeen) user.studentProfile.internshipsSeen = [];
     user.studentProfile.internshipsSeen.push(...internships.map((internship) => internship._id));
     await user.save();
   }
 
-  // Return all internships that one has already seen and that fit the filter together with as many
-  // as possible other internships that one has not yet seen and that fit the filter
-  res.json(internships.concat(internshipsSeenThatFitFilter));
+  res.json(internships);
 }
 
 /**
@@ -290,8 +275,12 @@ export async function findInternshipsInSemester(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
-  if (!user) return next(new NotFound("User not found"));
+  let user;
+  try {
+    user = await getUser(req.user?.email);
+  } catch (e: any) {
+    return next(e);
+  }
 
   if (!req.query.semester || !Semester.isValidSemesterString(req.query.semester.toString())) {
     return next(new NotFound("Invalid Semester String. Needs to be like WS2021 or SS2021."));
@@ -393,8 +382,11 @@ export async function getAllPaymentTypes(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
-  if (!user) return next(new NotFound("User not found"));
+  try {
+    await getUser(req.user?.email);
+  } catch (e: any) {
+    return next(e);
+  }
 
   res.json([...Object.values(PaymentTypes)]);
 }
@@ -411,8 +403,11 @@ export async function getAllOperationalAreas(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
-  if (!user) return next(new NotFound("User not found"));
+  try {
+    await getUser(req.user?.email);
+  } catch (e: any) {
+    return next(e);
+  }
 
   const operationalAreas: string[] = await Internship.distinct("operationalArea");
 
@@ -431,8 +426,11 @@ export async function getAllProgrammingLanguages(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
-  if (!user) return next(new NotFound("User not found"));
+  try {
+    await getUser(req.user?.email);
+  } catch (e: any) {
+    return next(e);
+  }
 
   const internships = await Internship.find().lean().select("programmingLanguages");
   const programmingLanguages: string[] = [
@@ -483,14 +481,12 @@ export async function createInternship(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const user = await User.findOne({ emailAddress: req.user?.email })
-    .select("isAdmin studentProfile")
-    .populate({
-      path: "studentProfile.internship",
-      lean: true,
-    });
-
-  if (!user) return next(new NotFound("User not found"));
+  let user;
+  try {
+    user = await getUserWithInternshipModule(req.user?.email);
+  } catch (e: any) {
+    return next(e);
+  }
   if (!user.studentProfile) return next(new NotFound("User does not appear to be a student"));
 
   // create new internship
@@ -532,18 +528,11 @@ export async function updateInternship(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const user = await User.findOne({ emailAddress: req.user?.email })
-    .select("isAdmin studentProfile")
-    .populate({
-      path: "studentProfile.internship",
-      lean: true,
-    });
-
-  if (!user) return next(new NotFound("User not found"));
-  if (!user.isAdmin) {
-    if (!user.studentProfile) return next(new NotFound("Student not found"));
-    if (!user.studentProfile.internship.internships.includes(req.params.id))
-      return next(new Forbidden("You may only edit your own internship"));
+  let user;
+  try {
+    user = await getAuthorizedUser(req.user?.email, req.params.id);
+  } catch (e: any) {
+    return next(e);
   }
 
   const internshipToUpdate = await Internship.findById(req.params.id);
@@ -559,7 +548,7 @@ export async function updateInternship(
   ) {
     return next(
       new Forbidden(
-        "You may only change certain properties after your internship has been approved. Please contact your internship officer."
+        "You may only change certain properties after your internship has been requested. Please contact your internship officer."
       )
     );
   }
@@ -594,7 +583,7 @@ export function submitPdf(
     if (!internship) return next(new NotFound("Internship not found"));
     let user;
     try {
-      user = await getAuthorizedUser(req.user?.email, internship._id);
+      user = await getAuthorizedUserWithInternshipModule(req.user?.email, internship._id);
     } catch (e) {
       return next(e);
     }
@@ -634,68 +623,17 @@ export function submitPdf(
   };
 }
 
-/**
- * Returns the authorized user with the specified email address.
- * @throws NotFound If the user was not found
- * @throws Forbidden If the user id not authorized to access the internship with the provided id.
- * @param emailAddress The email address of the user to find.
- * @param internshipId The internship id to use for the authorization check.
- * @returns IUser The authorized user
- */
-async function getAuthorizedUser(
-  emailAddress: string | undefined,
-  internshipId: Types.ObjectId
-): Promise<IUser> {
-  const user = await User.findOne({ emailAddress: emailAddress }).populate({
-    path: "studentProfile.internship",
-    lean: true,
-  });
-  if (!user) throw new NotFound("User not found");
-  if (
-    user.studentProfile &&
-    user.studentProfile.internship.internships.indexOf(internshipId) === -1
-  )
-    throw new Forbidden("Students may only modify their own internships");
-  return user;
-}
-
-/**
- * Saves an uploaded file to the disk.
- * @param file The file to save
- * @param path The path to save the file to
- * @returns Error|null Returns null if saving the file was successful, otherwise returns error
- */
-async function saveFile(file: UploadedFile, path: string): Promise<Error | null> {
-  // Get path without filename
-  const uploadPathParts = path.split("/");
-  uploadPathParts.pop();
-  const uploadDir = uploadPathParts.join("/");
-
-  try {
-    // Create parent directories if necessary
-    await fsPromises.mkdir(uploadDir, { recursive: true });
-    // Save file
-    await file.mv(process.cwd() + "/" + path);
-  } catch (e) {
-    return e;
-  }
-
-  return null;
-}
-
 export async function generateRequestPdf(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const user = await User.findOne({ emailAddress: req.user?.email }).populate({
-    path: "studentProfile.internship",
-    lean: true,
-  });
-  // Check if user exists and has permissions to generate request PDF for requested internship
-  if (!user) return next(new NotFound("User not found"));
-  if (!user.isAdmin && user.studentProfile?.internship.internships.indexOf(req.params.id) === -1)
-    return next(new Forbidden("Students may only generate request PDFs for their own internships"));
+  let user;
+  try {
+    user = await getAuthorizedUserWithInternshipModule(req.user?.email, req.params.id);
+  } catch (e: any) {
+    return next(e);
+  }
   // Load internship
   const internship = await Internship.findById(req.params.id)
     .populate({ path: "company", lean: true })
@@ -712,49 +650,7 @@ export async function generateRequestPdf(
         res.setHeader("Content-Type", "application/pdf");
         stream.pipe(res);
       });
-  } catch (e) {
+  } catch (e: any) {
     next(new BadRequest(e));
   }
-}
-
-/**
- * Loads a HTML file template and replaces the placeholders with the user's actual data.
- * @param fileName The file to load the template from
- * @param user The user to use for filling in the data
- * @param internship The internship to use for filling in the data
- * @returns string The generated HTML template
- */
-async function buildHtmlTemplate(
-  fileName: string,
-  user: LeanDocument<IUser>,
-  internship: LeanDocument<IInternship>
-): Promise<string> {
-  const dateFormatter = new Intl.DateTimeFormat("de");
-  const contentHtml = await fsPromises.readFile(`${process.cwd()}/pdf-templates/${fileName}`);
-  const html = contentHtml.toString();
-  return html
-    .replace("{{semester}}", user.studentProfile?.internship.inSemester ?? "")
-    .replace("{{studentId}}", user.studentProfile?.studentId ?? "")
-    .replace("{{firstName}}", user.firstName ?? "")
-    .replace("{{lastName}}", user.lastName ?? "")
-    .replace("{{emailAddress}}", user.emailAddress ?? "")
-    .replace("{{company}}", internship.company.companyName ?? "")
-    .replace(
-      "{{street}}",
-      `${internship.company.address.street ?? ""} ${internship.company.address.streetNumber ?? ""}`
-    )
-    .replace("{{zipCode}}", internship.company.address.zip ?? "")
-    .replace("{{city}}", internship.company.address.city ?? "")
-    .replace("{{country}}", internship.company.address.country ?? "")
-    .replace("{{supervisor}}", internship.supervisor?.fullName ?? "")
-    .replace("{{supervisor.emailAddress}}", internship.supervisor?.emailAddress ?? "")
-    .replace(
-      "{{startDate}}",
-      internship.startDate ? dateFormatter.format(internship.startDate) : ""
-    )
-    .replace("{{endDate}}", internship.endDate ? dateFormatter.format(internship.endDate) : "")
-    .replace("{{semesterOfStudy}}", user.studentProfile?.internship.inSemesterOfStudy ?? "")
-    .replace("{{operationalArea}}", internship.operationalArea ?? "")
-    .replace("{{tasks}}", internship.tasks ?? "")
-    .replace("{{programmingLanguages}}", internship.programmingLanguages?.join(", ") ?? "");
 }

@@ -57,6 +57,8 @@ export interface IInternship extends Document {
   markAsOver(creator: Types.ObjectId): Promise<IInternship>;
 
   pass(creator: Types.ObjectId): Promise<IInternship>;
+
+  forcePass(creator: Types.ObjectId): Promise<IInternship>;
 }
 
 export const InternshipSchema = new Schema<IInternship>({
@@ -326,6 +328,22 @@ InternshipSchema.methods.pass = async function (creator: Types.ObjectId) {
   if (this.status !== InternshipStatuses.READY_FOR_GRADING)
     throw new Error("Internship is not ready for grading yet");
 
+  this.events.push({
+    creator: user._id,
+    changes: {
+      status: InternshipStatuses.PASSED,
+    },
+  });
+  this.status = InternshipStatuses.PASSED;
+
+  return this.save();
+};
+
+InternshipSchema.methods.forcePass = async function (creator: Types.ObjectId) {
+  // Check if user is admin
+  const user = await User.findById(creator);
+  if (!user?.isAdmin) throw new Error("Only admins may grade an internship");
+  // Check if internship is ready for grading
   this.events.push({
     creator: user._id,
     changes: {

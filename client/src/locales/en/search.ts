@@ -26,6 +26,7 @@ const search = {
       + '\n with the programming language {programmingLanguage} ',
   },
   results: {
+    noResults: 'No internships found. Try again with less specific search criteria.',
     resultCount: 'There were 0 results | There was 1 result | There were {n} results',
     previousResultCount: '0 results of previous searches | 1 result of previous searches | {n} results of previous searches',
   },

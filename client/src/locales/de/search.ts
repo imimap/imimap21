@@ -27,6 +27,7 @@ const search = {
   + 'mit \n der Programmiersprache {programmingLanguage} ',
   },
   results: {
+    noResults: 'Keine Praktika gefunden. Versuche es mit weniger spezifischen Suchkriterien.',
     resultCount: 'Es wurden 0 Treffer gefunden | Es wurde 1 Treffer gefunden | Es wurden {n} Treffer gefunden',
     previousResultCount: '0 Ergebnisse vorheriger Suchen | 1 Ergebnis vorheriger Suchen | {n} Ergebnisse vorheriger Suchen',
   },
