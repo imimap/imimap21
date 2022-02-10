@@ -90,8 +90,6 @@
         </div>
         <div class="btn-group" role="group">
           <div class="field me-2">
-            <!-- data-bs-toggle="modal"
-                    data-bs-target="#tooManyResultsModal"-->
             <button class="btn btn-htw-green"
                     v-on:click="searchOrShowModal()">
               {{ $t("search.form.search") }}
@@ -204,6 +202,7 @@ export default defineComponent({
     },
     modal(): Modal {
       const el = document.getElementById('tooManyResultsModal');
+      if (!el) throw new Error('Modal could not be found!');
       const modal = new Modal(el);
       if (!modal) throw new Error('Modal could not be found!');
       return modal;
@@ -227,10 +226,7 @@ export default defineComponent({
         const res = await http.get('/info/countries');
         this.availableCountries = await res.data;
       } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
-        await this.$store.dispatch('addNotification', {
-          text: `Fehler beim laden der verfügbaren Länder [ERROR: ${err.message}]`,
-          type: 'danger',
-        });
+        await showErrorNotification(`Fehler beim Laden der verfügbaren Länder [ERROR: ${err.message}]`);
       }
     },
     async getAvailablePaymentOptions() {
@@ -238,10 +234,7 @@ export default defineComponent({
         const res = await http.get('/info/payment-types');
         this.availablePaymentOptions = res.data;
       } catch (err: any) {
-        await this.$store.dispatch('addNotification', {
-          text: `Fehler beim laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`,
-          type: 'danger',
-        });
+        await showErrorNotification(`Fehler beim Laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`);
       }
     },
     async getAvailableOrientations() {
@@ -249,10 +242,7 @@ export default defineComponent({
         const res = await http.get('/info/operational-areas');
         this.availableOperationalAreas = res.data;
       } catch (err: any) {
-        await this.$store.dispatch('addNotification', {
-          text: `Fehler beim laden der verfügbaren Bereiche [ERROR: ${err.message}]`,
-          type: 'danger',
-        });
+        await showErrorNotification(`Fehler beim Laden der verfügbaren Bereiche [ERROR: ${err.message}]`);
       }
     },
     async getAvailableLanguages() {
@@ -260,10 +250,7 @@ export default defineComponent({
         const res = await http.get('/info/programming-languages');
         this.availableLanguages = res.data;
       } catch (err: any) {
-        await this.$store.dispatch('addNotification', {
-          text: `Fehler beim laden der verfügbaren Programmiersprachen [ERROR: ${err.message}]`,
-          type: 'danger',
-        });
+        await showErrorNotification(`Fehler beim laden der verfügbaren Programmiersprachen [ERROR: ${err.message}]`);
       }
     },
     async getAmountOfPossibleResults(): Promise<number> {
@@ -296,21 +283,15 @@ export default defineComponent({
     async searchRequestForPreviousResults() {
       try {
         this.previousSearchResults = await this.getSearchResults(true);
-      } catch (e: any) {
-        await this.$store.dispatch('addNotification', {
-          text: e.message,
-          type: 'danger',
-        });
+      } catch (err: any) {
+        await showErrorNotification(`Fehler beim Durchsuchen der vorherigen Suchergebnisse [ERROR: ${err.message}]`);
       }
     },
     async searchRequestForNewResults() {
       try {
         this.searchResults = await this.getSearchResults(false);
-      } catch (e: any) {
-        await this.$store.dispatch('addNotification', {
-          text: e.message,
-          type: 'danger',
-        });
+      } catch (err: any) {
+        await showErrorNotification(`Fehler beim Suchen nach neuen Suchergebnisse [ERROR: ${err.message}]`);
       }
     },
     async searchRequest() {
