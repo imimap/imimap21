@@ -1,4 +1,4 @@
-enum notificationTypes {
+export enum NotificationTypes {
   danger = 'danger',
   success = 'success',
 }
@@ -6,5 +6,5 @@ enum notificationTypes {
 export interface Notification {
   id: string;
   text: string;
-  type: notificationTypes;
+  type: NotificationTypes;
 }

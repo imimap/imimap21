@@ -103,7 +103,7 @@ export default defineComponent({
         const res = await http.patch('/auth/profile', { firstName: this.newFirstName, lastName: this.newLastName });
         await this.$store.dispatch('setUserProfile', { ...res });
         await this.$store.dispatch('addNotification', { text: 'Dein Profil wurde erfolgreich gespeichert!', type: 'success' });
-      } catch (err) {
+      } catch (err: any) {
         await this.$store.dispatch('addNotification', { text: 'Dein Profil wurde erfolgreich gespeichert!', type: 'success' });
       }
     },

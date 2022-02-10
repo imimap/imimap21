@@ -281,7 +281,7 @@ export default defineComponent({
           },
         );
         await this.$emit('updateInternship', res.data);
-      } catch (err) {
+      } catch (err: any) {
         console.log(err);
       }
     },

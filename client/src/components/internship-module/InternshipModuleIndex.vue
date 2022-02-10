@@ -43,7 +43,7 @@ export default defineComponent({
           ...res.data,
         };
         this.loadingState = false;
-      } catch (err) {
+      } catch (err: any) {
         console.log(err);
       }
     },
