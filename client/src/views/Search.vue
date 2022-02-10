@@ -90,7 +90,9 @@
         </div>
         <div class="btn-group" role="group">
           <div class="field me-2">
-            <button v-on:click="searchRequest()" class="btn btn-htw-green">
+            <button class="btn btn-htw-green" data-bs-toggle="modal"
+                    data-bs-target="#tooManyResultsModal"
+                    v-on:click="getAmountOfSearchResults()">
               {{ $t("search.form.search") }}
             </button>
           </div>
@@ -106,39 +108,42 @@
       </form>
     </div>
   </div>
+  <!-- Too many results modal -->
+  <too-many-results v-if="amountOfResults >= 6" v-on:search="searchRequest"/>
   <!-- Search Results -->
   <div id="form-block4" class="mx-3 my-3"
-       v-if="!loadingState && searchResults.length <= 0 && previousSearchResults.length <= 0">
-    {{ $t("search.results.noResults") }}
-  </div>
+         v-if="!loadingState && searchResults.length <= 0 && previousSearchResults.length <= 0">
+      {{ $t("search.results.noResults") }}
+    </div>
   <div id="form-block4" class="mx-3 my-3"
-       v-if="!loadingState && (searchResults.length > 0 || previousSearchResults.length > 0)">
-    <div class="text-center">
-      <button type="button"
-              class="btn btn-htw-green text-white mb-3"
-              v-on:click="cardToggle = !cardToggle">
-        {{ $t("search.showMap") }}
-      </button>
+         v-if="!loadingState && (searchResults.length > 0 || previousSearchResults.length > 0)">
+      <div class="text-center">
+        <button type="button"
+                class="btn btn-htw-green text-white mb-3"
+                v-on:click="cardToggle = !cardToggle">
+          {{ $t("search.showMap") }}
+        </button>
+      </div>
+      <div id="search-results" class="search_results"
+           v-if="!cardToggle && searchResults.length > 0">
+        <SearchResultList
+          :result-count="resultCount"
+          :search-results="searchResults"
+          result-count-text="search.results.resultCount">
+        </SearchResultList>
+      </div>
+      <div id="previous-search-results" class="search_results"
+           v-if="!cardToggle && previousSearchResults.length > 0">
+        <SearchResultList
+          :result-count="previousResultCount"
+          :search-results="previousSearchResults"
+          result-count-text="search.results.previousResultCount">
+        </SearchResultList>
+      </div>
+      <div id="map-results">
+        <Map v-if="cardToggle" :locations="locations"></Map>
+      </div>
     </div>
-    <div id="search-results" class="search_results" v-if="!cardToggle && searchResults.length > 0">
-      <SearchResultList
-        :result-count="resultCount"
-        :search-results="searchResults"
-        result-count-text="search.results.resultCount">
-      </SearchResultList>
-    </div>
-    <div id="previous-search-results" class="search_results"
-         v-if="!cardToggle && previousSearchResults.length > 0">
-      <SearchResultList
-        :result-count="previousResultCount"
-        :search-results="previousSearchResults"
-        result-count-text="search.results.previousResultCount">
-      </SearchResultList>
-    </div>
-    <div id="map-results">
-      <Map v-if="cardToggle" :locations="locations"></Map>
-    </div>
-  </div>
 </template>
 
 <script lang="ts">
@@ -149,10 +154,12 @@ import http from '@/utils/http-common';
 import { Internship } from '@/store/types/Internship';
 import { MapLocation } from '@/store/types/MapLocation';
 import SearchResultList from '@/components/search/SearchResultList.vue';
+import TooManyResults from '@/components/search/TooManyResults.vue';
+import { showErrorNotification } from '@/utils/notification';
 
 export default defineComponent({
   name: 'Search',
-  components: { SearchResultList, Map },
+  components: { SearchResultList, Map, TooManyResults },
   data() {
     return {
       // Available filters after query
@@ -171,6 +178,8 @@ export default defineComponent({
       // Component state
       cardToggle: false,
       loadingState: true,
+      amountOfResults: 0,
+      amountOfInternshipsSeen: 0,
     };
   },
   computed: {
@@ -233,6 +242,17 @@ export default defineComponent({
           text: `Fehler beim laden der verfügbaren Programmiersprachen [ERROR: ${err.message}]`,
           type: 'danger',
         });
+      }
+    },
+    async getAmountOfSearchResults() {
+      try {
+        let res = await http.get('/internships/amount');
+        this.amountOfResults = await res.data;
+
+        res = await http.get('/internships/seen/amount');
+        this.amountOfInternshipsSeen = await res.data;
+      } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
+        await showErrorNotification(`Fehler beim Laden der neuen und bereits früher erhaltenen Suchergebnisse [ERROR: ${err.message}]`);
       }
     },
     async searchRequest() {
