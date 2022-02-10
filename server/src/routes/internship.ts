@@ -3,7 +3,7 @@ import { body, param, query } from "express-validator";
 import authMiddleware from "../authentication/middleware";
 import {
   createInternship,
-  findInternships, findInternshipsAmount,
+  findInternships, findInternshipsAmount, findInternshipsSeenAmount,
   getInternshipLocations,
   getInternshipsById,
   submitPdf,
@@ -49,6 +49,13 @@ internshipRouter.get(
   query(standardQueryParams).toUpperCase(),
   validate,
   asyncHandler(findInternshipsAmount)
+);
+
+internshipRouter.get(
+  "/seen/amount",
+  authMiddleware(),
+  validate,
+  asyncHandler(findInternshipsSeenAmount)
 );
 
 // @TODO: Wäre praktisch wenn die Company hier direkt gepopulated werden würde

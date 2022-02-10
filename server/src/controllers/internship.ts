@@ -344,6 +344,27 @@ export async function findInternshipsAmount(
 }
 
 /**
+ * Returns amount of seen internships
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function findInternshipsSeenAmount(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  let user;
+  try {
+    user = await getUser(req.user?.email);
+  } catch (e: any) {
+    return next(e);
+  }
+
+  res.json(user.studentProfile?.internshipsSeen?.length || 0);
+}
+
+/**
  * Returns information on internships made in a specific semester.
  * For users only returns the id and company address, for admins returns more information.
  * @param req
