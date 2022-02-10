@@ -302,9 +302,7 @@ export async function findInternshipsAmount(
   if (!user.isAdmin) {
     options["company.excludedFromSearch"] = false;
     options.status = InternshipStatuses.PASSED;
-    let excludedInternships = user.studentProfile?.internship.internships || [];
-    const internshipsSeen = user.studentProfile?.internshipsSeen || [];
-    excludedInternships = excludedInternships.concat(internshipsSeen);
+    const excludedInternships = user.studentProfile?.internship.internships || [];
     if (excludedInternships.length > 0) {
       options._id = {
         $nin: excludedInternships,
