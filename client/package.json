@@ -26,6 +26,7 @@
     "vuex": "^4.0.2"
   },
   "devDependencies": {
+    "@types/bootstrap": "^5.1.9",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
     "@vue/cli-plugin-babel": "~4.5.0",

@@ -9,7 +9,7 @@
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">
+          <h5 class="modal-title" id="Caution">
             {{ $t("search.tooManyResults.headline") }}
           </h5>
           <button
@@ -55,7 +55,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss">
-
-</style>

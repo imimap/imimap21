@@ -90,9 +90,10 @@
         </div>
         <div class="btn-group" role="group">
           <div class="field me-2">
-            <button class="btn btn-htw-green" data-bs-toggle="modal"
-                    data-bs-target="#tooManyResults"
-                    v-on:click="getAmountOfSearchResults()">
+            <!-- data-bs-toggle="modal"
+                    data-bs-target="#tooManyResultsModal"-->
+            <button class="btn btn-htw-green"
+                    v-on:click="searchOrShowModal()">
               {{ $t("search.form.search") }}
             </button>
           </div>
@@ -109,10 +110,7 @@
     </div>
   </div>
   <!-- Too many results modal -->
-  <too-many-results id="tooManyResults"
-                    :v-if="!loadingState
-                    && amountOfInternshipsSeen + amountOfResults >= 12"
-                    :amount-of-results="amountOfResults"
+  <too-many-results :amount-of-results="amountOfResults"
                     :amount-of-internships-seen="amountOfInternshipsSeen"
                     v-on:search="searchRequest"/>
   <!-- Search Results -->
@@ -161,6 +159,7 @@ import { MapLocation } from '@/store/types/MapLocation';
 import SearchResultList from '@/components/search/SearchResultList.vue';
 import TooManyResults from '@/components/search/TooManyResults.vue';
 import { showErrorNotification } from '@/utils/notification';
+import { Modal } from 'bootstrap';
 
 export default defineComponent({
   name: 'Search',
@@ -203,8 +202,26 @@ export default defineComponent({
         }),
       );
     },
+    modal(): Modal {
+      const el = document.getElementById('tooManyResultsModal');
+      const modal = new Modal(el);
+      if (!modal) throw new Error('Modal could not be found!');
+      return modal;
+    },
   },
   methods: {
+    async searchOrShowModal() {
+      const amountSeen = await this.getAmountOfSeenResults();
+      const amountNew = await this.getAmountOfPossibleResults();
+      if (amountSeen < 12 && amountNew > 6) {
+        this.amountOfResults = amountNew;
+        this.amountOfInternshipsSeen = amountSeen;
+        this.modal.show();
+      } else {
+        this.modal.hide();
+        await this.searchRequest();
+      }
+    },
     async getAvailableCountries() {
       try {
         const res = await http.get('/info/countries');
@@ -249,10 +266,10 @@ export default defineComponent({
         });
       }
     },
-    async getAmountOfSearchResults() {
-      this.loadingState = true;
+    async getAmountOfPossibleResults(): Promise<number> {
+      let amount;
       try {
-        let res = await http.get('/internships/amount', {
+        const res = await http.get('/internships/amount', {
           params: {
             country: this.countryFilter,
             operationalArea: this.operationalAreaFilter,
@@ -260,26 +277,23 @@ export default defineComponent({
             paymentType: this.paymentFilter,
           },
         });
-        this.amountOfResults = await res.data;
-
-        if (this.amountOfInternshipsSeen < 12) {
-          res = await http.get('/internships/seen/amount');
-          this.amountOfInternshipsSeen = await res.data;
-        }
-
-        if (this.amountOfInternshipsSeen >= 12) {
-          await this.searchRequestForPrevousResults();
-        } else if (this.amountOfResults <= 6) {
-          await this.searchRequestForPrevousResults();
-          await this.searchRequestForNewResults();
-        }
+        amount = await res.data;
       } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
-        await showErrorNotification(`Fehler beim Laden der neuen und bereits früher erhaltenen Suchergebnisse [ERROR: ${err.message}]`);
-      } finally {
-        this.loadingState = false;
+        await showErrorNotification(`Fehler beim Laden der neuen Suchergebnisse [ERROR: ${err.message}]`);
       }
+      return amount;
     },
-    async searchRequestForPrevousResults() {
+    async getAmountOfSeenResults(): Promise<number> {
+      let amount;
+      try {
+        const res = await http.get('/internships/seen/amount');
+        amount = await res.data;
+      } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
+        await showErrorNotification(`Fehler beim Laden der vorherigen Suchergebnisse [ERROR: ${err.message}]`);
+      }
+      return amount;
+    },
+    async searchRequestForPreviousResults() {
       try {
         this.previousSearchResults = await this.getSearchResults(true);
       } catch (e: any) {
@@ -290,7 +304,6 @@ export default defineComponent({
       }
     },
     async searchRequestForNewResults() {
-      console.log('searching for new results');
       try {
         this.searchResults = await this.getSearchResults(false);
       } catch (e: any) {
@@ -302,7 +315,7 @@ export default defineComponent({
     },
     async searchRequest() {
       this.loadingState = true;
-      await this.searchRequestForPrevousResults();
+      await this.searchRequestForPreviousResults();
       await this.searchRequestForNewResults();
       this.loadingState = false;
     },
