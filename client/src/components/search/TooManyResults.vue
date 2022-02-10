@@ -10,7 +10,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">
-            {{ $t("internshipModule.tooManyResults.headline") }}
+            {{ $t("search.tooManyResults.headline") }}
           </h5>
           <button
             type="button"
@@ -21,8 +21,8 @@
         </div>
         <div class="modal-body text-left">
           <p>
-            {{ $t("search.tooManyResults.resultCount") }}
-            {{ $t("search.tooManyResults.previousResultCount") }}
+            {{ $tc("search.tooManyResults.resultCount", amountOfResults) }}
+            {{ $tc("search.tooManyResults.previousResultCount", amountOfInternshipsSeen) }}
           </p>
           <p> {{ $t("search.tooManyResults.question") }} </p>
         </div>
@@ -49,6 +49,10 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'TooManyResults',
+  props: {
+    amountOfResults: Number,
+    amountOfInternshipsSeen: Number,
+  },
 });
 </script>
 

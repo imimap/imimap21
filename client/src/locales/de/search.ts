@@ -43,8 +43,8 @@ const search = {
   programmingLanguages: 'Programmiersprachen: ',
   tooManyResults: {
     headline: 'Achtung',
-    resultCount: 'Es wurden {n} Treffer gefunden',
-    previousResultCount: 'Du hast jedoch bereits {n} von 12 möglichen Suchergebnissen gesehen.',
+    resultCount: 'Es wurden {n} Treffer gefunden.',
+    previousResultCount: 'Du hast bereits {n} von 12 möglichen Suchergebnissen gesehen.',
     question: 'Was möchtest du tun?',
     buttonConfirm: 'Zeige mir trotzdem die Ergebnisse!',
     buttonDecline: 'Ich möchte die Suche konkretisieren',

@@ -91,7 +91,7 @@
         <div class="btn-group" role="group">
           <div class="field me-2">
             <button class="btn btn-htw-green" data-bs-toggle="modal"
-                    data-bs-target="#tooManyResultsModal"
+                    data-bs-target="#tooManyResults"
                     v-on:click="getAmountOfSearchResults()">
               {{ $t("search.form.search") }}
             </button>
@@ -109,14 +109,19 @@
     </div>
   </div>
   <!-- Too many results modal -->
-  <too-many-results v-if="amountOfResults >= 6" v-on:search="searchRequest"/>
+  <too-many-results id="tooManyResults"
+                    :v-if="!loadingState
+                    && amountOfInternshipsSeen + amountOfResults >= 12"
+                    :amount-of-results="amountOfResults"
+                    :amount-of-internships-seen="amountOfInternshipsSeen"
+                    v-on:search="searchRequest"/>
   <!-- Search Results -->
   <div id="form-block4" class="mx-3 my-3"
-         v-if="!loadingState && searchResults.length <= 0 && previousSearchResults.length <= 0">
+         v-if="!loadingState && resultCount <= 0 && previousResultCount <= 0">
       {{ $t("search.results.noResults") }}
-    </div>
+  </div>
   <div id="form-block4" class="mx-3 my-3"
-         v-if="!loadingState && (searchResults.length > 0 || previousSearchResults.length > 0)">
+         v-if="!loadingState && (resultCount > 0 || previousResultCount > 0)">
       <div class="text-center">
         <button type="button"
                 class="btn btn-htw-green text-white mb-3"
@@ -125,7 +130,7 @@
         </button>
       </div>
       <div id="search-results" class="search_results"
-           v-if="!cardToggle && searchResults.length > 0">
+           v-if="!cardToggle && resultCount > 0">
         <SearchResultList
           :result-count="resultCount"
           :search-results="searchResults"
@@ -133,7 +138,7 @@
         </SearchResultList>
       </div>
       <div id="previous-search-results" class="search_results"
-           v-if="!cardToggle && previousSearchResults.length > 0">
+           v-if="!cardToggle && previousResultCount > 0">
         <SearchResultList
           :result-count="previousResultCount"
           :search-results="previousSearchResults"
@@ -245,18 +250,36 @@ export default defineComponent({
       }
     },
     async getAmountOfSearchResults() {
+      this.loadingState = true;
       try {
-        let res = await http.get('/internships/amount');
+        let res = await http.get('/internships/amount', {
+          params: {
+            country: this.countryFilter,
+            operationalArea: this.operationalAreaFilter,
+            programmingLanguage: this.languageFilter,
+            paymentType: this.paymentFilter,
+          },
+        });
         this.amountOfResults = await res.data;
 
-        res = await http.get('/internships/seen/amount');
-        this.amountOfInternshipsSeen = await res.data;
+        if (this.amountOfInternshipsSeen < 12) {
+          res = await http.get('/internships/seen/amount');
+          this.amountOfInternshipsSeen = await res.data;
+        }
+
+        if (this.amountOfInternshipsSeen >= 12) {
+          await this.searchRequestForPrevousResults();
+        } else if (this.amountOfResults <= 6) {
+          await this.searchRequestForPrevousResults();
+          await this.searchRequestForNewResults();
+        }
       } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
         await showErrorNotification(`Fehler beim Laden der neuen und bereits früher erhaltenen Suchergebnisse [ERROR: ${err.message}]`);
+      } finally {
+        this.loadingState = false;
       }
     },
-    async searchRequest() {
-      this.loadingState = true;
+    async searchRequestForPrevousResults() {
       try {
         this.previousSearchResults = await this.getSearchResults(true);
       } catch (e: any) {
@@ -265,16 +288,22 @@ export default defineComponent({
           type: 'danger',
         });
       }
+    },
+    async searchRequestForNewResults() {
+      console.log('searching for new results');
       try {
         this.searchResults = await this.getSearchResults(false);
-        // this.searchResults = this.searchResults.filter((internship) =>
-        // typeof internship.company.address !== 'undefined');
       } catch (e: any) {
         await this.$store.dispatch('addNotification', {
           text: e.message,
           type: 'danger',
         });
       }
+    },
+    async searchRequest() {
+      this.loadingState = true;
+      await this.searchRequestForPrevousResults();
+      await this.searchRequestForNewResults();
       this.loadingState = false;
     },
     async getSearchResults(seen: boolean) {
