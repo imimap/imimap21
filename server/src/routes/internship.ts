@@ -8,6 +8,7 @@ import {
   getInternshipsById,
   submitPdf,
   updateInternship,
+  updateAnswerOnInternship,
 } from "../controllers/internship";
 import { isObjectId, validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
@@ -176,6 +177,18 @@ internshipRouter.post(
   body("reject").optional().isBoolean(),
   validate,
   asyncHandler(submitPdf("reportPdf"))
+);
+
+internshipRouter.patch(
+  "/:id/answerToUpdate",
+  authMiddleware(),
+  param("id").custom(isObjectId),
+  query([
+    "answerTextContent",
+    "id",
+  ]),
+  validate,
+  asyncHandler(updateAnswerOnInternship)
 );
 
 export default internshipRouter;

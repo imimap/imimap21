@@ -773,3 +773,43 @@ async function buildHtmlTemplate(
     .replace("{{tasks}}", internship.tasks ?? "")
     .replace("{{programmingLanguages}}", internship.programmingLanguages?.join(", ") ?? "");
 }
+
+/**
+* Updates an answer in evaluationFile of an internship
+* @param req
+* @param res
+* @param next
+*/
+export async function updateAnswerOnInternship(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  console.log('We are here in controller, what is next?');
+  const user = await User.findOne({ emailAddress: req.user?.email })
+    .select("isAdmin studentProfile")
+    .populate({
+      path: "studentProfile.internship",
+      lean: true,
+    });
+
+  if (!user) return next(new NotFound("User not found"));
+  if (!user.isAdmin) {
+    if (!user.studentProfile) return next(new NotFound("Student not found"));
+    if (!user.studentProfile.internship.internships.includes(req.params.id))
+      return next(new Forbidden("You may only edit your own internship"));
+  }
+
+  const internshipToUpdate = await Internship.findById(req.params.id);
+  if (!internshipToUpdate) return next(new NotFound("Internship not found"));
+
+  // @ts-ignore
+  const question = internshipToUpdate.evaluationFile.questions.id(req.query.id);
+  question.answerTextContent = req.query.answerTextContent;
+  question.isAnswerPublished = req.query.isAnswerPublished;
+  question.answerUpdatedAt = Date.now();
+  const savedInternship = await internshipToUpdate.save();
+  if (!savedInternship) return next(new BadRequest("Could not update internship"));
+
+  res.json(internshipToUpdate);
+}

@@ -64,24 +64,26 @@
                     </span>
                     </div>
                     <br>
-                    <div style="display: none">
-                      {{ setEditorContent(row.answerTextContent) }}
-                    </div>
                     <div>
-                      <editor v-model="content"/>
+                      <editor v-model="content" :model-value="row.answerTextContent"/>
+                      <div class="content">
+                        <h3>Content</h3>
+                        <pre><code>{{ content }}</code></pre>
+                      </div>
                     </div>
                     <br>
                     <div class="row">
                       <div class="col-sm-1" style="margin-right: 20px !important;">
-                        <router-link
-                          class="btn btn-success text-white me-3"
-                          :to="{ path: `editQuestion/${row._id}` }">
-                          {{ $t("evaluationFormStudent.footer.buttonPost") }}
-                        </router-link>
+                        <div class="col-sm-1">
+                          <button class="btn btn-success btn-htw-green"
+                                  type="submit" v-on:click="saveMyAnswer(row._id)">
+                            {{ $t("evaluationFormStudent.footer.buttonPost") }}
+                          </button>
+                        </div>
                       </div>
                       <div class="col-md-10">
                         <input class="form-check-input" type="checkbox"
-                               value="0" id="checkboxForPublish" v-model="isPublished">
+                               value="0" id="checkboxForPublish" v-model="row.isAnswerPublished">
                         <label for="checkboxForPublish">
                           &nbsp; {{ $t("evaluationFormStudent.footer.checkboxPermission") }}
                         </label>
@@ -125,7 +127,7 @@ export default defineComponent({
       endDate: '',
       inSemester: '',
       evaluationFile: new Evaluation(),
-      isPublished: false,
+      isAnswerPublished: false,
       isLoading: false,
       content: '',
     };
@@ -138,18 +140,11 @@ export default defineComponent({
   },
   methods: {
     getDateString,
-    setEditorContent(content) {
-      console.log(content);
-      this.content = content;
-    },
     compareDates(date) {
       const receivedDate = new Date(date);
       const receivedDateInMs = receivedDate.getTime();
       const getDateNow = Date.now();
-      if ((receivedDateInMs - getDateNow) <= 0) {
-        return true;
-      }
-      return false;
+      return (receivedDateInMs - getDateNow) <= 0;
     },
     async getInternship() {
       try {
@@ -157,6 +152,7 @@ export default defineComponent({
         this.startDate = new Date(res.data.startDate).toISOString().split('T')[0].toString();
         this.endDate = new Date(res.data.endDate).toISOString().split('T')[0].toString();
         this.evaluationFile = res.data.evaluationFile;
+        console.log(this.evaluationFile);
       } catch (err) {
         await this.$store.dispatch('addNotification', {
           text: `Konnte kein Praktikum gefunden werden. [ERROR: ${err.message}]`,
@@ -164,6 +160,34 @@ export default defineComponent({
         });
       }
       this.isLoading = false;
+    },
+
+    async saveMyAnswer(questionId) {
+      if (this.content !== '') {
+        // eslint-disable-line no-alert
+        const userDoubleChecked = window.confirm('Sind Sie mit Ihrer Antwort sicher? Sie haben noch 2 Stunden Zeit, Ihre Antwort zu bearbeiten, danach ist es nicht mehr möglich.');
+        if (userDoubleChecked) {
+          try {
+            await http.patch(`/internships/${this.$route.params.id}/answerToUpdate`, null, {
+              params: {
+                answerTextContent: this.content,
+                id: questionId,
+                isAnswerPublished: this.isAnswerPublished.toString(),
+              },
+            });
+            await this.$store.dispatch('addNotification', {
+              text: 'Ihre Antwort wurde erfolgreich gespeichert!',
+              type: 'success',
+            });
+          } catch (err) {
+            await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
+          }
+        } else {
+          console.log('canceled');
+        }
+      } else {
+        await this.$store.dispatch('addNotification', { text: 'Bitte erzählen Sie etwas über Ihr Praktikum! Wir sehen keine Veränderungen zu speichern.', type: 'danger' });
+      }
     },
   },
 });

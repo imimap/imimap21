@@ -86,6 +86,7 @@ export default defineComponent({
       this.updatedAt = this.question.updatedAt;
     },
     async updateQuestion() {
+      // eslint-disable-line no-alert
       const userDoubleChecked = window.confirm('Sind Sie mit den Veränderungen sicher?');
       if (userDoubleChecked) {
         try {
@@ -103,7 +104,7 @@ export default defineComponent({
           await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
         }
       } else {
-        console.log('cancel');
+        console.log('canceled');
       }
       return true;
     },
