@@ -173,7 +173,9 @@ describe("Internship", () => {
     const internship = await Internship.findById(INTERNSHIP_ID);
 
     await internship?.markAsOver(ADMIN_USER_ID);
-    const path = `http://localhost:9000/pdfs/s0100000/${Types.ObjectId()}/${Types.ObjectId()}.pdf`;
+    const path = `${
+      process.env.API_HOST
+    }/pdfs/s0100000/${Types.ObjectId()}/${Types.ObjectId()}.pdf`;
     await internship?.reportPdf?.submit(USER_ID, path);
 
     const approvedInternship = await internship?.pass(ADMIN_USER_ID);

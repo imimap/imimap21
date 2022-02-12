@@ -37,8 +37,7 @@ beforeEach(async () => {
   // document
   const documentId = Types.ObjectId();
   const versionId = Types.ObjectId();
-  const path =
-    "http://localhost:9000/pdfs/" + studentId + "/" + documentId + "/" + versionId + ".pdf";
+  const path = `${process.env.API_HOST}/pdfs/${studentId}/${documentId}/${versionId}.pdf`;
 
   const pdfDocument: IPdfDocument = new PdfDocument();
   await pdfDocument.submit(savedUser._id, path);
@@ -56,14 +55,14 @@ describe("PdfDocument", () => {
     expect(savedDocument?.status).toEqual(PdfDocumentStatuses.SUBMITTED);
   });
   it("can not be submitted with invalid data", async () => {
-    const path = "http://localhost:9000/pdfs/s0123456/" + Types.ObjectId() + ".pdf";
+    const path = `${process.env.API_HOST}/pdfs/s0123456/${Types.ObjectId()}.pdf`;
     const pdfDocument: IPdfDocument = new PdfDocument();
 
     await expect(pdfDocument.submit(Types.ObjectId(), path)).rejects.toThrow();
   });
   describe("can be accepted and rejected", function () {
     it("can be accepted by an admin via event and get a new path", async () => {
-      const pdfDocument = await PdfDocument.findOne({});;
+      const pdfDocument = await PdfDocument.findOne({});
       const previousPath = pdfDocument?.path();
       const newPath = pdfDocument?.nextPath();
 
