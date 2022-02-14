@@ -112,7 +112,7 @@
                      placeholder="Email des Betreuers"/>
             </div>
             <div>
-              <label for="company">Firma</label>
+              <label for="company" class="required">Firma</label>
               <input v-model="company"
                      type="text"
                      class="form-control"
@@ -141,7 +141,7 @@
           </div>
           <div class="row mb-3">
             <div class="col-md-6">
-              <label>Name der Firma</label>
+              <label for="newCompanyName" class="required">Name der Firma</label>
               <input v-model="company"
                      type="text"
                      class="form-control"
