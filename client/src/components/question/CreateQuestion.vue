@@ -21,11 +21,9 @@
         </div>
         <br>
         <div class="col-auto">
-          <label for="textContent">Textinhalt</label>
-          <textarea v-model="textContent"
-                    type="text"
-                    id="textContent"
-                    class="form-control" rows="5" required/>
+          <div>
+            <editor v-model="textContent"/>
+          </div>
         </div>
         <br>
         <div class="row">
@@ -52,6 +50,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
+import Editor from '../Editor.vue';
 
 export default defineComponent({
   name: 'CreateQuestion',
@@ -64,8 +63,18 @@ export default defineComponent({
       isQuestionActive: false,
     };
   },
+  components: {
+    Editor,
+  },
   methods: {
     async createQuestion() {
+      if (this.textContent === null || this.textContent === String('<p></p>')) {
+        await this.$store.dispatch('addNotification', {
+          text: 'Bitte stellen Sie eine Frage. Der Textbox darf nicht leer bleiben. Oder haben Sie nichts bearbeitet.',
+          type: 'danger',
+        });
+        return;
+      }
       try {
         await http.post('/questions', {
           title: this.title,

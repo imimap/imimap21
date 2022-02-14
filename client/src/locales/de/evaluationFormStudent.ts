@@ -14,6 +14,7 @@ const evaluationFormStudent = {
   },
   footer: {
     answer: 'Antwort',
+    yourAnswer: 'Ihre Antwort',
     buttonPost: 'Speichern',
     checkboxPermission: 'Lassen Sie andere Studis meine Antwort sehen.',
   },

@@ -43,7 +43,7 @@ export const QuestionSchema = new Schema({
   answerTextContent: {
     type: String,
     required: true,
-    default: 'Please write a neutral, detailed,  fair answer. This might help many of your fellow students to find a good internship place.'
+    default: 'Please write a neutral, detailed,  fair answer. This might help many of your fellow students to find a good internship place.',
   },
   answerUpdatedAt: {
     type: Date,

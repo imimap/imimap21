@@ -4,17 +4,17 @@
       <div class="col-12">
         <fieldset class="form-group border p-3">
           <div v-if="!isLoading" class="accordion rounded-3" id="listAccordion">
-            <div v-if="evaluationFile.questions.length === 0">
-              <hr>
+            <div v-if="evaluationFile === undefined || evaluationFile.questions.length === 0">
               <h5>
                 <span class="alert alert-warning d-flex justify-content-center align-items-center">
                   {{ $t("evaluationFormStudent.notice.notFound") }}
                 </span>
               </h5>
             </div>
-            <div v-for="(row, index) in evaluationFile.questions" v-bind:key="index"
-                 class="accordion-item">
-<!--              <div v-if="compareDates(row.dateToPublishQuestion)">-->
+            <div v-else>
+              <div v-for="(row, index) in evaluationFile.questions" v-bind:key="index"
+                   class="accordion-item">
+                <!--              <div v-if="compareDates(row.dateToPublishQuestion)">-->
                 <h2 class="accordion-header rounded-3"
                     style="border-color: #77b900;border-style: solid;" v-bind:id="index">
                   <button class="accordion-button collapsed"
@@ -64,41 +64,57 @@
                     </span>
                     </div>
                     <br>
-                    <div>
-                      <editor v-model="content" :model-value="row.answerTextContent"/>
-                      <div class="content">
-                        <h3>Content</h3>
-                        <pre><code>{{ content }}</code></pre>
+                    <div v-if="ifEditPossible(row.answerUpdatedAt)">
+                      <div>
+                        <editor v-model="content" :model-value="row.answerTextContent"/>
+                      </div>
+                    </div>
+                    <div v-else>
+                      <hr>
+                      <div>
+                        {{ $t("evaluationFormStudent.footer.yourAnswer") }} von
+                        {{ getDateString(row.answerUpdatedAt) }}:
+                      </div>
+                      <br>
+                      <div class="row">
+                    <span v-html="row.answerTextContent">
+                    </span>
                       </div>
                     </div>
                     <br>
-                    <div class="row">
+                    <div v-if="ifEditPossible(row.answerUpdatedAt)" class="row">
                       <div class="col-sm-1" style="margin-right: 20px !important;">
                         <div class="col-sm-1">
                           <button class="btn btn-success btn-htw-green"
-                                  type="submit" v-on:click="saveMyAnswer(row._id)">
+                                  type="submit"
+                                  v-on:click="saveMyAnswer
+                                  (row._id, row.answerTextContent, row.isAnswerPublished)">
                             {{ $t("evaluationFormStudent.footer.buttonPost") }}
                           </button>
                         </div>
                       </div>
                       <div class="col-md-10">
                         <input class="form-check-input" type="checkbox"
-                               value="0" id="checkboxForPublish" v-model="row.isAnswerPublished">
-                        <label for="checkboxForPublish">
+                               id="checkboxForPublish"
+                               v-model="row.isAnswerPublished"
+                               @change="onCheckboxChange($event)"
+                               title="Bitte vergessen Sie nicht, den neuen Zustand zu speichern.">
+                        <label>
                           &nbsp; {{ $t("evaluationFormStudent.footer.checkboxPermission") }}
                         </label>
                       </div>
                     </div>
                   </div>
                 </div>
-<!--              </div>-->
-<!--              <div v-else>-->
-<!--                <h6>-->
-<!--                  Die Frage wird erst ab-->
-<!--                  {{ getDateString(row.dateToPublishQuestion) }}-->
-<!--                  freigeschaltet.-->
-<!--                </h6>-->
-<!--              </div>-->
+                <!--              </div>-->
+                <!--              <div v-else>-->
+                <!--                <h6>-->
+                <!--                  Die Frage wird erst ab-->
+                <!--                  {{ getDateString(row.dateToPublishQuestion) }}-->
+                <!--                  freigeschaltet.-->
+                <!--                </h6>-->
+                <!--              </div>-->
+              </div>
             </div>
           </div>
           <div v-else class="d-flex justify-content-center">
@@ -129,6 +145,7 @@ export default defineComponent({
       evaluationFile: new Evaluation(),
       isAnswerPublished: false,
       isLoading: false,
+      iChanged: '',
       content: '',
     };
   },
@@ -140,6 +157,28 @@ export default defineComponent({
   },
   methods: {
     getDateString,
+    onCheckboxChange(event) {
+      this.isAnswerPublished = event.target.checked;
+      if (this.iChanged === 'changed') {
+        this.iChanged = '';
+      } else {
+        this.iChanged = 'changed';
+      }
+    },
+    /**
+     *
+     * @param answerUpdatedAt
+     * this disables the edit button after two hours of posting an answer
+     */
+    ifEditPossible(answerUpdatedAt) {
+      const timeOut = 7200000;
+      if (answerUpdatedAt !== undefined) {
+        const dateInMS = new Date(answerUpdatedAt).getTime();
+        const elapsedTime = new Date().getTime() - dateInMS;
+        return (timeOut >= elapsedTime);
+      }
+      return true;
+    },
     compareDates(date) {
       const receivedDate = new Date(date);
       const receivedDateInMs = receivedDate.getTime();
@@ -152,7 +191,6 @@ export default defineComponent({
         this.startDate = new Date(res.data.startDate).toISOString().split('T')[0].toString();
         this.endDate = new Date(res.data.endDate).toISOString().split('T')[0].toString();
         this.evaluationFile = res.data.evaluationFile;
-        console.log(this.evaluationFile);
       } catch (err) {
         await this.$store.dispatch('addNotification', {
           text: `Konnte kein Praktikum gefunden werden. [ERROR: ${err.message}]`,
@@ -162,31 +200,41 @@ export default defineComponent({
       this.isLoading = false;
     },
 
-    async saveMyAnswer(questionId) {
-      if (this.content !== '') {
-        // eslint-disable-line no-alert
-        const userDoubleChecked = window.confirm('Sind Sie mit Ihrer Antwort sicher? Sie haben noch 2 Stunden Zeit, Ihre Antwort zu bearbeiten, danach ist es nicht mehr möglich.');
-        if (userDoubleChecked) {
-          try {
-            await http.patch(`/internships/${this.$route.params.id}/answerToUpdate`, null, {
-              params: {
-                answerTextContent: this.content,
-                id: questionId,
-                isAnswerPublished: this.isAnswerPublished.toString(),
-              },
-            });
-            await this.$store.dispatch('addNotification', {
-              text: 'Ihre Antwort wurde erfolgreich gespeichert!',
-              type: 'success',
-            });
-          } catch (err) {
-            await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
+    async saveMyAnswer(questionId, answerText, isAnswerChecked) {
+      if ((this.content === '' || this.content === String('<p></p>')) && this.iChanged === '') {
+        await this.$store.dispatch('addNotification', {
+          text: 'Bitte erzählen Sie etwas über Ihr Praktikum! Wir sehen keine Veränderungen zu speichern.',
+          type: 'danger',
+        });
+        return;
+      }
+      // eslint-disable-line no-alert
+      const userDoubleChecked = window.confirm('Sind Sie mit Ihrer Antwort sicher? Sie haben noch 2 Stunden Zeit, Ihre Antwort zu bearbeiten, danach ist es nicht mehr möglich.');
+      if (userDoubleChecked) {
+        try {
+          if (this.content === '') {
+            console.log(answerText);
+            this.content = answerText;
           }
-        } else {
-          console.log('canceled');
+          await http.patch(`/internships/${this.$route.params.id}/answerToUpdate`, null, {
+            params: {
+              answerTextContent: this.content,
+              id: questionId,
+              isAnswerPublished: isAnswerChecked,
+            },
+          });
+          await this.$store.dispatch('addNotification', {
+            text: 'Ihre Antwort wurde erfolgreich gespeichert!',
+            type: 'success',
+          }).then(() => window.location.reload());
+        } catch (err) {
+          await this.$store.dispatch('addNotification', {
+            text: `${err.response.data.error.message}`,
+            type: 'danger',
+          });
         }
       } else {
-        await this.$store.dispatch('addNotification', { text: 'Bitte erzählen Sie etwas über Ihr Praktikum! Wir sehen keine Veränderungen zu speichern.', type: 'danger' });
+        console.log('canceled');
       }
     },
   },

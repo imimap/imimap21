@@ -14,6 +14,7 @@ const evaluationFormStudent = {
   },
   footer: {
     answer: 'Answer',
+    yourAnswer: 'Your answer',
     buttonPost: 'Save',
     checkboxPermission: 'Let other students see my answer.',
   },

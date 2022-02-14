@@ -51,17 +51,14 @@ export async function getInternshipsById(
       .lean();
     if (!internship) return next(new NotFound("Internship not found"));
 
-    if(internship.evaluationFile == undefined) {
+    if(internship.status === InternshipStatuses.PLANNED && internship.evaluationFile === undefined) {
       // @ts-ignore
       const inSemester = user.studentProfile.internship.inSemester;
       // @ts-ignore
       internship.evaluationFile = await Evaluation.findOne({"inSemester": inSemester, "isPublished": true});
       if(internship.evaluationFile) {
-        const internshipEvalFile = Internship.hydrate({ _id: internshipId, type: 'evaluationFile' });
-        internshipEvalFile.evaluationFile = internship.evaluationFile;
-        await internshipEvalFile.save();
+        await Internship.findOneAndUpdate({ _id: internshipId }, {evaluationFile: internship.evaluationFile});
       }
-      console.log(internship.evaluationFile);
     }
     res.json(internship);
   } else if (user.studentProfile && internshipId === "my") {

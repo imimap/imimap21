@@ -91,11 +91,9 @@
                      aria-labelledby="headingOne"
                      data-bs-parent="#listAccordion">
                   <div class="accordion-body">
-                  <textarea type="text"
-                            id="textContent"
-                            class="form-control" rows="10"
-                            v-model="row.textContent" readonly/>
+                  <span v-html="row.textContent"/>
                     <br>
+                    <hr>
                     <div class="row">
                       <div class="col-sm-1" style="margin-right: 20px !important;">
                         <router-link
@@ -256,6 +254,10 @@ template {
 
 .accordion-header button {
   color: #000000;
+}
+
+.accordion .accordion-body {
+  background-color: #FFFFFF;
 }
 
 .list-item-label {

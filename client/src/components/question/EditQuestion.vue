@@ -21,11 +21,9 @@
         </div>
         <br>
         <div class="col-auto">
-          <label for="textContent">Textinhalt</label>
-          <textarea v-model="textContent"
-                    type="text"
-                    id="textContent"
-                    class="form-control" rows="5" required/>
+          <div>
+            <editor v-model="content" :model-value="textContent"/>
+          </div>
         </div>
         <br>
         <div class="row">
@@ -55,6 +53,7 @@ import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
 import Question from '@/models/Question';
 import store from '@/store';
+import Editor from '../Editor.vue';
 
 export default defineComponent({
   name: 'CreateQuestion',
@@ -67,16 +66,16 @@ export default defineComponent({
       isQuestionActive: '',
       updatedAt: '',
       question: new Question(),
+      content: '',
     };
+  },
+  components: {
+    Editor,
   },
   mounted() {
     this.getQuestion();
   },
   methods: {
-    ifSureToExit() {
-      const userDoubleChecked = window.confirm('Sicher das Fenster schließen?');
-      return userDoubleChecked;
-    },
     async getQuestion() {
       const res = await http.get(`/questions/${this.$route.params.id}`);
       this.question = res.data;
@@ -86,13 +85,20 @@ export default defineComponent({
       this.updatedAt = this.question.updatedAt;
     },
     async updateQuestion() {
+      if ((this.content === '' || this.content === String('<p></p>')) && this.title === '') {
+        await this.$store.dispatch('addNotification', {
+          text: 'Bitte stellen Sie eine Frage zusammen mit einem Titel. Die Textboxen dürfen nicht leer bleiben. Oder haben Sie nichts bearbeitet.',
+          type: 'danger',
+        });
+        return false;
+      }
       // eslint-disable-line no-alert
       const userDoubleChecked = window.confirm('Sind Sie mit den Veränderungen sicher?');
       if (userDoubleChecked) {
         try {
           await http.patch(`/questions/${this.$route.params.id}`, {
             title: this.title,
-            textContent: this.textContent,
+            textContent: this.content,
             isQuestionActive: this.isQuestionActive.toString(),
             updatedAt: Date.now(),
           });
