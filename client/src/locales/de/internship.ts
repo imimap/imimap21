@@ -3,11 +3,6 @@ const internship = {
     create: 'Neues Praktikum',
     edit: 'Praktikum bearbeiten',
   },
-  actions: {
-    save: 'Firma speichern',
-    abort: 'Abbrechen',
-    back: 'Zurück',
-  },
   form: {
     startDate: 'Anfangsdatum',
     endDate: 'Enddatum',

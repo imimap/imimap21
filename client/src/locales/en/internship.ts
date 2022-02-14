@@ -3,11 +3,6 @@ const internship = {
     create: 'New Internship',
     edit: 'Edit Internship',
   },
-  actions: {
-    save: 'save company',
-    abort: 'abort',
-    back: 'back',
-  },
   form: {
     startDate: 'start date',
     endDate: 'end date',

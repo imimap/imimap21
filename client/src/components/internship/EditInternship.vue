@@ -125,12 +125,12 @@
         <div class="row my-4">
           <div class="col-md-4">
             <button v-on:click="save" class="btn btn-secondary">
-              {{ $t("company.action.save") }}
+              {{ $t("actions.save") }}
             </button>
           </div>
         </div>
         <div class="row mt-3">
-          <a href="javascript:history.back()">{{ $t("company.action.back") }}</a>
+          <a href="javascript:history.back()">{{ $t("actions.back") }}</a>
         </div>
       </form>
     </div>

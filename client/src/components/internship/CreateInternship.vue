@@ -258,12 +258,12 @@
           <div class="row my-2">
             <div class="col-md-2">
               <button v-on:click="createNewCompany" class="btn btn-secondary">
-                {{ $t("company.action.save") }}
+                {{ $t("company.heading") }} {{ $t("actions.save") }}
               </button>
             </div>
             <div class="col-md-2">
               <button v-on:click="abortCompanyCreation" class="btn btn-danger">
-                {{ $t("company.action.abort") }}
+                {{ $t("actions.abort") }}
               </button>
             </div>
           </div>
@@ -271,12 +271,12 @@
         <div class="row my-4" v-if="!toggleAddCompanyForm">
           <div class="col-md-4">
             <button v-on:click="save" class="btn btn-secondary">
-              {{ $t("company.action.save") }}
+              {{ $t("actions.save") }}
             </button>
           </div>
         </div>
         <div class="row mt-3">
-          <a href="javascript:history.back()">{{ $t("company.action.back") }}</a>
+          <a href="javascript:history.back()">{{ $t("actions.back") }}</a>
         </div>
       </form>
     </div>

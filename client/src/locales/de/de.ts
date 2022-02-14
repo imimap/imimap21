@@ -4,6 +4,7 @@ import internshipModule from '@/locales/de/internshipModule';
 import internship from '@/locales/de/internship';
 import company from '@/locales/de/company';
 import address from '@/locales/de/address';
+import actions from '@/locales/de/actions';
 
 const de = {
   header,
@@ -12,6 +13,7 @@ const de = {
   internship,
   company,
   address,
+  actions,
 };
 
 export default de;
