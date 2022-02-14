@@ -45,7 +45,7 @@
             <input v-model="salary"
                    type="number"
                    min="0"
-                   step="50"
+                   step="1"
                    class="form-control"
                    id="salary"
                    placeholder="Gehalt"/>
@@ -72,16 +72,6 @@
         </div>
 
         <div class="row my-4">
-          <div class="col">
-            <label for="livingCosts">Lebensunterhaltskosten in Euro</label>
-            <input v-model="livingCosts"
-                   type="number"
-                   min="0"
-                   step="50"
-                   class="form-control"
-                   id="livingCosts"
-                   placeholder="Lebensunterhaltskosten"/>
-          </div>
           <div class="col">
             <label for="workingHoursPerWeek">Arbeitsstunden pro Woche</label>
             <input v-model="workingHoursPerWeek"
