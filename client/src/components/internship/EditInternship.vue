@@ -5,18 +5,20 @@
       <form v-on:submit.prevent>
         <div class="row my-4">
           <div class="col">
-            <label for="startDate">Startdatum</label>
+            <label for="startDate">Startdatum (currently: {{startDate}})</label>
             <input v-model="newStartDate"
                    type="date"
                    id="startDate"
-                   class="form-control"/>
+                   class="form-control"
+                   :placeholder="startDate"/>
           </div>
           <div class="col">
-            <label for="startDate">Enddatum</label>
+            <label for="endDate">Enddatum (currently: {{endDate}})</label>
             <input v-model="newEndDate"
                    type="date"
                    id="endDate"
-                   class="form-control"/>
+                   class="form-control"
+                   :placeholder="endDate"/>
           </div>
         </div>
 
