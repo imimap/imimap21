@@ -45,6 +45,7 @@ export function getUserInfo(): UserState {
   if (!isLoggedIn()) throw new Error('User konnte nicht authentifiziert werden: Kein User ist eingeloggt. Bitte einloggen!');
   const token: string | null = getAuthToken();
   if (!token) throw new Error('User konnte nicht authentifiziert werden: Token konnte nicht gefunden werden.');
+  setAuthToken(token);
   const decodedToken: UserState | null = decode(token);
   if (!decodedToken) throw new Error('User konnte nicht authentifiziert werden: Token konnte nicht dekodiert werden.');
   return decodedToken;
