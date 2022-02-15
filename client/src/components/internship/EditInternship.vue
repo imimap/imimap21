@@ -27,7 +27,7 @@
                    type="text"
                    class="form-control"
                    id="operationalArea"
-                   :placeholder="$t('internship.form.operationalArea')"/>
+                   :placeholder="operationalArea || $t('internship.form.operationalArea')"/>
           </div>
           <div class="col">
             <label for="programmingLanguages">
@@ -37,7 +37,8 @@
                    type="text"
                    class="form-control"
                    id="programmingLanguages"
-                   :placeholder="$t('internship.form.programmingLanguages')"/>
+                   :placeholder="programmingLanguages || $t('internship.form.programmingLanguages')"
+            />
           </div>
         </div>
 
@@ -49,7 +50,7 @@
                    min="0"
                    class="form-control"
                    id="salary"
-                   :placeholder="$t('internship.form.salary')"/>
+                   :placeholder="salary || $t('internship.form.salary')"/>
           </div>
           <div class="col">
             <label for="paymentType">{{ $t('internship.form.paymentType') }}</label>
@@ -80,7 +81,7 @@
                    min="0"
                    class="form-control"
                    id="livingCosts"
-                   :placeholder="$t('internship.form.livingCosts')"/>
+                   :placeholder="livingCosts || $t('internship.form.livingCosts')"/>
           </div>
           <div class="col">
             <label for="workingHoursPerWeek">{{ $t('internship.form.workingHoursPerWeek') }}</label>
@@ -88,7 +89,7 @@
                    min="0"
                    class="form-control"
                    id="workingHoursPerWeek"
-                   :placeholder="$t('internship.form.workingHoursPerWeek')"/>
+                   :placeholder="workingHoursPerWeek || $t('internship.form.workingHoursPerWeek')"/>
           </div>
         </div>
 
@@ -100,7 +101,7 @@
                      type="text"
                      class="form-control"
                      id="supervisorFullName"
-                     :placeholder="$t('company.supervisor.name')"/>
+                     :placeholder="supervisorFullName || $t('company.supervisor.name')"/>
             </div>
             <div>
               <label for="supervisorEmail">{{ $t('company.supervisor.email') }}</label>
@@ -108,7 +109,7 @@
                      type="text"
                      class="form-control"
                      id="supervisorEmail"
-                     :placeholder="$t('company.supervisor.email')"/>
+                     :placeholder="supervisorEmail || $t('company.supervisor.email')"/>
             </div>
           </div>
           <div class="col">
@@ -118,7 +119,7 @@
                       id="tasks"
                       cols="30"
                       rows="6"
-                      :placeholder="$t('internship.form.tasks')"/>
+                      :placeholder="tasks || $t('internship.form.tasks')"/>
           </div>
         </div>
 
