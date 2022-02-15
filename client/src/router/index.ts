@@ -257,6 +257,7 @@ router.beforeEach(async (to, from, next) => {
       next();
     } catch (err: any) {
       await showErrorNotification('User konnte nicht identifiziert werden. Logge dich nochmal aus und wieder ein.');
+      next();
     }
   } else {
     next();
