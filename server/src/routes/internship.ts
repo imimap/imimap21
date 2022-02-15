@@ -111,7 +111,7 @@ internshipRouter.patch(
 );
 
 /* PDF endpoints */
-const idRegEx = /[0-91-f]{24}/;
+const idRegEx = /[0-9a-f]{24}/;
 
 internshipRouter.post(
   "/:id/pdf/request",
