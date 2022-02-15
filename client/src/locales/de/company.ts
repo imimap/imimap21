@@ -3,8 +3,8 @@ const company = {
   attention: 'Achtung!',
   warning: 'Du hast einen Firmennamen angegeben, welcher noch nicht in der Datenbank existiert. Bitte gib zunächst ergänzende Informationen zur Firma an und speichere anschließend dein Praktikum!',
   supervisor: {
-    name: 'Name der Betreuer*in',
-    email: 'Email der Betreuer*in',
+    name: 'Name der Betreuer:in',
+    email: 'Email der Betreuer:in',
   },
   name: 'Firmenname',
   branchName: 'Name der Zweigstelle',
