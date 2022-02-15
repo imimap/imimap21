@@ -22,37 +22,37 @@
 
         <div class="row my-4">
           <div class="col">
-            <label for="operationalArea">{{ $t("internship.form.operationalArea") }}</label>
+            <label for="operationalArea">{{ $t('internship.form.operationalArea') }}</label>
             <input v-model="newOperationalArea"
                    type="text"
                    class="form-control"
                    id="operationalArea"
-                   :placeholder="operationalArea"/>
+                   :placeholder="$t('internship.form.operationalArea')"/>
           </div>
           <div class="col">
             <label for="programmingLanguages">
-              {{ $t("internship.form.programmingLanguages") }}
+              {{ $t('internship.form.programmingLanguages') }}
             </label>
             <input v-model="newProgrammingLanguages"
                    type="text"
                    class="form-control"
                    id="programmingLanguages"
-                   :placeholder="programmingLanguages"/>
+                   :placeholder="$t('internship.form.programmingLanguages')"/>
           </div>
         </div>
 
         <div class="row my-4">
           <div class="col">
-            <label for="salary">{{ $t("internship.form.salary") }} (in Euro)</label>
+            <label for="salary">{{ $t('internship.form.salary') }} (in Euro)</label>
             <input v-model="newSalary"
                    type="number"
                    min="0"
                    class="form-control"
                    id="salary"
-                   :placeholder="salary"/>
+                   :placeholder="$t('internship.form.salary')"/>
           </div>
           <div class="col">
-            <label for="paymentType">{{ $t("internship.form.paymentType") }}</label>
+            <label for="paymentType">{{ $t('internship.form.paymentType') }}</label>
             <div class="form-group d-flex internship-payment-options">
               <div class="form-check internship-payment-option"
                    v-for="(paymentType, index) in availablePaymentTypes"
@@ -74,51 +74,51 @@
 
         <div class="row my-4">
           <div class="col">
-            <label for="livingCosts">{{ $t("internship.form.livingCosts") }}</label>
+            <label for="livingCosts">{{ $t('internship.form.livingCosts') }}</label>
             <input v-model="newLivingCosts"
                    type="number"
                    min="0"
                    class="form-control"
                    id="livingCosts"
-                   :placeholder="livingCosts"/>
+                   :placeholder="$t('internship.form.livingCosts')"/>
           </div>
           <div class="col">
-            <label for="workingHoursPerWeek">{{ $t("internship.form.workingHoursPerWeek") }}</label>
+            <label for="workingHoursPerWeek">{{ $t('internship.form.workingHoursPerWeek') }}</label>
             <input v-model="newWorkingHoursPerWeek"
                    min="0"
                    class="form-control"
                    id="workingHoursPerWeek"
-                   :placeholder="workingHoursPerWeek"/>
+                   :placeholder="$t('internship.form.workingHoursPerWeek')"/>
           </div>
         </div>
 
         <div class="row my-4">
           <div class="col">
             <div class="mb-3">
-              <label for="supervisorFullName">{{ $t("company.supervisor.name") }}</label>
+              <label for="supervisorFullName">{{ $t('company.supervisor.name') }}</label>
               <input v-model="newSupervisorFullName"
                      type="text"
                      class="form-control"
                      id="supervisorFullName"
-                     :placeholder="supervisorFullName"/>
+                     :placeholder="$t('company.supervisor.name')"/>
             </div>
             <div>
-              <label for="supervisorEmail">{{ $t("company.supervisor.email") }}</label>
+              <label for="supervisorEmail">{{ $t('company.supervisor.email') }}</label>
               <input v-model="newSupervisorEmail"
                      type="text"
                      class="form-control"
                      id="supervisorEmail"
-                     :placeholder="supervisorEmail"/>
+                     :placeholder="$t('company.supervisor.email')"/>
             </div>
           </div>
           <div class="col">
-            <label for="tasks">{{ $t("internship.form.tasks") }}</label>
+            <label for="tasks">{{ $t('internship.form.tasks') }}</label>
             <textarea v-model="newTasks"
                       class="form-control"
                       id="tasks"
                       cols="30"
                       rows="6"
-                      :placeholder="tasks"/>
+                      :placeholder="t('internship.form.tasks')"/>
           </div>
         </div>
 

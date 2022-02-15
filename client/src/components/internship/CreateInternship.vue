@@ -22,16 +22,16 @@
 
         <div class="row my-4">
           <div class="col">
-            <label for="operationalArea">{{ $t("internship.form.operationalArea") }}</label>
+            <label for="operationalArea">{{ $t('internship.form.operationalArea') }}</label>
             <input v-model="operationalArea"
                    type="text"
                    class="form-control"
                    id="operationalArea"
-                   placeholder="Bereich"/>
+                   placeholder="$t('internship.form.operationalArea')"/>
           </div>
           <div class="col">
             <label for="programmingLanguages">
-              {{ $t("internship.form.programmingLanguages") }}
+              {{ $t('internship.form.programmingLanguages') }}
             </label>
             <input v-model="programmingLanguages"
                    type="text"
@@ -43,16 +43,16 @@
 
         <div class="row my-4">
           <div class="col">
-            <label for="salary">{{ $t("internship.form.salary") }} (in Euro)</label>
+            <label for="salary">{{ $t('internship.form.salary') }} (in Euro)</label>
             <input v-model="salary"
                    type="number"
                    min="0"
                    class="form-control"
                    id="salary"
-                   placeholder="Gehalt"/>
+                   placeholder="$t('internship.form.salary')"/>
           </div>
           <div class="col">
-            <label for="paymentType">{{ $t("internship.form.paymentType") }}</label>
+            <label for="paymentType">{{ $t('internship.form.paymentType') }}</label>
             <div class="form-group d-flex internship-payment-options">
               <div class="form-check internship-payment-option"
                    v-for="(paymentType, index) in availablePaymentTypes"
@@ -74,45 +74,45 @@
 
         <div class="row my-4">
           <div class="col">
-            <label for="workingHoursPerWeek">{{ $t("internship.form.workingHoursPerWeek") }}</label>
+            <label for="workingHoursPerWeek">{{ $t('internship.form.workingHoursPerWeek') }}</label>
             <input v-model="workingHoursPerWeek"
                    type="number"
                    min="0"
                    class="form-control"
                    id="workingHoursPerWeek"
-                   placeholder="Arbeitsstunden pro Woche"/>
+                   placeholder="$t('internship.form.workingHoursPerWeek')"/>
           </div>
         </div>
 
         <div class="row my-4">
           <div class="col">
             <div class="mb-3">
-              <label for="supervisorFullName">{{ $t("company.supervisor.name") }}</label>
+              <label for="supervisorFullName">{{ $t('company.supervisor.name') }}</label>
               <input v-model="supervisorFullName"
                      type="text"
                      class="form-control"
                      id="supervisorFullName"
-                     placeholder="Name der Betreuer:in"/>
+                     placeholder="$t('company.supervisor.name')"/>
             </div>
             <div class="mb-3">
-              <label for="supervisorEmail">{{ $t("company.supervisor.email") }}</label>
+              <label for="supervisorEmail">{{ $t('company.supervisor.email') }}</label>
               <input v-model="supervisorEmailAddress"
                      type="text"
                      class="form-control"
                      id="supervisorEmail"
-                     placeholder="Email der Betreuer:in"/>
+                     placeholder="$t('company.supervisor.email')"/>
             </div>
             <div>
-              <label for="company">{{ $t("company.heading") }}</label>
+              <label for="company">{{ $t('company.heading') }}</label>
               <input v-model="company"
                      type="text"
                      class="form-control"
                      id="company"
-                     placeholder="Firma"/>
+                     placeholder="$t('company.heading')"/>
             </div>
           </div>
           <div class="col">
-            <label for="tasks">{{ $t("internship.form.tasks") }}</label>
+            <label for="tasks">{{ $t('internship.form.tasks') }}</label>
             <textarea v-model="tasks"
                       class="form-control"
                       id="tasks"
@@ -130,48 +130,48 @@
           </div>
           <div class="row mb-3">
             <div class="col-md-6">
-              <label>{{ $t("company.name") }}</label>
+              <label>{{ $t('company.name') }}</label>
               <input v-model="company"
                      type="text"
                      class="form-control"
                      id="newCompanyName"
-                     placeholder="Firmenname"/>
+                     placeholder="$t('company.name')"/>
             </div>
           </div>
           <div class="row mb-3">
             <div class="col">
-              <label for="newCompanyBranchName">{{ $t("company.branchName") }}</label>
+              <label for="newCompanyBranchName">{{ $t('company.branchName') }}</label>
               <input v-model="newCompanyBranchName"
                      type="text"
                      class="form-control"
                      id="newCompanyBranchName"
-                     placeholder="Name der Zweigstelle"/>
+                     placeholder="$t('company.branchName')"/>
             </div>
             <div class="col">
-              <label for="newCompanyEmailAddress">{{ $t("company.email") }}</label>
+              <label for="newCompanyEmailAddress">{{ $t('company.email') }}</label>
               <input v-model="newCompanyEmailAddress"
                      type="email"
                      class="form-control"
                      id="newCompanyEmailAddress"
-                     placeholder="Email Adresse"/>
+                     placeholder="$t('company.email')"/>
             </div>
           </div>
           <div class="row mb-3">
             <div class="col">
-              <label for="newCompanyIndustry">{{ $t("company.industry") }}</label>
+              <label for="newCompanyIndustry">{{ $t('company.industry') }}</label>
               <input v-model="newCompanyIndustry"
                      type="text"
                      class="form-control"
                      id="newCompanyIndustry"
-                     placeholder="Industrie"/>
+                     placeholder="$t('company.industry')"/>
             </div>
             <div class="col">
-              <label for="newCompanyWebsite">{{ $t("company.website") }}</label>
+              <label for="newCompanyWebsite">{{ $t('company.website') }}</label>
               <input v-model="newCompanyWebsite"
                      type="text"
                      class="form-control"
                      id="newCompanyWebsite"
-                     placeholder="Webseite"/>
+                     placeholder="$t('company.website')"/>
             </div>
           </div>
           <div class="row mb-3">
@@ -203,62 +203,62 @@
           </div>
           <div class="row mb-3">
             <div class="col">
-              <label for="newCompanyMainLanguage">{{ $t("address.street") }}</label>
+              <label for="newCompanyMainLanguage">{{ $t('address.street') }}</label>
               <input v-model="newCompanyStreet"
                      type="text"
                      class="form-control"
                      id="newCompanyStreet"
-                     placeholder="Straße"/>
+                     placeholder="$t('address.street')"/>
             </div>
             <div class="col">
-              <label for="newCompanyStreetNumber">{{ $t("address.nr") }}</label>
+              <label for="newCompanyStreetNumber">{{ $t('address.nr') }}</label>
               <input v-model="newCompanyStreetNumber"
                      type="text"
                      class="form-control"
                      id="newCompanyStreetNumber"
-                     placeholder="Nr."/>
+                     placeholder="$t('address.nr')"/>
             </div>
           </div>
           <div class="row mb-3">
             <div class="col">
-              <label for="newCompanyAdditionalLines">{{ $t("address.line") }}</label>
+              <label for="newCompanyAdditionalLines">{{ $t('address.line') }}</label>
               <input v-model="newCompanyAdditionalLines"
                      type="text"
                      class="form-control"
                      id="newCompanyAdditionalLines"
-                     placeholder="Adresszusatz"/>
+                     placeholder=" $t('address.line')"/>
             </div>
             <div class="col">
-              <label for="newCompanyZip">{{ $t("address.zip") }}</label>
+              <label for="newCompanyZip">{{ $t('address.zip') }}</label>
               <input v-model="newCompanyZip"
                      type="text"
                      class="form-control"
                      id="newCompanyZip"
-                     placeholder="Postleitzahl"/>
+                     placeholder="$t('address.zip')"/>
             </div>
           </div>
           <div class="row mb-3">
             <div class="col">
-              <label for="newCompanyCity">{{ $t("address.city") }}</label>
+              <label for="newCompanyCity">{{ $t('address.city') }}</label>
               <input v-model="newCompanyCity"
                      type="text"
                      class="form-control"
                      id="newCompanyCity"
-                     placeholder="Stadt"/>
+                     placeholder="$t('address.city')"/>
             </div>
             <div class="col">
-              <label for="newCompanyCountry">{{ $t("address.country") }}</label>
+              <label for="newCompanyCountry">{{ $t('address.country') }}</label>
               <input v-model="newCompanyCountry"
                      type="text"
                      class="form-control"
                      id="newCompanyCountry"
-                     placeholder="Land"/>
+                     placeholder="$t('address.country')"/>
             </div>
           </div>
           <div class="row my-2">
             <div class="col-md-2">
               <button v-on:click="createNewCompany" class="btn btn-secondary">
-                {{ $t("company.heading") }} {{ $t("actions.save") }}
+                {{ $t("company.actions.save") }}
               </button>
             </div>
             <div class="col-md-2">

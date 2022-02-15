@@ -14,6 +14,9 @@ const company = {
   mainLanguage: 'main language',
   select: 'please select',
   size: 'size',
+  actions: {
+    save: 'save company',
+  },
 };
 
 export default company;

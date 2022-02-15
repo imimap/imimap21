@@ -14,6 +14,9 @@ const company = {
   mainLanguage: 'Hauptsprache',
   select: 'Bitte auswählen',
   size: 'Größe',
+  actions: {
+    save: 'Firma speichern',
+  },
 };
 
 export default company;
