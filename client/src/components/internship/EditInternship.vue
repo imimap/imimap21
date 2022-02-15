@@ -5,7 +5,9 @@
       <form v-on:submit.prevent>
         <div class="row my-4">
           <div class="col">
-            <label for="startDate">{{ $t("internship.form.startDate") }} ($t("internship.form.currently"): {{startDate}})</label>
+            <label for="startDate">
+              {{ $t("internship.form.startDate") }} ($t("internship.form.currently"): {{startDate}})
+            </label>
             <input v-model="newStartDate"
                    type="date"
                    id="startDate"
@@ -13,7 +15,9 @@
                    :placeholder="startDate"/>
           </div>
           <div class="col">
-            <label for="startDate">{{ $t("internship.form.endDate") }} ($t("internship.form.currently"): {{endDate}})</label>
+            <label for="startDate">
+              {{ $t("internship.form.endDate") }} ($t("internship.form.currently"): {{endDate}})
+            </label>
             <input v-model="newEndDate"
                    type="date"
                    id="endDate"

@@ -27,7 +27,8 @@
           <p> {{ $t("search.tooManyResults.question") }} </p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" :aria-label="$t('search.tooManyResults.buttonDecline')">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+                  :aria-label="$t('search.tooManyResults.buttonDecline')">
             {{ $t("search.tooManyResults.buttonDecline") }}
           </button>
           <button
@@ -53,6 +54,6 @@ export default defineComponent({
     amountOfResults: Number,
     amountOfInternshipsSeen: Number,
   },
-  emits: ['search']
+  emits: ['search'],
 });
 </script>

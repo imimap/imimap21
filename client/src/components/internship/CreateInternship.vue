@@ -300,8 +300,8 @@ export default defineComponent({
       newCompanyEmailAddress: null,
       newCompanyIndustry: null,
       newCompanyWebsite: null,
-      newCompanyMainLanguage: '',
-      newCompanySize: '',
+      newCompanyMainLanguage: null,
+      newCompanySize: null,
       newCompanyStreet: null,
       newCompanyStreetNumber: null,
       newCompanyAdditionalLines: null,
@@ -362,23 +362,22 @@ export default defineComponent({
         this.toggleAddCompanyForm = !this.toggleAddCompanyForm;
       } else {
         try {
-          const res = await http.post('/companies', null, {
-            params: {
-              companyName: this.company,
-              branchName: this.newCompanyBranchName,
-              emailAddress: this.newCompanyEmailAddress,
-              industry: this.newCompanyIndustry,
-              website: this.newCompanyWebsite,
-              mainLanguage: this.newCompanyMainLanguage,
-              size: this.newCompanySize,
-              street: this.newCompanyStreet,
-              streetNumber: this.newCompanyStreetNumber,
-              additionalLines: this.newCompanyAdditionalLines,
-              zip: this.newCompanyZip,
-              city: this.newCompanyCity,
-              country: this.newCompanyCountry,
-            },
+          const res = await http.post('/companies', {
+            companyName: this.company,
+            branchName: this.newCompanyBranchName,
+            emailAddress: this.newCompanyEmailAddress,
+            industry: this.newCompanyIndustry,
+            website: this.newCompanyWebsite,
+            mainLanguage: this.newCompanyMainLanguage,
+            size: this.newCompanySize,
+            street: this.newCompanyStreet,
+            streetNumber: this.newCompanyStreetNumber,
+            additionalLines: this.newCompanyAdditionalLines,
+            zip: this.newCompanyZip,
+            city: this.newCompanyCity,
+            country: this.newCompanyCountry,
           });
+          console.log(res.data);
           this.existingCompany = res.data;
           await this.$store.dispatch('addNotification', { text: 'Firma erfolgreich angelegt!', type: 'success' });
           this.toggleAddCompanyForm = false;
@@ -442,8 +441,8 @@ export default defineComponent({
       this.newCompanyEmailAddress = null;
       this.newCompanyIndustry = null;
       this.newCompanyWebsite = null;
-      this.newCompanyMainLanguage = '';
-      this.newCompanySize = '';
+      this.newCompanyMainLanguage = null;
+      this.newCompanySize = null;
       this.newCompanyStreet = null;
       this.newCompanyStreetNumber = null;
       this.newCompanyAdditionalLines = null;
