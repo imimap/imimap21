@@ -118,7 +118,7 @@
                       id="tasks"
                       cols="30"
                       rows="6"
-                      :placeholder="t('internship.form.tasks')"/>
+                      :placeholder="$t('internship.form.tasks')"/>
           </div>
         </div>
 

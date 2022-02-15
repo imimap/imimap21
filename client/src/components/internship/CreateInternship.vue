@@ -27,7 +27,7 @@
                    type="text"
                    class="form-control"
                    id="operationalArea"
-                   placeholder="$t('internship.form.operationalArea')"/>
+                   :placeholder="$t('internship.form.operationalArea')"/>
           </div>
           <div class="col">
             <label for="programmingLanguages">
@@ -49,7 +49,7 @@
                    min="0"
                    class="form-control"
                    id="salary"
-                   placeholder="$t('internship.form.salary')"/>
+                   :placeholder="$t('internship.form.salary')"/>
           </div>
           <div class="col">
             <label for="paymentType">{{ $t('internship.form.paymentType') }}</label>
@@ -80,7 +80,7 @@
                    min="0"
                    class="form-control"
                    id="workingHoursPerWeek"
-                   placeholder="$t('internship.form.workingHoursPerWeek')"/>
+                   :placeholder="$t('internship.form.workingHoursPerWeek')"/>
           </div>
         </div>
 
@@ -92,7 +92,7 @@
                      type="text"
                      class="form-control"
                      id="supervisorFullName"
-                     placeholder="$t('company.supervisor.name')"/>
+                     :placeholder="$t('company.supervisor.name')"/>
             </div>
             <div class="mb-3">
               <label for="supervisorEmail">{{ $t('company.supervisor.email') }}</label>
@@ -100,7 +100,7 @@
                      type="text"
                      class="form-control"
                      id="supervisorEmail"
-                     placeholder="$t('company.supervisor.email')"/>
+                     :placeholder="$t('company.supervisor.email')"/>
             </div>
             <div>
               <label for="company">{{ $t('company.heading') }}</label>
@@ -108,7 +108,7 @@
                      type="text"
                      class="form-control"
                      id="company"
-                     placeholder="$t('company.heading')"/>
+                     :placeholder="$t('company.heading')"/>
             </div>
           </div>
           <div class="col">
@@ -135,7 +135,7 @@
                      type="text"
                      class="form-control"
                      id="newCompanyName"
-                     placeholder="$t('company.name')"/>
+                     :placeholder="$t('company.name')"/>
             </div>
           </div>
           <div class="row mb-3">
@@ -145,7 +145,7 @@
                      type="text"
                      class="form-control"
                      id="newCompanyBranchName"
-                     placeholder="$t('company.branchName')"/>
+                     :placeholder="$t('company.branchName')"/>
             </div>
             <div class="col">
               <label for="newCompanyEmailAddress">{{ $t('company.email') }}</label>
@@ -153,7 +153,7 @@
                      type="email"
                      class="form-control"
                      id="newCompanyEmailAddress"
-                     placeholder="$t('company.email')"/>
+                    :placeholder="$t('company.email')"/>
             </div>
           </div>
           <div class="row mb-3">
@@ -163,7 +163,7 @@
                      type="text"
                      class="form-control"
                      id="newCompanyIndustry"
-                     placeholder="$t('company.industry')"/>
+                     :placeholder="$t('company.industry')"/>
             </div>
             <div class="col">
               <label for="newCompanyWebsite">{{ $t('company.website') }}</label>
@@ -171,7 +171,7 @@
                      type="text"
                      class="form-control"
                      id="newCompanyWebsite"
-                     placeholder="$t('company.website')"/>
+                     :placeholder="$t('company.website')"/>
             </div>
           </div>
           <div class="row mb-3">
@@ -208,7 +208,7 @@
                      type="text"
                      class="form-control"
                      id="newCompanyStreet"
-                     placeholder="$t('address.street')"/>
+                     :placeholder="$t('address.street')"/>
             </div>
             <div class="col">
               <label for="newCompanyStreetNumber">{{ $t('address.nr') }}</label>
@@ -216,7 +216,7 @@
                      type="text"
                      class="form-control"
                      id="newCompanyStreetNumber"
-                     placeholder="$t('address.nr')"/>
+                     :placeholder="$t('address.nr')"/>
             </div>
           </div>
           <div class="row mb-3">
@@ -226,7 +226,7 @@
                      type="text"
                      class="form-control"
                      id="newCompanyAdditionalLines"
-                     placeholder=" $t('address.line')"/>
+                     :placeholder=" $t('address.line')"/>
             </div>
             <div class="col">
               <label for="newCompanyZip">{{ $t('address.zip') }}</label>
@@ -234,7 +234,7 @@
                      type="text"
                      class="form-control"
                      id="newCompanyZip"
-                     placeholder="$t('address.zip')"/>
+                     :placeholder="$t('address.zip')"/>
             </div>
           </div>
           <div class="row mb-3">
@@ -244,7 +244,7 @@
                      type="text"
                      class="form-control"
                      id="newCompanyCity"
-                     placeholder="$t('address.city')"/>
+                     :placeholder="$t('address.city')"/>
             </div>
             <div class="col">
               <label for="newCompanyCountry">{{ $t('address.country') }}</label>
@@ -252,7 +252,7 @@
                      type="text"
                      class="form-control"
                      id="newCompanyCountry"
-                     placeholder="$t('address.country')"/>
+                     :placeholder="$t('address.country')"/>
             </div>
           </div>
           <div class="row my-2">
