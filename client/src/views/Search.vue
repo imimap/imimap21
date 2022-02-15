@@ -90,7 +90,8 @@
         </div>
         <div class="btn-group" role="group">
           <div class="field me-2">
-            <button v-on:click="searchRequest()" class="btn btn-htw-green">
+            <button class="btn btn-htw-green"
+                    v-on:click="searchOrShowModal()">
               {{ $t("search.form.search") }}
             </button>
           </div>
@@ -106,39 +107,44 @@
       </form>
     </div>
   </div>
+  <!-- Too many results modal -->
+  <too-many-results :amount-of-results="amountOfResults"
+                    :amount-of-internships-seen="amountOfInternshipsSeen"
+                    v-on:search="searchRequest"/>
   <!-- Search Results -->
   <div id="form-block4" class="mx-3 my-3"
-       v-if="!loadingState && searchResults.length <= 0 && previousSearchResults.length <= 0">
-    {{ $t("search.results.noResults") }}
+         v-if="!loadingState && resultCount <= 0 && previousResultCount <= 0">
+      {{ $t("search.results.noResults") }}
   </div>
   <div id="form-block4" class="mx-3 my-3"
-       v-if="!loadingState && (searchResults.length > 0 || previousSearchResults.length > 0)">
-    <div class="text-center">
-      <button type="button"
-              class="btn btn-htw-green text-white mb-3"
-              v-on:click="cardToggle = !cardToggle">
-        {{ $t("search.showMap") }}
-      </button>
+         v-if="!loadingState && (resultCount > 0 || previousResultCount > 0)">
+      <div class="text-center">
+        <button type="button"
+                class="btn btn-htw-green text-white mb-3"
+                v-on:click="cardToggle = !cardToggle">
+          {{ $t("search.showMap") }}
+        </button>
+      </div>
+      <div id="search-results" class="search_results"
+           v-if="!cardToggle && resultCount > 0">
+        <SearchResultList
+          :result-count="resultCount"
+          :search-results="searchResults"
+          result-count-text="search.results.resultCount">
+        </SearchResultList>
+      </div>
+      <div id="previous-search-results" class="search_results"
+           v-if="!cardToggle && previousResultCount > 0">
+        <SearchResultList
+          :result-count="previousResultCount"
+          :search-results="previousSearchResults"
+          result-count-text="search.results.previousResultCount">
+        </SearchResultList>
+      </div>
+      <div id="map-results">
+        <Map v-if="cardToggle" :locations="locations"></Map>
+      </div>
     </div>
-    <div id="search-results" class="search_results" v-if="!cardToggle && searchResults.length > 0">
-      <SearchResultList
-        :result-count="resultCount"
-        :search-results="searchResults"
-        result-count-text="search.results.resultCount">
-      </SearchResultList>
-    </div>
-    <div id="previous-search-results" class="search_results"
-         v-if="!cardToggle && previousSearchResults.length > 0">
-      <SearchResultList
-        :result-count="previousResultCount"
-        :search-results="previousSearchResults"
-        result-count-text="search.results.previousResultCount">
-      </SearchResultList>
-    </div>
-    <div id="map-results">
-      <Map v-if="cardToggle" :locations="locations"></Map>
-    </div>
-  </div>
 </template>
 
 <script lang="ts">
@@ -149,10 +155,13 @@ import http from '@/utils/http-common';
 import { Internship } from '@/store/types/Internship';
 import { MapLocation } from '@/store/types/MapLocation';
 import SearchResultList from '@/components/search/SearchResultList.vue';
+import TooManyResults from '@/components/search/TooManyResults.vue';
+import { showErrorNotification } from '@/utils/notification';
+import { Modal } from 'bootstrap';
 
 export default defineComponent({
   name: 'Search',
-  components: { SearchResultList, Map },
+  components: { SearchResultList, Map, TooManyResults },
   data() {
     return {
       // Available filters after query
@@ -171,6 +180,8 @@ export default defineComponent({
       // Component state
       cardToggle: false,
       loadingState: true,
+      amountOfResults: 0,
+      amountOfInternshipsSeen: 0,
     };
   },
   computed: {
@@ -189,17 +200,33 @@ export default defineComponent({
         }),
       );
     },
+    modal(): Modal {
+      const el = document.getElementById('tooManyResultsModal');
+      if (!el) throw new Error('Modal could not be found!');
+      const modal = new Modal(el);
+      if (!modal) throw new Error('Modal could not be found!');
+      return modal;
+    },
   },
   methods: {
+    async searchOrShowModal() {
+      const amountSeen = await this.getAmountOfSeenResults();
+      const amountNew = await this.getAmountOfPossibleResults();
+      if (amountSeen < 12 && amountNew > 6) {
+        this.amountOfResults = amountNew;
+        this.amountOfInternshipsSeen = amountSeen;
+        this.modal.show();
+      } else {
+        this.modal.hide();
+        await this.searchRequest();
+      }
+    },
     async getAvailableCountries() {
       try {
         const res = await http.get('/info/countries');
         this.availableCountries = await res.data;
       } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
-        await this.$store.dispatch('addNotification', {
-          text: `Fehler beim laden der verfügbaren Länder [ERROR: ${err.message}]`,
-          type: 'danger',
-        });
+        await showErrorNotification(`Fehler beim Laden der verfügbaren Länder [ERROR: ${err.message}]`);
       }
     },
     async getAvailablePaymentOptions() {
@@ -207,10 +234,7 @@ export default defineComponent({
         const res = await http.get('/info/payment-types');
         this.availablePaymentOptions = res.data;
       } catch (err: any) {
-        await this.$store.dispatch('addNotification', {
-          text: `Fehler beim laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`,
-          type: 'danger',
-        });
+        await showErrorNotification(`Fehler beim Laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`);
       }
     },
     async getAvailableOrientations() {
@@ -218,10 +242,7 @@ export default defineComponent({
         const res = await http.get('/info/operational-areas');
         this.availableOperationalAreas = res.data;
       } catch (err: any) {
-        await this.$store.dispatch('addNotification', {
-          text: `Fehler beim laden der verfügbaren Bereiche [ERROR: ${err.message}]`,
-          type: 'danger',
-        });
+        await showErrorNotification(`Fehler beim Laden der verfügbaren Bereiche [ERROR: ${err.message}]`);
       }
     },
     async getAvailableLanguages() {
@@ -229,32 +250,54 @@ export default defineComponent({
         const res = await http.get('/info/programming-languages');
         this.availableLanguages = res.data;
       } catch (err: any) {
-        await this.$store.dispatch('addNotification', {
-          text: `Fehler beim laden der verfügbaren Programmiersprachen [ERROR: ${err.message}]`,
-          type: 'danger',
+        await showErrorNotification(`Fehler beim laden der verfügbaren Programmiersprachen [ERROR: ${err.message}]`);
+      }
+    },
+    async getAmountOfPossibleResults(): Promise<number> {
+      let amount;
+      try {
+        const res = await http.get('/internships/amount', {
+          params: {
+            country: this.countryFilter,
+            operationalArea: this.operationalAreaFilter,
+            programmingLanguage: this.languageFilter,
+            paymentType: this.paymentFilter,
+          },
         });
+        amount = await res.data;
+      } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
+        await showErrorNotification(`Fehler beim Laden der neuen Suchergebnisse [ERROR: ${err.message}]`);
+      }
+      return amount;
+    },
+    async getAmountOfSeenResults(): Promise<number> {
+      let amount;
+      try {
+        const res = await http.get('/internships/seen/amount');
+        amount = await res.data;
+      } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
+        await showErrorNotification(`Fehler beim Laden der vorherigen Suchergebnisse [ERROR: ${err.message}]`);
+      }
+      return amount;
+    },
+    async searchRequestForPreviousResults() {
+      try {
+        this.previousSearchResults = await this.getSearchResults(true);
+      } catch (err: any) {
+        await showErrorNotification(`Fehler beim Durchsuchen der vorherigen Suchergebnisse [ERROR: ${err.message}]`);
+      }
+    },
+    async searchRequestForNewResults() {
+      try {
+        this.searchResults = await this.getSearchResults(false);
+      } catch (err: any) {
+        await showErrorNotification(`Fehler beim Suchen nach neuen Suchergebnisse [ERROR: ${err.message}]`);
       }
     },
     async searchRequest() {
       this.loadingState = true;
-      try {
-        this.previousSearchResults = await this.getSearchResults(true);
-      } catch (e: any) {
-        await this.$store.dispatch('addNotification', {
-          text: e.message,
-          type: 'danger',
-        });
-      }
-      try {
-        this.searchResults = await this.getSearchResults(false);
-        // this.searchResults = this.searchResults.filter((internship) =>
-        // typeof internship.company.address !== 'undefined');
-      } catch (e: any) {
-        await this.$store.dispatch('addNotification', {
-          text: e.message,
-          type: 'danger',
-        });
-      }
+      await this.searchRequestForPreviousResults();
+      await this.searchRequestForNewResults();
       this.loadingState = false;
     },
     async getSearchResults(seen: boolean) {

@@ -18,6 +18,8 @@ Else: Try the user "imimap@htw-berlin.de" with the same password.
 Inspect database at `mongodb://127.0.0.1:27017` with [mongodb-compass](https://docs.mongodb.com/compass/master/connect/).
 Or log in at `http://localhost:8081` with the credentials ME_USER and ME_PASS in the env file.
 
+Get the Postman collection at https://www.getpostman.com/collections/3406cd53e9316e2cf003.
+
 ## Credits
 Project created with [mevn-cli](https://www.npmjs.com/package/mevn-cli).
 Client created with [vue-cli](https://www.npmjs.com/package/@vue/cli).

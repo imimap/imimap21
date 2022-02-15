@@ -3,7 +3,7 @@ import { body, param, query } from "express-validator";
 import authMiddleware from "../authentication/middleware";
 import {
   createInternship,
-  findInternships,
+  findInternships, findInternshipsAmount, findInternshipsSeenAmount,
   getInternshipLocations,
   getInternshipsById,
   submitPdf,
@@ -17,20 +17,22 @@ import isBoolean = validator.isBoolean;
 
 const internshipRouter = Router();
 
+const standardQueryParams = [
+  "branchName",
+  "companyName",
+  "country",
+  "industry",
+  "mainLanguage",
+  "operationalArea",
+  "paymentType",
+  "programmingLanguage",
+  "size",
+];
+
 internshipRouter.get(
   "/",
   authMiddleware(),
-  query([
-    "branchName",
-    "companyName",
-    "country",
-    "industry",
-    "mainLanguage",
-    "operationalArea",
-    "paymentType",
-    "programmingLanguage",
-    "size",
-  ]).toUpperCase(),
+  query(standardQueryParams).toUpperCase(),
   query("semester")
     .toUpperCase()
     .custom((s) => Semester.isValidSemesterString(s) || !s),
@@ -39,6 +41,21 @@ internshipRouter.get(
     .custom((s) => (s ? isBoolean(s) : true)),
   validate,
   asyncHandler(findInternships)
+);
+
+internshipRouter.get(
+  "/amount",
+  authMiddleware(),
+  query(standardQueryParams).toUpperCase(),
+  validate,
+  asyncHandler(findInternshipsAmount)
+);
+
+internshipRouter.get(
+  "/seen/amount",
+  authMiddleware(),
+  validate,
+  asyncHandler(findInternshipsSeenAmount)
 );
 
 // @TODO: Wäre praktisch wenn die Company hier direkt gepopulated werden würde
@@ -61,24 +78,25 @@ internshipRouter.get(
   asyncHandler(getInternshipsById)
 );
 
+const standardPostParams = [
+  "startDate",
+  "endDate",
+  "tasks",
+  "operationalArea",
+  "livingCosts",
+  "salary",
+  "workingHoursPerWeek",
+  "programmingLanguages", //array
+  "paymentTypes", //enum, array
+  //supervisor
+  "supervisorFullName",
+  "supervisorEmailAddress",
+];
+
 internshipRouter.post(
   "/",
   authMiddleware(),
-  body([
-    "startDate",
-    "endDate",
-    "tasks",
-    "operationalArea",
-    "livingCosts",
-    "salary",
-    "workingHoursPerWeek",
-    "programmingLanguages", //array
-    "paymentTypes", //enum, array
-    //supervisor
-    "supervisorFullName",
-    "supervisorEmailAddress",
-    "companyId",
-  ]),
+  body(standardPostParams.concat("companyId")),
   validate,
   asyncHandler(createInternship)
 );
@@ -87,29 +105,18 @@ internshipRouter.patch(
   "/:id",
   authMiddleware(),
   param("id").custom(isObjectId),
-  query([
-    "startDate",
-    "endDate",
-    "tasks",
-    "operationalArea",
-    "livingCosts",
-    "salary",
-    "workingHoursPerWeek",
-    "programmingLanguages", //array
-    "paymentTypes", //enum, array
-    //supervisor
-    "supervisorFullName",
-    "supervisorEmailAddress",
-  ]),
+  query(standardPostParams),
   validate,
   asyncHandler(updateInternship)
 );
 
 /* PDF endpoints */
+const idRegEx = /[0-9a-f]{24}/;
+
 internshipRouter.post(
   "/:id/pdf/request",
   authMiddleware(),
-  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  param("id").custom((id) => idRegEx.test(id)),
   body("accept").optional().isBoolean(),
   body("reject").optional().isBoolean(),
   validate,
@@ -119,7 +126,7 @@ internshipRouter.post(
 internshipRouter.post(
   "/:id/pdf/lsfEctsProof",
   authMiddleware(),
-  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  param("id").custom((id) => idRegEx.test(id)),
   body("accept").optional().isBoolean(),
   body("reject").optional().isBoolean(),
   validate,
@@ -129,7 +136,7 @@ internshipRouter.post(
 internshipRouter.post(
   "/:id/pdf/locationJustification",
   authMiddleware(),
-  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  param("id").custom((id) => idRegEx.test(id)),
   body("accept").optional().isBoolean(),
   body("reject").optional().isBoolean(),
   validate,
@@ -139,7 +146,7 @@ internshipRouter.post(
 internshipRouter.post(
   "/:id/pdf/contract",
   authMiddleware(),
-  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  param("id").custom((id) => idRegEx.test(id)),
   body("accept").optional().isBoolean(),
   body("reject").optional().isBoolean(),
   validate,
@@ -149,7 +156,7 @@ internshipRouter.post(
 internshipRouter.post(
   "/:id/pdf/bvgTicketExemption",
   authMiddleware(),
-  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  param("id").custom((id) => idRegEx.test(id)),
   body("accept").optional().isBoolean(),
   body("reject").optional().isBoolean(),
   validate,
@@ -159,7 +166,7 @@ internshipRouter.post(
 internshipRouter.post(
   "/:id/pdf/certificate",
   authMiddleware(),
-  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  param("id").custom((id) => idRegEx.test(id)),
   body("accept").optional().isBoolean(),
   body("reject").optional().isBoolean(),
   validate,
@@ -169,7 +176,7 @@ internshipRouter.post(
 internshipRouter.post(
   "/:id/pdf/report",
   authMiddleware(),
-  param("id").custom((id) => /[0-91-f]{24}/.test(id)),
+  param("id").custom((id) => idRegEx.test(id)),
   body("accept").optional().isBoolean(),
   body("reject").optional().isBoolean(),
   validate,
