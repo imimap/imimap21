@@ -27,14 +27,14 @@
           <p> {{ $t("search.tooManyResults.question") }} </p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Back">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" :aria-label="$t('search.tooManyResults.buttonDecline')">
             {{ $t("search.tooManyResults.buttonDecline") }}
           </button>
           <button
             type="button"
             class="btn btn-htw-green"
             data-bs-dismiss="modal"
-            aria-label="Continue"
+            :aria-label="$t('search.tooManyResults.buttonConfirm')"
             v-on:click="$emit('search')">
             {{ $t("search.tooManyResults.buttonConfirm") }}
           </button>
@@ -53,5 +53,6 @@ export default defineComponent({
     amountOfResults: Number,
     amountOfInternshipsSeen: Number,
   },
+  emits: ['search']
 });
 </script>
