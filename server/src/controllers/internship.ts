@@ -338,7 +338,9 @@ export async function findInternshipsAmount(
 
   const internships = await Internship.aggregate(pipeline);
 
-  res.json(internships[0].totalCount[0].count);
+  const count = internships[0].totalCount.length > 0 ? internships[0].totalCount[0].count : 0;
+
+  res.json(count);
 }
 
 /**
