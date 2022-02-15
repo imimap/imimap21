@@ -288,6 +288,20 @@ import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
 import { Company } from '@/store/types/Company';
 import { showErrorNotification } from '@/utils/notification';
+import convertStringToArray from '@/utils/stringHelper';
+
+const possibleInternshipFields = [
+  'startDate',
+  'endDate',
+  'operationalArea',
+  'salary',
+  'payment',
+  'livingCosts',
+  'workingHoursPerWeek',
+  'supervisorFullName',
+  'supervisorEmailAddress',
+  'tasks',
+];
 
 // @TODO: Companies abfragen, wenn nicht neue erstellen und ID einfügen
 // @TODO: Formularfelder sind optional, Formular macht zum bearbeiten aber dennoch Sinn
@@ -315,7 +329,7 @@ export default defineComponent({
       operationalArea: null,
       programmingLanguages: null,
       salary: null,
-      payment: [] as string[],
+      payment: null,
       livingCosts: null,
       workingHoursPerWeek: null,
       company: null,
@@ -408,24 +422,27 @@ export default defineComponent({
         }
       }
     },
+    getInternshipObject(): { [k: string]: string | string[] } {
+      const internshipProps: { [k: string]: string | string[] } = {};
+
+      if (!this.existingCompany._id) {
+        throw new Error('Error: No company id found');
+      }
+      internshipProps.companyId = this.existingCompany._id;
+
+      if (this.programmingLanguages) {
+        internshipProps.proprammingLanguages = convertStringToArray(this.programmingLanguages);
+      }
+
+      possibleInternshipFields.forEach((prop) => {
+        if (this[prop]) internshipProps[prop] = this[prop];
+      });
+
+      return internshipProps;
+    },
     async postInternship() {
       try {
-        await http.post('/internships', {
-          startDate: this.startDate,
-          endDate: this.endDate,
-          operationalArea: this.operationalArea,
-          programmingLanguages: this.convertStringToArray(
-            this.programmingLanguages,
-          ),
-          salary: this.salary,
-          payment: this.payment,
-          livingCosts: this.livingCosts,
-          workingHoursPerWeek: this.workingHoursPerWeek,
-          companyId: this.existingCompany._id,
-          supervisorFullName: this.supervisorFullName,
-          supervisorEmailAddress: this.supervisorEmailAddress,
-          tasks: this.tasks,
-        });
+        await http.post('/internships', this.getInternshipObject());
         await this.$store.dispatch('addNotification', { text: 'Praktikum erfolgreich angelegt!', type: 'success' });
       } catch (err: any) {
         await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
@@ -470,10 +487,6 @@ export default defineComponent({
       this.newCompanyZip = null;
       this.newCompanyCity = null;
       this.newCompanyCountry = null;
-    },
-    convertStringToArray(string: string | null): string[] | null {
-      if (string === null) return string;
-      return string.split(', ').map((subStr) => subStr);
     },
   },
 });

@@ -147,6 +147,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
+import convertStringToArray from '@/utils/stringHelper';
 
 export default defineComponent({
   name: 'EditInternship',
@@ -210,7 +211,7 @@ export default defineComponent({
           startDate: this.newStartDate,
           endDate: this.newEndDate,
           operationalArea: this.newOperationalArea,
-          programmingLanguages: this.convertStringToArray(this.programmingLanguages),
+          programmingLanguages: convertStringToArray(this.programmingLanguages ?? ''),
           salary: this.salary,
           payment: this.newPayment,
           livingCosts: this.newLivingCosts,
@@ -237,10 +238,6 @@ export default defineComponent({
           type: 'danger',
         });
       }
-    },
-    convertStringToArray(string: string | null): string[] | null {
-      if (string === null) return string;
-      return string.split(', ').map((subStr) => subStr);
     },
   },
 });
