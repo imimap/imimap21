@@ -6,7 +6,8 @@
         <div class="row my-4">
           <div class="col">
             <label for="startDate">
-              {{ $t("internship.form.startDate") }} ($t("internship.form.currently"): {{startDate}})
+              {{ $t("internship.form.startDate") }}
+              ({{ $t("internship.form.currently") }}: {{startDate}})
             </label>
             <input v-model="newStartDate"
                    type="date"
@@ -16,7 +17,8 @@
           </div>
           <div class="col">
             <label for="startDate">
-              {{ $t("internship.form.endDate") }} ($t("internship.form.currently"): {{endDate}})
+              {{ $t("internship.form.endDate") }}
+              ({{ $t("internship.form.currently") }}: {{endDate}})
             </label>
             <input v-model="newEndDate"
                    type="date"
@@ -147,7 +149,20 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
-import convertStringToArray from '@/utils/stringHelper';
+import { capitalizeFirstLetter, convertStringToArray } from '@/utils/stringHelper';
+
+const possibleInternshipFields = [
+  'startDate',
+  'endDate',
+  'operationalArea',
+  'salary',
+  'payment',
+  'livingCosts',
+  'workingHoursPerWeek',
+  'supervisorFullName',
+  'supervisorEmailAddress',
+  'tasks',
+];
 
 export default defineComponent({
   name: 'EditInternship',
@@ -166,12 +181,12 @@ export default defineComponent({
       supervisorEmail: null,
       tasks: null,
 
-      newStartDate: '',
-      newEndDate: '',
+      newStartDate: null,
+      newEndDate: null,
       newOperationalArea: null,
       newProgrammingLanguages: null,
       newSalary: null,
-      newPayment: [] as string[],
+      newPayment: null,
       newLivingCosts: null,
       newWorkingHoursPerWeek: null,
       newSupervisorFullName: null,
@@ -205,21 +220,23 @@ export default defineComponent({
         console.log(err.message);
       }
     },
+    getInternshipObject(): { [k: string]: string | string[] } {
+      const internshipProps: { [k: string]: string | string[] } = {};
+
+      if (this.newProgrammingLanguages) {
+        internshipProps.proprammingLanguages = convertStringToArray(this.newProgrammingLanguages);
+      }
+
+      possibleInternshipFields.forEach((prop) => {
+        const newProp = `new${capitalizeFirstLetter(prop)}`;
+        if (this[newProp]) internshipProps[prop] = this[newProp];
+      });
+
+      return internshipProps;
+    },
     async save() {
       try {
-        const res = await http.patch(`/internships/${this.$route.params.id}`, {
-          startDate: this.newStartDate,
-          endDate: this.newEndDate,
-          operationalArea: this.newOperationalArea,
-          programmingLanguages: convertStringToArray(this.programmingLanguages ?? ''),
-          salary: this.salary,
-          payment: this.newPayment,
-          livingCosts: this.newLivingCosts,
-          workingHoursPerWeek: this.newWorkingHoursPerWeek,
-          supervisorFullName: this.newSupervisorFullName,
-          supervisorEmail: this.newSupervisorEmail,
-          tasks: this.newTasks,
-        });
+        const res = await http.patch(`/internships/${this.$route.params.id}`, this.getInternshipObject());
         this.$data = {
           ...res.data,
         };

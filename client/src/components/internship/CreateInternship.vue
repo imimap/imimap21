@@ -288,7 +288,7 @@ import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
 import { Company } from '@/store/types/Company';
 import { showErrorNotification } from '@/utils/notification';
-import convertStringToArray from '@/utils/stringHelper';
+import { convertStringToArray, capitalizeFirstLetter } from '@/utils/stringHelper';
 
 const possibleInternshipFields = [
   'startDate',
@@ -301,6 +301,21 @@ const possibleInternshipFields = [
   'supervisorFullName',
   'supervisorEmailAddress',
   'tasks',
+];
+
+const possibleCompanyFields = [
+  'branchName',
+  'emailAddress',
+  'industry',
+  'website',
+  'mainLanguage',
+  'size',
+  'street',
+  'streetNumber',
+  'additionalLines',
+  'zip',
+  'city',
+  'country',
 ];
 
 // @TODO: Companies abfragen, wenn nicht neue erstellen und ID einfügen
@@ -355,27 +370,6 @@ export default defineComponent({
         (lang) => ({ language: lang, languageName: this.availableLanguages[lang].name }),
       );
     },
-    possibleCompanyProps() {
-      const possibleCompanyProps = [
-        'branchName',
-        'emailAddress',
-        'industry',
-        'website',
-        'mainLanguage',
-        'size',
-        'street',
-        'streetNumber',
-        'additionalLines',
-        'zip',
-        'city',
-        'country',
-      ].map((key) => {
-        const firstChar = key.charAt(0).toUpperCase();
-        const remainingChars = key.slice(1);
-        return `newCompany${firstChar}${remainingChars}`;
-      });
-      return possibleCompanyProps;
-    },
   },
   methods: {
     async save() {
@@ -401,8 +395,9 @@ export default defineComponent({
       }
       companyProps.companyName = this.company;
 
-      this.possibleCompanyProps.forEach((prop) => {
-        if (this[prop]) companyProps[prop] = this[prop];
+      possibleCompanyFields.forEach((prop) => {
+        const newProp = `newCompany${capitalizeFirstLetter(prop)}`;
+        if (this[newProp]) companyProps[prop] = this[newProp];
       });
 
       return companyProps;
