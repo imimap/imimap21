@@ -287,6 +287,7 @@
 import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
 import { Company } from '@/store/types/Company';
+import { showErrorNotification } from '@/utils/notification';
 
 // @TODO: Companies abfragen, wenn nicht neue erstellen und ID einfügen
 // @TODO: Formularfelder sind optional, Formular macht zum bearbeiten aber dennoch Sinn
@@ -340,6 +341,27 @@ export default defineComponent({
         (lang) => ({ language: lang, languageName: this.availableLanguages[lang].name }),
       );
     },
+    possibleCompanyProps() {
+      const possibleCompanyProps = [
+        'branchName',
+        'emailAddress',
+        'industry',
+        'website',
+        'mainLanguage',
+        'size',
+        'street',
+        'streetNumber',
+        'additionalLines',
+        'zip',
+        'city',
+        'country',
+      ].map((key) => {
+        const firstChar = key.charAt(0).toUpperCase();
+        const remainingChars = key.slice(1);
+        return `newCompany${firstChar}${remainingChars}`;
+      });
+      return possibleCompanyProps;
+    },
   },
   methods: {
     async save() {
@@ -357,33 +379,32 @@ export default defineComponent({
         return false;
       }
     },
+    getCompanyObject(): { [k: string]: string } {
+      const companyProps: { [k: string]: string } = {};
+
+      if (!this.company) {
+        throw new Error('Error: A company name needs to be entered!');
+      }
+      companyProps.companyName = this.company;
+
+      this.possibleCompanyProps.forEach((prop) => {
+        if (this[prop]) companyProps[prop] = this[prop];
+      });
+
+      return companyProps;
+    },
     async createNewCompany() {
       if (await this.companyExists()) {
         this.toggleAddCompanyForm = !this.toggleAddCompanyForm;
       } else {
         try {
-          const res = await http.post('/companies', {
-            companyName: this.company,
-            branchName: this.newCompanyBranchName,
-            emailAddress: this.newCompanyEmailAddress,
-            industry: this.newCompanyIndustry,
-            website: this.newCompanyWebsite,
-            mainLanguage: this.newCompanyMainLanguage,
-            size: this.newCompanySize,
-            street: this.newCompanyStreet,
-            streetNumber: this.newCompanyStreetNumber,
-            additionalLines: this.newCompanyAdditionalLines,
-            zip: this.newCompanyZip,
-            city: this.newCompanyCity,
-            country: this.newCompanyCountry,
-          });
-          console.log(res.data);
+          const res = await http.post('/companies', this.getCompanyObject());
           this.existingCompany = res.data;
           await this.$store.dispatch('addNotification', { text: 'Firma erfolgreich angelegt!', type: 'success' });
           this.toggleAddCompanyForm = false;
           this.clearNewCompanyForm();
         } catch (err: any) {
-          await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
+          await showErrorNotification(err);
         }
       }
     },

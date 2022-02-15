@@ -206,20 +206,18 @@ export default defineComponent({
     },
     async save() {
       try {
-        const res = await http.patch(`/internships/${this.$route.params.id}`, null, {
-          params: {
-            startDate: this.newStartDate,
-            endDate: this.newEndDate,
-            operationalArea: this.newOperationalArea,
-            programmingLanguages: this.convertStringToArray(this.programmingLanguages),
-            salary: this.salary,
-            payment: this.newPayment,
-            livingCosts: this.newLivingCosts,
-            workingHoursPerWeek: this.newWorkingHoursPerWeek,
-            supervisorFullName: this.newSupervisorFullName,
-            supervisorEmail: this.newSupervisorEmail,
-            tasks: this.newTasks,
-          },
+        const res = await http.patch(`/internships/${this.$route.params.id}`, {
+          startDate: this.newStartDate,
+          endDate: this.newEndDate,
+          operationalArea: this.newOperationalArea,
+          programmingLanguages: this.convertStringToArray(this.programmingLanguages),
+          salary: this.salary,
+          payment: this.newPayment,
+          livingCosts: this.newLivingCosts,
+          workingHoursPerWeek: this.newWorkingHoursPerWeek,
+          supervisorFullName: this.newSupervisorFullName,
+          supervisorEmail: this.newSupervisorEmail,
+          tasks: this.newTasks,
         });
         this.$data = {
           ...res.data,
