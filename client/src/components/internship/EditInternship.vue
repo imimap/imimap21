@@ -206,20 +206,23 @@ export default defineComponent({
       const dateWithoutTime = new Date(date).toISOString().split('T')[0].toString();
       return dateWithoutTime;
     },
+    updateData(data) {
+      this.startDate = this.normalizedDate(data.startDate) ?? this.startDate;
+      this.endDate = this.normalizedDate(data.startDate) ?? this.endDate;
+      this.operationalArea = data.operationalArea ?? this.operationalArea;
+      this.programmingLanguages = data.programmingLanguages.toString().split(',').join(', ') ?? this.programmingLanguages;
+      this.salary = data.salary ?? this.salary;
+      this.payment = data.paymentTypes ?? this.payment;
+      this.livingCosts = data.livingCosts ?? this.livingCosts;
+      this.workingHoursPerWeek = data.workingHoursPerWeek ?? this.workingHoursPerWeek;
+      this.supervisorFullName = data.supervisor.fullName ?? this.supervisorFullName;
+      this.supervisorEmail = data.supervisor.emailAddress ?? this.supervisorEmail;
+      this.tasks = data.tasks ?? this.tasks;
+    },
     async getInternship() {
       try {
         const res = await http.get(`/internships/${this.$route.params.id}`);
-        this.startDate = this.normalizedDate(res.data.startDate) ?? null;
-        this.endDate = this.normalizedDate(res.data.startDate) ?? null;
-        this.operationalArea = res.data.operationalArea ?? null;
-        this.programmingLanguages = res.data.programmingLanguages.toString().split(',').join(', ') ?? null;
-        this.salary = res.data.salary ?? null;
-        this.payment = res.data.paymentTypes ?? null;
-        this.livingCosts = res.data.livingCosts ?? null;
-        this.workingHoursPerWeek = res.data.workingHoursPerWeek ?? null;
-        this.supervisorFullName = res.data.supervisor.fullName ?? null;
-        this.supervisorEmail = res.data.supervisor.emailAddress ?? null;
-        this.tasks = res.data.tasks ?? null;
+        this.updateData(res.data);
       } catch (err: any) {
         await showErrorNotification(`Fehler beim Abfragen der bisherigen Praktikumsinformationen [ERROR: ${err.message}]`);
       } finally {
@@ -243,9 +246,7 @@ export default defineComponent({
     async save() {
       try {
         const res = await http.patch(`/internships/${this.$route.params.id}`, this.getInternshipObject());
-        this.$data = {
-          ...res.data,
-        };
+        this.updateData(res.data);
         await showSuccessNotification('Praktikum erfolgreich gespeichert!');
       } catch (err: any) {
         await showErrorNotification(`Fehler beim Speichern des Praktikums [ERROR: ${err.message}]`);
