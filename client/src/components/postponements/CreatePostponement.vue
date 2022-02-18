@@ -1,18 +1,18 @@
 <template>
     <div id="form-block4" class="text-left">
       <form v-on:submit.prevent>
-        <h3>Antrag auf Verschiebung des Praktikums</h3>
+        <h3>{{ $t("postponement.heading") }}</h3>
         <div class="pl-5">
           <div class="row">&nbsp;</div>
           <div class="row">
             <div class="field">
-              Ich möchte mein Praktikum nicht im 4. Fachsemester absolvieren.
+              {{ $t("postponement.statement") }}
             </div>
           </div>
           <div class="row">&nbsp;</div>
           <div class="row">
             <div class="field">
-              Ich beantrage eine Verschiebung auf das
+              {{ $t("postponement.request") }}:
               <select v-model="this.newSemester" class="required">
                 <option
                   v-for="semester in this.nextSemesters"
@@ -27,9 +27,9 @@
           <div class="row">&nbsp;</div>
           <div class="row">
             <div class="form-group max required">
-              Dieses wird mein
+              {{ $t("postponement.info") }}:
               <label class="sr-only" for="postponementSemester">
-                Semester of study
+                {{ $t("postponement.semesterOfStudy") }}
               </label>
               <input
                 v-model="this.newSemesterOfStudy"
@@ -38,13 +38,14 @@
                 type="number"
                 min="4"
                 id="postponementSemester"/>
-              . Fachsemester sein.
             </div>
           </div>
           <div class="row">&nbsp;</div>
           <div class="row">
             <div class="form-group">
-              <label for="postponementReason" class="required">Begründung</label>
+              <label for="postponementReason" class="required">
+                {{ $t("postponement.reason") }}
+              </label>
               <textarea
                 v-model="this.reason"
                 cols="50"
@@ -59,7 +60,7 @@
                 v-on:click="savePostponement"
                 type="submit"
                 class="btn btn-secondary">
-                Verschiebung beantragen
+                {{ $t("actions.send") }}
               </button>
             </div>
           </div>
