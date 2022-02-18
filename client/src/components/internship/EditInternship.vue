@@ -7,24 +7,24 @@
           <div class="col">
             <label for="startDate">
               {{ $t("internship.form.startDate") }}
-              ({{ $t("internship.form.currently") }}: {{startDate}})
+              <span v-if="startDate">({{ $t("internship.form.currently") }}: {{startDate}})</span>
             </label>
             <input v-model="newStartDate"
                    type="date"
                    id="startDate"
                    class="form-control"
-                   :placeholder="startDate"/>
+                   :placeholder="startDate ?? false"/>
           </div>
           <div class="col">
             <label for="startDate">
               {{ $t("internship.form.endDate") }}
-              ({{ $t("internship.form.currently") }}: {{endDate}})
+              <span v-if="endDate">({{ $t("internship.form.currently") }}: {{endDate}})</span>
             </label>
             <input v-model="newEndDate"
                    type="date"
                    id="endDate"
                    class="form-control"
-                   :placeholder="endDate"/>
+                   :placeholder="endDate ?? false"/>
           </div>
         </div>
 
@@ -35,7 +35,7 @@
                    type="text"
                    class="form-control"
                    id="operationalArea"
-                   :placeholder="operationalArea || $t('internship.form.operationalArea')"/>
+                   :placeholder="operationalArea ?? $t('internship.form.operationalArea')"/>
           </div>
           <div class="col">
             <label for="programmingLanguages">
@@ -45,7 +45,7 @@
                    type="text"
                    class="form-control"
                    id="programmingLanguages"
-                   :placeholder="programmingLanguages || $t('internship.form.programmingLanguages')"
+                   :placeholder="programmingLanguages ?? $t('internship.form.programmingLanguages')"
             />
           </div>
         </div>
@@ -58,7 +58,7 @@
                    min="0"
                    class="form-control"
                    id="salary"
-                   :placeholder="salary || $t('internship.form.salary')"/>
+                   :placeholder="salary ?? $t('internship.form.salary')"/>
           </div>
           <div class="col">
             <label for="paymentType">{{ $t('internship.form.paymentType') }}</label>
@@ -89,7 +89,7 @@
                    min="0"
                    class="form-control"
                    id="livingCosts"
-                   :placeholder="livingCosts || $t('internship.form.livingCosts')"/>
+                   :placeholder="livingCosts ?? $t('internship.form.livingCosts')"/>
           </div>
           <div class="col">
             <label for="workingHoursPerWeek">{{ $t('internship.form.workingHoursPerWeek') }}</label>
@@ -97,7 +97,7 @@
                    min="0"
                    class="form-control"
                    id="workingHoursPerWeek"
-                   :placeholder="workingHoursPerWeek || $t('internship.form.workingHoursPerWeek')"/>
+                   :placeholder="workingHoursPerWeek ?? $t('internship.form.workingHoursPerWeek')"/>
           </div>
         </div>
 
@@ -109,7 +109,7 @@
                      type="text"
                      class="form-control"
                      id="supervisorFullName"
-                     :placeholder="supervisorFullName || $t('company.supervisor.name')"/>
+                     :placeholder="supervisorFullName ?? $t('company.supervisor.name')"/>
             </div>
             <div>
               <label for="supervisorEmail">{{ $t('company.supervisor.email') }}</label>
@@ -117,7 +117,7 @@
                      type="text"
                      class="form-control"
                      id="supervisorEmail"
-                     :placeholder="supervisorEmail || $t('company.supervisor.email')"/>
+                     :placeholder="supervisorEmail ?? $t('company.supervisor.email')"/>
             </div>
           </div>
           <div class="col">
@@ -127,7 +127,7 @@
                       id="tasks"
                       cols="30"
                       rows="6"
-                      :placeholder="tasks || $t('internship.form.tasks')"/>
+                      :placeholder="tasks ?? $t('internship.form.tasks')"/>
           </div>
         </div>
 
@@ -150,6 +150,7 @@
 import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
 import { capitalizeFirstLetter, convertStringToArray } from '@/utils/stringHelper';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
 
 const possibleInternshipFields = [
   'startDate',
@@ -169,8 +170,8 @@ export default defineComponent({
   data() {
     return {
       loadingState: true,
-      startDate: '',
-      endDate: '',
+      startDate: null as unknown as string,
+      endDate: null as unknown as string,
       operationalArea: null,
       programmingLanguages: null,
       salary: null,
@@ -201,23 +202,28 @@ export default defineComponent({
     await this.getInternship();
   },
   methods: {
+    normalizedDate(date: string): string {
+      const dateWithoutTime = new Date(date).toISOString().split('T')[0].toString();
+      return dateWithoutTime;
+    },
     async getInternship() {
       try {
         const res = await http.get(`/internships/${this.$route.params.id}`);
-        this.startDate = new Date(res.data.startDate).toISOString().split('T')[0].toString();
-        this.endDate = new Date(res.data.endDate).toISOString().split('T')[0].toString();
-        this.operationalArea = res.data.operationalArea;
-        this.programmingLanguages = res.data.programmingLanguages.toString().split(',').join(', ');
-        this.salary = res.data.salary;
-        this.payment = res.data.paymentTypes;
-        this.livingCosts = res.data.livingCosts;
-        this.workingHoursPerWeek = res.data.workingHoursPerWeek;
-        this.supervisorFullName = res.data.supervisor.fullName;
-        this.supervisorEmail = res.data.supervisor.emailAddress;
-        this.tasks = res.data.tasks;
-        this.loadingState = false;
+        this.startDate = this.normalizedDate(res.data.startDate) ?? null;
+        this.endDate = this.normalizedDate(res.data.startDate) ?? null;
+        this.operationalArea = res.data.operationalArea ?? null;
+        this.programmingLanguages = res.data.programmingLanguages.toString().split(',').join(', ') ?? null;
+        this.salary = res.data.salary ?? null;
+        this.payment = res.data.paymentTypes ?? null;
+        this.livingCosts = res.data.livingCosts ?? null;
+        this.workingHoursPerWeek = res.data.workingHoursPerWeek ?? null;
+        this.supervisorFullName = res.data.supervisor.fullName ?? null;
+        this.supervisorEmail = res.data.supervisor.emailAddress ?? null;
+        this.tasks = res.data.tasks ?? null;
       } catch (err: any) {
-        console.log(err.message);
+        await showErrorNotification(`Fehler beim Abfragen der bisherigen Praktikumsinformationen [ERROR: ${err.message}]`);
+      } finally {
+        this.loadingState = false;
       }
     },
     getInternshipObject(): { [k: string]: string | string[] } {
@@ -240,9 +246,9 @@ export default defineComponent({
         this.$data = {
           ...res.data,
         };
-        await this.$store.dispatch('addNotification', { text: 'Praktikum erfolgreich gespeichert!', type: 'success' });
+        await showSuccessNotification('Praktikum erfolgreich gespeichert!');
       } catch (err: any) {
-        await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
+        await showErrorNotification(`Fehler beim Speichern des Praktikums [ERROR: ${err.message}]`);
       }
     },
     async getAvailablePaymentTypes() {
@@ -250,10 +256,7 @@ export default defineComponent({
         const res = await http.get('/info/payment-types');
         this.availablePaymentTypes = res.data;
       } catch (err: any) {
-        await this.$store.dispatch('addNotification', {
-          text: `Fehler beim laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`,
-          type: 'danger',
-        });
+        await showErrorNotification(`Fehler beim Laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`);
       }
     },
   },
