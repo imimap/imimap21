@@ -26,8 +26,8 @@
           </div>
           <div class="row">&nbsp;</div>
           <div class="row">
-            Dieses wird mein
             <div class="form-group max" >
+              Dieses wird mein
               <label class="sr-only" for="postponementSemester">
                 Semester of study
               </label>
@@ -38,8 +38,8 @@
                 type="number"
                 min="4"
                 id="postponementSemester"/>
+              . Fachsemester sein.
             </div>
-            . Fachsemester sein.
           </div>
           <div class="row">&nbsp;</div>
           <div class="row">
@@ -53,15 +53,18 @@
                 id="postponementReason"/>
             </div>
           </div>
-          <div class="row">
-            <div class="actions">
+          <div class="row my-4">
+            <div class="col-md-4">
               <button
                 v-on:click="savePostponement"
                 type="submit"
-                class="btn btn-secondary my-4">
+                class="btn btn-secondary">
                 Verschiebung beantragen
               </button>
             </div>
+          </div>
+          <div class="row mt-3">
+            <a href="javascript:history.back()">{{ $t("actions.back") }}</a>
           </div>
         </div>
       </form>
