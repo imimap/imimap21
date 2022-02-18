@@ -13,7 +13,7 @@
           <div class="row">
             <div class="field">
               Ich beantrage eine Verschiebung auf das
-              <select v-model="this.newSemester">
+              <select v-model="this.newSemester" class="required">
                 <option
                   v-for="semester in this.nextSemesters"
                   v-bind:key="semester"
@@ -26,7 +26,7 @@
           </div>
           <div class="row">&nbsp;</div>
           <div class="row">
-            <div class="form-group max" >
+            <div class="form-group max required">
               Dieses wird mein
               <label class="sr-only" for="postponementSemester">
                 Semester of study
@@ -44,12 +44,12 @@
           <div class="row">&nbsp;</div>
           <div class="row">
             <div class="form-group">
-              <label for="postponementReason">Begründung</label>
+              <label for="postponementReason" class="required">Begründung</label>
               <textarea
                 v-model="this.reason"
                 cols="50"
                 rows="10"
-                class="form-control required"
+                class="form-control"
                 id="postponementReason"/>
             </div>
           </div>
