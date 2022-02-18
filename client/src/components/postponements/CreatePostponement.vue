@@ -14,9 +14,14 @@
             <div class="field">
               Ich beantrage eine Verschiebung auf das
               <select v-model="this.newSemester">
-                <option value="WS2021">WS 21/22</option>
-                <option value="SS2022">SS 22</option>
-                <option value="WS2022">WS 22/223</option></select>
+                <option
+                  v-for="semester in this.nextSemesters"
+                  v-bind:key="semester"
+                  v-bind:newSemester="semester"
+                  :value="semester">
+                  {{ semester }}
+                </option>
+              </select>
             </div>
           </div>
           <div class="row">&nbsp;</div>
@@ -31,6 +36,7 @@
                 cols="5"
                 class="form-control"
                 type="number"
+                min="1"
                 id="postponementSemester"/>
             </div>
             . Fachsemester sein.
@@ -65,16 +71,28 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
-import store from '@/store';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
 
 export default defineComponent({
   name: 'CreatePostponement',
   data() {
     return {
-      newSemester: null,
-      newSemesterOfStudy: null,
+      newSemester: '' as string,
+      newSemesterOfStudy: 5,
       reason: '',
+      nextSemesters: [] as string[],
     };
+  },
+  async created() {
+    let res;
+    try {
+      res = await http.get('/info/semesters/upcoming');
+      this.nextSemesters = res.data;
+      // eslint-disable-next-line prefer-destructuring
+      this.newSemester = res.data[0];
+    } catch (err: any) {
+      await showErrorNotification(`Fehler beim Anfragen der Namen der folgenden Semester [ERROR: ${err.message}]`);
+    }
   },
   methods: {
     async savePostponement() {
@@ -85,16 +103,12 @@ export default defineComponent({
           newSemesterOfStudy,
           reason,
         });
-        await store.dispatch('addNotification', { text: 'Verschiebung erfolgreich beantragt!', type: 'success' });
+        await showSuccessNotification('Verschiebung erfolgreich beantragt!');
         await this.$router.push({ name: 'InternshipModuleIndex' });
       } catch (err: any) {
-        await this.$store.dispatch('addNotification', { text: `Fehler beim Beantragen der Verschiebung [ERROR: ${err.message}]`, type: 'danger' });
+        await showErrorNotification(`Fehler beim Beantragen der Verschiebung [ERROR: ${err.message}]`);
       }
     },
   },
 });
 </script>
-
-<style lang="scss">
-
-</style>
