@@ -36,7 +36,7 @@
                 cols="5"
                 class="form-control"
                 type="number"
-                min="1"
+                min="4"
                 id="postponementSemester"/>
             </div>
             . Fachsemester sein.
@@ -49,7 +49,7 @@
                 v-model="this.reason"
                 cols="50"
                 rows="10"
-                class="form-control"
+                class="form-control required"
                 id="postponementReason"/>
             </div>
           </div>
