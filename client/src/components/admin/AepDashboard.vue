@@ -29,6 +29,20 @@
         </div>
       </div>
 
+      <div class="col-lg-4 col-md-6 d-flex">
+        <div class="card text-center">
+          <div class="card-body d-flex flex-column">
+            <p class="card-text">
+              Hier können Sie die Antworten der Studis auf die Fragen überprüfen.
+            </p>
+            <router-link
+              class="btn btn-success text-white align-self-end mx-auto mt-auto" to="reviews">
+              Fragen überprüfen
+            </router-link>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
@@ -77,12 +91,6 @@ template {
 
 .table-nav button {
   margin-right: 20px;
-}
-
-.text-htw {
-  color: rgba(119, 185, 0, 1);
-  width: 5rem;
-  height: 5rem;
 }
 
 </style>

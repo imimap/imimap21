@@ -29,7 +29,6 @@ import { availableLocales, defaultLocale } from '@/locales/locales';
 import Internship from '@/views/Internship.vue';
 import CreateInternship from '@/components/internship/CreateInternship.vue';
 import EditInternship from '@/components/internship/EditInternship.vue';
-// Nima -------------------------------------------------------
 import AepDashboard from '@/components/admin/AepDashboard.vue';
 import QuestionsList from '@/components/question/QuestionsList.vue';
 import CreateQuestion from '@/components/question/CreateQuestion.vue';
@@ -37,6 +36,7 @@ import EditQuestion from '@/components/question/EditQuestion.vue';
 import CreateEvaluation from '@/components/evaluation/CreateEvaluation.vue';
 import EvaluationsList from '@/components/evaluation/EvaluationsList.vue';
 import EvaluationFormStudent from '@/components/evaluation/EvaluationFormStudent.vue';
+import ReviewQuestions from '@/components/question/ReviewQuestions.vue';
 
 // @TODO: Router auf Modules aufteilen
 const routes: Array<RouteRecordRaw> = [
@@ -241,6 +241,14 @@ const routes: Array<RouteRecordRaw> = [
             path: 'newEvaluation',
             name: 'CreateEvaluation',
             component: CreateEvaluation,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+          {
+            path: 'reviews',
+            name: 'ReviewQuestions',
+            component: ReviewQuestions,
             meta: {
               allowAnonymous: false,
             },

@@ -782,7 +782,6 @@ export async function updateAnswerOnInternship(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  console.log('We are here in controller, what is next?');
   const user = await User.findOne({ emailAddress: req.user?.email })
     .select("isAdmin studentProfile")
     .populate({
@@ -803,10 +802,67 @@ export async function updateAnswerOnInternship(
   // @ts-ignore
   const question = internshipToUpdate.evaluationFile.questions.id(req.query.id);
   question.answerTextContent = req.query.answerTextContent;
-  question.isAnswerPublished = req.query.isAnswerPublished;
+  question.studentAllowsToPublish = req.query.studentAllowsToPublish;
   question.answerUpdatedAt = Date.now();
   const savedInternship = await internshipToUpdate.save();
   if (!savedInternship) return next(new BadRequest("Could not update internship"));
 
   res.json(internshipToUpdate);
+}
+
+/**
+ *
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function getInternshipEvaluation(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
+  if (!user) return next(new NotFound("User not found"));
+  if (!user.isAdmin) return next(new Forbidden("Only admins may get the internships."));
+
+  const internships = await Internship.find({ 'evaluationFile.inSemester': req.query.semester });
+  if (!internships) return next(new NotFound("No Internship with evaluation files found"));
+
+  const mapInternshipsIdQuestions = new Map();
+
+  for(const internship of internships) {
+    const internshipModule = await InternshipModule.find({ internships: internship.id });
+    const student = await User.findOne({ "studentProfile.internship": internshipModule[0]._id });
+    // @ts-ignore
+    const question = internship.evaluationFile.questions.id(req.query.questionId);
+    mapInternshipsIdQuestions.set(internship.id,{question, student});
+  }
+
+  res.json(Array.from(mapInternshipsIdQuestions));
+}
+
+/**
+ *
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function updateAnswerToPublish(req: Request, res: Response, next: NextFunction): Promise<void> {
+
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
+  if (!user) return next(new NotFound("User not found"));
+  if (!user.isAdmin) return next(new Forbidden("Only admins may get/edit the internships."));
+
+  const internshipToUpdate = await Internship.findById(req.params.id);
+  if (!internshipToUpdate) return next(new NotFound("Internship not found"));
+
+  console.log(internshipToUpdate);
+  console.log(req.query.questionId);
+
+  // @ts-ignore
+  const question = internshipToUpdate.evaluationFile.questions.id(req.query.questionId);
+  console.log(question);
+  question.isAnswerReviewed = req.query.isAnswerReviewed;
+  question.isAnswerPublished = req.query.isAnswerPublished;
+
+  const savedInternship = await internshipToUpdate.save();
+  if (!savedInternship) return next(new BadRequest("Could not update internship"));
+
+  res.json(savedInternship);
 }

@@ -8,7 +8,7 @@
               <router-link
                 class="btn btn-success text-white align-self-end mx-auto mt-auto"
                 to="newQuestion">
-                Neue Vorlage
+                Neue Frage
               </router-link>
             </div>
           </div>
@@ -40,12 +40,11 @@
             </div>
           </div>
           <div v-if="!isLoading" class="accordion rounded-3" id="listAccordion">
-            <div v-if="questionsWithSearch.length == 0">
+            <div v-if="questionsWithSearch.length === 0">
               <hr>
               <h5>
                 <span class="alert alert-warning d-flex justify-content-center align-items-center">
-                  Sei der Mutige und stell die erste Frage.
-                Du musst nur auf den grünen Button oben klicken ;-)
+                  Es ist die Zeit die erste Frage zu stellen.
                 </span>
               </h5>
             </div>
@@ -67,10 +66,10 @@
                         </div>
                         <div class="col-1">
                           <h6 class="list-item-label">Aktiv</h6>
-                          <div v-if="row.isQuestionActive == true">
+                          <div v-if="row.isQuestionActive === true">
                             <span class="fw-bold">Ja</span>
                           </div>
-                          <div v-else-if="row.isQuestionActive == false">
+                          <div v-else-if="row.isQuestionActive === false">
                             <span class="fw-bold">Nein</span>
                           </div>
                         </div>
@@ -163,12 +162,7 @@ export default defineComponent({
   methods: {
     getDateString,
 
-    ifSureToExit() {
-      const userDoubleChecked = window.confirm('Sicher das Fenster schließen?');
-      return userDoubleChecked;
-    },
     updateList() {
-      // API call for GET list with params
       this.isLoading = true;
       getQuestionsList()
         .then((list) => {

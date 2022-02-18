@@ -21,7 +21,7 @@
               </div>
               <br>
               <div id="tblQue" style="display: none">
-                <div v-if="questionsToShow.length == 0">
+                <div v-if="questionsToShow.length === 0">
                   <fieldset class="alert alert-warning form-group border p-3">
                     <h5>
                       <span class="d-flex justify-content-center align-items-center">
@@ -33,7 +33,7 @@
                   <br>
                 </div>
                 <fieldset class="form-group border p-3">
-                  <div v-if="counterQuestion==0">
+                  <div v-if="counterQuestion === 0">
                     <h6>Sie haben noch keine Fragen ausgewählt.</h6>
                   </div>
                   <div v-else>
@@ -42,14 +42,14 @@
                 </fieldset>
                 <br>
                 <fieldset class="form-group border p-3" title="Bitte erst eine Frage auswählen.">
-                  <div><input class="form-check-input" type="checkbox"
+                  <div>
+                    <input class="form-check-input" type="checkbox"
                               id="checkboxOrder"
                               value="0" v-on:change="enableOrder" disabled>
                     <label for="checkboxOrder">
                       &nbsp;&nbsp; Ich möchte, dass die Fragen in der gewünschten Reihenfolge
                       ab Anfang des Semesters angezeigt werden.</label>
                   </div>
-                  <div></div>
                 </fieldset>
                 <br>
                 <fieldset class="form-group border p-3">

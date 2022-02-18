@@ -88,7 +88,7 @@
                           <button class="btn btn-success btn-htw-green"
                                   type="submit"
                                   v-on:click="saveMyAnswer
-                                  (row._id, row.answerTextContent, row.isAnswerPublished)">
+                                  (row._id, row.answerTextContent, row.studentAllowsToPublish)">
                             {{ $t("evaluationFormStudent.footer.buttonPost") }}
                           </button>
                         </div>
@@ -96,7 +96,7 @@
                       <div class="col-md-10">
                         <input class="form-check-input" type="checkbox"
                                id="checkboxForPublish"
-                               v-model="row.isAnswerPublished"
+                               v-model="row.studentAllowsToPublish"
                                @change="onCheckboxChange($event)"
                                title="Bitte vergessen Sie nicht, den neuen Zustand zu speichern.">
                         <label>
@@ -143,7 +143,7 @@ export default defineComponent({
       endDate: '',
       inSemester: '',
       evaluationFile: new Evaluation(),
-      isAnswerPublished: false,
+      studentAllowsToPublish: false,
       isLoading: false,
       iChanged: '',
       content: '',
@@ -158,7 +158,7 @@ export default defineComponent({
   methods: {
     getDateString,
     onCheckboxChange(event) {
-      this.isAnswerPublished = event.target.checked;
+      this.studentAllowsToPublish = event.target.checked;
       if (this.iChanged === 'changed') {
         this.iChanged = '';
       } else {
@@ -220,7 +220,7 @@ export default defineComponent({
             params: {
               answerTextContent: this.content,
               id: questionId,
-              isAnswerPublished: isAnswerChecked,
+              studentAllowsToPublish: isAnswerChecked,
             },
           });
           await this.$store.dispatch('addNotification', {

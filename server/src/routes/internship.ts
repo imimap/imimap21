@@ -9,6 +9,8 @@ import {
   submitPdf,
   updateInternship,
   updateAnswerOnInternship,
+  getInternshipEvaluation,
+  updateAnswerToPublish,
 } from "../controllers/internship";
 import { isObjectId, validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
@@ -52,6 +54,17 @@ internshipRouter.get(
     .custom((s) => Semester.isValidSemesterString(s) || s === ""),
   validate,
   asyncHandler(getInternshipLocations)
+);
+
+internshipRouter.get(
+  "/internshipsWithEvaluation",
+  authMiddleware(),
+  query("semester")
+    .toUpperCase()
+    .optional()
+    .custom((s) => Semester.isValidSemesterString(s) || s === ""),
+  validate,
+  asyncHandler(getInternshipEvaluation)
 );
 
 internshipRouter.get(
@@ -189,6 +202,19 @@ internshipRouter.patch(
   ]),
   validate,
   asyncHandler(updateAnswerOnInternship)
+);
+
+internshipRouter.patch(
+  "/:id/updateAnswerToPublish",
+  authMiddleware(),
+  param("id").custom(isObjectId),
+  query([
+    "questionId",
+    "isAnswerReviewed",
+    "isAnswerPublished"
+  ]),
+  validate,
+  asyncHandler(updateAnswerToPublish)
 );
 
 export default internshipRouter;
