@@ -553,7 +553,7 @@ export default defineComponent({
       }
       this.isLoading = false;
     },
-    resetResults() {
+    async resetResults() {
       this.currentSorting = '';
       this.currentFilterSemester = '';
       this.currentFilterStatus = '';

@@ -27,6 +27,9 @@
               Name, Zweig oder Ort
             </div>
         </div>
+         <div class="col-lg-3 col-md-12 reset" >
+           <button @click="resetResults()">Zurücksetzen</button>
+          </div>
       </div>
 
         <div v-if="!isLoading" class="accordion" id="listAccordion">
@@ -297,6 +300,12 @@ export default defineComponent({
           this.isLoading = false;
         }).catch((err) => console.log(err));
     },
+    async resetResults() {
+      this.currentSorting = '';
+      this.currentSearch = '';
+      this.companies = [];
+      this.updateList();
+    },
     changeCurrentEditCompanyIndex(companyId: string) {
       const index = this.companies.findIndex((x) => x.id === companyId);
       this.currentEditCompanyIndex = index;
@@ -381,6 +390,17 @@ export default defineComponent({
     color: rgba(119, 185, 0, 1);
     width: 3rem;
     height: 3rem;
+  }
+
+  .reset {
+    margin-top: 0.5em;
+  }
+  .reset > button {
+    background: rgba(119, 185, 0, 1);
+    color: white;
+    border-style: none;
+    border-radius: 3px;
+    font-size: 15px;
   }
 
 </style>
