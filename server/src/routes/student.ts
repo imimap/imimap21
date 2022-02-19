@@ -3,7 +3,12 @@ import { param, query } from "express-validator";
 import authMiddleware from "../authentication/middleware";
 import { isObjectId, validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
-import { clearInternshipSearchHistory, getStudentById, getStudents } from "../controllers/student";
+import {
+  clearInternshipSearchHistory,
+  getStudentById,
+  getStudents,
+  // getAllStudents,
+} from "../controllers/student";
 import { Semester } from "../helpers/semesterHelper";
 
 const studentRouter = Router();
@@ -16,6 +21,8 @@ studentRouter.get(
   validate,
   asyncHandler(getStudents)
 );
+
+// studentRouter.get("/", authMiddleware(true), validate, asyncHandler(getAllStudents));
 
 studentRouter.get(
   "/:id",

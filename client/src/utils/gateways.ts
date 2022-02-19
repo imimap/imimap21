@@ -1,6 +1,14 @@
 import apiClient from '@/utils/http-common';
 
-export const getStudentsList = async (semester: string) => apiClient
+export const getStudentsList = async () => apiClient
+  .get('/students')
+  .then((res) => res.data)
+  .catch((err) => {
+    console.log(err);
+    return [];
+  });
+
+export const getStudentsListWithSemester = async (semester: string) => apiClient
   .get(`/students?semester=${semester}`)
   .then((res) => res.data)
   .catch((err) => {
