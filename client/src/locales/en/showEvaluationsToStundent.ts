@@ -6,7 +6,7 @@ const showEvaluationsToStudent = {
     userSaid: 'has reported on this in',
     userSaidEnd: '',
     anonymSaid: 'has one of your fellow students reported on this.',
-    writeEmail: ' might help you with your questions about this internship: ',
+    writeEmail: 'Write to',
   },
 };
 

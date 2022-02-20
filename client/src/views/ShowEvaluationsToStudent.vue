@@ -4,7 +4,7 @@
       <div class="col-12">
         <fieldset class="form-group border p-3">
           <div v-if="!isLoading" class="accordion rounded-3" id="listAccordion">
-            <div v-if="internshipsAndQuestions.length == 1">
+            <div v-if="internshipsAndQuestions.length === 1">
               <h5>
                 <span class="alert alert-warning d-flex justify-content-center align-items-center">
                   {{ $t("showEvaluationsToStudent.notice.notFound") }}
@@ -36,11 +36,14 @@
                           {{ $t("showEvaluationsToStudent.header.userSaidEnd") }}
                         </span>
                       </div>
-                      <div class="col-8" v-if="row[1].internshipOwner != null">
-                        <h6 class="list-item-label">Contact</h6>
-                        {{ row[1].internshipOwner.firstName }}
-                        {{ $t("showEvaluationsToStudent.header.writeEmail") }}
-                        {{ row[1].internshipOwner.emailAddress }}
+                      <div class="col-4" v-if="row[1].internshipOwner != null">
+                        <h6 class="list-item-label">
+                          {{ $t("showEvaluationsToStudent.header.writeEmail") }}
+                          {{ row[1].internshipOwner.firstName }}
+                        </h6>
+                        <a :href="`mailto:${ row[1].internshipOwner.emailAddress }`">
+                          {{ row[1].internshipOwner.emailAddress }}
+                        </a>
                       </div>
                     </div>
                   </div>
@@ -53,8 +56,11 @@
                 <div class="accordion-body">
                   <table id="tableOfQuestions" class="table table-hover">
                     <tbody>
-                    <tr v-for="question in row[1].questions"
-                        :key="question.id">
+                    <tr v-for="(question, qIndex) in row[1].questions" v-bind:key="qIndex"
+                        @click="sendIdToModal(qIndex, question)"
+                        data-bs-toggle="modal"
+                        data-id="qIndex"
+                        data-bs-target="#evaluationModal" title="Click">
                       <td>
                         {{ question.title }}
                       </td>
@@ -77,29 +83,50 @@
       </div>
     </div>
   </div>
+  <div class="modal fade" id="evaluationModal"
+       tabindex="-1" role="dialog"
+       aria-labelledby="showEvaluationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-notify modal-success">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="showEvaluationModalLabel">
+            {{ title }}
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"
+                  aria-label="Close">
+          </button>
+        </div>
+        <div class="modal-body" id="body">
+          <fieldset class="form-group border p-4">
+            <legend class="float-none w-auto px-3">Q</legend>
+            <span v-html="textContent"/>
+          </fieldset>
+          <br>
+          <fieldset class="form-group border p-4">
+            <legend class="float-none w-auto px-3">A</legend>
+            <span v-html="answerTextContent"/>
+          </fieldset>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { getDateString } from '@/utils/admin';
-import Evaluation from '@/models/Evaluation';
-import Question from '@/models/Question';
 import http from '@/utils/http-common';
 
 export default defineComponent({
   name: 'ShowEvaluationsToStudent',
   data() {
     return {
-      evaluations: [] as Evaluation[],
-      questions: [] as Question[],
-      currentSemester: '-1',
-      currentQuestion: '-1',
-      currentSearch: '',
       isLoading: false,
-      inSemester: '',
       internshipsAndQuestions: [],
-      isAnswerReviewed: [],
-      isAnswerPublished: [],
+      currentId: -1,
+      title: '',
+      textContent: '',
+      answerTextContent: '',
     };
   },
   mounted() {
@@ -108,6 +135,11 @@ export default defineComponent({
 
   methods: {
     getDateString,
+    sendIdToModal(givenQuestionId, question) {
+      this.title = question.title;
+      this.textContent = question.textContent;
+      this.answerTextContent = question.answerTextContent;
+    },
     async getUsersAndEvaluations() {
       try {
         const res = await http.get(`/internships/company/${this.$route.params.id}`);
@@ -152,5 +184,12 @@ template {
   color: rgba(119, 185, 0, 1);
   width: 3rem;
   height: 3rem;
+}
+
+.modal-header{
+  background-color: rgba(119, 185, 0, 1);
+}
+.modal-content {
+  overflow:hidden;
 }
 </style>

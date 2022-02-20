@@ -6,7 +6,7 @@ const showEvaluationsToStudent = {
     userSaid: 'hat darüber in ',
     userSaidEnd: 'berichtet.',
     anonymSaid: 'hat ein Ihrer Kommilitonen darüber berichtet.',
-    writeEmail: ' könnte Ihnen bei Ihren Fragen zu diesem Praktikum helfen: ',
+    writeEmail: 'Schreib an',
   },
 };
 
