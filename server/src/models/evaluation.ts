@@ -3,6 +3,7 @@ import {IQuestion, QuestionSchema} from "./question";
 
 export interface IEvaluation {
   inSemester: string,
+  questions: IQuestion[],
   createdAt: Date;
   updatedAt: Date;
   isPublished: boolean;

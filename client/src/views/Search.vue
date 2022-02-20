@@ -153,6 +153,7 @@
               </tr>
               <tr class="collapse" :id="'collapseResult' + searchResult._id">
                 <td colspan="7">
+                  <fieldset class="form-group border p-3">
                   <p class="pl-3">
                     <strong>{{ $t("search.programmingLanguages") }}</strong>
                     {{
@@ -175,6 +176,15 @@
                     <strong>{{ $t("search.contact") }}</strong>
                     {{ searchResult?.company?.emailAddress }}
                   </p>
+                  <div>
+                    <router-link
+                      class="btn btn-outline-htw-green btn-md btn-block"
+                      :to="{ name: 'ShowEvaluationsToStudent',
+                      params: { id: searchResult.company._id }}">
+                      {{ $t("search.readAboutInternship") }}
+                    </router-link>
+                  </div>
+                  </fieldset>
                 </td>
               </tr>
             </template>

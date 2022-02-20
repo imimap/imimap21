@@ -39,6 +39,7 @@ const search = {
   tasks: 'Tasks: ',
   contact: 'Contact: ',
   programmingLanguages: 'Programming languages: ',
+  readAboutInternship: 'Learn more about this internship from your fellow students',
 };
 
 export default search;

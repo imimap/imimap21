@@ -141,7 +141,7 @@ import http from '@/utils/http-common';
 import store from '@/store';
 
 export default defineComponent({
-  name: 'EvaluationsList',
+  name: 'ReviewQuestions',
   data() {
     return {
       evaluations: [] as Evaluation[],

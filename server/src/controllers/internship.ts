@@ -857,7 +857,6 @@ export async function updateAnswerToPublish(req: Request, res: Response, next: N
 
   // @ts-ignore
   const question = internshipToUpdate.evaluationFile.questions.id(req.query.questionId);
-  console.log(question);
   question.isAnswerReviewed = req.query.isAnswerReviewed;
   question.isAnswerPublished = req.query.isAnswerPublished;
 
@@ -865,4 +864,64 @@ export async function updateAnswerToPublish(req: Request, res: Response, next: N
   if (!savedInternship) return next(new BadRequest("Could not update internship"));
 
   res.json(savedInternship);
+}
+
+/**
+ * Returns filtered information of possible evlaution forms of an intership
+ * from different semesters to the student
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function getAllInternshipsInCompany(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email })
+    .select("isAdmin studentProfile")
+    .populate({
+      path: "studentProfile.internship",
+      lean: true,
+    });
+
+  if (!user) return next(new NotFound("User not found"));
+  if (!user.isAdmin) {
+    if (!user.studentProfile) return next(new NotFound("Student not found"));
+  }
+
+  const INTERNSHIP_FIELDS_QUESTION_ANSWER =
+    "evaluationFile.inSemester " +
+    "evaluationFile.questions.title " +
+    "evaluationFile.questions.textContent " +
+    "evaluationFile.questions.answerTextContent " +
+    "evaluationFile.questions.studentAllowsToPublish " +
+    "evaluationFile.questions.isAnswerPublished";
+
+  const internshipsToShow = await Internship.find({ company: req.params.id })
+    .select(INTERNSHIP_FIELDS_QUESTION_ANSWER);
+  if (!internshipsToShow) return next(new NotFound("Internship not found"));
+
+  const evaluationsAndProfiles = new Map();
+  let inSemester = '';
+
+  for (let[index, internship] of internshipsToShow.entries()) {
+    let questions = [];
+    if(internship.evaluationFile) {
+      inSemester = internship.evaluationFile.inSemester;
+      console.log(inSemester);
+      for(const question of internship.evaluationFile.questions) {
+        if(question.studentAllowsToPublish && question.isAnswerPublished) {
+          questions.push(question);
+        }
+      }
+    }
+
+    const internshipModule = await InternshipModule.find({ internships: internship.id });
+    const internshipOwner = await User.findOne({ "studentProfile.internship": internshipModule[0]._id, "studentProfile.showMyProfile": true }, {_id: false, emailAddress: true, firstName: true});
+
+    evaluationsAndProfiles.set(index, {internshipOwner, questions, inSemester});
+  }
+
+  res.json(Array.from(evaluationsAndProfiles));
 }

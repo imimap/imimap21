@@ -40,6 +40,7 @@ const search = {
   tasks: 'Aufgaben: ',
   contact: 'Kontakt: ',
   programmingLanguages: 'Programmiersprachen: ',
+  readAboutInternship: 'Erfahren Sie mehr über dieses Praktikum von Ihren Mitstudierenden',
 };
 
 export default search;

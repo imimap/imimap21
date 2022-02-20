@@ -37,6 +37,7 @@ import CreateEvaluation from '@/components/evaluation/CreateEvaluation.vue';
 import EvaluationsList from '@/components/evaluation/EvaluationsList.vue';
 import EvaluationFormStudent from '@/components/evaluation/EvaluationFormStudent.vue';
 import ReviewQuestions from '@/components/question/ReviewQuestions.vue';
+import ShowEvaluationsToStudent from '@/views/ShowEvaluationsToStudent.vue';
 
 // @TODO: Router auf Modules aufteilen
 const routes: Array<RouteRecordRaw> = [
@@ -72,6 +73,14 @@ const routes: Array<RouteRecordRaw> = [
         path: 'search',
         name: 'Search',
         component: Search,
+        meta: {
+          allowAnonymous: false,
+        },
+      },
+      {
+        path: 'showEvaluationsToStudent/:id',
+        name: 'ShowEvaluationsToStudent',
+        component: ShowEvaluationsToStudent,
         meta: {
           allowAnonymous: false,
         },
