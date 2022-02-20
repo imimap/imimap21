@@ -12,16 +12,7 @@
       </select>
     </div>
   </div>
-  <Map v-if="!loadingState && searchResults.length > 0" :locations="searchResults"></Map>
-  <div class="container" v-if="!loadingState && searchResults.length == 0">
-    <div id="form-block4">
-      <div class="alert alert-primary">
-        <small>
-          <strong>Achtung!</strong> Es wurden keine Praktika gefunden
-        </small>
-      </div>
-    </div>
-  </div>
+  <Map v-if="!loadingState" :locations="searchResults"></Map>
 </template>
 
 <script lang="ts">
