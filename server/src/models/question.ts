@@ -43,14 +43,14 @@ export const QuestionSchema = new Schema({
   answerTextContent: {
     type: String,
     required: true,
-    default: 'Please write a neutral, detailed,  fair answer. This might help many of your fellow students to find a good internship place.',
+    default: 'We are hungry to know ;-)',
   },
   answerUpdatedAt: {
     type: Date,
   },
   studentAllowsToPublish: {
     type: Boolean,
-    default: false,
+    default: true,
     required: true,
   },
   isAnswerReviewed: {

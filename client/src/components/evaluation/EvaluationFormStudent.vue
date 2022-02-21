@@ -12,6 +12,68 @@
               </h5>
             </div>
             <div v-else>
+              <div class="accordion" id="accordion">
+                <div class="accordion-item">
+                  <h2 class="accordion-header rounded-3"
+                      style="border-color: #77b900;border-style: solid;" id="headingOne">
+                    <button class="accordion-button"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseOne"
+                            aria-expanded="true"
+                            aria-controls="collapseOne">
+                      <a><img src="/assets/info_black.png"/></a>
+                      &nbsp;&nbsp; {{ $t("evaluationFormStudent.notice.pleaseRead") }}
+                    </button>
+                  </h2>
+                  <div id="collapseOne"
+                       class="accordion-collapse collapse show"
+                       aria-labelledby="headingOne"
+                       data-bs-parent="#accordion">
+                    <div class="accordion-body">
+                      <fieldset class="form-group border p-3 rounded-3">
+                        <span v-html="$t('evaluationFormStudent.notice.importantToRead')"/>
+                      </fieldset>
+                      <fieldset class="form-group border p-3 rounded-3">
+                        <span v-html="$t('evaluationFormStudent.notice.agreement')"/>
+                        <fieldset class="form-group border p-3 rounded-3">
+                          <input class="form-check-input" type="checkbox"
+                                 id="checkboxForPublishProfile"
+                                 v-model="studentAllowsToPublish"
+                                 @change="onCheckboxChange($event)"
+                                 title="Bitte vergessen Sie nicht, den neuen Zustand zu speichern.">
+                          <label for="checkboxForPublishProfile"
+                                 style="position: relative;"
+                                 v-html="$t('evaluationFormStudent.notice.checkboxExplanation')">
+                          </label>
+                        </fieldset>
+                      </fieldset>
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header rounded-3"
+                      style="border-color: #77b900;border-style: solid;" id="headingTwo">
+                    <button class="accordion-button collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseTwo"
+                            aria-expanded="false"
+                            aria-controls="collapseTwo">
+                      <a><img src="/assets/file_download_black.png"/></a>
+                      &nbsp;&nbsp; {{ $t("evaluationFormStudent.notice.pleaseRead") }}
+                    </button>
+                  </h2>
+                  <div id="collapseTwo"
+                       class="accordion-collapse collapse"
+                       aria-labelledby="headingTwo"
+                       data-bs-parent="#accordion">
+                    <div class="accordion-body">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <hr>
               <div v-for="(row, index) in evaluationFile.questions" v-bind:key="index"
                    class="accordion-item">
                 <!--              <div v-if="compareDates(row.dateToPublishQuestion)">-->
@@ -64,7 +126,7 @@
                     </span>
                     </div>
                     <br>
-                    <div v-if="ifEditPossible(row.answerUpdatedAt)">
+                    <div v-if="ifEditPossible(row.answerUpdatedAt, row.isAnswerReviewed)">
                       <div>
                         <editor v-model="content" :model-value="row.answerTextContent"/>
                       </div>
@@ -82,7 +144,8 @@
                       </div>
                     </div>
                     <br>
-                    <div v-if="ifEditPossible(row.answerUpdatedAt)" class="row">
+                    <div v-if="ifEditPossible(row.answerUpdatedAt,row.isAnswerReviewed)"
+                         class="row">
                       <div class="col-sm-1" style="margin-right: 20px !important;">
                         <div class="col-sm-1">
                           <button class="btn btn-success btn-htw-green"
@@ -115,6 +178,8 @@
                 <!--                </h6>-->
                 <!--              </div>-->
               </div>
+              <fieldset class="form-group border p-3 rounded-3">
+              </fieldset>
             </div>
           </div>
           <div v-else class="d-flex justify-content-center">
@@ -141,12 +206,12 @@ export default defineComponent({
     return {
       startDate: '',
       endDate: '',
-      inSemester: '',
       evaluationFile: new Evaluation(),
-      studentAllowsToPublish: false,
+      studentAllowsToPublish: true,
       isLoading: false,
       iChanged: '',
       content: '',
+      elapsedTime: '',
     };
   },
   components: {
@@ -165,19 +230,31 @@ export default defineComponent({
         this.iChanged = 'changed';
       }
     },
+
     /**
      *
      * @param answerUpdatedAt
-     * this disables the edit button after two hours of posting an answer
+     * @param isAnswerReviewed
+     *
+     * this method returns true if it is still inside 24 hours after submitting the answer
+     * and the answer still has not been reviewed. After that the edit in not possible.
      */
-    ifEditPossible(answerUpdatedAt) {
-      const timeOut = 7200000;
+    ifEditPossible(answerUpdatedAt, isAnswerReviewed) {
+      let isThereStillTime;
+      const timeOut = 86400000; // 24 hours in ms
       if (answerUpdatedAt !== undefined) {
+        // getting the answerUpdateAt in ms
         const dateInMS = new Date(answerUpdatedAt).getTime();
+        // getting the recent date and calculating the difference
         const elapsedTime = new Date().getTime() - dateInMS;
-        return (timeOut >= elapsedTime);
+        isThereStillTime = (timeOut >= elapsedTime);
+      } else {
+        return true;
       }
-      return true;
+      if (isAnswerReviewed === undefined || isAnswerReviewed === false) {
+        return isThereStillTime;
+      }
+      return false;
     },
     compareDates(date) {
       const receivedDate = new Date(date);

@@ -11,65 +11,92 @@
                 </span>
               </h5>
             </div>
-            <div v-else v-for="(row, index) in internshipsAndQuestions" v-bind:key="index"
-                 class="accordion-item">
-              <h2 class="accordion-header rounded-3"
-                  style="border-color: #77b900;border-style: solid;" v-bind:id="index">
-                <button class="accordion-button collapsed"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        v-bind:data-bs-target="'#question-' + row[0]"
-                        aria-expanded="false"
-                        v-bind:aria-controls="'question-' + row[0]">
-                  <div class="container rounded-4">
-                    <div class="row">
-                      <div class="col-5">
-                        <h6 class="list-item-label">Student/in</h6>
-                        <span v-if="row[1].internshipOwner == null">
+            <div v-else>
+              <div class="accordion" id="accordionInformation">
+                <div class="accordion-item">
+                  <h2 class="accordion-header rounded-3" id="headingOne"
+                      style="border-color: #77b900;border-style: solid;">
+                    <button class="accordion-button"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseOne"
+                            aria-expanded="true"
+                            aria-controls="collapseOne">
+                      <a><img src="/assets/baseline_info_black_24dp.png"/></a>
+                      &nbsp;&nbsp; {{ $t("showEvaluationsToStudent.notice.pleaseRead") }}
+                    </button>
+                  </h2>
+                  <div id="collapseOne"
+                       class="accordion-collapse collapse show"
+                       aria-labelledby="headingOne"
+                       data-bs-parent="#accordionInformation">
+                    <div class="accordion-body">
+                      <span v-html="$t('showEvaluationsToStudent.notice.goodToRead')"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <hr>
+              <div v-for="(row, index) in internshipsAndQuestions" v-bind:key="index"
+                   class="accordion-item">
+                <h2 class="accordion-header rounded-3"
+                    style="border-color: #77b900;border-style: solid;" v-bind:id="index">
+                  <button class="accordion-button collapsed"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          v-bind:data-bs-target="'#question-' + row[0]"
+                          aria-expanded="false"
+                          v-bind:aria-controls="'question-' + row[0]">
+                    <div class="container rounded-4">
+                      <div class="row">
+                        <div class="col-5">
+                          <h6 class="list-item-label">Student/in</h6>
+                          <span v-if="row[1].internshipOwner == null">
                           In <b>{{ row[1].inSemester }}</b>
                           {{ $t("showEvaluationsToStudent.header.anonymSaid") }}
                         </span>
-                        <span v-else>
+                          <span v-else>
                           <b>{{ row[1].internshipOwner.firstName }}</b>
                           {{ $t("showEvaluationsToStudent.header.userSaid") }}
                           <b>{{ row[1].inSemester }}</b>
                           {{ $t("showEvaluationsToStudent.header.userSaidEnd") }}
                         </span>
-                      </div>
-                      <div class="col-4" v-if="row[1].internshipOwner != null">
-                        <h6 class="list-item-label">
-                          {{ $t("showEvaluationsToStudent.header.writeEmail") }}
-                          {{ row[1].internshipOwner.firstName }}
-                        </h6>
-                        <a :href="`mailto:${ row[1].internshipOwner.emailAddress }`">
-                          {{ row[1].internshipOwner.emailAddress }}
-                        </a>
+                        </div>
+                        <div class="col-4" v-if="row[1].internshipOwner != null">
+                          <h6 class="list-item-label">
+                            {{ $t("showEvaluationsToStudent.header.writeEmail") }}
+                            {{ row[1].internshipOwner.firstName }}
+                          </h6>
+                          <a :href="`mailto:${ row[1].internshipOwner.emailAddress }`">
+                            {{ row[1].internshipOwner.emailAddress }}
+                          </a>
+                        </div>
                       </div>
                     </div>
+                  </button>
+                </h2>
+                <div v-bind:id="'question-' + row[0]"
+                     class="accordion-collapse collapse"
+                     aria-labelledby="headingOne"
+                     data-bs-parent="#listAccordion">
+                  <div class="accordion-body">
+                    <table id="tableOfQuestions" class="table table-hover">
+                      <tbody>
+                      <tr v-for="(question, qIndex) in row[1].questions" v-bind:key="qIndex"
+                          @click="sendIdToModal(qIndex, question)"
+                          data-bs-toggle="modal"
+                          data-id="qIndex"
+                          data-bs-target="#evaluationModal" title="Click"
+                          style="cursor: pointer;">
+                        <td>
+                          <u>
+                            {{ question.title }}
+                          </u>
+                        </td>
+                      </tr>
+                      </tbody>
+                    </table>
                   </div>
-                </button>
-              </h2>
-              <div v-bind:id="'question-' + row[0]"
-                   class="accordion-collapse collapse"
-                   aria-labelledby="headingOne"
-                   data-bs-parent="#listAccordion">
-                <div class="accordion-body">
-                  <table id="tableOfQuestions" class="table table-hover">
-                    <tbody>
-                    <tr v-for="(question, qIndex) in row[1].questions" v-bind:key="qIndex"
-                        @click="sendIdToModal(qIndex, question)"
-                        data-bs-toggle="modal"
-                        data-id="qIndex"
-                        data-bs-target="#evaluationModal" title="Click">
-                      <td>
-                        {{ question.title }}
-                      </td>
-                      <td style="display: none">
-                        {{ question._id }}
-                      </td>
-                    </tr>
-                    </tbody>
-                  </table>
                 </div>
               </div>
             </div>
@@ -83,6 +110,8 @@
       </div>
     </div>
   </div>
+<!--  Here comes the modal to show question and answer to student,
+student has only to click on the desired QA on the table-->
   <div class="modal fade" id="evaluationModal"
        tabindex="-1" role="dialog"
        aria-labelledby="showEvaluationModalLabel" aria-hidden="true">
@@ -167,7 +196,7 @@ template {
 }
 
 .accordion-item .accordion-body {
-  background: #eee;
+  background: #fff;
 }
 
 .accordion-header button {
