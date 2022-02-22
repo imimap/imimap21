@@ -831,7 +831,9 @@ export async function getInternshipEvaluation(req: Request, res: Response, next:
     const student = await User.findOne({ "studentProfile.internship": internshipModule[0]._id });
     // @ts-ignore
     const question = internship.evaluationFile.questions.id(req.query.questionId);
-    mapInternshipsIdQuestions.set(internship.id,{question, student});
+    if (question.answerUpdatedAt !== undefined) {
+      mapInternshipsIdQuestions.set(internship.id,{question, student});
+    }
   }
 
   res.json(Array.from(mapInternshipsIdQuestions));
@@ -904,23 +906,31 @@ export async function getAllInternshipsInCompany(
 
   const evaluationsAndProfiles = new Map();
   let inSemester = '';
+  let internshipModule = null;
+  let internshipOwner = null;
+
+  console.log(internshipsToShow);
 
   for (let[index, internship] of internshipsToShow.entries()) {
     let questions = [];
-    if(internship.evaluationFile) {
-      inSemester = internship.evaluationFile.inSemester;
-      console.log(inSemester);
-      for(const question of internship.evaluationFile.questions) {
+    const evaluationFile = internship?.evaluationFile;
+    if(evaluationFile) {
+      inSemester = evaluationFile.inSemester;
+      for(const question of evaluationFile.questions) {
         if(question.studentAllowsToPublish && question.isAnswerPublished) {
           questions.push(question);
         }
       }
     }
+    if (internship.showMyProfile) {
+      internshipModule = await InternshipModule.find({ internships: internship.id });
+      internshipOwner = await User.findOne({ "studentProfile.internship": internshipModule[0]._id}, {_id: false, emailAddress: true, firstName: true});
+    }
 
-    const internshipModule = await InternshipModule.find({ internships: internship.id });
-    const internshipOwner = await User.findOne({ "studentProfile.internship": internshipModule[0]._id, "studentProfile.showMyProfile": true }, {_id: false, emailAddress: true, firstName: true});
+    console.log(questions.length);
 
-    evaluationsAndProfiles.set(index, {internshipOwner, questions, inSemester});
+    if(questions.length !== 0) evaluationsAndProfiles.set(internship.id, {internshipOwner, questions, inSemester});
+
   }
 
   res.json(Array.from(evaluationsAndProfiles));

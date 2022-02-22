@@ -8,6 +8,8 @@ const evaluationFormStudent = {
   },
   header: {
     title: 'Title',
+    downloadTextFile: 'Download your answers',
+    downloadButton: 'Download text file',
   },
   body: {
     freeToPublish: 'Publish my answer',

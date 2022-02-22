@@ -4,7 +4,7 @@
       <div class="col-12">
         <fieldset class="form-group border p-3">
           <div v-if="!isLoading" class="accordion rounded-3" id="listAccordion">
-            <div v-if="internshipsAndQuestions.length === 1">
+            <div v-if="internshipsAndQuestions.length === 0">
               <h5>
                 <span class="alert alert-warning d-flex justify-content-center align-items-center">
                   {{ $t("showEvaluationsToStudent.notice.notFound") }}
@@ -22,7 +22,7 @@
                             data-bs-target="#collapseOne"
                             aria-expanded="true"
                             aria-controls="collapseOne">
-                      <a><img src="/assets/baseline_info_black_24dp.png"/></a>
+                      <a><img src="/assets/info_black.png"/></a>
                       &nbsp;&nbsp; {{ $t("showEvaluationsToStudent.notice.pleaseRead") }}
                     </button>
                   </h2>

@@ -49,6 +49,7 @@ export interface IInternship extends Document {
   events: IEvent[];
   status: string;
   evaluationFile?: IEvaluation;
+  showMyProfile: boolean;
 
   durationInWeeksSoFar(): number;
 
@@ -128,6 +129,10 @@ export const InternshipSchema = new Schema<IInternship>({
     },
   ],
   evaluationFile: EvaluationSchema,
+  showMyProfile: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 export const requiredFields = [

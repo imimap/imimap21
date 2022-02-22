@@ -31,10 +31,6 @@ export const StudentProfileSchema = new Schema(
       ref: "InternshipModule",
       type: Schema.Types.ObjectId,
     },
-    showMyProfile: {
-      type: Boolean,
-      default: false,
-    },
   },
   { _id: false }
 );

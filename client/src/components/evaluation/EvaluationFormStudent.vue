@@ -16,18 +16,18 @@
                 <div class="accordion-item">
                   <h2 class="accordion-header rounded-3"
                       style="border-color: #77b900;border-style: solid;" id="headingOne">
-                    <button class="accordion-button"
+                    <button class="accordion-button collapsed"
                             type="button"
                             data-bs-toggle="collapse"
                             data-bs-target="#collapseOne"
-                            aria-expanded="true"
+                            aria-expanded="false"
                             aria-controls="collapseOne">
                       <a><img src="/assets/info_black.png"/></a>
                       &nbsp;&nbsp; {{ $t("evaluationFormStudent.notice.pleaseRead") }}
                     </button>
                   </h2>
                   <div id="collapseOne"
-                       class="accordion-collapse collapse show"
+                       class="accordion-collapse collapse"
                        aria-labelledby="headingOne"
                        data-bs-parent="#accordion">
                     <div class="accordion-body">
@@ -38,12 +38,12 @@
                         <span v-html="$t('evaluationFormStudent.notice.agreement')"/>
                         <fieldset class="form-group border p-3 rounded-3">
                           <input class="form-check-input" type="checkbox"
+                                 style="margin-left: 15px; margin-top: 25px;"
                                  id="checkboxForPublishProfile"
                                  v-model="studentAllowsToPublish"
-                                 @change="onCheckboxChange($event)"
-                                 title="Bitte vergessen Sie nicht, den neuen Zustand zu speichern.">
+                                 @change="onCheckboxChange($event)">
                           <label for="checkboxForPublishProfile"
-                                 style="position: relative;"
+                                 style="position: relative; padding-left: 20px;"
                                  v-html="$t('evaluationFormStudent.notice.checkboxExplanation')">
                           </label>
                         </fieldset>
@@ -61,7 +61,7 @@
                             aria-expanded="false"
                             aria-controls="collapseTwo">
                       <a><img src="/assets/file_download_black.png"/></a>
-                      &nbsp;&nbsp; {{ $t("evaluationFormStudent.notice.pleaseRead") }}
+                      &nbsp;&nbsp; {{ $t("evaluationFormStudent.header.downloadTextFile") }}
                     </button>
                   </h2>
                   <div id="collapseTwo"
@@ -69,6 +69,11 @@
                        aria-labelledby="headingTwo"
                        data-bs-parent="#accordion">
                     <div class="accordion-body">
+                      <fieldset class="form-group border p-3 rounded-3">
+                        <button type="button" class="btn btn-primary">
+                          {{ $t("evaluationFormStudent.header.downloadButton") }}
+                        </button>
+                      </fieldset>
                     </div>
                   </div>
                 </div>
@@ -126,7 +131,7 @@
                     </span>
                     </div>
                     <br>
-                    <div v-if="ifEditPossible(row.answerUpdatedAt, row.isAnswerReviewed)">
+                    <div v-if="!row.isAnswerReviewed">
                       <div>
                         <editor v-model="content" :model-value="row.answerTextContent"/>
                       </div>
@@ -144,7 +149,7 @@
                       </div>
                     </div>
                     <br>
-                    <div v-if="ifEditPossible(row.answerUpdatedAt,row.isAnswerReviewed)"
+                    <div v-if="!row.isAnswerReviewed"
                          class="row">
                       <div class="col-sm-1" style="margin-right: 20px !important;">
                         <div class="col-sm-1">
@@ -230,32 +235,6 @@ export default defineComponent({
         this.iChanged = 'changed';
       }
     },
-
-    /**
-     *
-     * @param answerUpdatedAt
-     * @param isAnswerReviewed
-     *
-     * this method returns true if it is still inside 24 hours after submitting the answer
-     * and the answer still has not been reviewed. After that the edit in not possible.
-     */
-    ifEditPossible(answerUpdatedAt, isAnswerReviewed) {
-      let isThereStillTime;
-      const timeOut = 86400000; // 24 hours in ms
-      if (answerUpdatedAt !== undefined) {
-        // getting the answerUpdateAt in ms
-        const dateInMS = new Date(answerUpdatedAt).getTime();
-        // getting the recent date and calculating the difference
-        const elapsedTime = new Date().getTime() - dateInMS;
-        isThereStillTime = (timeOut >= elapsedTime);
-      } else {
-        return true;
-      }
-      if (isAnswerReviewed === undefined || isAnswerReviewed === false) {
-        return isThereStillTime;
-      }
-      return false;
-    },
     compareDates(date) {
       const receivedDate = new Date(date);
       const receivedDateInMs = receivedDate.getTime();
@@ -276,9 +255,19 @@ export default defineComponent({
       }
       this.isLoading = false;
     },
-
     async saveMyAnswer(questionId, answerText, isAnswerChecked) {
-      if ((this.content === '' || this.content === String('<p></p>')) && this.iChanged === '') {
+      const sampleText = 'Please write a neutral, detailed, fair answer. This might help many of your fellow students to find a good internship place.';
+      const sampleTextHTML = '<p>Please write a neutral, detailed, fair answer. This might help many of your fellow students to find a good internship place.</p>';
+
+      const sampleTextNoSpace = sampleText.toLowerCase().split(' ').join('');
+      const sampleTextHTMLNoSpace = sampleTextHTML.toLowerCase().split(' ').join('');
+      const answerTextNoSpace = answerText.toLowerCase().split(' ').join('');
+      console.log(this.content);
+      if ((this.content === '' && answerTextNoSpace === sampleTextNoSpace)
+        || (this.content === '' && answerTextNoSpace === sampleTextHTMLNoSpace)
+        || this.content.toLowerCase().split(' ').join('') === sampleTextNoSpace
+        || this.content.toLowerCase().split(' ').join('') === sampleTextHTMLNoSpace
+        || this.content === String('<p></p>') || (this.content === '' && this.iChanged === '')) {
         await this.$store.dispatch('addNotification', {
           text: 'Bitte erzählen Sie etwas über Ihr Praktikum! Wir sehen keine Veränderungen zu speichern.',
           type: 'danger',
@@ -303,16 +292,33 @@ export default defineComponent({
           await this.$store.dispatch('addNotification', {
             text: 'Ihre Antwort wurde erfolgreich gespeichert!',
             type: 'success',
-          }).then(() => window.location.reload());
+          }).then(() => {
+            this.content = '';
+            this.iChanged = '';
+            window.location.reload();
+          });
         } catch (err) {
           await this.$store.dispatch('addNotification', {
             text: `${err.response.data.error.message}`,
             type: 'danger',
           });
         }
-      } else {
-        console.log('canceled');
       }
+    },
+    exportHTML() {
+      const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "
+        + "xmlns:w='urn:schemas-microsoft-com:office:word' "
+        + "xmlns='http://www.w3.org/TR/REC-html40'>"
+        + "<head><meta charset='utf-8'><title>Export HTML to Word Document with JavaScript</title></head><body>";
+      const footer = '</body></html>';
+      const sourceHTML = header + document.getElementById('source-html')!.innerHTML + footer;
+      const source = `data:application/vnd.ms-word;charset=utf-8,${encodeURIComponent(sourceHTML)}`;
+      const fileDownload = document.createElement('a');
+      document.body.appendChild(fileDownload);
+      fileDownload.href = source;
+      fileDownload.download = 'document.doc';
+      fileDownload.click();
+      document.body.removeChild(fileDownload);
     },
   },
 });
