@@ -1,23 +1,17 @@
 import { IUser, User } from "../models/user";
 import { Forbidden, NotFound } from "http-errors";
-import { Types } from "mongoose";
-
-interface IPopulate {
-  path: string;
-  lean: boolean;
-  populate?: IPopulate;
-}
 
 /**
  * Returns the user with the specified email address.
  * @throws NotFound If the user was not found
  * @param emailAddress The email address of the user to find.
- * @param populateCompany Should the company object be fully returned instead of just the id?
  * @returns IUser The authorized user
  */
 export async function getUser(emailAddress: string | undefined): Promise<IUser> {
   if (!emailAddress) throw new NotFound("User not found. No email address was provided.");
-  const user = await User.findOne({ emailAddress: emailAddress }).select("_id isAdmin studentProfile");
+  const user = await User.findOne({ emailAddress: emailAddress }).select(
+    "_id isAdmin studentProfile"
+  );
   if (!user) throw new NotFound("User not found");
   return user;
 }
@@ -32,7 +26,7 @@ export async function getUserWithInternshipModule(
   emailAddress: string | undefined
 ): Promise<IUser> {
   const user = await getUser(emailAddress);
-  return user.populate("studentProfile.internship");
+  return await user.populate("studentProfile.internship").execPopulate();
 }
 
 /**

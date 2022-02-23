@@ -20,3 +20,5 @@ export const getInternshipModuleDuration = (internships: Internship[]): string =
     ? `${Math.floor(durationSumInDays / 7)} Wochen, ${Math.floor(durationSumInDays) % 7} Tage`
     : '-';
 };
+
+export const jsDateToHTMLDate = (jsDate?: string): string | undefined => jsDate?.substr(0, 10);

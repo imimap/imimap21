@@ -7,10 +7,10 @@ import { Types } from "mongoose";
 import { UploadedFile } from "express-fileupload";
 import * as pdf from "html-pdf";
 import {
-  getUserWithInternshipModule,
   getAuthorizedUser,
   getAuthorizedUserWithInternshipModule,
   getUser,
+  getUserWithInternshipModule,
 } from "../helpers/userHelper";
 import { buildHtmlTemplate, saveFile } from "../helpers/pdfHelper";
 import { User } from "../models/user";
@@ -572,6 +572,56 @@ export async function updateInternship(
   if (!savedInternship) return next(new BadRequest("Could not update internship"));
 
   res.json(savedInternship);
+}
+
+export async function approveInternshipApplication(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  let user;
+  try {
+    user = await getAuthorizedUser(req.user?.email, req.params.id);
+  } catch (e) {
+    return next(e);
+  }
+
+  if (!user.isAdmin) return next(new Forbidden("Only admins may approve internship applications"));
+
+  const internshipToUpdate = await Internship.findById(req.params.id);
+  if (!internshipToUpdate) return next(new NotFound("Internship not found"));
+
+  try {
+    const savedInternship = await internshipToUpdate.approve(user._id);
+    res.json(savedInternship);
+  } catch (e) {
+    return next(new BadRequest(e.message));
+  }
+}
+
+export async function markInternshipAsPassed(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  let user;
+  try {
+    user = await getAuthorizedUser(req.user?.email, req.params.id);
+  } catch (e) {
+    return next(e);
+  }
+
+  if (!user.isAdmin) return next(new Forbidden("Only admins may mark internships as passed"));
+
+  const internshipToUpdate = await Internship.findById(req.params.id);
+  if (!internshipToUpdate) return next(new NotFound("Internship not found"));
+
+  try {
+    const savedInternship = await internshipToUpdate.pass(user._id);
+    res.json(savedInternship);
+  } catch (e) {
+    return next(new BadRequest(e.message));
+  }
 }
 
 export function submitPdf(

@@ -5,8 +5,6 @@ export default class Internship {
 
   companyDetails = new Company();
 
-  description = '';
-
   tasks = '';
 
   operationalArea = '';
@@ -17,7 +15,7 @@ export default class Internship {
 
   salary = 0;
 
-  paymentType = [];
+  paymentTypes: string[] = [];
 
   startDate = '';
 
@@ -25,7 +23,7 @@ export default class Internship {
 
   workingHoursPerWeek = 0;
 
-  supervisor = {};
+  supervisor: { emailAddress?: string; fullName?: string } = {};
 
   comment = '';
 
@@ -37,7 +35,7 @@ export default class Internship {
 
   contractPdf = '';
 
-  bvgTicketExemptionRequestPdf = '';
+  bvgTicketExemptionPdf = '';
 
   certificatePdf = '';
 

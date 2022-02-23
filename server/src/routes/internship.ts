@@ -2,10 +2,12 @@ import { Router } from "express";
 import { body, param, query } from "express-validator";
 import authMiddleware from "../authentication/middleware";
 import {
+  approveInternshipApplication,
   createInternship,
   findInternships,
   getInternshipLocations,
   getInternshipsById,
+  markInternshipAsPassed,
   submitPdf,
   updateInternship,
 } from "../controllers/internship";
@@ -103,6 +105,22 @@ internshipRouter.patch(
   ]),
   validate,
   asyncHandler(updateInternship)
+);
+
+internshipRouter.patch(
+  "/:id/approve",
+  authMiddleware(),
+  param("id").custom(isObjectId),
+  validate,
+  asyncHandler(approveInternshipApplication)
+);
+
+internshipRouter.patch(
+  "/:id/pass",
+  authMiddleware(),
+  param("id").custom(isObjectId),
+  validate,
+  asyncHandler(markInternshipAsPassed)
 );
 
 /* PDF endpoints */
