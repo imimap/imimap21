@@ -98,13 +98,15 @@ export default defineComponent({
   computed: mapState(['userProfile']),
   methods: {
     async save() {
-      // @TODO: POST an Student Endpoint
       try {
-        const res = await http.patch('/auth/profile', { firstName: this.newFirstName, lastName: this.newLastName });
-        await this.$store.dispatch('setUserProfile', { ...res });
+        const res = await http.patch('/auth/profile', {
+          firstName: this.newFirstName ? this.newFirstName : this.userProfile.firstName,
+          lastName: this.newLastName ? this.newLastName : this.userProfile.lastName,
+        });
+        await this.$store.dispatch('setUserProfile', { ...res.data });
         await this.$store.dispatch('addNotification', { text: 'Dein Profil wurde erfolgreich gespeichert!', type: 'success' });
       } catch (err: any) {
-        await this.$store.dispatch('addNotification', { text: 'Dein Profil wurde erfolgreich gespeichert!', type: 'success' });
+        await this.$store.dispatch('addNotification', { text: 'Es gab einen Fehler beim Speichern deines Profils!', type: 'error' });
       }
     },
   },
