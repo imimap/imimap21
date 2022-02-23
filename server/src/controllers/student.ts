@@ -5,13 +5,18 @@ import { Forbidden, NotFound } from "http-errors";
 import { InternshipModule } from "../models/internshipModule";
 
 export async function getStudents(req: Request, res: Response): Promise<void> {
-  // Get internship modules filtered by semester
-  const internshipModules = await InternshipModule.find({
-    inSemester: req.query.semester as string,
-  })
-    .limit(Number.parseInt(req.query.count as string) ?? 50)
-    .skip(Number.parseInt(req.query.offset as string) ?? 0);
-
+  let internshipModules;
+  if (!req.query.semester) {
+    // If no semester was chosen
+    internshipModules = await InternshipModule.find();
+  } else {
+    // Get internship modules filtered by semester
+    internshipModules = await InternshipModule.find({
+      inSemester: req.query.semester as string,
+    })
+      .limit(Number.parseInt(req.query.count as string) ?? 50)
+      .skip(Number.parseInt(req.query.offset as string) ?? 0);
+  }
   // Get users belonging to the found internship modules
   const users = [];
   for (const internshipModule of internshipModules) {

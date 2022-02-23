@@ -19,12 +19,13 @@
                     aria-label="Sortieren nach"
                     v-model="currentFilterSemester"
                     @change="() => {updateList()}">
+              <option selected value="">Alle Semester</option>
               <option value="SS2019">SS2019</option>
               <option value="WS2019">WS2019</option>
               <option value="SS2020">SS2020</option>
               <option value="WS2020">WS2020</option>
               <option value="SS2021">SS2021</option>
-              <option selected value="WS2021">WS2021</option>
+              <option value="WS2021">WS2021</option>
               <option value="SS2022">SS2022</option>
               <option value="WS2022">WS2022</option>
             </select>
@@ -33,7 +34,7 @@
             <select class="form-select"
                     aria-label="Sortieren nach"
                     v-model="currentFilterStatus">
-              <option selected value="">Status...</option>
+              <option selected value="">Alle Status...</option>
               <option value="unknown">unknown</option>
               <option value="planned">planned</option>
               <option value="postponement requested">postponement requested</option>
@@ -50,6 +51,9 @@
                    v-model="currentSearch">
             <div id="emailHelp" class="form-text">
               Matrikelnummer oder Nachname</div>
+          </div>
+          <div class="col-lg-3 col-md-12 mb-3 offset-lg-9 reset" >
+           <button @click="resetResults()">Zurücksetzen</button>
           </div>
         </div>
 
@@ -279,7 +283,7 @@
   <div v-if="students.length > 0 && students[currentEditInternshipModuleIndex]
                    .studentProfile
                    .internship
-                   .internships"
+                   .internships.length > 0"
        class="modal fade" id="internshipPartEditModal" tabindex="-1"
        aria-labelledby="internshipPartEditModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
@@ -490,7 +494,9 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Student from '@/models/Student';
-import { clearStudentSearch, getStudentsList, markAepPassedOnInternshipModule } from '@/utils/gateways';
+import {
+  clearStudentSearch, getStudentsList, getStudentsListWithSemester, markAepPassedOnInternshipModule,
+} from '@/utils/gateways';
 import { getDateString, getInternshipModuleDuration, getTimeDifferenceDays } from '@/utils/admin';
 import internshipModuleStatusColors from '@/models/InternshipModuleStatus';
 import store from '@/store';
@@ -506,7 +512,7 @@ export default defineComponent({
       currentEditInternshipModuleIndex: 0,
       currentEditInternshipPartIndex: 0,
       currentSorting: '',
-      currentFilterSemester: 'WS2021',
+      currentFilterSemester: '',
       currentFilterStatus: '',
       currentSearch: '',
       students: [] as Student[],
@@ -538,10 +544,25 @@ export default defineComponent({
     getTimeDifferenceDays,
     async updateList() {
       this.isLoading = true;
-      const studentList = await getStudentsList(this.currentFilterSemester) as Student[];
-      this.students = studentList;
+      if (this.currentFilterSemester === '') {
+        const studentsList = await getStudentsList() as Student[];
+        this.students = studentsList;
+      } else {
+        const studentsList = await getStudentsListWithSemester(this.currentFilterSemester) as Student[];
+        this.students = studentsList;
+      }
       this.isLoading = false;
     },
+    async resetResults() {
+      this.currentSorting = '';
+      this.currentFilterSemester = '';
+      this.currentFilterStatus = '';
+      this.currentSearch = '';
+      this.students = '';
+
+      this.updateList();
+    },
+
     async clearSearch(studentId: string, studentName: string) {
       const userDoubleChecked = window.confirm(`Suchanfragen für ${studentName} zurücksetzen?`);
       if (userDoubleChecked) {
@@ -703,6 +724,17 @@ export default defineComponent({
     color: rgba(119, 185, 0, 1);
     width: 3rem;
     height: 3rem;
+  }
+
+  .reset {
+    text-align: right;
+  }
+  .reset > button {
+    background: rgba(119, 185, 0, 1);
+    color: white;
+    border-style: none;
+    border-radius: 3px;
+    font-size: 15px;
   }
 
 </style>
