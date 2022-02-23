@@ -14,6 +14,7 @@ import {
 } from "../helpers/userHelper";
 import { buildHtmlTemplate, saveFile } from "../helpers/pdfHelper";
 import { User } from "../models/user";
+import { constants } from "http2";
 
 const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
   "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes status";
@@ -44,8 +45,8 @@ export async function getInternshipsById(
         populate: { path: "internships", lean: true, populate: { path: "company", lean: true } },
         lean: true,
       });
-    if (!user) throw new NotFound("User not found");
-  } catch (e: any) {
+    if (!user) return next(new NotFound("User not found"));
+  } catch (e) {
     return next(e);
   }
 
@@ -77,7 +78,7 @@ export async function getRandomInternship(
   let user;
   try {
     user = await getUserWithInternshipModule(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -139,7 +140,7 @@ export async function findInternships(
   let user;
   try {
     user = await getUserWithInternshipModule(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -278,7 +279,7 @@ export async function findInternshipsInSemester(
   let user;
   try {
     user = await getUser(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -384,7 +385,7 @@ export async function getAllPaymentTypes(
 ): Promise<void> {
   try {
     await getUser(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -405,7 +406,7 @@ export async function getAllOperationalAreas(
 ): Promise<void> {
   try {
     await getUser(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -428,7 +429,7 @@ export async function getAllProgrammingLanguages(
 ): Promise<void> {
   try {
     await getUser(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -484,7 +485,7 @@ export async function createInternship(
   let user;
   try {
     user = await getUserWithInternshipModule(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
   if (!user.studentProfile) return next(new NotFound("User does not appear to be a student"));
@@ -531,7 +532,7 @@ export async function updateInternship(
   let user;
   try {
     user = await getAuthorizedUser(req.user?.email, req.params.id);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -572,6 +573,27 @@ export async function updateInternship(
   if (!savedInternship) return next(new BadRequest("Could not update internship"));
 
   res.json(savedInternship);
+}
+
+export async function deleteInternship(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  let user;
+  try {
+    user = await getAuthorizedUser(req.user?.email, req.params.id);
+  } catch (e) {
+    return next(e);
+  }
+
+  if (!user.isAdmin) return next(new Forbidden("Only admins may delete an internship"));
+
+  const result = await Internship.findByIdAndDelete(req.params.id);
+  if (!result) return next(new NotFound("Internship not found"));
+
+  res.statusCode = constants.HTTP_STATUS_NO_CONTENT;
+  res.send();
 }
 
 export async function approveInternshipApplication(
@@ -681,7 +703,7 @@ export async function generateRequestPdf(
   let user;
   try {
     user = await getAuthorizedUserWithInternshipModule(req.user?.email, req.params.id);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
   // Load internship
@@ -700,7 +722,7 @@ export async function generateRequestPdf(
         res.setHeader("Content-Type", "application/pdf");
         stream.pipe(res);
       });
-  } catch (e: any) {
+  } catch (e) {
     next(new BadRequest(e));
   }
 }

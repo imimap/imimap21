@@ -61,6 +61,17 @@ export const deleteInternshipModule = async (internshipModuleId: string): Promis
   }
 };
 
+export const deleteInternship = async (internshipId: string): Promise<boolean> => {
+  try {
+    await apiClient.delete(`/internships/${internshipId}`);
+    return true;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Löschen vom Praktikum ${internshipId} [ERROR: ${err.message}]`);
+    return false;
+  }
+};
+
 export const markAepPassedOnInternshipModule = async (id) => apiClient.patch(`/internship-modules/${id}/aep-passed`)
   .then((res) => res)
   .catch((err) => {

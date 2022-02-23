@@ -85,7 +85,11 @@ import { defineComponent, PropType } from 'vue';
 import { getDateString, getTimeDifferenceDays } from '@/utils/admin';
 import Internship from '@/models/Internship';
 import UsersListStatusItem from '@/components/admin/UsersListStatusItem.vue';
-import { approveInternshipApplication, markInternshipAsPassed } from '@/utils/gateways';
+import {
+  approveInternshipApplication,
+  deleteInternship,
+  markInternshipAsPassed,
+} from '@/utils/gateways';
 import { showErrorNotification } from '@/utils/notification';
 
 export default defineComponent({
@@ -125,8 +129,8 @@ export default defineComponent({
     async deleteInternshipPart(internshipId: string) {
       const userDoubleChecked = window.confirm('Teilpraktikum wirklich löschen?');
       if (!userDoubleChecked) return;
-      // TODO: API call delete
-      console.log('delete internship:', internshipId);
+      await deleteInternship(internshipId);
+      this.$emit('updateInternship', this.index, null);
     },
   },
 });

@@ -4,6 +4,7 @@ import authMiddleware from "../authentication/middleware";
 import {
   approveInternshipApplication,
   createInternship,
+  deleteInternship,
   findInternships,
   getInternshipLocations,
   getInternshipsById,
@@ -105,6 +106,14 @@ internshipRouter.patch(
   ]),
   validate,
   asyncHandler(updateInternship)
+);
+
+internshipRouter.delete(
+  "/:id",
+  authMiddleware(),
+  param("id").custom(isObjectId),
+  validate,
+  asyncHandler(deleteInternship)
 );
 
 internshipRouter.patch(
