@@ -9,7 +9,7 @@ const evaluationFormStudent = {
   header: {
     title: 'Titel',
     downloadTextFile: 'Ihre Antworten herunterladen',
-    downloadButton: 'Textdatei herunterladen',
+    downloadButton: 'Datei herunterladen',
   },
   body: {
     freeToPublish: 'Meine Antwort veröffentlichen',
@@ -17,6 +17,11 @@ const evaluationFormStudent = {
     answerReviewed: 'Ihre Antwort wurde geprüft',
     yes: 'Ja',
     no: 'Nein',
+    dropdownMenu: 'Bitte wählen Sie das gewünschte Dateiformat',
+    rawText: 'Einfache Textdatei (*.txt)',
+    msWord: 'Microsoft Word (*.doc)',
+    openOffice: 'Open Office (*.odt)',
+    dropdownLanguage: 'Welche Sprache...',
   },
   footer: {
     answer: 'Antwort',

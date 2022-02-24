@@ -70,9 +70,48 @@
                        data-bs-parent="#accordion">
                     <div class="accordion-body">
                       <fieldset class="form-group border p-3 rounded-3">
-                        <button type="button" class="btn btn-primary">
-                          {{ $t("evaluationFormStudent.header.downloadButton") }}
-                        </button>
+                        <div class="row justify-content-md-center">
+                          <div class="col-auto">
+                            <select class="form-select"
+                                    id="formatSelection"
+                                    style="width: auto">
+                              <option selected value="null">
+                                {{ $t("evaluationFormStudent.body.dropdownMenu") }}
+                              </option>
+                              <option value="rawText">
+                                {{ $t("evaluationFormStudent.body.rawText") }}
+                              </option>
+                              <option value="msWord">
+                                {{ $t("evaluationFormStudent.body.msWord") }}
+                              </option>
+                              <option value="openOffice">
+                                {{ $t("evaluationFormStudent.body.openOffice") }}
+                              </option>
+                            </select>
+                          </div>
+                          <div class="col-auto">
+                            <select class="form-select"
+                                    id="languageSelection"
+                                    style="width: auto">
+                              <option selected value="null">
+                                {{ $t("evaluationFormStudent.body.dropdownLanguage") }}
+                              </option>
+                              <option value="de">
+                                de
+                              </option>
+                              <option value="en">
+                                en
+                              </option>
+                            </select>
+                          </div>
+                          <div class="col-auto">
+                            <button type="button"
+                                    class="btn btn-primary"
+                                    @click="checkDropMenus();">
+                              {{ $t("evaluationFormStudent.header.downloadButton") }}
+                            </button>
+                          </div>
+                        </div>
                       </fieldset>
                     </div>
                   </div>
@@ -144,8 +183,8 @@
                       </div>
                       <br>
                       <div class="row">
-                    <span v-html="row.answerTextContent">
-                    </span>
+                        <span :id="'htmlToText'+ row.id" v-html="row.answerTextContent">
+                        </span>
                       </div>
                     </div>
                     <br>
@@ -183,8 +222,6 @@
                 <!--                </h6>-->
                 <!--              </div>-->
               </div>
-              <fieldset class="form-group border p-3 rounded-3">
-              </fieldset>
             </div>
           </div>
           <div v-else class="d-flex justify-content-center">
@@ -193,6 +230,9 @@
             </div>
           </div>
         </fieldset>
+      </div>
+      <div>
+        <template-english ref="englishTemplate"></template-english>
       </div>
     </div>
   </div>
@@ -203,6 +243,10 @@ import { defineComponent } from 'vue';
 import { getDateString } from '@/utils/admin';
 import http from '@/utils/http-common';
 import Evaluation from '@/models/Evaluation';
+import Internship from '@/models/Internship';
+import Company from '@/models/Company';
+import { mapState } from 'vuex';
+import TemplateEnglish from '@/components/form/templateEnglish.vue';
 import Editor from '../Editor.vue';
 
 export default defineComponent({
@@ -217,9 +261,13 @@ export default defineComponent({
       iChanged: '',
       content: '',
       elapsedTime: '',
+      internship: new Internship(),
+      company: new Company(),
     };
   },
+  computed: mapState(['userProfile']),
   components: {
+    TemplateEnglish,
     Editor,
   },
   mounted() {
@@ -246,7 +294,12 @@ export default defineComponent({
         const res = await http.get(`/internships/${this.$route.params.id}`);
         this.startDate = new Date(res.data.startDate).toISOString().split('T')[0].toString();
         this.endDate = new Date(res.data.endDate).toISOString().split('T')[0].toString();
+        this.internship = res.data;
         this.evaluationFile = res.data.evaluationFile;
+        this.company = res.data.company;
+        console.log(this.company);
+        console.log(this.internship);
+        await this.setValuesToTemplate();
       } catch (err) {
         await this.$store.dispatch('addNotification', {
           text: `Konnte kein Praktikum gefunden werden. [ERROR: ${err.message}]`,
@@ -305,20 +358,78 @@ export default defineComponent({
         }
       }
     },
-    exportHTML() {
-      const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "
-        + "xmlns:w='urn:schemas-microsoft-com:office:word' "
-        + "xmlns='http://www.w3.org/TR/REC-html40'>"
-        + "<head><meta charset='utf-8'><title>Export HTML to Word Document with JavaScript</title></head><body>";
-      const footer = '</body></html>';
-      const sourceHTML = header + document.getElementById('source-html')!.innerHTML + footer;
-      const source = `data:application/vnd.ms-word;charset=utf-8,${encodeURIComponent(sourceHTML)}`;
+    async checkDropMenus() {
+      const selectedFormat = document.getElementById('formatSelection') as HTMLSelectElement;
+      const selectedLanguage = document.getElementById('languageSelection') as HTMLSelectElement;
+      if (selectedFormat.value !== 'null' && selectedLanguage.value !== 'null') {
+        this.exportHTML(selectedFormat, selectedLanguage);
+      } else {
+        await this.$store.dispatch('addNotification', {
+          text: 'Bitte die beide Dropdown Menus überprüfen',
+          type: 'danger',
+        });
+      }
+    },
+    exportHTML(selectedFormat, selectedLanguage) {
       const fileDownload = document.createElement('a');
+      let header = '';
+      let sourceHTML;
+      let hrefToAdd;
+      let fileExtension;
+
+      console.log(this.internship);
+      const footer = '</body></html>';
+
+      if (selectedFormat.value === 'rawText') {
+        header = "<head><meta charset='utf-8'></head><body>";
+        hrefToAdd = 'data:text/plain;charset=utf-8';
+        fileExtension = 'txt';
+      }
+      if (selectedFormat.value === 'msWord') {
+        header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "
+          + "xmlns:w='urn:schemas-microsoft-com:office:word' "
+          + "xmlns='http://www.w3.org/TR/REC-html40'>"
+          + "<head><meta charset='utf-8'></head><body>";
+        hrefToAdd = 'data:application/vnd.ms-word;charset=utf-8';
+        fileExtension = 'doc';
+      }
+      if (selectedFormat.value === 'openOffice') {
+        console.log('');
+      }
+      sourceHTML = header;
+      this.evaluationFile.questions.forEach((question) => {
+        if (question.answerUpdatedAt !== 'undefined') {
+          const answerBlock = `<u><b>Title:</b> ${question.title}</u><br><br>${question.answerTextContent}<br><hr>`;
+          sourceHTML += answerBlock;
+        }
+      });
+      sourceHTML += footer;
       document.body.appendChild(fileDownload);
+      const source = `${hrefToAdd},${encodeURIComponent(sourceHTML)}`;
       fileDownload.href = source;
-      fileDownload.download = 'document.doc';
+      fileDownload.download = `${this.evaluationFile.inSemester}_${this.company.companyName}.${fileExtension}`;
       fileDownload.click();
       document.body.removeChild(fileDownload);
+    },
+    async setValuesToTemplate() {
+      (this.$refs.englishTemplate as any).inSemester = this.evaluationFile.inSemester;
+      (this.$refs.englishTemplate as any).startDate = this.startDate;
+      (this.$refs.englishTemplate as any).endDate = this.endDate;
+      (this.$refs.englishTemplate as any).firstName = this.userProfile.firstName;
+      (this.$refs.englishTemplate as any).lastName = this.userProfile.lastName;
+      (this.$refs.englishTemplate as any).matriculation = this.userProfile.studentProfile.studentId
+        .substring(2, this.userProfile.studentProfile.studentId.length);
+      (this.$refs.englishTemplate as any).emailStudent = this.userProfile.emailAddress;
+      console.log(this.company.companyName);
+      (this.$refs.englishTemplate as any).companyName = this.company.companyName;
+      (this.$refs.englishTemplate as any).operationalArea = this.internship.operationalArea;
+      (this.$refs.englishTemplate as any).address = this.company.address.street
+        + this.company.address.streetNumber + this.company.address.zip
+        + this.company.address.city + this.company.address.country;
+      (this.$refs.englishTemplate as any).supervisor = (this.internship.supervisor as any)
+        .fullName;
+      (this.$refs.englishTemplate as any).emailSupervisor = (this.internship.supervisor as any)
+        .emailAddress;
     },
   },
 });
