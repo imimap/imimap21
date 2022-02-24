@@ -811,6 +811,42 @@ export async function updateAnswerOnInternship(
 }
 
 /**
+ * Updates the Agreement to show User Profile with this internship
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function updateAgreementOnInternship(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email })
+    .select("isAdmin studentProfile")
+    .populate({
+      path: "studentProfile.internship",
+      lean: true,
+    });
+
+  if (!user) return next(new NotFound("User not found"));
+  if (!user.isAdmin) {
+    if (!user.studentProfile) return next(new NotFound("Student not found"));
+    if (!user.studentProfile.internship.internships.includes(req.params.id))
+      return next(new Forbidden("You may only edit your own internship"));
+  }
+
+  const internshipToUpdate = await Internship.findById(req.params.id);
+  if (!internshipToUpdate) return next(new NotFound("Internship not found"));
+
+  // @ts-ignore
+  internshipToUpdate.showMyProfile = req.query.showMyProfile;
+  const savedInternship = await internshipToUpdate.save();
+  if (!savedInternship) return next(new BadRequest("Could not update the Agreement"));
+
+  res.json(internshipToUpdate);
+}
+
+/**
  *
  * @param req
  * @param res

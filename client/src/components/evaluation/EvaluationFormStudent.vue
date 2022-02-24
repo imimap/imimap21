@@ -40,8 +40,8 @@
                           <input class="form-check-input" type="checkbox"
                                  style="margin-left: 15px; margin-top: 25px;"
                                  id="checkboxForPublishProfile"
-                                 v-model="studentAllowsToPublish"
-                                 @change="onCheckboxChange($event)">
+                                 v-model="internship.showMyProfile"
+                                 @change="saveMyAgreement($event)">
                           <label for="checkboxForPublishProfile"
                                  style="position: relative; padding-left: 20px;"
                                  v-html="$t('evaluationFormStudent.notice.checkboxExplanation')">
@@ -71,24 +71,6 @@
                     <div class="accordion-body">
                       <fieldset class="form-group border p-3 rounded-3">
                         <div class="row justify-content-md-center">
-                          <div class="col-auto">
-                            <select class="form-select"
-                                    id="formatSelection"
-                                    style="width: auto">
-                              <option selected value="null">
-                                {{ $t("evaluationFormStudent.body.dropdownMenu") }}
-                              </option>
-                              <option value="rawText">
-                                {{ $t("evaluationFormStudent.body.rawText") }}
-                              </option>
-                              <option value="msWord">
-                                {{ $t("evaluationFormStudent.body.msWord") }}
-                              </option>
-                              <option value="openOffice">
-                                {{ $t("evaluationFormStudent.body.openOffice") }}
-                              </option>
-                            </select>
-                          </div>
                           <div class="col-auto">
                             <select class="form-select"
                                     id="languageSelection"
@@ -165,52 +147,56 @@
                      aria-labelledby="headingOne"
                      data-bs-parent="#listAccordion">
                   <div class="accordion-body">
-                    <div class="row">
+                    <fieldset class="form-group border p-3 rounded-3">
+                      <div class="row">
                     <span v-html="row.textContent">
                     </span>
-                    </div>
-                    <br>
-                    <div v-if="!row.isAnswerReviewed">
-                      <div>
-                        <editor v-model="content" :model-value="row.answerTextContent"/>
-                      </div>
-                    </div>
-                    <div v-else>
-                      <hr>
-                      <div>
-                        {{ $t("evaluationFormStudent.footer.yourAnswer") }} von
-                        {{ getDateString(row.answerUpdatedAt) }}:
                       </div>
                       <br>
-                      <div class="row">
-                        <span :id="'htmlToText'+ row.id" v-html="row.answerTextContent">
-                        </span>
-                      </div>
-                    </div>
-                    <br>
-                    <div v-if="!row.isAnswerReviewed"
-                         class="row">
-                      <div class="col-sm-1" style="margin-right: 20px !important;">
-                        <div class="col-sm-1">
-                          <button class="btn btn-success btn-htw-green"
-                                  type="submit"
-                                  v-on:click="saveMyAnswer
-                                  (row._id, row.answerTextContent, row.studentAllowsToPublish)">
-                            {{ $t("evaluationFormStudent.footer.buttonPost") }}
-                          </button>
+                      <div v-if="!row.isAnswerReviewed">
+                        <div>
+                          <editor v-model="content" :model-value="row.answerTextContent"/>
                         </div>
                       </div>
-                      <div class="col-md-10">
-                        <input class="form-check-input" type="checkbox"
-                               id="checkboxForPublish"
-                               v-model="row.studentAllowsToPublish"
-                               @change="onCheckboxChange($event)"
-                               title="Bitte vergessen Sie nicht, den neuen Zustand zu speichern.">
-                        <label>
-                          &nbsp; {{ $t("evaluationFormStudent.footer.checkboxPermission") }}
-                        </label>
+                      <div v-else>
+                        <hr style="height: 3px;">
+                        <div>
+                          <strong>
+                            {{ $t("evaluationFormStudent.footer.yourAnswer") }} von
+                            {{ getDateString(row.answerUpdatedAt) }}:
+                          </strong>
+                        </div>
+                        <br>
+                        <div class="row">
+                        <span :id="'htmlToText'+ row.id" v-html="row.answerTextContent">
+                        </span>
+                        </div>
                       </div>
-                    </div>
+                      <br>
+                      <div v-if="!row.isAnswerReviewed"
+                           class="row">
+                        <div class="col-sm-1" style="margin-right: 20px !important;">
+                          <div class="col-sm-1">
+                            <button class="btn btn-success btn-htw-green"
+                                    type="submit"
+                                    v-on:click="saveMyAnswer
+                                  (row._id, row.answerTextContent, row.studentAllowsToPublish)">
+                              {{ $t("evaluationFormStudent.footer.buttonPost") }}
+                            </button>
+                          </div>
+                        </div>
+                        <div class="col-md-10">
+                          <input class="form-check-input" type="checkbox"
+                                 id="checkboxForPublish"
+                                 v-model="row.studentAllowsToPublish"
+                                 @change="onCheckboxChange($event)"
+                                 title="Bitte vergessen Sie nicht, den neuen Zustand zu speichern.">
+                          <label>
+                            &nbsp; {{ $t("evaluationFormStudent.footer.checkboxPermission") }}
+                          </label>
+                        </div>
+                      </div>
+                    </fieldset>
                   </div>
                 </div>
                 <!--              </div>-->
@@ -231,8 +217,11 @@
           </div>
         </fieldset>
       </div>
-      <div>
+      <div hidden>
         <template-english ref="englishTemplate"></template-english>
+      </div>
+      <div hidden>
+        <template-german ref="germanTemplate"></template-german>
       </div>
     </div>
   </div>
@@ -247,6 +236,7 @@ import Internship from '@/models/Internship';
 import Company from '@/models/Company';
 import { mapState } from 'vuex';
 import TemplateEnglish from '@/components/form/templateEnglish.vue';
+import TemplateGerman from '@/components/form/templateGerman.vue';
 import Editor from '../Editor.vue';
 
 export default defineComponent({
@@ -268,6 +258,7 @@ export default defineComponent({
   computed: mapState(['userProfile']),
   components: {
     TemplateEnglish,
+    TemplateGerman,
     Editor,
   },
   mounted() {
@@ -297,9 +288,8 @@ export default defineComponent({
         this.internship = res.data;
         this.evaluationFile = res.data.evaluationFile;
         this.company = res.data.company;
-        console.log(this.company);
-        console.log(this.internship);
-        await this.setValuesToTemplate();
+        await this.setValuesToTemplateGerman();
+        await this.setValuesToTemplateEnglish();
       } catch (err) {
         await this.$store.dispatch('addNotification', {
           text: `Konnte kein Praktikum gefunden werden. [ERROR: ${err.message}]`,
@@ -309,13 +299,12 @@ export default defineComponent({
       this.isLoading = false;
     },
     async saveMyAnswer(questionId, answerText, isAnswerChecked) {
-      const sampleText = 'Please write a neutral, detailed, fair answer. This might help many of your fellow students to find a good internship place.';
-      const sampleTextHTML = '<p>Please write a neutral, detailed, fair answer. This might help many of your fellow students to find a good internship place.</p>';
+      const sampleText = 'Share your experiences with your fellow students.';
+      const sampleTextHTML = '<p>Share your experiences with your fellow students.</p>';
 
       const sampleTextNoSpace = sampleText.toLowerCase().split(' ').join('');
       const sampleTextHTMLNoSpace = sampleTextHTML.toLowerCase().split(' ').join('');
       const answerTextNoSpace = answerText.toLowerCase().split(' ').join('');
-      console.log(this.content);
       if ((this.content === '' && answerTextNoSpace === sampleTextNoSpace)
         || (this.content === '' && answerTextNoSpace === sampleTextHTMLNoSpace)
         || this.content.toLowerCase().split(' ').join('') === sampleTextNoSpace
@@ -328,7 +317,7 @@ export default defineComponent({
         return;
       }
       // eslint-disable-line no-alert
-      const userDoubleChecked = window.confirm('Sind Sie mit Ihrer Antwort sicher? Sie haben noch 2 Stunden Zeit, Ihre Antwort zu bearbeiten, danach ist es nicht mehr möglich.');
+      const userDoubleChecked = window.confirm('Sind Sie mit Ihrer Antwort sicher?');
       if (userDoubleChecked) {
         try {
           if (this.content === '') {
@@ -358,11 +347,37 @@ export default defineComponent({
         }
       }
     },
+    async saveMyAgreement(iAgree) {
+      const myAgreement = document.getElementById(iAgree.target.id) as HTMLInputElement;
+      try {
+        await http.patch(`/internships/${this.$route.params.id}/agreementToUpdate`, null, {
+          params: {
+            showMyProfile: myAgreement.checked,
+          },
+        });
+        await this.$store.dispatch('addNotification', {
+          text: 'Neuer Status zu Ihrem Einverständnis erfolgreich abgespeichert',
+          type: 'success',
+        });
+      } catch (err) {
+        await this.$store.dispatch('addNotification', {
+          text: `${err.response.data.error.message}`,
+          type: 'danger',
+        });
+      }
+    },
     async checkDropMenus() {
-      const selectedFormat = document.getElementById('formatSelection') as HTMLSelectElement;
       const selectedLanguage = document.getElementById('languageSelection') as HTMLSelectElement;
-      if (selectedFormat.value !== 'null' && selectedLanguage.value !== 'null') {
-        this.exportHTML(selectedFormat, selectedLanguage);
+      let pageContent = null;
+      if (selectedLanguage.value !== 'null') {
+        console.log(selectedLanguage.value);
+        if (selectedLanguage.value === 'de') {
+          pageContent = (this.$refs.germanTemplate as any).$el.parentElement.innerHTML;
+        }
+        if (selectedLanguage.value === 'en') {
+          pageContent = (this.$refs.englishTemplate as any).$el.parentElement.innerHTML;
+        }
+        this.exportHTML(pageContent, selectedLanguage);
       } else {
         await this.$store.dispatch('addNotification', {
           text: 'Bitte die beide Dropdown Menus überprüfen',
@@ -370,33 +385,21 @@ export default defineComponent({
         });
       }
     },
-    exportHTML(selectedFormat, selectedLanguage) {
+    exportHTML(pageContent, selectedLanguage) {
       const fileDownload = document.createElement('a');
       let header = '';
       let sourceHTML;
-      let hrefToAdd;
-      let fileExtension;
-
-      console.log(this.internship);
       const footer = '</body></html>';
 
-      if (selectedFormat.value === 'rawText') {
-        header = "<head><meta charset='utf-8'></head><body>";
-        hrefToAdd = 'data:text/plain;charset=utf-8';
-        fileExtension = 'txt';
-      }
-      if (selectedFormat.value === 'msWord') {
-        header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "
-          + "xmlns:w='urn:schemas-microsoft-com:office:word' "
-          + "xmlns='http://www.w3.org/TR/REC-html40'>"
-          + "<head><meta charset='utf-8'></head><body>";
-        hrefToAdd = 'data:application/vnd.ms-word;charset=utf-8';
-        fileExtension = 'doc';
-      }
-      if (selectedFormat.value === 'openOffice') {
-        console.log('');
-      }
+      header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "
+        + "xmlns:w='urn:schemas-microsoft-com:office:word' "
+        + "xmlns='http://www.w3.org/TR/REC-html40'>"
+        + "<head><meta charset='utf-8'></head><body>";
+      const hrefToAdd = 'data:application/vnd.ms-word;charset=utf-8';
+
       sourceHTML = header;
+      sourceHTML += pageContent;
+      sourceHTML += '<p style="page-break-after: always;">&nbsp;</p>\n';
       this.evaluationFile.questions.forEach((question) => {
         if (question.answerUpdatedAt !== 'undefined') {
           const answerBlock = `<u><b>Title:</b> ${question.title}</u><br><br>${question.answerTextContent}<br><hr>`;
@@ -405,13 +408,14 @@ export default defineComponent({
       });
       sourceHTML += footer;
       document.body.appendChild(fileDownload);
+      // Tutorial https://phppot.com/javascript/how-to-export-html-to-word-document-with-javascript/
       const source = `${hrefToAdd},${encodeURIComponent(sourceHTML)}`;
       fileDownload.href = source;
-      fileDownload.download = `${this.evaluationFile.inSemester}_${this.company.companyName}.${fileExtension}`;
+      fileDownload.download = `${this.evaluationFile.inSemester}_${this.company.companyName}_${selectedLanguage.value}.doc`;
       fileDownload.click();
       document.body.removeChild(fileDownload);
     },
-    async setValuesToTemplate() {
+    async setValuesToTemplateEnglish() {
       (this.$refs.englishTemplate as any).inSemester = this.evaluationFile.inSemester;
       (this.$refs.englishTemplate as any).startDate = this.startDate;
       (this.$refs.englishTemplate as any).endDate = this.endDate;
@@ -423,12 +427,30 @@ export default defineComponent({
       console.log(this.company.companyName);
       (this.$refs.englishTemplate as any).companyName = this.company.companyName;
       (this.$refs.englishTemplate as any).operationalArea = this.internship.operationalArea;
-      (this.$refs.englishTemplate as any).address = this.company.address.street
-        + this.company.address.streetNumber + this.company.address.zip
-        + this.company.address.city + this.company.address.country;
+      (this.$refs.englishTemplate as any).address = `${this.company.address.street} ${this.company.address.streetNumber},
+      ${this.company.address.zip}, ${this.company.address.city} ${this.company.address.country}`;
       (this.$refs.englishTemplate as any).supervisor = (this.internship.supervisor as any)
         .fullName;
       (this.$refs.englishTemplate as any).emailSupervisor = (this.internship.supervisor as any)
+        .emailAddress;
+    },
+    async setValuesToTemplateGerman() {
+      (this.$refs.germanTemplate as any).inSemester = this.evaluationFile.inSemester;
+      (this.$refs.germanTemplate as any).startDate = this.startDate;
+      (this.$refs.germanTemplate as any).endDate = this.endDate;
+      (this.$refs.germanTemplate as any).firstName = this.userProfile.firstName;
+      (this.$refs.germanTemplate as any).lastName = this.userProfile.lastName;
+      (this.$refs.germanTemplate as any).matriculation = this.userProfile.studentProfile.studentId
+        .substring(2, this.userProfile.studentProfile.studentId.length);
+      (this.$refs.germanTemplate as any).emailStudent = this.userProfile.emailAddress;
+      console.log(this.company.companyName);
+      (this.$refs.germanTemplate as any).companyName = this.company.companyName;
+      (this.$refs.germanTemplate as any).operationalArea = this.internship.operationalArea;
+      (this.$refs.germanTemplate as any).address = `${this.company.address.street} ${this.company.address.streetNumber},
+      ${this.company.address.zip}, ${this.company.address.city} ${this.company.address.country}`;
+      (this.$refs.germanTemplate as any).supervisor = (this.internship.supervisor as any)
+        .fullName;
+      (this.$refs.germanTemplate as any).emailSupervisor = (this.internship.supervisor as any)
         .emailAddress;
     },
   },

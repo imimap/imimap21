@@ -1,5 +1,5 @@
 <template>
-  <p style="text-align: center;">
+   <p style="text-align: center; margin-top: 150px;">
     <strong>
       <span style="font-family: Arial, Helvetica, sans-serif; font-size: 18px;">
         Report on the specialized internship
@@ -8,8 +8,10 @@
   </p>
   <br>
   <br>
+  <br>
+  <br>
   <table
-    style="width: 50%;margin-left: auto;margin-right: auto;">
+    style="margin-left: auto;margin-right: auto;">
     <tbody>
     <tr style="border: none;">
       <td>
@@ -63,7 +65,7 @@
       </td>
       <td>
         <span style="font-family: Arial, Helvetica, sans-serif;">
-          IMI (B), FB 4
+          IMI (B), Faculty 4
         </span>
       </td>
     </tr>
@@ -82,7 +84,10 @@
     </tbody>
   </table>
   <br>
-  <table style="width: 50%;margin-left: auto;margin-right: auto;">
+  <br>
+  <br>
+  <br>
+  <table style="margin-left: auto;margin-right: auto;">
     <tbody>
     <tr>
       <td>
@@ -94,7 +99,7 @@
       </td>
       <td>
         <span style="font-family: Arial, Helvetica, sans-serif;">
-          as {{ operationalArea }} in {{companyName}}
+          as "{{ operationalArea }}" in "{{ companyName }}"
         </span>
       </td>
     </tr>
@@ -113,7 +118,10 @@
     </tbody>
   </table>
   <br>
-  <table style="width: 50%;margin-left: auto;margin-right: auto;">
+  <br>
+  <br>
+  <br>
+  <table style="margin-left: auto;margin-right: auto;">
     <tbody>
     <tr>
       <td>
@@ -144,7 +152,10 @@
     </tbody>
   </table>
   <br>
-  <table style="width: 50%;margin-left: auto;margin-right: auto;">
+  <br>
+  <br>
+  <br>
+  <table style="margin-left: auto;margin-right: auto;">
     <tbody>
     <tr>
       <td>
@@ -157,14 +168,14 @@
       <td>
         <strong>
           <span style="font-family: Arial, Helvetica, sans-serif;">
-            Date and signature of the Company
+            &nbsp;&nbsp;&nbsp;&nbsp;Date and signature of the Company
           </span>
         </strong>
       </td>
     </tr>
     </tbody>
   </table>
-
+  <p style="page-break-after: always;">&nbsp;</p>
 </template>
 
 <script lang="ts">

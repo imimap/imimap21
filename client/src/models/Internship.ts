@@ -44,4 +44,6 @@ export default class Internship {
   events = [];
 
   evaluationFile = '';
+
+  showMyProfile = '';
 }

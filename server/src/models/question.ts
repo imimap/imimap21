@@ -43,7 +43,7 @@ export const QuestionSchema = new Schema({
   answerTextContent: {
     type: String,
     required: true,
-    default: 'We are hungry to know ;-)',
+    default: 'Share your experiences with your fellow students.',
   },
   answerUpdatedAt: {
     type: Date,

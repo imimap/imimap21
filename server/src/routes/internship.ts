@@ -12,6 +12,7 @@ import {
   getInternshipEvaluation,
   updateAnswerToPublish,
   getAllInternshipsInCompany,
+  updateAgreementOnInternship,
 } from "../controllers/internship";
 import { isObjectId, validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
@@ -224,6 +225,17 @@ internshipRouter.patch(
   ]),
   validate,
   asyncHandler(updateAnswerToPublish)
+);
+
+internshipRouter.patch(
+  "/:id/agreementToUpdate",
+  authMiddleware(),
+  param("id").custom(isObjectId),
+  query([
+    "showMyProfile",
+  ]),
+  validate,
+  asyncHandler(updateAgreementOnInternship)
 );
 
 export default internshipRouter;
