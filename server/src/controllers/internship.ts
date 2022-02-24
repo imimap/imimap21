@@ -936,7 +936,7 @@ export async function getAllInternshipsInCompany(
     "evaluationFile.questions.studentAllowsToPublish " +
     "evaluationFile.questions.isAnswerPublished";
 
-  const internshipsToShow = await Internship.find({ company: req.params.id })
+  const internshipsToShow = await Internship.find({ company: req.params.id }).select("showMyProfile")
     .select(INTERNSHIP_FIELDS_QUESTION_ANSWER);
   if (!internshipsToShow) return next(new NotFound("Internship not found"));
 
@@ -945,9 +945,7 @@ export async function getAllInternshipsInCompany(
   let internshipModule = null;
   let internshipOwner = null;
 
-  console.log(internshipsToShow);
-
-  for (let[index, internship] of internshipsToShow.entries()) {
+  for (const internship of internshipsToShow) {
     let questions = [];
     const evaluationFile = internship?.evaluationFile;
     if(evaluationFile) {
@@ -962,11 +960,7 @@ export async function getAllInternshipsInCompany(
       internshipModule = await InternshipModule.find({ internships: internship.id });
       internshipOwner = await User.findOne({ "studentProfile.internship": internshipModule[0]._id}, {_id: false, emailAddress: true, firstName: true});
     }
-
-    console.log(questions.length);
-
     if(questions.length !== 0) evaluationsAndProfiles.set(internship.id, {internshipOwner, questions, inSemester});
-
   }
 
   res.json(Array.from(evaluationsAndProfiles));
