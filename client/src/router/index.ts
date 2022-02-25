@@ -38,6 +38,9 @@ import EvaluationsList from '@/components/evaluation/EvaluationsList.vue';
 import EvaluationFormStudent from '@/components/evaluation/EvaluationFormStudent.vue';
 import ReviewQuestions from '@/components/question/ReviewQuestions.vue';
 import ShowEvaluationsToStudent from '@/views/ShowEvaluationsToStudent.vue';
+import FeedbacksList from '@/components/feedback/FeedbacksList.vue';
+import CreateFeedback from '@/components/feedback/CreateFeedback.vue';
+import EditFeedback from '@/components/feedback/EditFeedback.vue';
 
 // @TODO: Router auf Modules aufteilen
 const routes: Array<RouteRecordRaw> = [
@@ -258,6 +261,30 @@ const routes: Array<RouteRecordRaw> = [
             path: 'reviews',
             name: 'ReviewQuestions',
             component: ReviewQuestions,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+          {
+            path: 'feedbacks',
+            name: 'FeedbacksList',
+            component: FeedbacksList,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+          {
+            path: 'editFeedback/:id',
+            name: 'EditFeedback',
+            component: EditFeedback,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+          {
+            path: 'newFeedback',
+            name: 'CreateFeedback',
+            component: CreateFeedback,
             meta: {
               allowAnonymous: false,
             },

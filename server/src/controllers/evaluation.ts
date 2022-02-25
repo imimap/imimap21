@@ -20,9 +20,6 @@ function getEvaluationObject(propsObject: any) {
   for (const prop of directProps) {
     if(propsObject[prop]) {
       evaluationProps[prop] = propsObject[prop];
-      // console.log(questionProps[prop]);
-      // console.log(propsObject[prop]);
-      // console.log(prop);
     }
   }
 

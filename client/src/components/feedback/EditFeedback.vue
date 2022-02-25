@@ -3,12 +3,14 @@
     <div id="form">
       <h3>Edit Modus</h3>
       <br>
-      <form>
+      <form @submit.prevent="updateFeedback">
         <div class="col-auto">
-          <label for="isQuestionActive" class="form-label">Status</label>
+          <label for="isFeedbackActive" class="form-label">
+            Status (Ob Feedback sichtbar werden soll)
+          </label>
           <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" id="isQuestionActive"
-                   v-model="isQuestionActive">
+            <input class="form-check-input" type="checkbox" id="isFeedbackActive"
+                   v-model="isFeedbackActive">
           </div>
         </div>
         <br>
@@ -21,17 +23,16 @@
         </div>
         <br>
         <div class="col-auto">
-          <label>
-            Details der Frage
-          </label>
-          <div>
-            <editor v-model="content" :model-value="textContent"/>
-          </div>
+          <textarea v-model="explanation"
+                    class="form-control"
+                    id="explanationTextarea"
+                    rows="3">
+          </textarea>
         </div>
         <br>
         <div class="row">
           <div class="col-sm-1" style="margin-right: 10px !important;">
-            <router-link to="../questions">
+            <router-link to="../feedbacks">
               <button type="button"
                       class="btn btn-secondary">
                 Zurück
@@ -39,8 +40,7 @@
             </router-link>
           </div>
           <div class="col-sm-1">
-            <button v-on:click.stop.prevent="updateQuestion"
-                    class="btn btn-success btn-htw-green">
+            <button class="btn btn-success btn-htw-green" type="submit">
               Aktualisieren
             </button>
           </div>
@@ -54,61 +54,50 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
-import Question from '@/models/Question';
+import Feedback from '@/models/Feedback';
 import store from '@/store';
-import Editor from '../Editor.vue';
 
 export default defineComponent({
-  name: 'CreateQuestion',
+  name: 'CreateFeedback',
   data() {
     return {
       // New  Props
       id: null,
       title: '',
-      textContent: '',
-      isQuestionActive: '',
+      explanation: '',
+      isFeedbackActive: '',
       updatedAt: '',
-      question: new Question(),
+      feedback: new Feedback(),
       content: '',
     };
   },
-  components: {
-    Editor,
-  },
   mounted() {
-    this.getQuestion();
+    this.getFeedback();
   },
   methods: {
-    async getQuestion() {
-      const res = await http.get(`/questions/${this.$route.params.id}`);
-      this.question = res.data;
-      this.title = this.question.title;
-      this.textContent = this.question.textContent;
-      this.isQuestionActive = this.question.isQuestionActive;
-      this.updatedAt = this.question.updatedAt;
+    async getFeedback() {
+      const res = await http.get(`/feedbacks/${this.$route.params.id}`);
+      this.feedback = res.data;
+      this.title = this.feedback.title;
+      this.explanation = this.feedback.explanation;
+      this.isFeedbackActive = this.feedback.isFeedbackActive;
+      this.updatedAt = this.feedback.updatedAt;
     },
-    async updateQuestion() {
-      if ((this.content === '' || this.content === String('<p></p>')) && this.title === '') {
-        await this.$store.dispatch('addNotification', {
-          text: 'Bitte stellen Sie eine Frage zusammen mit einem Titel. Die Textboxen dürfen nicht leer bleiben. Oder haben Sie nichts bearbeitet.',
-          type: 'danger',
-        });
-        return false;
-      }
+    async updateFeedback() {
       // eslint-disable-line no-alert
       const userDoubleChecked = window.confirm('Sind Sie mit den Veränderungen sicher?');
       if (userDoubleChecked) {
         try {
-          await http.patch(`/questions/${this.$route.params.id}`, {
+          await http.patch(`/feedbacks/${this.$route.params.id}`, {
             title: this.title,
-            textContent: this.content,
-            isQuestionActive: this.isQuestionActive.toString(),
+            explanation: this.explanation,
+            isFeedbackActive: this.isFeedbackActive.toString(),
             updatedAt: Date.now(),
           });
           await store.dispatch('addNotification', {
-            text: 'Frage erfolgreich aktualisiert!',
+            text: 'Feedback erfolgreich aktualisiert!',
             type: 'success',
-          }).then(() => this.$router.push({ name: 'QuestionsList' }));
+          }).then(() => this.$router.push({ name: 'FeedbacksList' }));
         } catch (err) {
           await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
         }

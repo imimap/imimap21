@@ -5,7 +5,9 @@
       <br>
       <form @submit.prevent="createQuestion">
         <div class="col-auto">
-          <label for="isQuestionActive" class="form-label">Status</label>
+          <label for="isQuestionActive" class="form-label">
+            Status (Ob Feedback sichtbar werden soll)
+          </label>
           <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" id="isQuestionActive"
                    v-model="isQuestionActive">
@@ -21,6 +23,9 @@
         </div>
         <br>
         <div class="col-auto">
+          <label>
+            Details der Frage
+          </label>
           <div>
             <editor v-model="textContent"/>
           </div>

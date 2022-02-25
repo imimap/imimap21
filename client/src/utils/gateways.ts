@@ -99,3 +99,11 @@ export const getEvaluationsList = async () => apiClient.get('/evaluations')
     console.log(err);
     return [];
   });
+
+// here ask for the existing feedbacks in DB
+export const getFeedbacksList = async () => apiClient.get('/feedbacks')
+  .then((res) => res.data)
+  .catch((err) => {
+    console.log(err);
+    return [];
+  });

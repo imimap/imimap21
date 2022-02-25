@@ -5,11 +5,11 @@
       <div class="col-lg-4 col-md-6 d-flex">
         <div class="card text-center">
           <div class="card-body d-flex flex-column">
-            <p class="card-text">Hier können Sie die Vorlagen der Fragen verwalten</p>
+            <p class="card-text">Hier können Sie die Vorlagen der Fragen verwalten.</p>
             <router-link
               class="btn btn-success text-white align-self-end mx-auto mt-auto"
               to="questions">
-              Vorlagen bearbeiten
+              Fragen bearbeiten
             </router-link>
           </div>
         </div>
@@ -19,11 +19,11 @@
         <div class="card text-center">
           <div class="card-body d-flex flex-column">
             <p class="card-text">
-              Hier können Sie eine neue Liste der Fragen zum neuen Semester erstellen
+              Hier können Sie eine neue Liste der Fragen zum neuen Semester erstellen.
             </p>
             <router-link
               class="btn btn-success text-white align-self-end mx-auto mt-auto" to="evaluations">
-              Neue Liste erstellen
+              Neue Evaluationsliste erstellen
             </router-link>
           </div>
         </div>
@@ -43,6 +43,19 @@
         </div>
       </div>
 
+      <div class="col-lg-4 col-md-6 d-flex">
+        <div class="card text-center">
+          <div class="card-body d-flex flex-column">
+            <p class="card-text">
+              Hier können Sie ein neues Feedback erstellen und bearbeiten.
+            </p>
+            <router-link
+              class="btn btn-success text-white align-self-end mx-auto mt-auto" to="feedbacks">
+              Feedbacks bearbeiten
+            </router-link>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>

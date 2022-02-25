@@ -9,6 +9,7 @@ import postponementRequestRouter from "./postponementRequest";
 import infoRouter from "./info";
 import questionRouter from "./question";
 import evaluationRouter from "./evaluation";
+import feedbackRouter from "./feedback";
 
 const router = Router();
 
@@ -31,5 +32,7 @@ router.use("/info", infoRouter);
 router.use("/questions", questionRouter);
 
 router.use("/evaluations", evaluationRouter);
+
+router.use("/feedbacks", feedbackRouter);
 
 export default router;
