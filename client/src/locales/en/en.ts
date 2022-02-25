@@ -5,6 +5,7 @@ import address from '@/locales/en/address';
 import company from '@/locales/en/company';
 import actions from '@/locales/en/actions';
 import internship from '@/locales/en/internship';
+import postponement from '@/locales/en/postponement';
 
 const en = {
   header,
@@ -14,6 +15,7 @@ const en = {
   address,
   company,
   internship,
+  postponement,
 };
 
 export default en;
