@@ -6,7 +6,7 @@
               v-model="sorting"
               @change="$emit('sortingChange', sorting)"
       >
-        <option selected value="" ref="sortDefault">Sortieren nach...</option>
+        <option selected value="">Sortieren nach...</option>
         <option value="lastName">Nachname</option>
         <option value="studentId">Matrikelnummer</option>
       </select>
@@ -17,7 +17,7 @@
               v-model="semester"
               @change="$emit('semesterChange', semester)"
       >
-        <option selected value="" ref="semesterDefault">Alle Semester</option>
+        <option selected value="">Alle Semester</option>
         <option v-for="semester in availableSemesters"
                 :key="semester"
                 :value="semester"
@@ -32,7 +32,7 @@
               v-model="filter"
               @change="$emit('filterChange', filter)"
       >
-        <option selected value="" ref="statusDefault">Alle Status...</option>
+        <option selected value="">Alle Status...</option>
         <option v-for="status in availableStatuses"
                 :key="status"
                 :value="status">
@@ -82,9 +82,9 @@ export default defineComponent({
   },
   methods: {
     reset() {
-      (this.$refs.sortDefault as HTMLOptionElement).click();
-      (this.$refs.semesterDefault as HTMLOptionElement).click();
-      (this.$refs.statusDefault as HTMLOptionElement).click();
+      this.sorting = '';
+      this.filter = '';
+      this.semester = '';
       this.search = '';
       this.$emit('reset');
     },
