@@ -29,7 +29,7 @@
     </div>
   </div>
 
-  <EditInternshipModal :student="selectedStudent"/>
+  <EditInternshipModal :student="selectedStudent" @updateStudent="updateStudent"/>
   <EditInternshipPartModal :student="selectedStudent"
                            :internship-index="selectedInternshipIndex"
   />

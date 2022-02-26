@@ -11,7 +11,12 @@
           <h5 class="modal-title" id="internshipModuleEditModalLabel">
             Praktikumsmodul bearbeiten
           </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  ref="closeButton"
+          />
         </div>
         <div class="modal-body">
           <p>
@@ -26,16 +31,19 @@
                    id="inSemester"
                    aria-describedby="inSemester"
                    :placeholder="internship?.inSemester"
+                   v-model="inSemester"
             >
           </div>
 
           <div class="mb-3">
             <label for="inSemesterOfStudy" class="form-label">Hochschulsemester</label>
-            <input type="text"
+            <input type="number"
+                   min="1"
                    class="form-control"
                    id="inSemesterOfStudy"
                    aria-describedby="inSemesterOfStudy"
                    :placeholder="internship?.inSemesterOfStudy"
+                   v-model="inSemesterOfStudy"
             >
           </div>
 
@@ -46,6 +54,7 @@
                      type="checkbox"
                      id="AepPassed"
                      :checked="internship?.aepPassed"
+                     v-model="aepPassed"
               >
             </div>
           </div>
@@ -69,11 +78,21 @@
 import { defineComponent, PropType } from 'vue';
 import Student from '@/models/Student';
 import InternshipModule from '@/models/InternshipModule';
+import { updateInternshipModule } from '@/utils/gateways';
+import { showSuccessNotification } from '@/utils/notification';
 
 export default defineComponent({
   name: 'EditInternshipModal',
   props: {
     student: Object as PropType<Student>,
+  },
+  emits: ['updateStudent'],
+  data() {
+    return {
+      inSemester: undefined,
+      inSemesterOfStudy: undefined,
+      aepPassed: undefined,
+    };
   },
   computed: {
     internship(): InternshipModule | undefined {
@@ -81,9 +100,34 @@ export default defineComponent({
     },
   },
   methods: {
-    updateInternshipModule() {
-      // TODO: Implement me
-      console.log('implement me');
+    async updateInternshipModule() {
+      if (!this.internship) return;
+      const payload: { [k: string]: unknown } = {};
+      if (this.inSemester !== undefined && this.inSemester !== this.internship.inSemester) {
+        payload.inSemester = this.inSemester;
+      }
+      if (this.inSemesterOfStudy !== undefined
+        && this.inSemesterOfStudy !== this.internship.inSemesterOfStudy) {
+        payload.inSemesterOfStudy = this.inSemesterOfStudy;
+      }
+      if (this.aepPassed !== undefined && this.aepPassed !== this.internship.aepPassed) {
+        payload.aepPassed = this.aepPassed;
+      }
+      await updateInternshipModule(this.internship._id, payload);
+      this.$emit('updateStudent', this.student?._id);
+      await showSuccessNotification('Änderungen am Praktikumsmodul gespeichert');
+      (this.$refs.closeButton as HTMLButtonElement).click();
+      this.reset();
+    },
+    reset() {
+      this.inSemester = undefined;
+      this.inSemesterOfStudy = undefined;
+      this.aepPassed = undefined;
+    },
+  },
+  watch: {
+    student() {
+      this.reset();
     },
   },
 });
