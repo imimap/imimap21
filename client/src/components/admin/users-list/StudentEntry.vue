@@ -84,11 +84,6 @@
                 >
                   Details bearbeiten
                 </button>
-                <button class="btn btn-danger" type="button"
-                        @click="deleteInternshipModule"
-                >
-                  Löschen
-                </button>
               </div>
             </div>
           </div>
@@ -105,11 +100,7 @@ import { defineComponent, PropType } from 'vue';
 import { getDateString, getInternshipModuleDuration, getTimeDifferenceDays } from '@/utils/admin';
 import internshipModuleStatusColors from '@/models/InternshipModuleStatus';
 import Student from '@/models/Student';
-import {
-  clearStudentSearch,
-  deleteInternshipModule,
-  markAepPassedOnInternshipModule,
-} from '@/utils/gateways';
+import { clearStudentSearch, markAepPassedOnInternshipModule } from '@/utils/gateways';
 import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
 import InternshipPart from '@/components/admin/users-list/InternshipPart.vue';
 import InternshipModule from '@/models/InternshipModule';
@@ -155,14 +146,6 @@ export default defineComponent({
       await showSuccessNotification(`Das AEP für ${this.student.firstName} ${this.student.lastName} als bestanden markiert.`);
       this.$emit('updateStudent', this.student._id);
     },
-    async deleteInternshipModule() {
-      // TODO: API Endpoint doesn't exist. Is this really needed?
-      const userDoubleChecked = window.confirm('Praktikumsmodul wirklich löschen?');
-      if (!userDoubleChecked) return;
-      const result = await deleteInternshipModule(this.student.studentProfile.internship._id);
-      if (!result) return;
-      await showSuccessNotification('Das Praktikumsmodul wurde gelöscht.');
-    },
     async clearSearch() {
       const userDoubleChecked = window.confirm(`Suchanfragen für ${this.student.firstName}
       ${this.student.lastName} zurücksetzen?`);
@@ -180,11 +163,7 @@ export default defineComponent({
       this.$emit('editInternshipPart', this.student, internshipPartIndex);
     },
     updateInternship(index: number, internship: Internship) {
-      // TODO: Maybe use the updated internship returned by the API for updating the frontend.
-      // Currently the updated internship doesn't populate the company, so there is some data
-      // missing. Merge updated internship with existing one?
-      // this.$emit('updateInternship', this.student._id, index, internship);
-      this.$emit('updateStudent', this.student._id);
+      this.$emit('updateInternship', this.student._id, index, internship);
     },
   },
 });

@@ -66,14 +66,17 @@ export const updateInternshipModule = async (
   }
 };
 
-export const deleteInternshipModule = async (internshipModuleId: string): Promise<boolean> => {
+export const updateInternship = async (
+  id: string,
+  payload: unknown,
+): Promise<Internship | null> => {
   try {
-    await apiClient.delete(`/internship-modules/${internshipModuleId}`);
-    return true;
+    const response = await apiClient.patch(`/internships/${id}`, payload);
+    return response.data;
   } catch (err: any) {
     if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
-    await showErrorNotification(`Fehler beim Löschen vom Internship Module ${internshipModuleId} [ERROR: ${err.message}]`);
-    return false;
+    await showErrorNotification(`Fehler beim Updaten vom Praktikum ${id} [ERROR: ${err.message}]`);
+    return null;
   }
 };
 

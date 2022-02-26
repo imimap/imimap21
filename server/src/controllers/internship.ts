@@ -441,8 +441,8 @@ export async function getAllProgrammingLanguages(
   res.json(programmingLanguages);
 }
 
-function getInternshipObject(propsObject: any) {
-  const internshipProps: { [k: string]: unknown } = {};
+function getInternshipObject(propsObject: Record<string, unknown>) {
+  const internshipProps: Record<string, unknown> = {};
 
   //direct props of internship
   const directProps = [
@@ -457,16 +457,24 @@ function getInternshipObject(propsObject: any) {
     "paymentTypes",
   ];
   for (const prop of directProps) {
-    if (propsObject[prop]) internshipProps[prop] = propsObject[prop];
+    if (propsObject[prop] !== undefined) internshipProps[prop] = propsObject[prop];
   }
 
-  if (propsObject.companyId) internshipProps.company = propsObject.companyId;
+  if (propsObject.companyId !== undefined) internshipProps.company = propsObject.companyId;
 
   //supervisor props
-  internshipProps["supervisor"] = {
-    fullName: propsObject.supervisorFullName,
-    emailAddress: propsObject.supervisorEmailAddress,
-  };
+  if (
+    propsObject.supervisorFullName !== undefined ||
+    propsObject.supervisorEmailAddress !== undefined
+  ) {
+    internshipProps["supervisor"] = {};
+    if (propsObject.supervisorFullName !== undefined)
+      (internshipProps["supervisor"] as Record<string, unknown>).fullName =
+        propsObject.supervisorFullName;
+    if (propsObject.supervisorEmailAddress !== undefined)
+      (internshipProps["supervisor"] as Record<string, unknown>).emailAddress =
+        propsObject.supervisorEmailAddress;
+  }
 
   return internshipProps;
 }
@@ -545,7 +553,7 @@ export async function updateInternship(
     internshipToUpdate.status !== InternshipStatuses.PLANNED &&
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    !Object.keys(req.query).every((prop: string) => mutableProps.includes(prop))
+    !Object.keys(req.body).every((prop: string) => mutableProps.includes(prop))
   ) {
     return next(
       new Forbidden(
@@ -554,13 +562,7 @@ export async function updateInternship(
     );
   }
 
-  for (const prop in req.query) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    internshipToUpdate[prop] = req.query[prop];
-  }
-
-  const internshipProps = getInternshipObject(req.query);
+  const internshipProps = getInternshipObject(req.body);
   const updateEvent = {
     creator: user._id,
     changes: internshipProps,
@@ -568,6 +570,8 @@ export async function updateInternship(
   };
 
   internshipToUpdate.events.push(updateEvent);
+
+  Object.assign(internshipToUpdate, internshipProps);
 
   const savedInternship = await internshipToUpdate.save();
   if (!savedInternship) return next(new BadRequest("Could not update internship"));

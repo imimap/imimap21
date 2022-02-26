@@ -83,7 +83,6 @@ export async function updateInternshipModule(
   ];
 
   const changes: { [key: string]: unknown } = {};
-  console.log(req.body);
 
   for (const prop of possibleProperties) {
     if (req.body[prop] !== undefined) {
@@ -91,7 +90,6 @@ export async function updateInternshipModule(
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       internshipToUpdate[prop] = req.body[prop];
-      console.log(prop, req.body[prop]);
     }
   }
 

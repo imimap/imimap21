@@ -1,6 +1,8 @@
 import Company from '@/models/Company';
 
 export default class Internship {
+  _id = '';
+
   company = '';
 
   companyDetails = new Company();

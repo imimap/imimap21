@@ -32,6 +32,7 @@
   <EditInternshipModal :student="selectedStudent" @updateStudent="updateStudent"/>
   <EditInternshipPartModal :student="selectedStudent"
                            :internship-index="selectedInternshipIndex"
+                           @updateInternship="updateInternship"
   />
 </template>
 
@@ -117,8 +118,14 @@ export default defineComponent({
       this.selectedInternshipIndex = internshipPartIndex;
     },
     updateInternship(studentId: string, internshipIndex: number, internship: Internship) {
+      // TODO: Maybe use the updated internship returned by the API for updating the frontend.
+      // Currently the updated internship doesn't populate the company, so there is some data
+      // missing. Merge updated internship with existing one?
+      /*
       const index = this.findStudentIndexById(studentId);
       this.students[index].studentProfile.internship.internships[internshipIndex] = internship;
+       */
+      this.updateStudent(studentId);
     },
   },
 });

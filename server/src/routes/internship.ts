@@ -90,7 +90,7 @@ internshipRouter.patch(
   "/:id",
   authMiddleware(),
   param("id").custom(isObjectId),
-  query([
+  body([
     "startDate",
     "endDate",
     "tasks",

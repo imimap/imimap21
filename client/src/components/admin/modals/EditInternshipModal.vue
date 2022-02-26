@@ -43,7 +43,7 @@
                    id="inSemesterOfStudy"
                    aria-describedby="inSemesterOfStudy"
                    :placeholder="internship?.inSemesterOfStudy"
-                   v-model="inSemesterOfStudy"
+                   v-model.number="inSemesterOfStudy"
             >
           </div>
 
@@ -80,6 +80,7 @@ import Student from '@/models/Student';
 import InternshipModule from '@/models/InternshipModule';
 import { updateInternshipModule } from '@/utils/gateways';
 import { showSuccessNotification } from '@/utils/notification';
+import { createPayloadFromChangedProps } from '@/utils/admin';
 
 export default defineComponent({
   name: 'EditInternshipModal',
@@ -88,10 +89,17 @@ export default defineComponent({
   },
   emits: ['updateStudent'],
   data() {
+    const initialProps = {
+      inSemester: undefined as string | undefined,
+      inSemesterOfStudy: undefined as number | undefined,
+      aepPassed: undefined as boolean | undefined,
+    };
+
+    const updatableProperties = Object.keys(initialProps);
+
     return {
-      inSemester: undefined,
-      inSemesterOfStudy: undefined,
-      aepPassed: undefined,
+      updatableProperties,
+      ...initialProps,
     };
   },
   computed: {
@@ -102,18 +110,13 @@ export default defineComponent({
   methods: {
     async updateInternshipModule() {
       if (!this.internship) return;
-      const payload: { [k: string]: unknown } = {};
-      if (this.inSemester !== undefined && this.inSemester !== this.internship.inSemester) {
-        payload.inSemester = this.inSemester;
-      }
-      if (this.inSemesterOfStudy !== undefined
-        && this.inSemesterOfStudy !== this.internship.inSemesterOfStudy) {
-        payload.inSemesterOfStudy = this.inSemesterOfStudy;
-      }
-      if (this.aepPassed !== undefined && this.aepPassed !== this.internship.aepPassed) {
-        payload.aepPassed = this.aepPassed;
-      }
-      await updateInternshipModule(this.internship._id, payload);
+      const payload = createPayloadFromChangedProps(
+        this.updatableProperties,
+        this.$data,
+        this.internship,
+      );
+      const updatedInternshipModule = await updateInternshipModule(this.internship._id, payload);
+      if (updatedInternshipModule === null) return;
       this.$emit('updateStudent', this.student?._id);
       await showSuccessNotification('Änderungen am Praktikumsmodul gespeichert');
       (this.$refs.closeButton as HTMLButtonElement).click();

@@ -99,7 +99,7 @@ export default defineComponent({
   },
   props: {
     internship: Object as PropType<Internship>,
-    index: Number,
+    index: Object as PropType<string | number>,
   },
   emits: ['editInternshipPart', 'updateInternship'],
   methods: {
