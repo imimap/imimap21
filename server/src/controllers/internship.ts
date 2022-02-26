@@ -8,7 +8,8 @@ import { LeanDocument, Types } from "mongoose";
 import { UploadedFile } from "express-fileupload";
 import * as fsPromises from "fs/promises";
 import * as pdf from "html-pdf";
-import {Evaluation} from "../models/evaluation";
+import { Evaluation } from "../models/evaluation";
+import { Feedback } from "../models/feedback";
 
 const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
   "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes";
@@ -842,6 +843,48 @@ export async function updateAgreementOnInternship(
   internshipToUpdate.showMyProfile = req.query.showMyProfile;
   const savedInternship = await internshipToUpdate.save();
   if (!savedInternship) return next(new BadRequest("Could not update the Agreement"));
+
+  res.json(internshipToUpdate);
+}
+
+/**
+ * Updates the given Feedback on how did find the internship after registering the internship.
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function updateFeedbackOnInternship(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email })
+    .select("isAdmin studentProfile")
+    .populate({
+      path: "studentProfile.internship",
+      lean: true,
+    });
+
+  if (!user) return next(new NotFound("User not found"));
+  if (!user.isAdmin) {
+    if (!user.studentProfile) return next(new NotFound("Student not found"));
+    if (!user.studentProfile.internship.internships.includes(req.params.id))
+      return next(new Forbidden("You may only edit your own internship"));
+  }
+
+  const internshipToUpdate = await Internship.findById(req.params.id);
+  if (!internshipToUpdate) return next(new NotFound("Internship not found"));
+
+  const feedback = await Feedback.findById(req.query.feedbackId);
+  if (!feedback) return next(new NotFound("Feedback not found"));
+
+  // @ts-ignore
+  internshipToUpdate.feedback = feedback;
+  // @ts-ignore
+  internshipToUpdate.freetextFeedback = req.query.freetextFeedback;
+
+  const savedInternship = await internshipToUpdate.save();
+  if (!savedInternship) return next(new BadRequest("Could not update the feedback or the text"));
 
   res.json(internshipToUpdate);
 }

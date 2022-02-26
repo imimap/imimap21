@@ -13,6 +13,7 @@ import {
   updateAnswerToPublish,
   getAllInternshipsInCompany,
   updateAgreementOnInternship,
+  updateFeedbackOnInternship,
 } from "../controllers/internship";
 import { isObjectId, validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
@@ -236,6 +237,18 @@ internshipRouter.patch(
   ]),
   validate,
   asyncHandler(updateAgreementOnInternship)
+);
+
+internshipRouter.patch(
+  "/:id/feedbackToUpdate",
+  authMiddleware(),
+  param("id").custom(isObjectId),
+  query([
+    "feedbackId",
+    "freetextFeedback",
+  ]),
+  validate,
+  asyncHandler(updateFeedbackOnInternship)
 );
 
 export default internshipRouter;

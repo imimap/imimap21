@@ -339,6 +339,7 @@ export default defineComponent({
       existingCompany: {} as Company,
       // Component State
       toggleAddCompanyForm: false,
+      createdInternshipId: '',
     };
   },
   created() {
@@ -354,8 +355,12 @@ export default defineComponent({
   },
   methods: {
     async save() {
-      if (this.company !== null && await this.companyExists()) await this.postInternship();
-      else this.toggleAddCompanyForm = true;
+      if (this.company !== null && await this.companyExists()) {
+        await this.postInternship();
+        await this.$router.push({ name: 'AskForFeedback', params: { id: this.createdInternshipId } });
+      } else {
+        this.toggleAddCompanyForm = true;
+      }
     },
     async companyExists(): Promise<boolean> {
       if (this.company === null) return false;
@@ -401,7 +406,7 @@ export default defineComponent({
     },
     async postInternship() {
       try {
-        await http.post('/internships', {
+        const res = await http.post('/internships', {
           startDate: this.startDate,
           endDate: this.endDate,
           operationalArea: this.operationalArea,
@@ -417,6 +422,7 @@ export default defineComponent({
           supervisorEmailAddress: this.supervisorEmailAddress,
           tasks: this.tasks,
         });
+        this.createdInternshipId = res.data._id;
         await this.$store.dispatch('addNotification', { text: 'Praktikum erfolgreich angelegt!', type: 'success' });
       } catch (err) {
         await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });

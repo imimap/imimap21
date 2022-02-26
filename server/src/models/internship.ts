@@ -8,6 +8,7 @@ import { User } from "./user";
 import { EventSchema, IEvent } from "./event";
 import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
 import { EvaluationSchema, IEvaluation} from "./evaluation";
+import {FeedbackSchema, IFeedback} from "./feedback";
 
 export enum InternshipStatuses {
   UNKNOWN = "unknown",
@@ -50,6 +51,9 @@ export interface IInternship extends Document {
   status: string;
   evaluationFile?: IEvaluation;
   showMyProfile: boolean;
+  feedback?: IFeedback;
+  freetextFeedback: string;
+  isFreetextFeedbackReviewed: string;
 
   durationInWeeksSoFar(): number;
 
@@ -130,6 +134,16 @@ export const InternshipSchema = new Schema<IInternship>({
   ],
   evaluationFile: EvaluationSchema,
   showMyProfile: {
+    type: Boolean,
+    default: false,
+  },
+  feedback: FeedbackSchema,
+  freetextFeedback: {
+    type: String,
+    required: false,
+    default: undefined,
+  },
+  isFreetextFeedbackReviewed: {
     type: Boolean,
     default: false,
   },

@@ -17,9 +17,6 @@ function getFeedbackObject(propsObject: any) {
   for (const prop of directProps) {
     if(propsObject[prop]) {
       feedbackProps[prop] = propsObject[prop];
-      // console.log(feedbackProps[prop]);
-      // console.log(propsObject[prop]);
-      // console.log(prop);
     }
   }
 
@@ -38,19 +35,31 @@ export async function getAllFeedbacks(
   next: NextFunction
 ): Promise<void> {
 
+  const user = await User.findOne({ emailAddress: req.user?.email })
+    .select("isAdmin studentProfile")
+    .populate({
+      path: "studentProfile.internship",
+      lean: true,
+    });
+
+  if (!user) return next(new NotFound("User not found"));
+  if (!user.isAdmin) {
+    if (!user.studentProfile) return next(new NotFound("Student not found"));
+  }
+
   if (req.query.isFeedbackActive) return getAllActiveFeedbacks(req, res, next);
 
-  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
-  if (!user) return next(new NotFound("User not found"));
-  if (!user.isAdmin) return next(new Forbidden("Only admins may get all feedbacks."));
-
   const feedbacks = await Feedback.find();
+  for(const feedback of feedbacks) {
+    const total = await Feedback.countDocuments({id: await feedback._id});
+    console.log(total);
+  }
 
   res.json(feedbacks);
 }
 
 /**
- * Returns all feedbacks to admins
+ * Returns only all active feedbacks to admins
  * @param req
  * @param res
  * @param next
@@ -60,13 +69,7 @@ export async function getAllActiveFeedbacks(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-
-  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
-  if (!user) return next(new NotFound("User not found"));
-  if (!user.isAdmin) return next(new Forbidden("Only admins may get all feedbacks."));
-
-  const feedbacks = await Feedback.find({isFeedbackActive: true}).exec();
-
+  const feedbacks = await Feedback.find({isFeedbackActive: true}, { title: true}).exec();
   res.json(feedbacks);
 }
 

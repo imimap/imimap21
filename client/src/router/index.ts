@@ -41,6 +41,7 @@ import ShowEvaluationsToStudent from '@/views/ShowEvaluationsToStudent.vue';
 import FeedbacksList from '@/components/feedback/FeedbacksList.vue';
 import CreateFeedback from '@/components/feedback/CreateFeedback.vue';
 import EditFeedback from '@/components/feedback/EditFeedback.vue';
+import AskForFeedback from '@/views/askForFeedback.vue';
 
 // @TODO: Router auf Modules aufteilen
 const routes: Array<RouteRecordRaw> = [
@@ -108,6 +109,14 @@ const routes: Array<RouteRecordRaw> = [
             path: 'edit/:id',
             name: 'EditInternship',
             component: EditInternship,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+          {
+            path: 'askForFeedback',
+            name: 'AskForFeedback',
+            component: AskForFeedback,
             meta: {
               allowAnonymous: false,
             },
