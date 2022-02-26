@@ -6,21 +6,21 @@
               v-model="sorting"
               @change="$emit('sortingChange', sorting)"
       >
-        <option selected value="">Sortieren nach...</option>
+        <option selected value="" ref="sortDefault">Sortieren nach...</option>
         <option value="lastName">Nachname</option>
         <option value="studentId">Matrikelnummer</option>
       </select>
     </div>
     <div class="col-lg-3 col-md-12 mb-3">
       <select class="form-select"
-              aria-label="Sortieren nach"
+              aria-label="Semester filtern nach"
               v-model="semester"
               @change="$emit('semesterChange', semester)"
       >
+        <option selected value="" ref="semesterDefault">Alle Semester</option>
         <option v-for="semester in availableSemesters"
                 :key="semester"
                 :value="semester"
-                :selected="semester === defaultSemester"
         >
           {{ semester }}
         </option>
@@ -32,7 +32,7 @@
               v-model="filter"
               @change="$emit('filterChange', filter)"
       >
-        <option selected value="">Status...</option>
+        <option selected value="" ref="statusDefault">Alle Status...</option>
         <option v-for="status in availableStatuses"
                 :key="status"
                 :value="status">
@@ -51,6 +51,9 @@
       >
       <div id="emailHelp" class="form-text">Matrikelnummer oder Nachname</div>
     </div>
+    <div class="col-lg-3 col-md-12 mb-3 offset-lg-9 reset">
+      <button @click="reset">Zurücksetzen</button>
+    </div>
   </div>
 </template>
 
@@ -60,16 +63,13 @@ import { loadAvailableSemesters } from '@/utils/gateways';
 
 export default defineComponent({
   name: 'UsersListFilters',
-  emits: ['sortingChange', 'semesterChange', 'filterChange', 'searchChange'],
-  props: {
-    defaultSemester: String,
-  },
+  emits: ['sortingChange', 'semesterChange', 'filterChange', 'searchChange', 'reset'],
   data() {
     return {
       sorting: '',
       filter: '',
       search: '',
-      semester: this.defaultSemester,
+      semester: '',
       availableSemesters: [] as string[],
       availableStatuses: [
         'unknown',
@@ -80,8 +80,31 @@ export default defineComponent({
       ] as string[], // TODO: Load statuses dynamically from API
     };
   },
+  methods: {
+    reset() {
+      (this.$refs.sortDefault as HTMLOptionElement).click();
+      (this.$refs.semesterDefault as HTMLOptionElement).click();
+      (this.$refs.statusDefault as HTMLOptionElement).click();
+      this.search = '';
+      this.$emit('reset');
+    },
+  },
   async mounted() {
     this.availableSemesters = await loadAvailableSemesters();
   },
 });
 </script>
+
+<style scoped lang="scss">
+.reset {
+  text-align: right;
+}
+
+.reset > button {
+  background: rgba(119, 185, 0, 1);
+  color: white;
+  border-style: none;
+  border-radius: 3px;
+  font-size: 15px;
+}
+</style>

@@ -3,11 +3,11 @@
     <div class="row">
       <div class="col-12">
 
-        <UsersListFilters :default-semester="defaultSemester"
-                          @sortingChange="changeSorting"
+        <UsersListFilters @sortingChange="changeSorting"
                           @semesterChange="updateList"
-                          @filterChange="filter => this.statusFilter = filter"
-                          @searchChange="searchTerm => this.search = searchTerm"
+                          @filterChange="changeFilter"
+                          @searchChange="changeSearch"
+                          @reset="resetFilters"
         />
 
         <div v-if="!isLoading" class="accordion" id="listAccordion">
@@ -39,7 +39,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Student from '@/models/Student';
-import { getStudent, getStudentsList, getStudentsListWithSemester } from '@/utils/gateways';
+import { getStudent, getStudentsList } from '@/utils/gateways';
 import { getDateString, getInternshipModuleDuration, getTimeDifferenceDays } from '@/utils/admin';
 import internshipModuleStatusColors from '@/models/InternshipModuleStatus';
 import UsersListFilters from '@/components/admin/users-list/UsersListFilters.vue';
@@ -63,7 +63,6 @@ export default defineComponent({
       selectedInternshipIndex: 0,
       students: [] as Student[],
       isLoading: false,
-      defaultSemester: 'SS2022', // TODO: Load default semester dynamically
       statusFilter: '',
       search: '',
       internshipModuleStatusColors,
@@ -79,15 +78,15 @@ export default defineComponent({
     },
   },
   mounted() {
-    this.updateList(this.defaultSemester);
+    this.updateList();
   },
   methods: {
     getDateString,
     getInternshipModuleDuration,
     getTimeDifferenceDays,
-    async updateList(semester: string) {
+    async updateList(semester?: string) {
       this.isLoading = true;
-      this.students = await getStudentsList(semester) as Student[];
+      this.students = await getStudentsList(semester === '' ? undefined : semester) as Student[];
       this.isLoading = false;
     },
     findStudentIndexById(studentId: string): number {
@@ -102,13 +101,27 @@ export default defineComponent({
       const index = this.findStudentIndexById(studentId);
       this.students[index] = updatedStudent;
     },
+    changeFilter(filter) {
+      this.statusFilter = filter;
+    },
+    changeSearch(searchTerm) {
+      this.search = searchTerm;
+    },
     changeSorting(sorting) {
       if (sorting === 'lastName') {
         this.students.sort((a, b) => a[sorting].localeCompare(b[sorting]));
       } else if (sorting === 'studentId') {
         this.students.sort((a, b) => a.studentProfile[sorting]
           .localeCompare(b.studentProfile[sorting]));
+      } else {
+        this.students.sort((a, b) => a._id.localeCompare(b._id));
       }
+    },
+    resetFilters() {
+      this.changeFilter('');
+      this.changeSearch('');
+      this.changeSorting('');
+      this.updateList();
     },
     editInternshipModule(student: Student) {
       this.selectedStudent = student;
@@ -168,16 +181,5 @@ template {
   color: rgba(119, 185, 0, 1);
   width: 3rem;
   height: 3rem;
-}
-
-.reset {
-  text-align: right;
-}
-.reset > button {
-  background: rgba(119, 185, 0, 1);
-  color: white;
-  border-style: none;
-  border-radius: 3px;
-  font-size: 15px;
 }
 </style>

@@ -50,9 +50,9 @@
           <div class="row">
             <div class="col-8">
               <h5>Praktika</h5>
-              <InternshipPart v-for="(internship, internshipIndex) in internship.internships"
+              <InternshipPart v-for="(internshipPart, internshipIndex) in internship.internships"
                               :key="internshipIndex"
-                              :internship="internship"
+                              :internship="internshipPart"
                               :index="internshipIndex"
                               @editInternshipPart="editInternshipPart"
                               @updateInternship="updateInternship"
