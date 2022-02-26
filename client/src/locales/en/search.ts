@@ -40,6 +40,14 @@ const search = {
   tasks: 'Tasks: ',
   contact: 'Contact: ',
   programmingLanguages: 'Programming languages: ',
+  tooManyResults: {
+    headline: 'Caution',
+    resultCount: '{n} internships have been found.',
+    previousResultCount: 'You have already seen {n} of 12 possible search results.',
+    question: 'What do you want to do?',
+    buttonConfirm: 'Show the results anyway!',
+    buttonDecline: 'I want to concretise my search.',
+  },
 };
 
 export default search;

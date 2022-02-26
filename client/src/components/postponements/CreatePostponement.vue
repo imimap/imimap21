@@ -1,44 +1,51 @@
 <template>
     <div id="form-block4" class="text-left">
       <form v-on:submit.prevent>
-        <h3>Antrag auf Verschiebung des Praktikums</h3>
+        <h3>{{ $t("postponement.heading") }}</h3>
         <div class="pl-5">
           <div class="row">&nbsp;</div>
           <div class="row">
             <div class="field">
-              Ich möchte mein Praktikum nicht im 4. Fachsemester absolvieren.
+              {{ $t("postponement.statement") }}
             </div>
           </div>
           <div class="row">&nbsp;</div>
           <div class="row">
             <div class="field">
-              Ich beantrage eine Verschiebung auf das
-              <select v-model="this.newSemester">
-                <option value="WS2021">WS 21/22</option>
-                <option value="SS2022">SS 22</option>
-                <option value="WS2022">WS 22/223</option></select>
+              {{ $t("postponement.request") }}:
+              <select v-model="this.newSemester" class="required">
+                <option
+                  v-for="semester in this.nextSemesters"
+                  v-bind:key="semester"
+                  v-bind:newSemester="semester"
+                  :value="semester">
+                  {{ semester }}
+                </option>
+              </select>
             </div>
           </div>
           <div class="row">&nbsp;</div>
           <div class="row">
-            Dieses wird mein
-            <div class="form-group max" >
+            <div class="form-group max required">
+              {{ $t("postponement.info") }}:
               <label class="sr-only" for="postponementSemester">
-                Semester of study
+                {{ $t("postponement.semesterOfStudy") }}
               </label>
               <input
                 v-model="this.newSemesterOfStudy"
                 cols="5"
                 class="form-control"
                 type="number"
+                min="4"
                 id="postponementSemester"/>
             </div>
-            . Fachsemester sein.
           </div>
           <div class="row">&nbsp;</div>
           <div class="row">
             <div class="form-group">
-              <label for="postponementReason">Begründung</label>
+              <label for="postponementReason" class="required">
+                {{ $t("postponement.reason") }}
+              </label>
               <textarea
                 v-model="this.reason"
                 cols="50"
@@ -47,15 +54,18 @@
                 id="postponementReason"/>
             </div>
           </div>
-          <div class="row">
-            <div class="actions">
+          <div class="row my-4">
+            <div class="col-md-4">
               <button
                 v-on:click="savePostponement"
                 type="submit"
-                class="btn btn-secondary my-4">
-                Verschiebung beantragen
+                class="btn btn-secondary">
+                {{ $t("actions.send") }}
               </button>
             </div>
+          </div>
+          <div class="row mt-3">
+            <a href="javascript:history.back()">{{ $t("actions.back") }}</a>
           </div>
         </div>
       </form>
@@ -65,16 +75,28 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
-import store from '@/store';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
 
 export default defineComponent({
   name: 'CreatePostponement',
   data() {
     return {
-      newSemester: null,
-      newSemesterOfStudy: null,
+      newSemester: '' as string,
+      newSemesterOfStudy: 5,
       reason: '',
+      nextSemesters: [] as string[],
     };
+  },
+  async created() {
+    let res;
+    try {
+      res = await http.get('/info/semesters/upcoming');
+      this.nextSemesters = res.data;
+      // eslint-disable-next-line prefer-destructuring
+      this.newSemester = res.data[0];
+    } catch (err: any) {
+      await showErrorNotification(`Fehler beim Anfragen der Namen der folgenden Semester [ERROR: ${err.message}]`);
+    }
   },
   methods: {
     async savePostponement() {
@@ -85,16 +107,12 @@ export default defineComponent({
           newSemesterOfStudy,
           reason,
         });
-        await store.dispatch('addNotification', { text: 'Verschiebung erfolgreich beantragt!', type: 'success' });
+        await showSuccessNotification('Verschiebung erfolgreich beantragt!');
         await this.$router.push({ name: 'InternshipModuleIndex' });
       } catch (err: any) {
-        await this.$store.dispatch('addNotification', { text: `Fehler beim Beantragen der Verschiebung [ERROR: ${err.message}]`, type: 'danger' });
+        await showErrorNotification(`Fehler beim Beantragen der Verschiebung [ERROR: ${err.message}]`);
       }
     },
   },
 });
 </script>
-
-<style lang="scss">
-
-</style>

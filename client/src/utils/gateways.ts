@@ -4,7 +4,15 @@ import Student from '@/models/Student';
 import Internship from '@/models/Internship';
 import InternshipModule from '@/models/InternshipModule';
 
-export const getStudentsList = async (semester: string): Promise<Student[]> => apiClient
+export const getStudentsList = async (): Promise<Student[]> => apiClient
+  .get('/students')
+  .then((res) => res.data)
+  .catch((err) => {
+    console.log(err);
+    return [];
+  });
+
+export const getStudentsListWithSemester = async (semester: string): Promise<Student[]> => apiClient
   .get(`/students?semester=${semester}`)
   .then((res) => res.data)
   .catch((err) => {

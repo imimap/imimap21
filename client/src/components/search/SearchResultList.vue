@@ -32,7 +32,6 @@
   </div>
 </template>
 <script lang="ts">
-import Internship from '@/models/Internship';
 import SearchResult from '@/components/search/SearchResult.vue';
 import { defineComponent } from 'vue';
 

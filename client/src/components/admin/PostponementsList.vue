@@ -24,6 +24,9 @@
             <div id="emailHelp" class="form-text">
               Matrikelnummer oder Nachname</div>
           </div>
+          <div class="col-lg-3 col-md-12 reset" >
+           <button @click="resetResults()">Zurücksetzen</button>
+          </div>
         </div>
 
         <div v-if="!isLoading" class="accordion" id="listAccordion">
@@ -124,7 +127,6 @@ export default defineComponent({
   name: 'PostponementsList',
   data() {
     return {
-      currentEditCompanyIndex: 0,
       postponementRequests: [] as Postponement[],
       currentSorting: '',
       currentSearch: '',
@@ -173,6 +175,12 @@ export default defineComponent({
       } catch (e) {
         console.log(e);
       }
+    },
+    async resetResults() {
+      this.postponementRequests = [];
+      this.currentSorting = '';
+      this.currentSearch = '';
+      this.updateList();
     },
     changeSorting() {
       if (this.currentSorting === 'lastName') {
@@ -270,6 +278,18 @@ export default defineComponent({
     color: rgba(119, 185, 0, 1);
     width: 3rem;
     height: 3rem;
+  }
+
+  .reset {
+    margin-top: 0.5em;
+  }
+
+  .reset > button {
+    background: rgba(119, 185, 0, 1);
+    color: white;
+    border-style: none;
+    border-radius: 3px;
+    font-size: 15px;
   }
 
 </style>

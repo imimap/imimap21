@@ -39,7 +39,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Student from '@/models/Student';
-import { getStudent, getStudentsList } from '@/utils/gateways';
+import { getStudent, getStudentsList, getStudentsListWithSemester } from '@/utils/gateways';
 import { getDateString, getInternshipModuleDuration, getTimeDifferenceDays } from '@/utils/admin';
 import internshipModuleStatusColors from '@/models/InternshipModuleStatus';
 import UsersListFilters from '@/components/admin/users-list/UsersListFilters.vue';
@@ -170,4 +170,14 @@ template {
   height: 3rem;
 }
 
+.reset {
+  text-align: right;
+}
+.reset > button {
+  background: rgba(119, 185, 0, 1);
+  color: white;
+  border-style: none;
+  border-radius: 3px;
+  font-size: 15px;
+}
 </style>
