@@ -13,8 +13,8 @@
               <option v-for="(row, index) in evaluations"
                       :key="index"
                       :value="index">
-                {{ row.inSemester }} --
-                ({{ countOnEachEvaluation[index]}}) Studis haben teilgenommen
+                {{ row.inSemester }} ----
+                hier haben ({{ countOnEachEvaluation[index]}}) Studis teilgenommen
               </option>
             </select>
           </div>
@@ -28,7 +28,8 @@
               <option v-for="(row, index) in questions"
                       :key="index"
                       :value="index">
-                {{ row.title }} -- veröffentlicht am: {{ getDateString(row.dateToPublishQuestion) }}
+                {{ row.title }} ----
+                veröffentlicht am: {{ getDateString(row.dateToPublishQuestion) }}
               </option>
             </select>
             <br>
@@ -53,17 +54,21 @@
                   Alle Antworten ({{internshipsAndQuestions.length}})
                 </button>
               </li>
-              <li class="nav-item" role="presentation">
+              <li class="nav-item" role="presentation" v-if="countNotReviewed !== 0">
                 <button class="nav-link" id="notReviewed-tab"
                         data-bs-toggle="tab" data-bs-target="#notReviewed"
                         type="button" role="tab" aria-controls="notReviewed"
-                        aria-selected="false">Noch nicht überprüft</button>
+                        aria-selected="false">
+                  Noch nicht überprüft ({{ countNotReviewed }})
+                </button>
               </li>
-              <li class="nav-item" role="presentation">
+              <li class="nav-item" role="presentation" v-if="countNotPublished !== 0">
                 <button class="nav-link" id="notPublished-tab"
                         data-bs-toggle="tab" data-bs-target="#notPublished"
                         type="button" role="tab" aria-controls="notPublished"
-                        aria-selected="false">Noch nicht veröffentlicht</button>
+                        aria-selected="false">
+                  Noch nicht veröffentlicht ({{ countNotPublished }})
+                </button>
               </li>
             </ul>
             <div class="tab-content" id="myTabContent">
@@ -77,9 +82,9 @@
                       <button class="accordion-button collapsed"
                               type="button"
                               data-bs-toggle="collapse"
-                              v-bind:data-bs-target="'#question-' + row[0]"
+                              v-bind:data-bs-target="'#question-all' + row[0]"
                               aria-expanded="false"
-                              v-bind:aria-controls="'question-' + row[0]">
+                              v-bind:aria-controls="'question-all' + row[0]">
                         <div class="container rounded-4">
                           <div class="row">
                             <div class="col-2">
@@ -115,7 +120,7 @@
                         </div>
                       </button>
                     </h2>
-                    <div v-bind:id="'question-' + row[0]"
+                    <div v-bind:id="'question-all' + row[0]"
                          class="accordion-collapse collapse"
                          aria-labelledby="headingOne"
                          data-bs-parent="#listAccordion">
@@ -134,7 +139,7 @@
                         </div>
                         <div class="col-md-10">
                           <input class="form-check-input" type="checkbox"
-                                 :disabled="row[1].question.studentAllowsToPublish===false"
+                                 :disabled="row[1].question.studentAllowsToPublish === false"
                                  v-bind:id="'published_' + index"
                                  v-model="row[1].question.isAnswerPublished"
                                  v-on:change="saveCheckboxes(row[0], $event)">
@@ -149,7 +154,8 @@
                 </div>
               </div>
               <div class="tab-pane fade"
-                   id="notReviewed" role="tabpanel" aria-labelledby="notReviewed-tab">
+                   id="notReviewed" role="tabpanel" aria-labelledby="notReviewed-tab"
+                   v-if="countNotReviewed !== 0">
                 <div class="accordion rounded-3" id="listAccordionNotReviewed">
                   <div v-for="(row, index) in internshipsAndQuestions" v-bind:key="index"
                        class="accordion-item">
@@ -159,9 +165,9 @@
                         <button class="accordion-button collapsed"
                                 type="button"
                                 data-bs-toggle="collapse"
-                                v-bind:data-bs-target="'#question-' + row[0]"
+                                v-bind:data-bs-target="'#question-review' + row[0]"
                                 aria-expanded="false"
-                                v-bind:aria-controls="'question-' + row[0]">
+                                v-bind:aria-controls="'question-review' + row[0]">
                           <div class="container rounded-4">
                             <div class="row">
                               <div class="col-2">
@@ -197,7 +203,7 @@
                           </div>
                         </button>
                       </h2>
-                      <div v-bind:id="'question-' + row[0]"
+                      <div v-bind:id="'question-review' + row[0]"
                            class="accordion-collapse collapse"
                            aria-labelledby="headingOne"
                            data-bs-parent="#listAccordion">
@@ -232,19 +238,20 @@
                 </div>
               </div>
               <div class="tab-pane fade"
-                   id="notPublished" role="tabpanel" aria-labelledby="notPublished-tab">
+                   id="notPublished" role="tabpanel" aria-labelledby="notPublished-tab"
+                   v-if="countNotPublished !== 0">
                 <div class="accordion rounded-3" id="listAccordionNotPublished">
                   <div v-for="(row, index) in internshipsAndQuestions" v-bind:key="index"
                        class="accordion-item">
-                    <div v-if="row[1].question.isAnswerPublished !== true">
+                    <div id="tabReview" v-if="row[1].question.isAnswerPublished !== true">
                       <h2 class="accordion-header rounded-3"
                           style="border-color: #77b900;border-style: solid;" v-bind:id="index">
                         <button class="accordion-button collapsed"
                                 type="button"
                                 data-bs-toggle="collapse"
-                                v-bind:data-bs-target="'#question-' + row[0]"
+                                v-bind:data-bs-target="'#question-publish' + row[0]"
                                 aria-expanded="false"
-                                v-bind:aria-controls="'question-' + row[0]">
+                                v-bind:aria-controls="'question-publish' + row[0]">
                           <div class="container rounded-4">
                             <div class="row">
                               <div class="col-2">
@@ -280,7 +287,7 @@
                           </div>
                         </button>
                       </h2>
-                      <div v-bind:id="'question-' + row[0]"
+                      <div v-bind:id="'question-publish' + row[0]"
                            class="accordion-collapse collapse"
                            aria-labelledby="headingOne"
                            data-bs-parent="#listAccordion">
@@ -315,99 +322,6 @@
                 </div>
               </div>
             </div>
-<!--            <div class="tab-content" id="myTabContent">-->
-<!--              <div class="tab-pane fade show active"-->
-<!--                   id="allAnswers" role="tabpanel" aria-labelledby="allAnswers-tab">-->
-<!--                <div class="accordion rounded-3" id="listAccordion">-->
-<!--                  <div v-for="(row, index) in internshipsAndQuestions" v-bind:key="index"-->
-<!--                       class="accordion-item">-->
-<!--                    <h2 class="accordion-header rounded-3"-->
-<!--                        style="border-color: #77b900;border-style: solid;" v-bind:id="index">-->
-<!--                      <button class="accordion-button collapsed"-->
-<!--                              type="button"-->
-<!--                              data-bs-toggle="collapse"-->
-<!--                              v-bind:data-bs-target="'#question-' + row[0]"-->
-<!--                              aria-expanded="false"-->
-<!--                              v-bind:aria-controls="'question-' + row[0]">-->
-<!--                        <div class="container rounded-4">-->
-<!--                          <div class="row">-->
-<!--                            <div class="col-2">-->
-<!--                              <h6 class="list-item-label">Student/in</h6>-->
-<!--                              <span class="fw-bold">-->
-<!--                          {{ row[1].student.lastName }}, {{ row[1].student.firstName }}-->
-<!--                        </span>-->
-<!--                            </div>-->
-<!--                            <div class="col-3">-->
-<!--                              <h6 class="list-item-label">Student/in</h6>-->
-<!--                              <span class="fw-bold">-->
-<!--                          <a :href="`mailto:${ row[1].student.emailAddress }`">-->
-<!--                            {{ row[1].student.emailAddress }}-->
-<!--                          </a>-->
-<!--                        </span>-->
-<!--                            </div>-->
-<!--                            <div class="col-4">-->
-<!--                              <h6 class="list-item-label">
-Antwort darf veröffentlicht werden</h6>-->
-<!--                              <div v-if="row[1].question.studentAllowsToPublish === true">-->
-<!--                                <span class="fw-bold">Ja</span>-->
-<!--                              </div>-->
-<!--                              <div
-v-else-if="row[1].question.studentAllowsToPublish === false">-->
-<!--                                <span class="fw-bold">Nein</span>-->
-<!--                              </div>-->
-<!--                            </div>-->
-<!--                            <div class="col-2">-->
-<!--                              <h6 class="list-item-label">Beantwortet am</h6>-->
-<!--                              <span class="fw-bold">-->
-<!--                          {{ getDateString(row[1].question.answerUpdatedAt) }}-->
-<!--                        </span>-->
-<!--                            </div>-->
-<!--                          </div>-->
-<!--                        </div>-->
-<!--                      </button>-->
-<!--                    </h2>-->
-<!--                    <div v-bind:id="'question-' + row[0]"-->
-<!--                         class="accordion-collapse collapse"-->
-<!--                         aria-labelledby="headingOne"-->
-<!--                         data-bs-parent="#listAccordion">-->
-<!--                      <div class="accordion-body">-->
-<!--                        <span v-html="row[1].question.answerTextContent"/>-->
-<!--                        <hr>-->
-<!--                        <div style="margin-right: 20px !important;">-->
-<!--                          <input class="form-check-input" type="checkbox"-->
-<!--                                 v-bind:id="'reviewed_' + index"-->
-<!--                                 v-model="row[1].question.isAnswerReviewed"-->
-<!--                                 v-on:change="saveCheckboxes(row[0], $event)">-->
-<!--                          <label>-->
-<!--                            &nbsp;&nbsp; Die Antwort wurde geprüft.-->
-<!--                            {{ row[1].question.isAnswerReviewed }}-->
-<!--                          </label>-->
-<!--                        </div>-->
-<!--                        <div class="col-md-10">-->
-<!--                          <input class="form-check-input" type="checkbox"-->
-<!--                                 :disabled="row[1].question.studentAllowsToPublish===false"-->
-<!--                                 v-bind:id="'published_' + index"-->
-<!--                                 v-model="row[1].question.isAnswerPublished"-->
-<!--                                 v-on:change="saveCheckboxes(row[0], $event)">-->
-<!--                          <label>-->
-<!--                            &nbsp;&nbsp; Die Antwort kann veröffentlicht werden.-->
-<!--                            {{ row[1].question.isAnswerPublished }}-->
-<!--                          </label>-->
-<!--                        </div>-->
-<!--                      </div>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--              <div class="tab-pane fade"-->
-<!--                   id="notReviewed" role="tabpanel" aria-labelledby="notReviewed-tab">-->
-<!--                not reviewed-->
-<!--              </div>-->
-<!--              <div class="tab-pane fade"-->
-<!--                   id="notPublished" role="tabpanel" aria-labelledby="notPublished-tab">-->
-<!--                not published-->
-<!--              </div>-->
-<!--            </div>-->
           </div>
           <div v-else class="d-flex justify-content-center">
             <div class="spinner-border text-htw" role="status">
@@ -446,6 +360,8 @@ export default defineComponent({
       isAnswerReviewed: [],
       isAnswerPublished: [],
       countOnEachEvaluation: [] as any,
+      countNotReviewed: 0,
+      countNotPublished: 0,
     };
   },
   mounted() {
@@ -496,6 +412,8 @@ export default defineComponent({
     },
 
     async showAnswersToQuestion() {
+      this.countNotReviewed = 0;
+      this.countNotPublished = 0;
       const displayTabs = document.getElementById('displayTabs');
       const errorNoAnswer = document.getElementById('errorNoAnswer');
 
@@ -509,6 +427,11 @@ export default defineComponent({
             },
           });
           this.internshipsAndQuestions = await res.data;
+          for (let i = 0; i < this.internshipsAndQuestions.length; i += 1) {
+            const myMap = new Map(Object.entries(this.internshipsAndQuestions[i][1]));
+            if (!(myMap.get('question') as Question).isAnswerReviewed) this.countNotReviewed += 1;
+            if (!(myMap.get('question') as Question).isAnswerPublished) this.countNotPublished += 1;
+          }
           this.isLoading = false;
         } catch (err) {
           await this.$store.dispatch('addNotification', {
@@ -537,10 +460,20 @@ export default defineComponent({
         answerReviewed = document.getElementById(checkboxId);
         const rowNumber = checkboxId.replace('reviewed_', '');
         answerPublished = document.getElementById(`published_${rowNumber}`);
+        if (answerReviewed.checked) {
+          this.countNotReviewed -= 1;
+        } else {
+          this.countNotReviewed += 1;
+        }
       } else if (checkboxId.includes('published_')) {
         answerPublished = document.getElementById(checkboxId);
         const rowNumber = checkboxId.replace('published_', '');
         answerReviewed = document.getElementById(`reviewed_${rowNumber}`);
+        if (answerPublished.checked) {
+          this.countNotPublished -= 1;
+        } else {
+          this.countNotPublished += 1;
+        }
       }
       try {
         await http.patch(`/internships/${internshipId}/updateAnswerToPublish`, null, {
@@ -566,6 +499,17 @@ export default defineComponent({
 </script>
 
 <style scoped>
+
+.tab-content {
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  padding: 10px;
+}
+
+.nav-tabs {
+  margin-bottom: 0;
+}
+
 template {
   padding: 20px;
 }
