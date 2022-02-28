@@ -61,7 +61,7 @@
 
             <div class="col-4">
               <div class="d-grid gap-2 mt-4 col-8 mx-auto">
-                <button class="btn btn-secondary"
+                <button class="btn btn-success"
                         type="button"
                         :disabled="internship.aepPassed"
                         @click="passAEP(internship._id,
