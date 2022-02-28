@@ -1,8 +1,6 @@
 <template>
   <div class="container">
-    <div class="row justify-content-center">
-
-      <div class="col-lg-4 col-md-6 d-flex">
+      <div class="row justify-content-center">
         <div class="card text-center">
           <div class="card-body d-flex flex-column">
             <p class="card-text">Hier können Sie die Vorlagen der Fragen verwalten.</p>
@@ -15,7 +13,7 @@
         </div>
       </div>
 
-      <div class="col-lg-4 col-md-6 d-flex">
+      <div class="row justify-content-center">
         <div class="card text-center">
           <div class="card-body d-flex flex-column">
             <p class="card-text">
@@ -29,7 +27,7 @@
         </div>
       </div>
 
-      <div class="col-lg-4 col-md-6 d-flex">
+      <div class="row justify-content-center">
         <div class="card text-center">
           <div class="card-body d-flex flex-column">
             <p class="card-text">
@@ -43,7 +41,7 @@
         </div>
       </div>
 
-      <div class="col-lg-4 col-md-6 d-flex">
+      <div class="row justify-content-center">
         <div class="card text-center">
           <div class="card-body d-flex flex-column">
             <p class="card-text">
@@ -56,7 +54,6 @@
           </div>
         </div>
       </div>
-    </div>
   </div>
 </template>
 

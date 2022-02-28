@@ -41,19 +41,22 @@
               <hr>
               <h5>
                 <span class="alert alert-warning d-flex justify-content-center align-items-center">
-                  Es ist die Zeit das erste Feedback zu erstellen.
+                  Es ist die Zeit das erste Feedback Objekt zu erstellen.
                 </span>
               </h5>
             </div>
             <div v-else>
-              <table id="tableOfQuestions" class="table table-hover">
+              <table id="tableOfFeedbacks" class="table table-hover">
                 <thead>
                 <tr>
                   <th class="col-4">
                     Titel des Feedback
                   </th>
-                  <th class="col-5">
+                  <th class="col-4">
                     Beschreibung
+                  </th>
+                  <th class="col-auto">
+                    Anzahl
                   </th>
                   <th class="col-auto">
                     ist Aktiv
@@ -66,13 +69,16 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="feedback in feedbacksWithSearch"
+                <tr v-for="(feedback, index) in feedbacksWithSearch"
                     :key="feedback.id">
                   <td>
                     {{ feedback.title }}
                   </td>
                   <td>
                     {{ feedback.explanation }}
+                  </td>
+                  <td>
+                    {{ countOnEachFeedback[index]}}
                   </td>
                   <td>
                     <input class="form-check-input" type="checkbox"
@@ -85,7 +91,8 @@
                       <a><img src="/assets/feedback/edit.png"
                               style="width: 30px;height: 30px;"/></a>
                     </router-link>
-                    <button type="button" class="btn btn-danger me-3"
+                    <button v-if="countOnEachFeedback[index] === 0"
+                            type="button" class="btn btn-danger me-3"
                             id="deleteButton" @click="deleteFeedback(feedback.id)">
                       <a><img src="/assets/feedback/delete.png"
                               style="width: 30px;height: 30px;"/></a>
@@ -127,6 +134,7 @@ export default defineComponent({
       currentSorting: '',
       currentSearch: '',
       isLoading: false,
+      countOnEachFeedback: [] as any,
     };
   },
   computed: {
@@ -150,15 +158,16 @@ export default defineComponent({
       getFeedbacksList()
         .then((list) => {
           const feedbacksList = [] as Feedback[];
-          list.forEach((feedback) => {
+          list.forEach((feedback, index) => {
             feedbacksList.push({
-              id: feedback._id,
-              title: feedback.title,
-              explanation: feedback.explanation,
-              isFeedbackActive: feedback.isFeedbackActive,
-              createdAt: feedback.createdAt,
-              updatedAt: feedback.updatedAt,
+              id: feedback[0]._id,
+              title: feedback[0].title,
+              explanation: feedback[0].explanation,
+              isFeedbackActive: feedback[0].isFeedbackActive,
+              createdAt: feedback[0].createdAt,
+              updatedAt: feedback[0].updatedAt,
             });
+            this.countOnEachFeedback.splice(index, 0, feedback[1]);
           });
           this.feedbacks = feedbacksList;
           this.isLoading = false;

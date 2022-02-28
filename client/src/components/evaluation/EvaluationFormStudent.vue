@@ -38,7 +38,7 @@
                         <span v-html="$t('evaluationFormStudent.notice.agreement')"/>
                         <fieldset class="form-group border p-3 rounded-3">
                           <input class="form-check-input" type="checkbox"
-                                 style="margin-left: 15px; margin-top: 25px;"
+                                 style="margin-left: 15px;"
                                  id="checkboxForPublishProfile"
                                  v-model="internship.showMyProfile"
                                  @change="saveMyAgreement($event)">
@@ -112,13 +112,13 @@
                           aria-expanded="false"
                           v-bind:aria-controls="'question-' + row._id">
                     <div class="row container rounded-3">
-                      <div class="col-8">
+                      <div class="col-7">
                         <h6 class="list-item-label">
                           {{ $t("evaluationFormStudent.header.title") }}
                         </h6>
                         <span class="fw-bold">{{ row.title }}</span>
                       </div>
-                      <div class="col-2">
+                      <div class="col-3">
                         <h6 class="list-item-label">
                           {{ $t("evaluationFormStudent.body.answerReviewed") }}
                         </h6>

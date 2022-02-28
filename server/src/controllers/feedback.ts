@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { Forbidden, NotFound, BadRequest } from "http-errors";
 import { User } from "../models/user";
 import { Feedback } from "../models/feedback";
+import {Internship} from "../models/internship";
 
 function getFeedbackObject(propsObject: any) {
   const feedbackProps: { [k: string]: unknown } = {};
@@ -49,13 +50,16 @@ export async function getAllFeedbacks(
 
   if (req.query.isFeedbackActive) return getAllActiveFeedbacks(req, res, next);
 
+  const feedbacksMap = new Map();
   const feedbacks = await Feedback.find();
-  for(const feedback of feedbacks) {
-    const total = await Feedback.countDocuments({id: await feedback._id});
+  for(const fb of feedbacks) {
+    let total = await Internship.find({ 'feedback.title': (await fb).title }).countDocuments();
     console.log(total);
+    feedbacksMap.set(fb, total);
   }
 
-  res.json(feedbacks);
+  const sortedMap = new Map([...feedbacksMap.entries()].sort((a, b) => b[1] - a[1]));
+  res.json(Array.from(sortedMap));
 }
 
 /**

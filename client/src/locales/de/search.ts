@@ -8,6 +8,8 @@ const search = {
     + 'erreichen des Limits sichtbar. Solltest das Limit aus '
     + 'irgendeinem Grund nicht ausreichen, kannst du in '
     + 'Ausnahmefällen per Mail an imi-praktikum[at]htw-berlin.de um eine Zurücksetzung bitten.',
+    hintSuccessfulLinks: 'Ihre Mitstudierende haben die folgenden Webseiten als hilfreich bei der Suche nach einem Praktikumsplatz genannt.',
+    hintHelpful: 'Andere hilfreiche Webseiten:',
   },
   form: {
     paymentOptions: {

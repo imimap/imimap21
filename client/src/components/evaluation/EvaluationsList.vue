@@ -48,7 +48,7 @@
                         v-bind:aria-controls="'evaluation-' + row.id">
                   <div class="container rounded-3">
                     <div class="row">
-                      <div class="col-3">
+                      <div class="col-auto">
                         <h6 class="list-item-label">In Semester</h6>
                         <span class="fw-bold">{{ row.inSemester }}</span>
                       </div>
@@ -61,13 +61,19 @@
                           <span class="fw-bold">Nein</span>
                         </div>
                       </div>
-                      <div class="col-3">
+                      <div class="col-2">
                         <h6 class="list-item-label">Erstellt am</h6>
                         <span class="fw-bold">{{ getDateString(row.createdAt) }}</span>
                       </div>
                       <div class="col-3">
                         <h6 class="list-item-label">Liste letzt Aktualisiert am</h6>
                         <span class="fw-bold">{{ getDateString(row.updatedAt) }}</span>
+                      </div>
+                      <div class="col-2">
+                        <h6 class="list-item-label">Kopien davon bei Studis erzeugt</h6>
+                        <span class="fw-bold">
+                          {{ countOnEachEvaluation[index]}}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -107,7 +113,8 @@
                       </router-link>
                     </div>
                     <div class="col-md-10">
-                      <button type="button" class="btn btn-danger me-3"
+                      <button v-if="countOnEachEvaluation[index] === 0"
+                              type="button" class="btn btn-danger me-3"
                               id="deleteButton" @click="deleteEvaluation(row.id)">
                         Löschen
                       </button>
@@ -145,6 +152,7 @@ export default defineComponent({
       currentSorting: '',
       currentSearch: '',
       isLoading: false,
+      countOnEachEvaluation: [] as any,
     };
   },
   computed: {
@@ -168,20 +176,20 @@ export default defineComponent({
       return userDoubleChecked;
     },
     updateList() {
-      // API call for GET list with params
       this.isLoading = true;
       getEvaluationsList()
         .then((list) => {
           const evaluationsList = [] as Evaluation[];
-          list.forEach((evaluation) => {
+          list.forEach((evaluation, index) => {
             evaluationsList.push({
-              id: evaluation._id,
-              inSemester: evaluation.inSemester,
-              questions: evaluation.questions,
-              isPublished: evaluation.isPublished,
-              createdAt: evaluation.createdAt,
-              updatedAt: evaluation.updatedAt,
+              id: evaluation[0]._id,
+              inSemester: evaluation[0].inSemester,
+              questions: evaluation[0].questions,
+              isPublished: evaluation[0].isPublished,
+              createdAt: evaluation[0].createdAt,
+              updatedAt: evaluation[0].updatedAt,
             });
+            this.countOnEachEvaluation.splice(index, 0, evaluation[1]);
           });
           this.evaluations = evaluationsList;
           this.isLoading = false;

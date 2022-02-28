@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { Forbidden, NotFound, BadRequest } from "http-errors";
 import { User } from "../models/user";
 import { Evaluation } from "../models/evaluation";
+import {Internship} from "../models/internship";
 
 function getEvaluationObject(propsObject: any) {
   const evaluationProps: { [k: string]: unknown } = {};
@@ -42,9 +43,16 @@ export async function getAllEvaluations(
   if (!user) return next(new NotFound("User not found"));
   if (!user.isAdmin) return next(new Forbidden("Only admins may get all evaluations."));
 
+  const evaluationsMap = new Map();
   const evaluations = await Evaluation.find();
 
-  res.json(evaluations);
+  for(const evaluation of evaluations) {
+    let total = await Internship.find({ 'evaluationFile.inSemester': (await evaluation).inSemester }).countDocuments();
+    console.log(total);
+    evaluationsMap.set(evaluation, total);
+  }
+
+  res.json(Array.from(evaluationsMap));
 }
 
 /**

@@ -191,6 +191,36 @@
           </template>
           </tbody>
         </table>
+        <hr style="height: 5px">
+        <div>
+          <h6 class="mb-3">{{ $t("search.hint.hintHelpful") }}</h6>
+          <span>
+            {{ $t("search.hint.hintSuccessfulLinks") }}
+          </span>
+          <hr>
+          <div>
+            <table id="tableOfFeedbacks" class="table table-hover">
+              <tbody>
+              <tr v-for="(feedback, index) in feedbacks"
+                  :key="feedback.id">
+                <td>
+                  <strong>
+                    {{ feedback.title }}
+                  </strong>
+                </td>
+                <td>
+                  {{ feedback.explanation }}
+                </td>
+                <td>
+                  <strong>
+                    {{ countOnEachFeedback[index]}}x
+                  </strong>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
     <div id="map-results">
@@ -206,6 +236,8 @@ import Map from '@/components/Map.vue';
 import http from '@/utils/http-common';
 import { Internship } from '@/store/types/Internship';
 import { MapLocation } from '@/store/types/MapLocation';
+import { getFeedbacksList } from '@/utils/gateways';
+import Feedback from '@/models/Feedback';
 
 export default defineComponent({
   name: 'Search',
@@ -227,6 +259,8 @@ export default defineComponent({
       // Component state
       cardToggle: false,
       loadingState: true,
+      countOnEachFeedback: [] as any,
+      feedbacks: [] as Feedback[],
     };
   },
   computed: {
@@ -310,12 +344,31 @@ export default defineComponent({
         });
       }
     },
+    async getSuccessfulLinks() {
+      getFeedbacksList()
+        .then((list) => {
+          const feedbacksList = [] as Feedback[];
+          list.forEach((feedback, index) => {
+            feedbacksList.push({
+              id: feedback[0]._id,
+              title: feedback[0].title,
+              explanation: feedback[0].explanation,
+              isFeedbackActive: feedback[0].isFeedbackActive,
+              createdAt: feedback[0].createdAt,
+              updatedAt: feedback[0].updatedAt,
+            });
+            this.countOnEachFeedback.splice(index, 0, feedback[1]);
+          });
+          this.feedbacks = feedbacksList;
+        }).catch((err) => console.log(err));
+    },
   },
   created() {
     this.getAvailableCountries();
     this.getAvailablePaymentOptions();
     this.getAvailableOrientations();
     this.getAvailableLanguages();
+    this.getSuccessfulLinks();
   },
 });
 </script>

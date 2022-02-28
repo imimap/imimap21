@@ -7,6 +7,8 @@ const search = {
       + 'seen once, stay visible even if you reach this limit. '
       + 'If for any reason you need to extend that limit, '
       + 'please write an email at imi-praktikum[at]htw-berlin.de ',
+    hintSuccessfulLinks: 'Your fellow students mentioned the following websites as helpful with their search for an internship.',
+    hintHelpful: 'Other helpful websites:',
   },
   form: {
     paymentOptions: {
