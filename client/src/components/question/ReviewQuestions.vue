@@ -13,8 +13,9 @@
               <option v-for="(row, index) in evaluations"
                       :key="index"
                       :value="index">
-                {{ row.inSemester }} ----
-                hier haben ({{ countOnEachEvaluation[index]}}) Studis teilgenommen
+                {{ row.inSemester }} --------
+                Bisher haben ({{ countOnEachEvaluation[index]}})
+                Studis teilgenommen
               </option>
             </select>
           </div>
@@ -28,8 +29,9 @@
               <option v-for="(row, index) in questions"
                       :key="index"
                       :value="index">
-                {{ row.title }} ----
-                veröffentlicht am: {{ getDateString(row.dateToPublishQuestion) }}
+                {{ row.title }} --------
+                zu überprüfen ({{tmpCountNotReviewed[index]}}) --------
+                zu veröffentlichen ({{tmpCountNotPublished[index]}})
               </option>
             </select>
             <br>
@@ -243,7 +245,9 @@
                 <div class="accordion rounded-3" id="listAccordionNotPublished">
                   <div v-for="(row, index) in internshipsAndQuestions" v-bind:key="index"
                        class="accordion-item">
-                    <div id="tabReview" v-if="row[1].question.isAnswerPublished !== true">
+                    <div id="tabReview"
+                         v-if="row[1].question.isAnswerPublished !== true &&
+                         row[1].question.studentAllowsToPublish === true">
                       <h2 class="accordion-header rounded-3"
                           style="border-color: #77b900;border-style: solid;" v-bind:id="index">
                         <button class="accordion-button collapsed"
@@ -359,9 +363,13 @@ export default defineComponent({
       answerNotPublished: [],
       isAnswerReviewed: [],
       isAnswerPublished: [],
-      countOnEachEvaluation: [] as any,
+      countOnEachEvaluation: [] as any[],
       countNotReviewed: 0,
       countNotPublished: 0,
+      tmpCountNotReviewed: [] as number[],
+      tmpCountNotPublished: [] as number[],
+      notReviewed: 0,
+      notPublished: 0,
     };
   },
   mounted() {
@@ -404,11 +412,43 @@ export default defineComponent({
         this.inSemester = this.evaluations[this.currentSemester].inSemester;
         this.questions = this.evaluations[this.currentSemester].questions;
         questionsDropdown!.style.display = 'block';
+        this.countAnswers();
       } else {
         this.currentQuestion = '-1';
         questionsDropdown!.style.display = 'none';
         displayTabs!.style.display = 'none';
       }
+    },
+
+    async countAnswers() {
+      /* eslint-disable no-await-in-loop */
+      for (let i = 0; i < this.evaluations[this.currentSemester].questions.length; i += 1) {
+        this.notReviewed = 0;
+        this.notPublished = 0;
+        try {
+          const res = await http.get('/internships/internshipsWithEvaluation', {
+            params: {
+              semester: this.inSemester,
+              questionId: this.evaluations[this.currentSemester].questions[i]._id,
+            },
+          });
+          const tempInternshipsAndQuestions = await res.data;
+          for (let j = 0; j < tempInternshipsAndQuestions.length; j += 1) {
+            const myTempMap = new Map(Object.entries(tempInternshipsAndQuestions[j][1]));
+            if (!(myTempMap.get('question') as Question).isAnswerReviewed) this.notReviewed += 1;
+            this.tmpCountNotReviewed.splice(i, 0, this.notReviewed);
+            if (!(myTempMap.get('question') as Question).isAnswerPublished
+              && (myTempMap.get('question') as Question).studentAllowsToPublish) this.notPublished += 1;
+            this.tmpCountNotPublished.splice(i, 0, this.notPublished);
+          }
+        } catch (err) {
+          await this.$store.dispatch('addNotification', {
+            text: `${{ errorMessage: err.message }}`,
+            type: 'danger',
+          });
+        }
+      }
+      /* eslint-enable no-await-in-loop */
     },
 
     async showAnswersToQuestion() {
@@ -430,7 +470,8 @@ export default defineComponent({
           for (let i = 0; i < this.internshipsAndQuestions.length; i += 1) {
             const myMap = new Map(Object.entries(this.internshipsAndQuestions[i][1]));
             if (!(myMap.get('question') as Question).isAnswerReviewed) this.countNotReviewed += 1;
-            if (!(myMap.get('question') as Question).isAnswerPublished) this.countNotPublished += 1;
+            if (!(myMap.get('question') as Question).isAnswerPublished
+              && (myMap.get('question') as Question).studentAllowsToPublish) this.countNotPublished += 1;
           }
           this.isLoading = false;
         } catch (err) {
