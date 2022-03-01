@@ -3,6 +3,7 @@ import authMiddleware from "../authentication/middleware";
 import * as asyncHandler from "express-async-handler";
 import {
   createPostponementRequest,
+  editPostponementRequest,
   listPostponementRequests,
   processPostponementRequest,
 } from "../controllers/postponementRequest";
@@ -40,6 +41,17 @@ postponementRequestRouter.patch(
   body("reason").isString().optional(),
   validate,
   asyncHandler(processPostponementRequest(false))
+);
+
+postponementRequestRouter.patch(
+  "/:id",
+  authMiddleware(true),
+  param("id").custom(isObjectId),
+  body("newSemester").custom(Semester.isValidSemesterString).optional(),
+  body("newSemesterOfStudy").isInt({ gt: 1 }).optional(),
+  body("reason").isString().optional(),
+  validate,
+  asyncHandler(editPostponementRequest)
 );
 
 export default postponementRequestRouter;

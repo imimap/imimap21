@@ -59,7 +59,7 @@ export async function listPostponementRequests(req: Request, res: Response): Pro
   for (const request of postponementRequests) {
     request.user = await User.findOne(
       { "studentProfile.internship": request._id },
-      "firstName lastName"
+      "firstName lastName studentProfile.studentId"
     );
     requestsWithUsers.push(request);
   }
@@ -120,4 +120,30 @@ export function processPostponementRequest(accept: boolean) {
     res.statusCode = constants.HTTP_STATUS_NO_CONTENT;
     res.send();
   };
+}
+
+export async function editPostponementRequest(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  // Get internship module by id
+  const internshipModule = await InternshipModule.findById(req.params.id);
+  if (!internshipModule)
+    return next(new NotFound(`Internship module with id ${req.params.id} not found`));
+  // Get admin user id
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean();
+  // Accept or reject postponement
+  try {
+    const updatedInternshipModule = await internshipModule.editPostponement(user?._id, req.body);
+    const updatedPostponementRequest = updatedInternshipModule.getRecentPostponementRequest();
+    res.json({
+      _id: updatedInternshipModule._id,
+      newSemester: updatedPostponementRequest.changes?.newSemester,
+      newSemesterOfStudy: updatedPostponementRequest.changes?.newSemesterOfStudy,
+      reason: updatedPostponementRequest.comment,
+    });
+  } catch (e) {
+    return next(new BadRequest(e.message));
+  }
 }
