@@ -2,7 +2,6 @@
   <div class="accordion-item">
     <div class="accordion-header">
       <div class="accordion-button collapsed"
-           type="button"
            data-bs-toggle="collapse"
            :data-bs-target="'#' + student.studentProfile.studentId"
            aria-expanded="false"
