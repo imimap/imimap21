@@ -1008,3 +1008,37 @@ export async function getAllInternshipsInCompany(
 
   res.json(Array.from(evaluationsAndProfiles));
 }
+
+/**
+ * This method gathers the free given comments by students and will be shown to admin to review them
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function getInternshipFreeFeedbacks(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
+  if (!user) return next(new NotFound("User not found"));
+  if (!user.isAdmin) return next(new Forbidden("Only admins may get the free Feedbacks."));
+
+  const INTERNSHIP_FIELDS_FEEDBACK =
+    "startDate" +
+    "freetextFeedbackReviewed " +
+    "isFreetextFeedbackReviewed ";
+  const internships = await Internship.find({ "freetextFeedbackReviewed" : { "$exists" : true, "$ne" : "" } } ).select(INTERNSHIP_FIELDS_FEEDBACK);
+  if (!internships) return next(new NotFound("No Internship with unreviewed status found"));
+
+  const mapInternshipsFreeFeedback = new Map();
+
+  const STUDENT_FIELDS =
+    "firstName " +
+    "lastName " +
+    "emailAddress ";
+
+  for(const internship of internships) {
+    const internshipModule = await InternshipModule.find();
+    const student = await User.findOne({ "studentProfile.internship": internshipModule[0]._id }).select(STUDENT_FIELDS);
+    mapInternshipsFreeFeedback.set(internship, student);
+  }
+
+  res.json(Array.from(mapInternshipsFreeFeedback));
+}

@@ -357,7 +357,6 @@ export default defineComponent({
     async save() {
       if (this.company !== null && await this.companyExists()) {
         await this.postInternship();
-        await this.$router.push({ name: 'AskForFeedback', params: { id: this.createdInternshipId } });
       } else {
         this.toggleAddCompanyForm = true;
       }
@@ -424,6 +423,7 @@ export default defineComponent({
         });
         this.createdInternshipId = res.data._id;
         await this.$store.dispatch('addNotification', { text: 'Praktikum erfolgreich angelegt!', type: 'success' });
+        await this.$router.push({ name: 'AskForFeedback', params: { id: this.createdInternshipId } });
       } catch (err) {
         await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
       }

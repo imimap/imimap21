@@ -161,7 +161,9 @@
                 <div class="accordion rounded-3" id="listAccordionNotReviewed">
                   <div v-for="(row, index) in internshipsAndQuestions" v-bind:key="index"
                        class="accordion-item">
-                    <div v-if="row[1].question.isAnswerReviewed !== true">
+                    <div v-if="row[1].question.isAnswerReviewed !== true &&
+                    row[1].question.isAnswerPublished !== true &&
+                    countNotReviewed !== 0">
                       <h2 class="accordion-header rounded-3"
                           style="border-color: #77b900;border-style: solid;" v-bind:id="index">
                         <button class="accordion-button collapsed"
@@ -247,7 +249,9 @@
                        class="accordion-item">
                     <div id="tabReview"
                          v-if="row[1].question.isAnswerPublished !== true &&
-                         row[1].question.studentAllowsToPublish === true">
+                         row[1].question.isAnswerReviewed === true &&
+                         row[1].question.studentAllowsToPublish === true &&
+                         countNotPublished !== 0">
                       <h2 class="accordion-header rounded-3"
                           style="border-color: #77b900;border-style: solid;" v-bind:id="index">
                         <button class="accordion-button collapsed"
@@ -378,7 +382,6 @@ export default defineComponent({
 
   methods: {
     getDateString,
-
     updateList() {
       this.isLoading = true;
       getEvaluationsList()
@@ -403,11 +406,12 @@ export default defineComponent({
     showQuestions() {
       const questionsDropdown = document.getElementById('questionsDropdown');
       const displayTabs = document.getElementById('displayTabs');
+      document.getElementById('allAnswers-tab')!.classList.add('active');
       const errorNoAnswer = document.getElementById('errorNoAnswer');
 
       displayTabs!.style.display = 'none';
       errorNoAnswer!.style.display = 'none';
-      if (this.currentSemester !== '-1') {
+      if (this.currentSemester !== '-1' && this.countOnEachEvaluation[this.currentSemester] !== 0) {
         this.currentQuestion = '-1';
         this.inSemester = this.evaluations[this.currentSemester].inSemester;
         this.questions = this.evaluations[this.currentSemester].questions;
@@ -421,6 +425,8 @@ export default defineComponent({
     },
 
     async countAnswers() {
+      this.tmpCountNotPublished = [];
+      this.tmpCountNotReviewed = [];
       /* eslint-disable no-await-in-loop */
       for (let i = 0; i < this.evaluations[this.currentSemester].questions.length; i += 1) {
         this.notReviewed = 0;
@@ -438,6 +444,7 @@ export default defineComponent({
             if (!(myTempMap.get('question') as Question).isAnswerReviewed) this.notReviewed += 1;
             this.tmpCountNotReviewed.splice(i, 0, this.notReviewed);
             if (!(myTempMap.get('question') as Question).isAnswerPublished
+              && (myTempMap.get('question') as Question).isAnswerReviewed
               && (myTempMap.get('question') as Question).studentAllowsToPublish) this.notPublished += 1;
             this.tmpCountNotPublished.splice(i, 0, this.notPublished);
           }
@@ -471,6 +478,7 @@ export default defineComponent({
             const myMap = new Map(Object.entries(this.internshipsAndQuestions[i][1]));
             if (!(myMap.get('question') as Question).isAnswerReviewed) this.countNotReviewed += 1;
             if (!(myMap.get('question') as Question).isAnswerPublished
+              && (myMap.get('question') as Question).isAnswerReviewed
               && (myMap.get('question') as Question).studentAllowsToPublish) this.countNotPublished += 1;
           }
           this.isLoading = false;
@@ -500,19 +508,29 @@ export default defineComponent({
       if (checkboxId.includes('reviewed_')) {
         answerReviewed = document.getElementById(checkboxId);
         const rowNumber = checkboxId.replace('reviewed_', '');
+        const myMap = new Map(Object.entries(this.internshipsAndQuestions[rowNumber][1]));
         answerPublished = document.getElementById(`published_${rowNumber}`);
         if (answerReviewed.checked) {
-          this.countNotReviewed -= 1;
+          if (this.countNotReviewed !== 0) this.countNotReviewed -= 1;
+          if ((myMap.get('question') as Question).studentAllowsToPublish) {
+            this.countNotPublished += 1;
+          }
         } else {
           this.countNotReviewed += 1;
+          if (answerPublished.checked) {
+            answerPublished.checked = false;
+          }
         }
       } else if (checkboxId.includes('published_')) {
         answerPublished = document.getElementById(checkboxId);
         const rowNumber = checkboxId.replace('published_', '');
+        const myMap = new Map(Object.entries(this.internshipsAndQuestions[rowNumber][1]));
         answerReviewed = document.getElementById(`reviewed_${rowNumber}`);
         if (answerPublished.checked) {
-          this.countNotPublished -= 1;
-        } else {
+          answerReviewed.checked = true;
+          if (this.countNotReviewed !== 0) this.countNotReviewed -= 1;
+          if (this.countNotPublished !== 0) this.countNotPublished -= 1;
+        } else if ((myMap.get('question') as Question).studentAllowsToPublish) {
           this.countNotPublished += 1;
         }
       }

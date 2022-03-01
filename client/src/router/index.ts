@@ -42,6 +42,7 @@ import FeedbacksList from '@/components/feedback/FeedbacksList.vue';
 import CreateFeedback from '@/components/feedback/CreateFeedback.vue';
 import EditFeedback from '@/components/feedback/EditFeedback.vue';
 import AskForFeedback from '@/views/askForFeedback.vue';
+import ShowFreeFeedbacksAdmin from '@/views/ShowFreeFeedbacksAdmin.vue';
 
 // @TODO: Router auf Modules aufteilen
 const routes: Array<RouteRecordRaw> = [
@@ -294,6 +295,14 @@ const routes: Array<RouteRecordRaw> = [
             path: 'newFeedback',
             name: 'CreateFeedback',
             component: CreateFeedback,
+            meta: {
+              allowAnonymous: false,
+            },
+          },
+          {
+            path: 'showFreeFeedbacksAdmin',
+            name: 'ShowFreeFeedbacksAdmin',
+            component: ShowFreeFeedbacksAdmin,
             meta: {
               allowAnonymous: false,
             },

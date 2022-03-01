@@ -14,6 +14,7 @@ import {
   getAllInternshipsInCompany,
   updateAgreementOnInternship,
   updateFeedbackOnInternship,
+  getInternshipFreeFeedbacks,
 } from "../controllers/internship";
 import { isObjectId, validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
@@ -76,6 +77,14 @@ internshipRouter.get(
   param("id").custom((id) => isObjectId(id)),
   validate,
   asyncHandler(getAllInternshipsInCompany)
+);
+
+internshipRouter.get(
+  "/freeFeedbacks",
+  authMiddleware(),
+  param("id").custom((id) => isObjectId(id)),
+  validate,
+  asyncHandler(getInternshipFreeFeedbacks)
 );
 
 internshipRouter.get(

@@ -61,7 +61,6 @@ export default defineComponent({
   name: 'CreateFeedback',
   data() {
     return {
-      // New  Props
       id: null,
       title: '',
       explanation: '',
@@ -99,7 +98,8 @@ export default defineComponent({
             type: 'success',
           }).then(() => this.$router.push({ name: 'FeedbacksList' }));
         } catch (err) {
-          await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
+          await this.$store.dispatch('addNotification',
+            { text: `${err.response.data.error.message}`, type: 'danger' });
         }
       } else {
         console.log('canceled');

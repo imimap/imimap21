@@ -53,7 +53,7 @@ export interface IInternship extends Document {
   showMyProfile: boolean;
   feedback?: IFeedback;
   freetextFeedback: string;
-  isFreetextFeedbackReviewed: string;
+  isFreetextFeedbackReviewed: boolean;
 
   durationInWeeksSoFar(): number;
 

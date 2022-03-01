@@ -46,4 +46,10 @@ export default class Internship {
   evaluationFile = '';
 
   showMyProfile = '';
+
+  feedback = '';
+
+  freetextFeedback = '';
+
+  isFreetextFeedbackReviewed = '';
 }

@@ -1,59 +1,74 @@
 <template>
   <div class="container">
-      <div class="row justify-content-center">
-        <div class="card text-center">
-          <div class="card-body d-flex flex-column">
-            <p class="card-text">Hier können Sie die Vorlagen der Fragen verwalten.</p>
-            <router-link
-              class="btn btn-success text-white align-self-end mx-auto mt-auto"
-              to="questions">
-              Fragen bearbeiten
-            </router-link>
-          </div>
+    <div class="row justify-content-center">
+      <div class="card text-center">
+        <div class="card-body d-flex flex-column">
+          <p class="card-text">Hier können Sie die Vorlagen der Fragen verwalten.</p>
+          <router-link
+            class="btn btn-success text-white align-self-end mx-auto mt-auto"
+            to="questions">
+            Fragen bearbeiten
+          </router-link>
         </div>
       </div>
+    </div>
 
-      <div class="row justify-content-center">
-        <div class="card text-center">
-          <div class="card-body d-flex flex-column">
-            <p class="card-text">
-              Hier können Sie eine neue Liste der Fragen zum neuen Semester erstellen.
-            </p>
-            <router-link
-              class="btn btn-success text-white align-self-end mx-auto mt-auto" to="evaluations">
-              Neue Evaluationsliste erstellen
-            </router-link>
-          </div>
+    <div class="row justify-content-center">
+      <div class="card text-center">
+        <div class="card-body d-flex flex-column">
+          <p class="card-text">
+            Hier können Sie eine neue Liste der Fragen zum neuen Semester erstellen.
+          </p>
+          <router-link
+            class="btn btn-success text-white align-self-end mx-auto mt-auto" to="evaluations">
+            Neue Evaluationsliste erstellen
+          </router-link>
         </div>
       </div>
+    </div>
 
-      <div class="row justify-content-center">
-        <div class="card text-center">
-          <div class="card-body d-flex flex-column">
-            <p class="card-text">
-              Hier können Sie die Antworten der Studis auf die Fragen überprüfen.
-            </p>
-            <router-link
-              class="btn btn-success text-white align-self-end mx-auto mt-auto" to="reviews">
-              Fragen überprüfen
-            </router-link>
-          </div>
+    <div class="row justify-content-center">
+      <div class="card text-center">
+        <div class="card-body d-flex flex-column">
+          <p class="card-text">
+            Hier können Sie die Antworten der Studis auf die Fragen überprüfen.
+          </p>
+          <router-link
+            class="btn btn-success text-white align-self-end mx-auto mt-auto" to="reviews">
+            Fragen überprüfen
+          </router-link>
         </div>
       </div>
+    </div>
 
-      <div class="row justify-content-center">
-        <div class="card text-center">
-          <div class="card-body d-flex flex-column">
-            <p class="card-text">
-              Hier können Sie ein neues Feedback erstellen und bearbeiten.
-            </p>
-            <router-link
-              class="btn btn-success text-white align-self-end mx-auto mt-auto" to="feedbacks">
-              Feedbacks bearbeiten
-            </router-link>
-          </div>
+    <div class="row justify-content-center">
+      <div class="card text-center">
+        <div class="card-body d-flex flex-column">
+          <p class="card-text">
+            Hier können Sie ein neues Feedback erstellen und bearbeiten.
+          </p>
+          <router-link
+            class="btn btn-success text-white align-self-end mx-auto mt-auto" to="feedbacks">
+            Feedbacks bearbeiten
+          </router-link>
         </div>
       </div>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="card text-center">
+        <div class="card-body d-flex flex-column">
+          <p class="card-text">
+            Hier können Sie die Rückmeldungen von Studierenden als freie Kommentare einsehen.
+          </p>
+          <router-link
+            class="btn btn-success text-white align-self-end mx-auto mt-auto"
+            to="ShowFreeFeedbacksAdmin">
+            Feedbacks überprüfen
+          </router-link>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
