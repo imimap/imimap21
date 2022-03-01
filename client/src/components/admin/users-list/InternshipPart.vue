@@ -25,19 +25,26 @@
           <br>
           <ul class="list-group">
             <UsersListStatusItem text="Antrag"
-                                 :item="internship.requestPdf"/>
+                                 :item="internship.requestPdf"
+            />
             <UsersListStatusItem text="ECTS-Nachweis"
-                                 :item="internship.lsfEctsProofPdf"/>
+                                 :item="internship.lsfEctsProofPdf"
+            />
             <UsersListStatusItem text="Ortsnachweis"
-                                 :item="internship.locationJustificationPdf"/>
+                                 :item="internship.locationJustificationPdf"
+            />
             <UsersListStatusItem text="Praktikumsvertrag"
-                                 :item="internship.contractPdf"/>
+                                 :item="internship.contractPdf"
+            />
             <UsersListStatusItem text="BVG Ticket Ausnahme"
-                                 :item="internship.bvgTicketExemptionPdf"/>
+                                 :item="internship.bvgTicketExemptionPdf"
+            />
             <UsersListStatusItem text="Praktikumszeugnis"
-                                 :item="internship.certificatePdf"/>
+                                 :item="internship.certificatePdf"
+            />
             <UsersListStatusItem text="Praktikumsbericht"
-                                 :item="internship.reportPdf"/>
+                                 :item="internship.reportPdf"
+            />
           </ul>
         </div>
       </div>
@@ -75,7 +82,7 @@
 import { defineComponent, PropType } from 'vue';
 import { getDateString, getTimeDifferenceDays } from '@/utils/admin';
 import Internship from '@/models/Internship';
-import UsersListStatusItem from '@/components/admin/UsersListStatusItem.vue';
+import UsersListStatusItem from '@/components/admin/users-list/UsersListStatusItem.vue';
 import {
   approveInternshipApplication,
   deleteInternship,

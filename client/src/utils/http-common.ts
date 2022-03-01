@@ -1,9 +1,9 @@
 import axios, { AxiosInstance } from 'axios';
 
-const BASE_URL = `${process.env.API_HOST ?? 'http://localhost:9000'}/api`;
+export const API_HOST = process.env.API_HOST ?? 'http://localhost:9000';
 
 const apiClient: AxiosInstance = axios.create({
-  baseURL: BASE_URL,
+  baseURL: `${API_HOST}/api`,
   headers: {
     'Content-type': 'application/json',
   },
