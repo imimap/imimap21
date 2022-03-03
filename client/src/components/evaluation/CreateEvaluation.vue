@@ -166,6 +166,7 @@
                       class="btn btn-success"
                       aria-label="close"
                       data-bs-dismiss="modal"
+                      :disabled="!isPublished"
                       @click="createEvaluation"
               >Speichern</button>
             </div>

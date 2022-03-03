@@ -380,7 +380,7 @@ export default defineComponent({
         this.exportHTML(pageContent, selectedLanguage);
       } else {
         await this.$store.dispatch('addNotification', {
-          text: 'Bitte die beide Dropdown Menus überprüfen',
+          text: 'Bitte das Dropdown Menu überprüfen',
           type: 'danger',
         });
       }

@@ -18,7 +18,7 @@
             <select class="form-select"
                     id="selectFeedback"
                     v-model="selectedFeedback"
-                    style="width: auto" required>
+                    style="width: auto">
               <option selected value="null">
                 {{ $t("askForFeedback.notice.dropdown") }}
               </option>
@@ -101,27 +101,20 @@ export default defineComponent({
       }
     },
     async saveFeedback() {
-      if (this.selectedFeedback !== null) {
-        try {
-          await http.patch(`/internships/${this.$route.params.id}/feedbackToUpdate`, null, {
-            params: {
-              feedbackId: this.selectedFeedback,
-              freetextFeedback: this.explanation,
-            },
-          });
-          await this.$store.dispatch('addNotification', {
-            text: 'Danke für Ihr Feedback',
-            type: 'success',
-          }).then(() => this.$router.push({ name: 'InternshipModuleIndex' }));
-        } catch (err) {
-          await this.$store.dispatch('addNotification', {
-            text: `${err.response.data.error.message}`,
-            type: 'danger',
-          });
-        }
-      } else {
+      try {
+        await http.patch(`/internships/${this.$route.params.id}/feedbackToUpdate`, null, {
+          params: {
+            feedbackId: this.selectedFeedback,
+            freetextFeedback: this.explanation,
+          },
+        });
         await this.$store.dispatch('addNotification', {
-          text: 'Bitte passende Option aus dem Dropdown auswählen',
+          text: 'Danke für Ihr Feedback',
+          type: 'success',
+        }).then(() => this.$router.push({ name: 'InternshipModuleIndex' }));
+      } catch (err) {
+        await this.$store.dispatch('addNotification', {
+          text: `${err.response.data.error.message}`,
           type: 'danger',
         });
       }

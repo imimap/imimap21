@@ -141,7 +141,7 @@ export const InternshipSchema = new Schema<IInternship>({
   freetextFeedback: {
     type: String,
     required: false,
-    default: undefined,
+    default: null,
   },
   isFreetextFeedbackReviewed: {
     type: Boolean,

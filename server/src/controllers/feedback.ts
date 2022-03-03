@@ -54,7 +54,6 @@ export async function getAllFeedbacks(
   const feedbacks = await Feedback.find();
   for(const fb of feedbacks) {
     let total = await Internship.find({ 'feedback.title': (await fb).title }).countDocuments();
-    console.log(total);
     feedbacksMap.set(fb, total);
   }
 

@@ -203,18 +203,18 @@
               <tbody>
               <tr v-for="(feedback, index) in feedbacks"
                   :key="feedback.id">
-                <td>
+                <td v-if="countOnEachFeedback[index] > 0">
+                  <strong>
+                    {{ countOnEachFeedback[index] }}x
+                  </strong>
+                </td>
+                <td v-if="countOnEachFeedback[index] > 0">
                   <strong>
                     {{ feedback.title }}
                   </strong>
                 </td>
-                <td>
+                <td v-if="countOnEachFeedback[index] > 0">
                   {{ feedback.explanation }}
-                </td>
-                <td>
-                  <strong>
-                    {{ countOnEachFeedback[index]}}x
-                  </strong>
                 </td>
               </tr>
               </tbody>

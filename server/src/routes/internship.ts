@@ -15,6 +15,7 @@ import {
   updateAgreementOnInternship,
   updateFeedbackOnInternship,
   getInternshipFreeFeedbacks,
+  updateFreeFeedback,
 } from "../controllers/internship";
 import { isObjectId, validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
@@ -61,6 +62,14 @@ internshipRouter.get(
 );
 
 internshipRouter.get(
+  "/freeFeedbacks",
+  authMiddleware(),
+  query("isFreetextFeedbackReviewed"),
+  validate,
+  asyncHandler(getInternshipFreeFeedbacks)
+);
+
+internshipRouter.get(
   "/internshipsWithEvaluation",
   authMiddleware(),
   query("semester")
@@ -77,14 +86,6 @@ internshipRouter.get(
   param("id").custom((id) => isObjectId(id)),
   validate,
   asyncHandler(getAllInternshipsInCompany)
-);
-
-internshipRouter.get(
-  "/freeFeedbacks",
-  authMiddleware(),
-  param("id").custom((id) => isObjectId(id)),
-  validate,
-  asyncHandler(getInternshipFreeFeedbacks)
 );
 
 internshipRouter.get(
@@ -251,13 +252,24 @@ internshipRouter.patch(
 internshipRouter.patch(
   "/:id/feedbackToUpdate",
   authMiddleware(),
-  param("id").custom(isObjectId),
+  param("id"),
   query([
     "feedbackId",
     "freetextFeedback",
   ]),
   validate,
   asyncHandler(updateFeedbackOnInternship)
+);
+
+internshipRouter.patch(
+  "/:id/updateFreeFeedback",
+  authMiddleware(),
+  param("id").custom(isObjectId),
+  query([
+    "isFreetextFeedbackReviewed",
+  ]),
+  validate,
+  asyncHandler(updateFreeFeedback)
 );
 
 export default internshipRouter;

@@ -875,11 +875,13 @@ export async function updateFeedbackOnInternship(
   const internshipToUpdate = await Internship.findById(req.params.id);
   if (!internshipToUpdate) return next(new NotFound("Internship not found"));
 
-  const feedback = await Feedback.findById(req.query.feedbackId);
-  if (!feedback) return next(new NotFound("Feedback not found"));
+  if (req.query.feedbackId !== undefined) {
+    const feedback = await Feedback.findById(req.query.feedbackId);
+    if (!feedback) return next(new NotFound("Feedback not found"));
+    // @ts-ignore
+    internshipToUpdate.feedback = feedback;
+  }
 
-  // @ts-ignore
-  internshipToUpdate.feedback = feedback;
   // @ts-ignore
   internshipToUpdate.freetextFeedback = req.query.freetextFeedback;
 
@@ -1020,11 +1022,14 @@ export async function getInternshipFreeFeedbacks(req: Request, res: Response, ne
   if (!user) return next(new NotFound("User not found"));
   if (!user.isAdmin) return next(new Forbidden("Only admins may get the free Feedbacks."));
 
-  const INTERNSHIP_FIELDS_FEEDBACK =
-    "startDate" +
-    "freetextFeedbackReviewed " +
-    "isFreetextFeedbackReviewed ";
-  const internships = await Internship.find({ "freetextFeedbackReviewed" : { "$exists" : true, "$ne" : "" } } ).select(INTERNSHIP_FIELDS_FEEDBACK);
+  let internships = [];
+  if (req.query.isFreetextFeedbackReviewed === 'showAll') {
+    internships = await Internship.find({}, { _id: true, startDate: true, freetextFeedback: true, isFreetextFeedbackReviewed: true} ).where('freetextFeedback').ne(null);
+  } else if (req.query.isFreetextFeedbackReviewed === 'true') {
+    internships = await Internship.find({ isFreetextFeedbackReviewed: true }, { _id: true, startDate: true, freetextFeedback: true, isFreetextFeedbackReviewed: true} ).where('freetextFeedback').ne(null);
+  } else {
+    internships = await Internship.find({ isFreetextFeedbackReviewed: false }, { _id: true, startDate: true, freetextFeedback: true, isFreetextFeedbackReviewed: true} ).where('freetextFeedback').ne(null);
+  }
   if (!internships) return next(new NotFound("No Internship with unreviewed status found"));
 
   const mapInternshipsFreeFeedback = new Map();
@@ -1035,10 +1040,37 @@ export async function getInternshipFreeFeedbacks(req: Request, res: Response, ne
     "emailAddress ";
 
   for(const internship of internships) {
-    const internshipModule = await InternshipModule.find();
+    const internshipModule = await InternshipModule.find({ internships: internship.id });
     const student = await User.findOne({ "studentProfile.internship": internshipModule[0]._id }).select(STUDENT_FIELDS);
     mapInternshipsFreeFeedback.set(internship, student);
   }
 
   res.json(Array.from(mapInternshipsFreeFeedback));
+}
+
+/**
+ *
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function updateFreeFeedback(req: Request, res: Response, next: NextFunction): Promise<void> {
+
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
+  if (!user) return next(new NotFound("User not found"));
+  if (!user.isAdmin) return next(new Forbidden("Only admins may get/edit the internships."));
+
+  const internshipToUpdate = await Internship.findById(req.params.id);
+  if (!internshipToUpdate) return next(new NotFound("Internship not found"));
+
+  console.log(internshipToUpdate);
+  console.log(req.query.isFreetextFeedbackReviewed);
+
+  // @ts-ignore
+  internshipToUpdate.isFreetextFeedbackReviewed = req.query.isFreetextFeedbackReviewed;
+
+  const savedInternship = await internshipToUpdate.save();
+  if (!savedInternship) return next(new BadRequest("Could not update internship"));
+
+  res.json(savedInternship);
 }

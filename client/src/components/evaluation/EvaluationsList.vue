@@ -105,13 +105,6 @@
                     </table>
                   </div>
                   <div class="row">
-                    <div class="col-sm-1" style="margin-right: 20px !important;">
-                      <router-link
-                        class="btn btn-success text-white me-3"
-                        :to="{ path: `editEvaluation/${row.id}` }">
-                        Bearbeiten
-                      </router-link>
-                    </div>
                     <div class="col-md-10">
                       <button v-if="countOnEachEvaluation[index] === 0"
                               type="button" class="btn btn-danger me-3"
