@@ -13,7 +13,7 @@
                    type="date"
                    id="startDate"
                    class="form-control"
-                   :placeholder="startDate ?? false"/>
+                   :placeholder="startDate"/>
           </div>
           <div class="col">
             <label for="startDate">
@@ -24,7 +24,7 @@
                    type="date"
                    id="endDate"
                    class="form-control"
-                   :placeholder="endDate ?? false"/>
+                   :placeholder="endDate"/>
           </div>
         </div>
 
@@ -170,8 +170,8 @@ export default defineComponent({
   data() {
     return {
       loadingState: true,
-      startDate: null as unknown as string,
-      endDate: null as unknown as string,
+      startDate: null as string | null,
+      endDate: null as string | null,
       operationalArea: null,
       programmingLanguages: null,
       salary: null,
