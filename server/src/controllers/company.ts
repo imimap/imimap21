@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { User } from "../models/user";
 import { Forbidden, NotFound, BadRequest } from "http-errors";
 import { Company } from "../models/company";
+import { getCompanyObject } from "../helpers/companyHelper";
 
 /**
  * Returns all companies to admins
@@ -131,34 +132,6 @@ export async function getAllCountries(
   res.json(countries);
 }
 
-function getCompanyObject(propsObject: any) {
-  const companyProps: { [k: string]: any } = {};
-
-  //direct props of internship
-  const directProps = [
-    "companyName",
-    "branchName",
-    "emailAddress",
-    "industry",
-    "website",
-    "mainLanguage",
-    "size",
-  ];
-  for (const prop of directProps) {
-    if(propsObject[prop]) companyProps[prop] = propsObject[prop];
-  }
-
-  //address props
-  const addressProps = ["street", "streetNumber", "additionalLines", "zip", "city", "country"];
-  for (const prop of addressProps) {
-    if (propsObject[prop]) {
-      companyProps[`address.${prop}`] = propsObject[prop];
-    }
-  }
-
-  return companyProps;
-}
-
 /**
  * Creates new company
  * @param req
@@ -170,9 +143,14 @@ export async function createCompany(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const companyProps = getCompanyObject(req.query);
-  const newCompany = new Company(companyProps);
-  const savedCompany = await newCompany.save();
+  let savedCompany;
+  try {
+    const companyProps = getCompanyObject(req.body);
+    const newCompany = new Company(companyProps);
+    savedCompany = await newCompany.save();
+  } catch (e: any) {
+    return next(e);
+  }
 
   res.json(savedCompany);
 }
@@ -196,7 +174,7 @@ export async function updateCompany(
   const companyToUpdate = await Company.findById(req.params.id);
   if (!companyToUpdate) return next(new NotFound("Company not found"));
 
-  const companyProps = getCompanyObject(req.query);
+  const companyProps = getCompanyObject(req.body);
   for (const prop in companyProps) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore

@@ -603,17 +603,23 @@ export async function createInternship(
   const newlyCreatedInternship = await newInternship.save();
   if (!newlyCreatedInternship) return next(new BadRequest("Could not create internship"));
 
-  if (!user.studentProfile.internship) {
+  let internshipModuleId = user.studentProfile.internship;
+  let internshipModule;
+  if (!internshipModuleId) {
     // create new internship module
-    const newInternshipModule = new InternshipModule({
-      internships: [newlyCreatedInternship._id],
-    });
-    const newlyPlannedInternshipModule = await newInternshipModule.plan();
-    user.studentProfile.internship = newlyPlannedInternshipModule._id;
+    const newInternshipModule = new InternshipModule({});
+    internshipModule = await newInternshipModule.plan();
+    internshipModuleId = user.studentProfile.internship;
+    user.studentProfile.internship = internshipModuleId;
   } else {
-    user.studentProfile.internship.internships.push(newlyCreatedInternship._id);
+    internshipModule = await InternshipModule.findById(internshipModuleId);
   }
-  await user.studentProfile.internship.save();
+  if (!internshipModule) return next(new NotFound("Internship Module not found."));
+  if (!internshipModule.internships) internshipModule.internships = [];
+
+  internshipModule.internships.push(newlyCreatedInternship._id);
+
+  await internshipModule.save();
   await user.save();
   res.json(newlyCreatedInternship);
 }

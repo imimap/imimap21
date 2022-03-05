@@ -4,6 +4,7 @@ const internship = {
     edit: 'Edit Internship',
   },
   form: {
+    currently: 'currently',
     startDate: 'start date',
     endDate: 'end date',
     operationalArea: 'operational area',

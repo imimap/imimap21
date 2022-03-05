@@ -103,7 +103,7 @@
                      :placeholder="$t('company.supervisor.email')"/>
             </div>
             <div>
-              <label for="company">{{ $t('company.heading') }}</label>
+              <label for="company" class="required">{{ $t('company.heading') }}</label>
               <input v-model="company"
                      type="text"
                      class="form-control"
@@ -130,7 +130,7 @@
           </div>
           <div class="row mb-3">
             <div class="col-md-6">
-              <label>{{ $t('company.name') }}</label>
+              <label for="newCompanyName" class="required">{{ $t('company.name') }}</label>
               <input v-model="company"
                      type="text"
                      class="form-control"
@@ -287,6 +287,36 @@
 import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
 import { Company } from '@/store/types/Company';
+import { showErrorNotification } from '@/utils/notification';
+import { convertStringToArray, capitalizeFirstLetter } from '@/utils/stringHelper';
+
+const possibleInternshipFields = [
+  'startDate',
+  'endDate',
+  'operationalArea',
+  'salary',
+  'payment',
+  'livingCosts',
+  'workingHoursPerWeek',
+  'supervisorFullName',
+  'supervisorEmailAddress',
+  'tasks',
+];
+
+const possibleCompanyFields = [
+  'branchName',
+  'emailAddress',
+  'industry',
+  'website',
+  'mainLanguage',
+  'size',
+  'street',
+  'streetNumber',
+  'additionalLines',
+  'zip',
+  'city',
+  'country',
+];
 
 // @TODO: Companies abfragen, wenn nicht neue erstellen und ID einfügen
 // @TODO: Formularfelder sind optional, Formular macht zum bearbeiten aber dennoch Sinn
@@ -300,8 +330,8 @@ export default defineComponent({
       newCompanyEmailAddress: null,
       newCompanyIndustry: null,
       newCompanyWebsite: null,
-      newCompanyMainLanguage: '',
-      newCompanySize: '',
+      newCompanyMainLanguage: null,
+      newCompanySize: null,
       newCompanyStreet: null,
       newCompanyStreetNumber: null,
       newCompanyAdditionalLines: null,
@@ -314,7 +344,7 @@ export default defineComponent({
       operationalArea: null,
       programmingLanguages: null,
       salary: null,
-      payment: [] as string[],
+      payment: null,
       livingCosts: null,
       workingHoursPerWeek: null,
       company: null,
@@ -357,55 +387,57 @@ export default defineComponent({
         return false;
       }
     },
+    getCompanyObject(): { [k: string]: string } {
+      const companyProps: { [k: string]: string } = {};
+
+      if (!this.company) {
+        throw new Error('Error: A company name needs to be entered!');
+      }
+      companyProps.companyName = this.company;
+
+      possibleCompanyFields.forEach((prop) => {
+        const newProp = `newCompany${capitalizeFirstLetter(prop)}`;
+        if (this[newProp]) companyProps[prop] = this[newProp];
+      });
+
+      return companyProps;
+    },
     async createNewCompany() {
       if (await this.companyExists()) {
         this.toggleAddCompanyForm = !this.toggleAddCompanyForm;
       } else {
         try {
-          const res = await http.post('/companies', null, {
-            params: {
-              companyName: this.company,
-              branchName: this.newCompanyBranchName,
-              emailAddress: this.newCompanyEmailAddress,
-              industry: this.newCompanyIndustry,
-              website: this.newCompanyWebsite,
-              mainLanguage: this.newCompanyMainLanguage,
-              size: this.newCompanySize,
-              street: this.newCompanyStreet,
-              streetNumber: this.newCompanyStreetNumber,
-              additionalLines: this.newCompanyAdditionalLines,
-              zip: this.newCompanyZip,
-              city: this.newCompanyCity,
-              country: this.newCompanyCountry,
-            },
-          });
+          const res = await http.post('/companies', this.getCompanyObject());
           this.existingCompany = res.data;
           await this.$store.dispatch('addNotification', { text: 'Firma erfolgreich angelegt!', type: 'success' });
           this.toggleAddCompanyForm = false;
           this.clearNewCompanyForm();
         } catch (err: any) {
-          await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
+          await showErrorNotification(err);
         }
       }
     },
+    getInternshipObject(): { [k: string]: string | string[] } {
+      const internshipProps: { [k: string]: string | string[] } = {};
+
+      if (!this.existingCompany._id) {
+        throw new Error('Error: No company id found');
+      }
+      internshipProps.companyId = this.existingCompany._id;
+
+      if (this.programmingLanguages) {
+        internshipProps.proprammingLanguages = convertStringToArray(this.programmingLanguages);
+      }
+
+      possibleInternshipFields.forEach((prop) => {
+        if (this[prop]) internshipProps[prop] = this[prop];
+      });
+
+      return internshipProps;
+    },
     async postInternship() {
       try {
-        await http.post('/internships', {
-          startDate: this.startDate,
-          endDate: this.endDate,
-          operationalArea: this.operationalArea,
-          programmingLanguages: this.convertStringToArray(
-            this.programmingLanguages,
-          ),
-          salary: this.salary,
-          payment: this.payment,
-          livingCosts: this.livingCosts,
-          workingHoursPerWeek: this.workingHoursPerWeek,
-          companyId: this.existingCompany._id,
-          supervisorFullName: this.supervisorFullName,
-          supervisorEmailAddress: this.supervisorEmailAddress,
-          tasks: this.tasks,
-        });
+        await http.post('/internships', this.getInternshipObject());
         await this.$store.dispatch('addNotification', { text: 'Praktikum erfolgreich angelegt!', type: 'success' });
       } catch (err: any) {
         await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
@@ -442,18 +474,14 @@ export default defineComponent({
       this.newCompanyEmailAddress = null;
       this.newCompanyIndustry = null;
       this.newCompanyWebsite = null;
-      this.newCompanyMainLanguage = '';
-      this.newCompanySize = '';
+      this.newCompanyMainLanguage = null;
+      this.newCompanySize = null;
       this.newCompanyStreet = null;
       this.newCompanyStreetNumber = null;
       this.newCompanyAdditionalLines = null;
       this.newCompanyZip = null;
       this.newCompanyCity = null;
       this.newCompanyCountry = null;
-    },
-    convertStringToArray(string: string | null): string[] | null {
-      if (string === null) return string;
-      return string.split(', ').map((subStr) => subStr);
     },
   },
 });
