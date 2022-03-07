@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/user";
-import { Forbidden, NotFound, BadRequest } from "http-errors";
+import { BadRequest, Forbidden, NotFound } from "http-errors";
 import { Company } from "../models/company";
 import { getCompanyObject } from "../helpers/companyHelper";
+import { constants } from "http2";
 
 /**
  * Returns all companies to admins
@@ -184,4 +185,17 @@ export async function updateCompany(
   const savedCompany = await companyToUpdate.save();
 
   res.json(savedCompany);
+}
+
+export async function deleteCompany(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  if (!req.params.id) return next(new BadRequest("Please provide a company id"));
+  const result = await Company.findByIdAndDelete(req.params.id);
+  if (!result) return next(new NotFound("Company not found"));
+
+  res.statusCode = constants.HTTP_STATUS_NO_CONTENT;
+  res.send();
 }
