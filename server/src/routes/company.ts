@@ -5,6 +5,7 @@ import * as asyncHandler from "express-async-handler";
 import { Router } from "express";
 import {
   createCompany,
+  deleteCompany,
   getAllCompanies,
   getCompanyById,
   updateCompany,
@@ -61,6 +62,14 @@ companyRouter.patch(
   body(standardPostParams),
   validate,
   asyncHandler(updateCompany)
+);
+
+companyRouter.delete(
+  "/:id",
+  authMiddleware(true),
+  param("id").custom(isObjectId),
+  validate,
+  asyncHandler(deleteCompany)
 );
 
 export default companyRouter;
