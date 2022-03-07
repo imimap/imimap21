@@ -18,16 +18,7 @@
       <div class="row">
         <div class="col-lg-4 col-md-12 mb-2">
           <span class="fw-bold list-item-label">Dauer</span><br>
-          {{
-            Math.floor(getTimeDifferenceDays(internship.startDate,
-              internship.endDate) / 7)
-          }}
-          Wochen,
-          {{
-            Math.floor(getTimeDifferenceDays(internship.startDate,
-              internship.endDate)) % 7
-          }}
-          Tage
+          {{ duration.weeks }} Wochen, {{ duration.days }} Tage
         </div>
         <div class="col-lg-8 col-md-12 mb-2 status-internship-part">
           <span class="fw-bold list-item-label">Status</span>
@@ -98,10 +89,25 @@ export default defineComponent({
     UsersListStatusItem,
   },
   props: {
-    internship: Object as PropType<Internship>,
-    index: Number,
+    internship: {
+      type: Object as PropType<Internship>,
+      required: true,
+    },
+    index: {
+      type: Number,
+      required: true,
+    },
   },
   emits: ['editInternshipPart', 'updateInternship'],
+  computed: {
+    duration(): { weeks: number; days: number } {
+      const durationInDays = getTimeDifferenceDays(this.internship.startDate,
+        this.internship.endDate);
+      const weeks = Math.floor(durationInDays / 7);
+      const days = Math.floor(durationInDays) % 7;
+      return { weeks, days };
+    },
+  },
   methods: {
     getDateString,
     getTimeDifferenceDays,

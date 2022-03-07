@@ -130,10 +130,10 @@
           </div>
 
           <div class="mb-3">
-            <label for="supervisorFirstName" class="form-label">Supervisor</label>
+            <label for="supervisorName" class="form-label">Supervisor</label>
             <input type="text"
                    class="form-control"
-                   id="supervisorFirstName"
+                   id="supervisorName"
                    aria-describedby="supervisorName"
                    :placeholder="internshipPart?.supervisor.fullName"
                    v-model="supervisorFullName"
@@ -223,16 +223,6 @@ export default defineComponent({
   computed: {
     internshipPart(): Internship | undefined {
       return this.student?.studentProfile.internship.internships[this.internshipIndex];
-    },
-    getSupervisorFirstName(): string {
-      if (!this.internshipPart?.supervisor.fullName) return '';
-      const nameParts = this.internshipPart.supervisor.fullName.split(' ');
-      return nameParts.slice(0, nameParts.length - 1).join(' ');
-    },
-    getSupervisorLastName(): string {
-      if (!this.internshipPart?.supervisor.fullName) return '';
-      const nameParts = this.internshipPart.supervisor.fullName.split(' ');
-      return nameParts[nameParts.length - 1];
     },
   },
   methods: {
