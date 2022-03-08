@@ -51,13 +51,20 @@ export async function getStudentById(
 
   const studentId = req.params.id.toString();
 
-  if (user.isAdmin) {
-    const student = await User.findById(studentId).lean();
-    if (!student) return next(new NotFound("Student not found"));
-    res.json(student);
-  } else {
-    return next(new Forbidden("You are not allowed to fetch student details."));
-  }
+  const student = await User.findById(studentId).populate({
+    path: "studentProfile.internship",
+    lean: true,
+    populate: {
+      path: "internships",
+      lean: true,
+      populate: {
+        path: "company",
+        lean: true,
+      },
+    },
+  });
+  if (!student) return next(new NotFound("Student not found"));
+  res.json(student);
 }
 
 export async function clearInternshipSearchHistory(

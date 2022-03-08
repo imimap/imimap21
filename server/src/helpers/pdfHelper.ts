@@ -1,7 +1,7 @@
 import { LeanDocument } from "mongoose";
 import { IUser } from "../models/user";
 import { IInternship } from "../models/internship";
-import fsPromises from "fs/promises";
+import * as fsPromises from "fs/promises";
 import { UploadedFile } from "express-fileupload";
 
 /**
@@ -21,7 +21,7 @@ export async function saveFile(file: UploadedFile, path: string): Promise<Error 
     await fsPromises.mkdir(uploadDir, { recursive: true });
     // Save file
     await file.mv(process.cwd() + "/" + path);
-  } catch (e: any) {
+  } catch (e) {
     return e;
   }
 

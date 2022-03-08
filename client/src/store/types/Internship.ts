@@ -11,11 +11,11 @@ export interface Internship {
   programmingLanguages: string[];
   livingCosts: number;
   salary: number;
-  paymentType: string[];
+  paymentTypes: string[];
   startDate: string;
   endDate: string;
   workingHoursPerWeek: number;
-  supervisor: {fullName: string; email: string};
+  supervisor: { fullName: string; email: string };
   comment: string;
   reportPdf: PdfDocument;
   requestPdf: PdfDocument;

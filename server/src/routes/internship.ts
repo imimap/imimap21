@@ -2,10 +2,15 @@ import { Router } from "express";
 import { body, param, query } from "express-validator";
 import authMiddleware from "../authentication/middleware";
 import {
+  approveInternshipApplication,
   createInternship,
-  findInternships, findInternshipsAmount, findInternshipsSeenAmount,
+  deleteInternship,
+  findInternships,
+  findInternshipsAmount,
+  findInternshipsSeenAmount,
   getInternshipLocations,
   getInternshipsById,
+  markInternshipAsPassed,
   submitPdf,
   updateInternship,
 } from "../controllers/internship";
@@ -105,9 +110,33 @@ internshipRouter.patch(
   "/:id",
   authMiddleware(),
   param("id").custom(isObjectId),
-  query(standardPostParams),
+  body(standardPostParams),
   validate,
   asyncHandler(updateInternship)
+);
+
+internshipRouter.delete(
+  "/:id",
+  authMiddleware(),
+  param("id").custom(isObjectId),
+  validate,
+  asyncHandler(deleteInternship)
+);
+
+internshipRouter.patch(
+  "/:id/approve",
+  authMiddleware(),
+  param("id").custom(isObjectId),
+  validate,
+  asyncHandler(approveInternshipApplication)
+);
+
+internshipRouter.patch(
+  "/:id/pass",
+  authMiddleware(),
+  param("id").custom(isObjectId),
+  validate,
+  asyncHandler(markInternshipAsPassed)
 );
 
 /* PDF endpoints */
