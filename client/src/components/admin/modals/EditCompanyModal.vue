@@ -16,50 +16,67 @@
             <label for="name" class="form-label">Name</label>
             <input type="text" class="form-control" id="name"
                    aria-describedby="name"
-                   v-model="companyName"/>
+                   :placeholder="company?.companyName"
+                   v-model="companyName"
+            />
           </div>
 
           <div class="mb-3">
             <label for="branchName" class="form-label">Zweig Name</label>
             <input type="text" class="form-control" id="branchName"
                    aria-describedby="branchName"
-                   v-model="branchName"/>
+                   :placeholder="company?.branchName"
+                   v-model="branchName"
+            />
           </div>
 
           <div class="mb-3">
             <label for="industry" class="form-label">Industrie</label>
             <input type="text" class="form-control" id="industry"
                    aria-describedby="industry"
-                   v-model="industry"/>
+                   :placeholder="company?.industry"
+                   v-model="industry"
+            />
           </div>
 
           <div class="mb-3">
             <label for="mainLanguage" class="form-label">Sprache</label>
             <input type="text" class="form-control" id="mainLanguage"
                    aria-describedby="mainLanguage"
-                   v-model="mainLanguage"/>
+                   :placeholder="company?.mainLanguage"
+                   v-model="mainLanguage"
+            />
           </div>
 
           <div class="mb-3">
             <label for="comment" class="form-label">Kommentar</label>
             <textarea class="form-control"
+                      id="comment"
+                      :placeholder="company?.comment"
                       v-model="comment"
-                      id="comment"></textarea>
+            ></textarea>
           </div>
 
           <div class="mb-3">
             <label for="excludedFromSearch" class="form-label">Unsichtbar in der Suche</label>
             <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" id="excludedFromSearch"
-                     v-model="excludedFromSearch">
+              <input class="form-check-input"
+                     type="checkbox"
+                     id="excludedFromSearch"
+                     :placeholder="company?.excludedFromSearch"
+                     v-model="excludedFromSearch"
+              >
             </div>
           </div>
 
           <div class="mb-3">
             <label for="size" class="form-label">Größe</label>
             <select
-              v-model="size"
-              class="form-select" aria-label="Größe" id="size">
+                class="form-select"
+                aria-label="Größe"
+                id="size"
+                v-model="size"
+            >
               <option>SMALL</option>
               <option>MEDIUM</option>
               <option>LARGE</option>
@@ -70,64 +87,89 @@
             <label for="address" class="form-label">Adresse</label>
             <div class="mb-2 row g-2 align-items-center">
               <div class="col-6">
-                <input type="text" class="form-control" id="address"
-                       aria-describedby="address" placeholder="Straße"
-                       v-model="street"/>
+                <input type="text"
+                       class="form-control"
+                       id="address"
+                       aria-describedby="address"
+                       :placeholder="company?.address.street"
+                       v-model="street"
+                />
               </div>
 
               <div class="col-6">
-                <input type="text" class="form-control"
-                       aria-describedby="number" placeholder="Nummer"
-                       v-model="streetNumber"/>
+                <input type="text"
+                       class="form-control"
+                       aria-describedby="number"
+                       :placeholder="company?.address.streetNumber"
+                       v-model="streetNumber"
+                />
               </div>
             </div>
 
             <div class="mb-2 row g-2 align-items-center">
               <div class="col-6">
-                <input type="text" class="form-control"
-                       aria-describedby="zip" placeholder="PLZ"
-                       v-model="zip"/>
+                <input type="text"
+                       class="form-control"
+                       aria-describedby="zip"
+                       :placeholder="company?.address.zip"
+                       v-model="zip"
+                />
               </div>
 
               <div class="col-6">
-                <input type="text" class="form-control"
-                       aria-describedby="city" placeholder="Ort"
-                       v-model="city"/>
+                <input type="text"
+                       class="form-control"
+                       aria-describedby="city"
+                       :placeholder="company?.address.city"
+                       v-model="city"
+                />
               </div>
 
               <div class="col-12">
-                <input type="text" class="form-control"
-                       aria-describedby="country" placeholder="Land"
-                       v-model="country"/>
+                <input type="text"
+                       class="form-control"
+                       aria-describedby="country"
+                       :placeholder="company?.address.country"
+                       v-model="country"
+                />
               </div>
 
               <div class="col-12">
-                <input type="text" class="form-control"
-                       aria-describedby="additionalLines" placeholder="Zusätzliche Angaben"
-                       v-model="additionalLines"/>
+                <input type="text"
+                       class="form-control"
+                       aria-describedby="additionalLines"
+                       :placeholder="company?.address.additionalLines"
+                       v-model="additionalLines"
+                />
               </div>
 
               <div class="col-6">
-                <input type="text" class="form-control"
-                       aria-describedby="latitude" placeholder="Latitude"
-                       v-model="latitude"/>
+                <input type="text"
+                       class="form-control"
+                       aria-describedby="latitude"
+                       :placeholder="company?.address.coordinates.latitude"
+                       v-model="latitude"
+                />
               </div>
 
               <div class="col-6">
-                <input type="text" class="form-control"
-                       aria-describedby="longitude" placeholder="Longitude"
-                       v-model="longitude"/>
+                <input type="text"
+                       class="form-control"
+                       aria-describedby="longitude"
+                       :placeholder="company?.address.coordinates.longitude"
+                       v-model="longitude"
+                />
               </div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary"
-                  data-bs-dismiss="modal">Schließen
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Schließen
           </button>
           <button type="button"
                   class="btn btn-success"
-                  @click="updateCompany(currentEditCompanyIndex)"
+                  @click="updateCompany"
           >
             Speichern
           </button>
@@ -139,8 +181,10 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import store from '@/store';
 import Company from '@/models/Company';
+import { createPayloadFromChangedProps } from "@/utils/admin";
+import { updateInternship } from "@/utils/gateways";
+import { showSuccessNotification } from "@/utils/notification";
 
 export default defineComponent({
   name: 'EditCompanyModal',
@@ -175,17 +219,24 @@ export default defineComponent({
   },
   methods: {
     async updateCompany() {
-      const userDoubleChecked = window.confirm('Unternehmen wirklich aktualisieren?');
-      if (userDoubleChecked) {
-        // API POST call
-        await store.dispatch('addNotification', {
-          text: 'Unternehmen aktualisiert!',
-          type: 'success',
-        });
-      } else {
-        console.log('cancel');
-      }
-      return true;
+      // TODO: Remodel to fit company
+      if (!this.company) return;
+      const payload = createPayloadFromChangedProps(
+          this.updatableProperties,
+          this.$data,
+          this.company,
+      );
+      const updatedInternship = await updateInternship(this.company._id, payload);
+      if (updatedInternship === null) return;
+      this.$emit('updateInternship', this.student?._id, this.company, updatedInternship);
+      await showSuccessNotification('Änderungen am Praktikum gespeichert');
+      (this.$refs.closeButton as HTMLButtonElement).click();
+      this.reset();
+    },
+    reset() {
+      this.updatableProperties.forEach((prop) => {
+        this.$data[prop] = undefined;
+      });
     },
   },
 });

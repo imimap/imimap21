@@ -25,7 +25,7 @@
       </div>
     </div>
   </div>
-  <!--  <EditCompanyModal :company="selectedCompany" @updateCompany="updateCompany"/>-->
+  <EditCompanyModal :company="selectedCompany" @updateCompany="updateCompany"/>
 </template>
 
 <script lang="ts">
@@ -34,10 +34,11 @@ import { getCompaniesList } from '@/utils/gateways';
 import Company from '@/models/Company';
 import CompaniesListFilters from '@/components/admin/companies/CompaniesListFilters.vue';
 import CompaniesListEntry from '@/components/admin/companies/CompaniesListEntry.vue';
+import EditCompanyModal from '@/components/admin/modals/EditCompanyModal.vue';
 
 export default defineComponent({
   name: 'CompaniesList',
-  components: { /* EditCompanyModal, */ CompaniesListEntry, CompaniesListFilters },
+  components: { EditCompanyModal, CompaniesListEntry, CompaniesListFilters },
   data() {
     return {
       selectedCompany: undefined as Company | undefined,
