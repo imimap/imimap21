@@ -16,7 +16,7 @@ export default defineComponent({
   created() {
     this.$Progress.start();
     this.$router.beforeEach((to, from, next) => {
-      //  does the page we want to go to have a meta.progress object
+      // does the page we want to go to have a meta.progress object
       if (to.meta.progress !== undefined) {
         const meta = to.meta.progress;
         this.$Progress.parseMeta(meta);
@@ -24,7 +24,7 @@ export default defineComponent({
       this.$Progress.start();
       next();
     });
-    //  hook the progress bar to finish after we've finished moving router-view
+    // hook the progress bar to finish after we've finished moving router-view
     this.$router.afterEach(() => {
       this.$Progress.finish();
     });
@@ -34,9 +34,12 @@ export default defineComponent({
       return config;
     });
 
-    http.interceptors.response.use((response) => {
+    http.interceptors.response.use((value) => {
       this.$Progress.finish();
-      return response;
+      return value;
+    }, (error) => {
+      this.$Progress.fail();
+      throw error;
     });
   },
 });
