@@ -54,7 +54,7 @@ export async function getCompanyById(
 }
 
 /**
- * Returns a companies that fits a certain company name and optionally branch name
+ * Returns a company that fits a certain company name and optionally branch name
  * @param req
  * @param res
  * @param next
@@ -67,7 +67,7 @@ export async function searchCompanyByName(
   const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
   if (!user) return next(new NotFound("User not found"));
 
-  const searchOptions: { [k: string]: any } = {};
+  const searchOptions: Record<string, unknown> = {};
 
   if (req.query.companyName) {
     searchOptions.companyName = {
@@ -104,7 +104,7 @@ export async function getCities(req: Request, res: Response, next: NextFunction)
   const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
   if (!user) return next(new NotFound("User not found"));
 
-  const options: { [k: string]: any } = {};
+  const options: Record<string, unknown> = {};
   if (req.params.country) options["address.country"] = req.params.country;
 
   const cities: string[] = await Company.find(options).distinct("address.city");
@@ -149,7 +149,7 @@ export async function createCompany(
     const companyProps = getCompanyObject(req.body);
     const newCompany = new Company(companyProps);
     savedCompany = await newCompany.save();
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
