@@ -175,11 +175,18 @@ export async function updateCompany(
   const companyToUpdate = await Company.findById(req.params.id);
   if (!companyToUpdate) return next(new NotFound("Company not found"));
 
-  const companyProps = getCompanyObject(req.body);
+  const companyProps = getCompanyObject(req.body, true);
   for (const prop in companyProps) {
+    const propPath = prop.split(".");
+    let propToUpdate = companyToUpdate;
+    while (propPath.length > 1) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      propToUpdate = propToUpdate[propPath.shift()];
+    }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    companyToUpdate[prop] = companyProps[prop];
+    propToUpdate[propPath.shift()] = companyProps[prop];
   }
 
   const savedCompany = await companyToUpdate.save();

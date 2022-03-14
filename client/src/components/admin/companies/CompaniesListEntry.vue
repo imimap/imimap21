@@ -38,6 +38,7 @@
             <strong>Adresse:</strong>
             <p>
               {{ company.address?.street }} {{ company.address?.streetNumber }}<br>
+              {{ company.address?.additionalLines }}<br v-if="company.address?.additionalLines">
               {{ company.address?.zip }} {{ company.address?.city }}<br>
               {{ company.address?.country }}
             </p>
@@ -52,10 +53,16 @@
                 <a :href="company.website" target="_blank">{{ company.website }}</a>
               </li>
               <li>
-                <strong>Sprache:</strong> {{ company.mainLanguage }}
+                <strong>Sprache:</strong> {{ company.prettyPrintLanguage() }}
               </li>
               <li>
-                <strong>Größe:</strong> {{ company.prettyPrintSize }}
+                <strong>Größe:</strong> {{ company.prettyPrintSize() }}
+              </li>
+              <li>
+                <strong>Unsichtbar in der Suche:</strong> {{ excludedFromSearch }}
+              </li>
+              <li>
+                <strong>Kommentar:</strong> {{ company.comment }}
               </li>
             </ul>
           </div>
@@ -100,6 +107,9 @@ export default defineComponent({
   computed: {
     location(): string {
       return `${this.company.address?.city}, ${this.company.address?.country}`;
+    },
+    excludedFromSearch(): string {
+      return this.company.excludedFromSearch ? 'Ja' : 'Nein';
     },
   },
   methods: {

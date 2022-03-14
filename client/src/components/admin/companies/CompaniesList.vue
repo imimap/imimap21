@@ -73,8 +73,9 @@ export default defineComponent({
       const index = this.companies.indexOf(company);
       this.companies.splice(index, 1);
     },
-    updateCompany(company: Company) {
-      // TODO: Implement list entry update logic
+    updateCompany(company: Company, updatedCompany: Company) {
+      const index = this.companies.indexOf(company);
+      this.companies[index] = updatedCompany;
     },
     changeSorting(sorting: string) {
       if (sorting === 'companyName' || sorting === 'branchName') {

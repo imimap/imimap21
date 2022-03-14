@@ -1,7 +1,9 @@
 import Address from '@/models/Address';
 import Coordinates from '@/models/Coordinates';
+import store from '@/store';
+import Language from '@/store/types/Language';
 
-const companySizes = {
+export const companySizes = {
   big: 'mehr als 250 Angestellte',
   medium: 'weniger als 250 Angestellte',
   small: 'weniger als 50 Angestellte',
@@ -34,27 +36,27 @@ export default class Company {
   public static parseFromAPIResponseData(data: any): Company {
     return new Company(
       data._id,
-      data.mainLanguage ? data.mainLanguage : '',
-      data.excludedFromSearch ? data.excludedFromSearch : '',
+      data.mainLanguage !== undefined ? data.mainLanguage : '',
+      data.excludedFromSearch !== undefined ? data.excludedFromSearch : false,
       data.companyName,
-      data.branchName ? data.branchName : '',
+      data.branchName !== undefined ? data.branchName : '',
       new Address(
-        data.address ? data.address.street : '',
-        data.address ? data.address.streetNumber : '',
-        data.address ? data.address.zip : '',
-        data.address ? data.address.city : '',
-        data.address ? data.address.country : '',
-        data.address ? data.address.additionalLines : '',
+        data.address !== undefined ? data.address.street : '',
+        data.address !== undefined ? data.address.streetNumber : '',
+        data.address !== undefined ? data.address.zip : '',
+        data.address !== undefined ? data.address.city : '',
+        data.address !== undefined ? data.address.country : '',
+        data.address !== undefined ? data.address.additionalLines : '',
         new Coordinates(
-          data.address ? data.address.coordinates.latitude : '',
-          data.address ? data.address.coordinates.longitude : '',
+          data.address !== undefined ? data.address.coordinates.latitude : '',
+          data.address !== undefined ? data.address.coordinates.longitude : '',
         ),
       ),
-      data.emailAddress ? data.emailAddress : '',
-      data.industry ? data.industry : '',
-      data.website ? data.website : '',
-      data.size ? data.size : '',
-      data.comment ? data.comment : '',
+      data.emailAddress !== undefined ? data.emailAddress : '',
+      data.industry !== undefined ? data.industry : '',
+      data.website !== undefined ? data.website : '',
+      data.size !== undefined ? data.size : '',
+      data.comment !== undefined ? data.comment : '',
     );
   }
 
@@ -84,7 +86,12 @@ export default class Company {
     this.comment = comment;
   }
 
-  get prettyPrintSize(): string {
+  public prettyPrintSize(): string {
     return companySizes[this.size];
+  }
+
+  public prettyPrintLanguage(): string {
+    const language: Language = store.getters.getLanguages.get(this.mainLanguage);
+    return language.prettyPrint();
   }
 }
