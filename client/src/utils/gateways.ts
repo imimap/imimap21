@@ -136,6 +136,20 @@ export const getCompaniesList = async (): Promise<Company[]> => {
   }
 };
 
+export const updateCompany = async (
+  companyId: string,
+  payload: unknown,
+): Promise<Company | null> => {
+  try {
+    const response = await apiClient.patch(`/companies/${companyId}`, payload);
+    return Company.parseFromAPIResponseData(response.data);
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Updaten vom Unternehmen ${companyId} [ERROR: ${err.message}]`);
+    return null;
+  }
+};
+
 export const deleteCompany = async (companyId: string): Promise<boolean> => {
   try {
     await apiClient.delete(`/companies/${companyId}`);
