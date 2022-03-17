@@ -426,7 +426,6 @@ export default defineComponent({
       (this.$refs.englishTemplate as any).emailStudent = this.userProfile.emailAddress;
       console.log(this.company.companyName);
       (this.$refs.englishTemplate as any).companyName = this.company.companyName;
-      (this.$refs.englishTemplate as any).operationalArea = this.internship.operationalArea;
       (this.$refs.englishTemplate as any).address = `${this.company.address.street} ${this.company.address.streetNumber},
       ${this.company.address.zip}, ${this.company.address.city} ${this.company.address.country}`;
       (this.$refs.englishTemplate as any).supervisor = (this.internship.supervisor as any)
@@ -445,7 +444,6 @@ export default defineComponent({
       (this.$refs.germanTemplate as any).emailStudent = this.userProfile.emailAddress;
       console.log(this.company.companyName);
       (this.$refs.germanTemplate as any).companyName = this.company.companyName;
-      (this.$refs.germanTemplate as any).operationalArea = this.internship.operationalArea;
       (this.$refs.germanTemplate as any).address = `${this.company.address.street} ${this.company.address.streetNumber},
       ${this.company.address.zip}, ${this.company.address.city} ${this.company.address.country}`;
       (this.$refs.germanTemplate as any).supervisor = (this.internship.supervisor as any)

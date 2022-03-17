@@ -86,7 +86,7 @@
                          v-model="row[0].isFreetextFeedbackReviewed"
                          v-on:change="saveCheckbox(row[0]._id, $event)">
                   <label>
-                    &nbsp;&nbsp; Die Antwort wurde geprüft.
+                    &nbsp;&nbsp; Das Feedback wurde geprüft.
                     {{ row[1].isFreetextFeedbackReviewed }}
                   </label>
                 </div>

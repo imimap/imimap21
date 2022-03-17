@@ -99,7 +99,7 @@
       </td>
       <td>
         <span style="font-family: Arial, Helvetica, sans-serif;">
-          als "{{ operationalArea }}" in "{{ companyName }}"
+          "{{ companyName }}"
         </span>
       </td>
     </tr>

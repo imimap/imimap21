@@ -6,7 +6,7 @@
       <form @submit.prevent="createQuestion">
         <div class="col-auto">
           <label for="isQuestionActive" class="form-label">
-            Status (Ob Feedback sichtbar werden soll)
+            Status (Ob Frage sichtbar werden soll)
           </label>
           <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" id="isQuestionActive"

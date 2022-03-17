@@ -47,7 +47,8 @@
           </div>
           <br>
           <div className="row">
-            <div className="col-1" style="margin-right: 25px !important;">
+            <div className="col-1" style="flex: 0 0 0;
+            margin-right: 1px !important; padding-right: 1px;">
               <router-link to="../internship-module">
                 <button type="button"
                         className="btn btn-secondary">
@@ -55,7 +56,7 @@
                 </button>
               </router-link>
             </div>
-            <div className="col-1">
+            <div className="col">
               <button className="btn btn-success btn-htw-green" type="submit">
                 {{ $t("askForFeedback.button.save") }}
               </button>

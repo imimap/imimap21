@@ -1,74 +1,75 @@
 <template>
   <div class="container">
-    <div class="row justify-content-center">
-      <div class="card text-center">
-        <div class="card-body d-flex flex-column">
-          <p class="card-text">Hier können Sie die Vorlagen der Fragen verwalten.</p>
-          <router-link
-            class="btn btn-success text-white align-self-end mx-auto mt-auto"
-            to="questions">
-            Fragen bearbeiten
-          </router-link>
-        </div>
-      </div>
-    </div>
-
-    <div class="row justify-content-center">
-      <div class="card text-center">
-        <div class="card-body d-flex flex-column">
-          <p class="card-text">
-            Hier können Sie eine neue Liste der Fragen zum neuen Semester erstellen.
-          </p>
-          <router-link
-            class="btn btn-success text-white align-self-end mx-auto mt-auto" to="evaluations">
-            Neue Evaluationsliste erstellen
-          </router-link>
-        </div>
-      </div>
-    </div>
-
-    <div class="row justify-content-center">
-      <div class="card text-center">
-        <div class="card-body d-flex flex-column">
-          <p class="card-text">
-            Hier können Sie die Antworten der Studis auf die Fragen überprüfen.
-          </p>
-          <router-link
-            class="btn btn-success text-white align-self-end mx-auto mt-auto" to="reviews">
-            Fragen überprüfen
-          </router-link>
-        </div>
-      </div>
-    </div>
-
-    <div class="row justify-content-center">
-      <div class="card text-center">
-        <div class="card-body d-flex flex-column">
-          <p class="card-text">
-            Hier können Sie ein neues Feedback erstellen und bearbeiten.
-          </p>
-          <router-link
-            class="btn btn-success text-white align-self-end mx-auto mt-auto" to="feedbacks">
-            Feedbacks bearbeiten
-          </router-link>
-        </div>
-      </div>
-    </div>
-
-    <div class="row justify-content-center">
-      <div class="card text-center">
-        <div class="card-body d-flex flex-column">
-          <p class="card-text">
-            Hier können Sie die Rückmeldungen von Studierenden als freie Kommentare einsehen.
-          </p>
-          <router-link
-            class="btn btn-success text-white align-self-end mx-auto mt-auto"
-            to="ShowFreeFeedbacksAdmin">
-            Feedbacks überprüfen
-          </router-link>
-        </div>
-      </div>
-    </div>
+    <fieldset class="form-group border p-3 rounded-3">
+      <table class="table table-hover">
+        <tbody>
+        <tr>
+        </tr>
+        <tr>
+          <td>
+            Die Vorlagen der Fragen verwalten.
+          </td>
+          <td>
+            <router-link
+              style="width: 300px; float: right"
+              class="btn btn-success text-white align-self-end mx-auto mt-auto"
+              to="questions">
+              Fragen verwalten
+            </router-link>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Eine neue Evaluationsliste zum neuen Semester erstellen.
+          </td>
+          <td>
+            <router-link
+              style="width: 300px; float: right"
+              class="btn btn-success text-white align-self-end mx-auto mt-auto" to="evaluations">
+              Evaluationsliste verwalten
+            </router-link>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Die Antworten der Studis auf die Fragen überprüfen.
+          </td>
+          <td>
+            <router-link
+              style="width: 300px; float: right"
+              class="btn btn-success text-white align-self-end mx-auto mt-auto" to="reviews">
+              Antworten überprüfen
+            </router-link>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Die Vorlagen der Feedbacks verwalten.
+          </td>
+          <td>
+            <router-link
+              style="width: 300px; float: right"
+              class="btn btn-success text-white align-self-end mx-auto mt-auto" to="feedbacks">
+              Feedbacks verwalten
+            </router-link>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Die Rückmeldungen von Studierenden als freie Kommentare einsehen.
+          </td>
+          <td>
+            <router-link
+              style="width: 300px; float: right"
+              class="btn btn-success text-white align-self-end mx-auto mt-auto"
+              to="ShowFreeFeedbacksAdmin">
+              Feedbacks überprüfen
+            </router-link>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </fieldset>
   </div>
 </template>
 
@@ -117,5 +118,4 @@ template {
 .table-nav button {
   margin-right: 20px;
 }
-
 </style>

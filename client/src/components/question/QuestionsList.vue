@@ -146,13 +146,7 @@ export default defineComponent({
     questionsWithSearch(): Question[] {
       return this.questions.filter((question) => question
         .title.toLowerCase()
-        .includes(this.currentSearch.toLowerCase())
-      || question.textContent.toLowerCase()
-        .includes(this.currentSearch.toLowerCase())
-        || question.isQuestionActive
-          .includes(this.currentSearch.toLowerCase())
-        || question.updatedAt
-          .includes(this.currentSearch.toLowerCase()));
+        .includes(this.currentSearch.toLowerCase()));
     },
   },
   mounted() {
@@ -215,8 +209,7 @@ export default defineComponent({
             .localeCompare(b[this.currentSorting]));
       } else if (this.currentSorting === 'isQuestionActive') {
         this.questions
-          .sort((a, b) => a[this.currentSorting]
-            .localeCompare(b[this.currentSorting]));
+          .sort((a, b) => (a[this.currentSorting] - b[this.currentSorting]));
       }
     },
   },

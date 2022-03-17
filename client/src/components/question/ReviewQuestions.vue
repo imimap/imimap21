@@ -34,7 +34,6 @@
                 zu veröffentlichen ({{tmpCountNotPublished[index]}})
               </option>
             </select>
-            <br>
           </div>
           <div id="errorNoAnswer" style="display: none">
             <hr>
@@ -45,6 +44,7 @@
             </h5>
           </div>
           <div id="displayTabs" v-if="!isLoading" style="display: none">
+            <hr>
             <ul class="nav nav-tabs" id="myTab" role="tablist">
               <li class="nav-item" role="presentation">
                 <button class="nav-link active"
@@ -56,7 +56,7 @@
                   Alle Antworten ({{internshipsAndQuestions.length}})
                 </button>
               </li>
-              <li class="nav-item" role="presentation" v-if="countNotReviewed !== 0">
+              <li class="nav-item" role="presentation" v-show="countNotReviewed !== 0">
                 <button class="nav-link" id="notReviewed-tab"
                         data-bs-toggle="tab" data-bs-target="#notReviewed"
                         type="button" role="tab" aria-controls="notReviewed"
@@ -64,7 +64,7 @@
                   Noch nicht überprüft ({{ countNotReviewed }})
                 </button>
               </li>
-              <li class="nav-item" role="presentation" v-if="countNotPublished !== 0">
+              <li class="nav-item" role="presentation" v-show="countNotPublished !== 0">
                 <button class="nav-link" id="notPublished-tab"
                         data-bs-toggle="tab" data-bs-target="#notPublished"
                         type="button" role="tab" aria-controls="notPublished"
@@ -136,7 +136,7 @@
                                  v-on:change="saveCheckboxes(row[0], $event)">
                           <label>
                             &nbsp;&nbsp; Die Antwort wurde geprüft.
-                            {{ row[1].question.isAnswerReviewed }}
+<!--                            {{ row[1].question.isAnswerReviewed }}-->
                           </label>
                         </div>
                         <div class="col-md-10">
@@ -147,7 +147,7 @@
                                  v-on:change="saveCheckboxes(row[0], $event)">
                           <label>
                             &nbsp;&nbsp; Die Antwort kann veröffentlicht werden.
-                            {{ row[1].question.isAnswerPublished }}
+<!--                            {{ row[1].question.isAnswerPublished }}-->
                           </label>
                         </div>
                       </div>
@@ -157,11 +157,11 @@
               </div>
               <div class="tab-pane fade"
                    id="notReviewed" role="tabpanel" aria-labelledby="notReviewed-tab"
-                   v-if="countNotReviewed !== 0">
+                   v-show="countNotReviewed !== 0">
                 <div class="accordion rounded-3" id="listAccordionNotReviewed">
                   <div v-for="(row, index) in internshipsAndQuestions" v-bind:key="index"
                        class="accordion-item">
-                    <div v-if="row[1].question.isAnswerReviewed !== true &&
+                    <div v-show="row[1].question.isAnswerReviewed !== true &&
                     row[1].question.isAnswerPublished !== true &&
                     countNotReviewed !== 0">
                       <h2 class="accordion-header rounded-3"
@@ -243,12 +243,12 @@
               </div>
               <div class="tab-pane fade"
                    id="notPublished" role="tabpanel" aria-labelledby="notPublished-tab"
-                   v-if="countNotPublished !== 0">
+                   v-show="countNotPublished !== 0">
                 <div class="accordion rounded-3" id="listAccordionNotPublished">
                   <div v-for="(row, index) in internshipsAndQuestions" v-bind:key="index"
                        class="accordion-item">
                     <div id="tabReview"
-                         v-if="row[1].question.isAnswerPublished !== true &&
+                         v-show="row[1].question.isAnswerPublished !== true &&
                          row[1].question.isAnswerReviewed === true &&
                          row[1].question.studentAllowsToPublish === true &&
                          countNotPublished !== 0">
@@ -309,7 +309,7 @@
                                    v-on:change="saveCheckboxes(row[0], $event)">
                             <label>
                               &nbsp;&nbsp; Die Antwort wurde geprüft.
-                              {{ row[1].question.isAnswerReviewed }}
+<!--                              {{ row[1].question.isAnswerReviewed }}-->
                             </label>
                           </div>
                           <div class="col-md-10">
@@ -320,7 +320,7 @@
                                    v-on:change="saveCheckboxes(row[0], $event)">
                             <label>
                               &nbsp;&nbsp; Die Antwort kann veröffentlicht werden.
-                              {{ row[1].question.isAnswerPublished }}
+<!--                              {{ row[1].question.isAnswerPublished }}-->
                             </label>
                           </div>
                         </div>
@@ -405,11 +405,8 @@ export default defineComponent({
 
     showQuestions() {
       const questionsDropdown = document.getElementById('questionsDropdown');
-      const displayTabs = document.getElementById('displayTabs');
-      document.getElementById('allAnswers-tab')!.classList.add('active');
       const errorNoAnswer = document.getElementById('errorNoAnswer');
 
-      displayTabs!.style.display = 'none';
       errorNoAnswer!.style.display = 'none';
       if (this.currentSemester !== '-1' && this.countOnEachEvaluation[this.currentSemester] !== 0) {
         this.currentQuestion = '-1';
@@ -420,7 +417,6 @@ export default defineComponent({
       } else {
         this.currentQuestion = '-1';
         questionsDropdown!.style.display = 'none';
-        displayTabs!.style.display = 'none';
       }
     },
 
@@ -459,9 +455,9 @@ export default defineComponent({
     },
 
     async showAnswersToQuestion() {
+      const displayTabs = document.getElementById('displayTabs');
       this.countNotReviewed = 0;
       this.countNotPublished = 0;
-      const displayTabs = document.getElementById('displayTabs');
       const errorNoAnswer = document.getElementById('errorNoAnswer');
 
       if (this.currentQuestion !== '-1') {
@@ -491,6 +487,10 @@ export default defineComponent({
         if (this.internshipsAndQuestions.length !== 0) {
           errorNoAnswer!.style.display = 'none';
           displayTabs!.style.display = 'block';
+          const allAnswersTab = document.getElementById('allAnswers-tab');
+          if (this.countNotReviewed === 0 || this.countNotPublished === 0) {
+            allAnswersTab!.click();
+          }
         } else {
           errorNoAnswer!.style.display = 'block';
           displayTabs!.style.display = 'none';
@@ -546,6 +546,7 @@ export default defineComponent({
           text: 'checkbox aktualisiert',
           type: 'success',
         });
+        await this.showAnswersToQuestion();
       } catch (err) {
         await this.$store.dispatch('addNotification', {
           text: `${err.response.data.error.message}`,
