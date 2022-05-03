@@ -9,3 +9,8 @@
 .border-htw-green {
   border-color: $htw-green-color;
 }
+
+.required::after {
+  content:" *";
+  color: $danger;
+}

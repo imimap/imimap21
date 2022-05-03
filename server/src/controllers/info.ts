@@ -11,9 +11,11 @@ import { isoLanguages } from "../helpers/isoLanguages";
  */
 export function getUpcomingSemesters(req: Request, res: Response): void {
   const count = Number.parseInt(req.query.count as string);
-  const semesters = [Semester.getCurrent()];
+  let semesters = [Semester.getCurrent()];
 
   for (let i = 0; i < count; i++) semesters.push(semesters[i].next());
+
+  semesters = semesters.slice(1);
 
   res.json(semesters.map((s) => s.toString()));
 }

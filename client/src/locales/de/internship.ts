@@ -4,6 +4,7 @@ const internship = {
     edit: 'Praktikum bearbeiten',
   },
   form: {
+    currently: 'momentan',
     startDate: 'Anfangsdatum',
     endDate: 'Enddatum',
     operationalArea: 'Einsatzgebiet',

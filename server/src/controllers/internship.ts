@@ -5,15 +5,15 @@ import { Semester } from "../helpers/semesterHelper";
 import { InternshipModule } from "../models/internshipModule";
 import { Types } from "mongoose";
 import { UploadedFile } from "express-fileupload";
-import * as pdf from "html-pdf";
 import {
-  getUserWithInternshipModule,
   getAuthorizedUser,
   getAuthorizedUserWithInternshipModule,
   getUser,
+  getUserWithInternshipModule,
 } from "../helpers/userHelper";
-import { buildHtmlTemplate, saveFile } from "../helpers/pdfHelper";
+import { buildHtmlTemplate, buildPDFFile, saveFile } from "../helpers/pdfHelper";
 import { User } from "../models/user";
+import { constants } from "http2";
 import * as QueryString from "qs";
 
 const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
@@ -45,8 +45,8 @@ export async function getInternshipsById(
         populate: { path: "internships", lean: true, populate: { path: "company", lean: true } },
         lean: true,
       });
-    if (!user) throw new NotFound("User not found");
-  } catch (e: any) {
+    if (!user) return next(new NotFound("User not found"));
+  } catch (e) {
     return next(e);
   }
 
@@ -78,7 +78,7 @@ export async function getRandomInternship(
   let user;
   try {
     user = await getUserWithInternshipModule(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -140,7 +140,7 @@ export async function findInternships(
   let user;
   try {
     user = await getUserWithInternshipModule(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -292,7 +292,7 @@ export async function findInternshipsAmount(
   let user;
   try {
     user = await getUserWithInternshipModule(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -310,8 +310,7 @@ export async function findInternshipsAmount(
     }
   }
 
-  const select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
-  const projection = getProjection(select);
+  const projection = getProjection(INTERNSHIP_FIELDS_VISIBLE_FOR_USER);
   projection.company = { $first: "$company" };
   const facet = {
     $facet: {
@@ -357,7 +356,7 @@ export async function findInternshipsSeenAmount(
   let user;
   try {
     user = await getUser(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -379,7 +378,7 @@ export async function findInternshipsInSemester(
   let user;
   try {
     user = await getUser(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -485,7 +484,7 @@ export async function getAllPaymentTypes(
 ): Promise<void> {
   try {
     await getUser(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -506,7 +505,7 @@ export async function getAllOperationalAreas(
 ): Promise<void> {
   try {
     await getUser(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -529,7 +528,7 @@ export async function getAllProgrammingLanguages(
 ): Promise<void> {
   try {
     await getUser(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -541,8 +540,8 @@ export async function getAllProgrammingLanguages(
   res.json(programmingLanguages);
 }
 
-function getInternshipObject(propsObject: any) {
-  const internshipProps: { [k: string]: unknown } = {};
+function getInternshipObject(propsObject: Record<string, unknown>) {
+  const internshipProps: Record<string, unknown> = {};
 
   //direct props of internship
   const directProps = [
@@ -557,16 +556,24 @@ function getInternshipObject(propsObject: any) {
     "paymentTypes",
   ];
   for (const prop of directProps) {
-    if (propsObject[prop]) internshipProps[prop] = propsObject[prop];
+    if (propsObject[prop] !== undefined) internshipProps[prop] = propsObject[prop];
   }
 
-  if (propsObject.companyId) internshipProps.company = propsObject.companyId;
+  if (propsObject.companyId !== undefined) internshipProps.company = propsObject.companyId;
 
   //supervisor props
-  internshipProps["supervisor"] = {
-    fullName: propsObject.supervisorFullName,
-    emailAddress: propsObject.supervisorEmailAddress,
-  };
+  if (
+    propsObject.supervisorFullName !== undefined ||
+    propsObject.supervisorEmailAddress !== undefined
+  ) {
+    internshipProps["supervisor"] = {};
+    if (propsObject.supervisorFullName !== undefined)
+      (internshipProps["supervisor"] as Record<string, unknown>).fullName =
+        propsObject.supervisorFullName;
+    if (propsObject.supervisorEmailAddress !== undefined)
+      (internshipProps["supervisor"] as Record<string, unknown>).emailAddress =
+        propsObject.supervisorEmailAddress;
+  }
 
   return internshipProps;
 }
@@ -585,7 +592,7 @@ export async function createInternship(
   let user;
   try {
     user = await getUserWithInternshipModule(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
   if (!user.studentProfile) return next(new NotFound("User does not appear to be a student"));
@@ -603,17 +610,23 @@ export async function createInternship(
   const newlyCreatedInternship = await newInternship.save();
   if (!newlyCreatedInternship) return next(new BadRequest("Could not create internship"));
 
-  if (!user.studentProfile.internship) {
+  let internshipModuleId = user.studentProfile.internship;
+  let internshipModule;
+  if (!internshipModuleId) {
     // create new internship module
-    const newInternshipModule = new InternshipModule({
-      internships: [newlyCreatedInternship._id],
-    });
-    const newlyPlannedInternshipModule = await newInternshipModule.plan();
-    user.studentProfile.internship = newlyPlannedInternshipModule._id;
+    const newInternshipModule = new InternshipModule({});
+    internshipModule = await newInternshipModule.plan();
+    internshipModuleId = user.studentProfile.internship;
+    user.studentProfile.internship = internshipModuleId;
   } else {
-    user.studentProfile.internship.internships.push(newlyCreatedInternship._id);
+    internshipModule = await InternshipModule.findById(internshipModuleId);
   }
-  await user.studentProfile.internship.save();
+  if (!internshipModule) return next(new NotFound("Internship Module not found."));
+  if (!internshipModule.internships) internshipModule.internships = [];
+
+  internshipModule.internships.push(newlyCreatedInternship._id);
+
+  await internshipModule.save();
   await user.save();
   res.json(newlyCreatedInternship);
 }
@@ -632,7 +645,7 @@ export async function updateInternship(
   let user;
   try {
     user = await getAuthorizedUser(req.user?.email, req.params.id);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -645,7 +658,7 @@ export async function updateInternship(
     internshipToUpdate.status !== InternshipStatuses.PLANNED &&
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    !Object.keys(req.query).every((prop: string) => mutableProps.includes(prop))
+    !Object.keys(req.body).every((prop: string) => mutableProps.includes(prop))
   ) {
     return next(
       new Forbidden(
@@ -654,13 +667,7 @@ export async function updateInternship(
     );
   }
 
-  for (const prop in req.query) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    internshipToUpdate[prop] = req.query[prop];
-  }
-
-  const internshipProps = getInternshipObject(req.query);
+  const internshipProps = getInternshipObject(req.body);
   const updateEvent = {
     creator: user._id,
     changes: internshipProps,
@@ -669,10 +676,83 @@ export async function updateInternship(
 
   internshipToUpdate.events.push(updateEvent);
 
+  Object.assign(internshipToUpdate, internshipProps);
+
   const savedInternship = await internshipToUpdate.save();
   if (!savedInternship) return next(new BadRequest("Could not update internship"));
 
   res.json(savedInternship);
+}
+
+export async function deleteInternship(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  let user;
+  try {
+    user = await getAuthorizedUser(req.user?.email, req.params.id);
+  } catch (e) {
+    return next(e);
+  }
+
+  if (!user.isAdmin) return next(new Forbidden("Only admins may delete an internship"));
+
+  const result = await Internship.findByIdAndDelete(req.params.id);
+  if (!result) return next(new NotFound("Internship not found"));
+
+  res.statusCode = constants.HTTP_STATUS_NO_CONTENT;
+  res.send();
+}
+
+export async function approveInternshipApplication(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  let user;
+  try {
+    user = await getAuthorizedUser(req.user?.email, req.params.id);
+  } catch (e) {
+    return next(e);
+  }
+
+  if (!user.isAdmin) return next(new Forbidden("Only admins may approve internship applications"));
+
+  const internshipToUpdate = await Internship.findById(req.params.id);
+  if (!internshipToUpdate) return next(new NotFound("Internship not found"));
+
+  try {
+    const savedInternship = await internshipToUpdate.approve(user._id);
+    res.json(savedInternship);
+  } catch (e) {
+    return next(new BadRequest(e.message));
+  }
+}
+
+export async function markInternshipAsPassed(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  let user;
+  try {
+    user = await getAuthorizedUser(req.user?.email, req.params.id);
+  } catch (e) {
+    return next(e);
+  }
+
+  if (!user.isAdmin) return next(new Forbidden("Only admins may mark internships as passed"));
+
+  const internshipToUpdate = await Internship.findById(req.params.id);
+  if (!internshipToUpdate) return next(new NotFound("Internship not found"));
+
+  try {
+    const savedInternship = await internshipToUpdate.pass(user._id);
+    res.json(savedInternship);
+  } catch (e) {
+    return next(new BadRequest(e.message));
+  }
 }
 
 export function submitPdf(
@@ -732,7 +812,7 @@ export async function generateRequestPdf(
   let user;
   try {
     user = await getAuthorizedUserWithInternshipModule(req.user?.email, req.params.id);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
   // Load internship
@@ -743,15 +823,7 @@ export async function generateRequestPdf(
 
   // Build PDF file
   const template = await buildHtmlTemplate("request.html", user, internship);
-  try {
-    pdf
-      .create(template, { format: "A4", border: "20px", header: { height: "50px" } })
-      .toStream((err, stream) => {
-        if (err) throw err;
-        res.setHeader("Content-Type", "application/pdf");
-        stream.pipe(res);
-      });
-  } catch (e: any) {
-    next(new BadRequest(e));
-  }
+  const pdf = await buildPDFFile(template);
+  res.setHeader("Content-Type", "application/pdf");
+  res.send(pdf);
 }

@@ -1,23 +1,24 @@
 <template>
-  <!-- Search Form -->
-  <div id="form-block4" class="text-left mt-5 mx-3">
-    <h4 class="mb-3">{{ $t("search.headline") }}</h4>
-    <div class="card text-white bg-htw-green mt-2 mb-4 ms-3">
-      <div class="card-body p-1">
-        <p class="card-text">
-          <strong>{{ $t("search.hint.hintHeading") }}</strong>
-          {{ $t("search.hint.hintContent") }}
-        </p>
+  <div class="container">
+    <!-- Search Form -->
+    <div id="form-block4" class="text-left mt-5 mx-3">
+      <h4 class="mb-3">{{ $t("search.headline") }}</h4>
+      <div class="card text-white bg-htw-green mt-2 mb-4 ms-3">
+        <div class="card-body p-1">
+          <p class="card-text">
+            <strong>{{ $t("search.hint.hintHeading") }}</strong>
+            {{ $t("search.hint.hintContent") }}
+          </p>
+        </div>
       </div>
-    </div>
-    <div class="container" style="max-width: 100vw;">
-      <form role="form"
-            v-on:submit.prevent>
-        <div id="search_options" class="row ps-3 row-cols-lg-auto g-3 align-items-center">
-          <i18n-t keypath="search.form.info"
-                  tag="div"
-                  class="form-inline search-option-text">
-            <template #payment>
+      <div class="container" style="max-width: 100vw;">
+        <form role="form"
+              v-on:submit.prevent>
+          <div id="search_options" class="row ps-3 row-cols-lg-auto g-3 align-items-center">
+            <i18n-t keypath="search.form.info"
+                    tag="div"
+                    class="form-inline search-option-text">
+              <template #payment>
                 <select class="form-select mx-2 my-2 w-auto h-auto"
                         v-model="paymentFilter"
                         id="search_paid">
@@ -32,8 +33,8 @@
                     </option>
                   </template>
                 </select>
-            </template>
-            <template #location>
+              </template>
+              <template #location>
                 <label class="sr-only" for="search_location">
                   {{ $t("search.form.location") }}
                 </label>
@@ -51,72 +52,72 @@
                     </option>
                   </template>
                 </select>
-            </template>
-            <template #orientation>
-              <label class="sr-only" for="search_orientation_id">
-                {{ $t("search.form.orientation") }}
-              </label>
-              <select class="form-select mx-2 my-2 w-auto h-auto"
-                      v-model="this.operationalAreaFilter"
-                      id="search_orientation_id">
-                <option :value="null">{{ $t("search.form.fun") }}</option>
-                <template v-if="this.availableOperationalAreas != null">
-                  <option v-for="(orientation, index) in this.availableOperationalAreas"
-                          v-bind:key="index"
-                          :value="orientation">
-                    {{ orientation }}
-                  </option>
-                </template>
-              </select>
-            </template>
-            <template #programmingLanguage>
-              <label class="sr-only" for="search_programming_language_id">
-                {{ $t("search.form.programmingLanguage") }}
-              </label>
-              <select class="form-select mx-2 my-2 w-auto h-auto"
-                      v-model="this.languageFilter"
-                      id="search_programming_language_id">
-                <option :value="null">{{ $t("search.form.interested") }}</option>
-                <template v-if="this.availableLanguages != null">
-                  <option v-for="(language, index) in this.availableLanguages"
-                          v-bind:key="index"
-                          :value="this.availableLanguages[index]">
-                          {{ language }}
-                  </option>
-                </template>
-              </select>
-            </template>
-          </i18n-t>
-        </div>
-        <div class="btn-group" role="group">
-          <div class="field me-2">
-            <button class="btn btn-htw-green"
-                    v-on:click="searchOrShowModal()">
-              {{ $t("search.form.search") }}
-            </button>
+              </template>
+              <template #orientation>
+                <label class="sr-only" for="search_orientation_id">
+                  {{ $t("search.form.orientation") }}
+                </label>
+                <select class="form-select mx-2 my-2 w-auto h-auto"
+                        v-model="this.operationalAreaFilter"
+                        id="search_orientation_id">
+                  <option :value="null">{{ $t("search.form.fun") }}</option>
+                  <template v-if="this.availableOperationalAreas != null">
+                    <option v-for="(orientation, index) in this.availableOperationalAreas"
+                            v-bind:key="index"
+                            :value="orientation">
+                      {{ orientation }}
+                    </option>
+                  </template>
+                </select>
+              </template>
+              <template #programmingLanguage>
+                <label class="sr-only" for="search_programming_language_id">
+                  {{ $t("search.form.programmingLanguage") }}
+                </label>
+                <select class="form-select mx-2 my-2 w-auto h-auto"
+                        v-model="this.languageFilter"
+                        id="search_programming_language_id">
+                  <option :value="null">{{ $t("search.form.interested") }}</option>
+                  <template v-if="this.availableLanguages != null">
+                    <option v-for="(language, index) in this.availableLanguages"
+                            v-bind:key="index"
+                            :value="this.availableLanguages[index]">
+                      {{ language }}
+                    </option>
+                  </template>
+                </select>
+              </template>
+            </i18n-t>
           </div>
-          <!-- @TODO: Zufallsorschlag implementieren -->
-          <form role="form" v-on:submit.prevent v-if="false">
-            <div class="field">
-              <button class="btn btn-htw-green">
-                {{ $t("search.form.random") }}
+          <div class="btn-group" role="group">
+            <div class="field me-2">
+              <button class="btn btn-htw-green"
+                      v-on:click="searchOrShowModal()">
+                {{ $t("search.form.search") }}
               </button>
             </div>
-          </form>
-        </div>
-      </form>
+            <!-- @TODO: Zufallsorschlag implementieren -->
+            <form role="form" v-on:submit.prevent v-if="false">
+              <div class="field">
+                <button class="btn btn-htw-green">
+                  {{ $t("search.form.random") }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
-  <!-- Too many results modal -->
-  <too-many-results :amount-of-results="amountOfResults"
-                    :amount-of-internships-seen="amountOfInternshipsSeen"
-                    v-on:search="searchRequest"/>
-  <!-- Search Results -->
-  <div id="form-block4" class="mx-3 my-3"
+    <!-- Too many results modal -->
+    <too-many-results :amount-of-results="amountOfResults"
+                      :amount-of-internships-seen="amountOfInternshipsSeen"
+                      v-on:search="searchRequest"/>
+    <!-- Search Results -->
+    <div id="form-block4" class="mx-3 my-3"
          v-if="!loadingState && resultCount <= 0 && previousResultCount <= 0">
       {{ $t("search.results.noResults") }}
-  </div>
-  <div id="form-block4" class="mx-3 my-3"
+    </div>
+    <div id="form-block4" class="mx-3 my-3"
          v-if="!loadingState && (resultCount > 0 || previousResultCount > 0)">
       <div class="text-center">
         <button type="button"
@@ -145,6 +146,7 @@
         <Map v-if="cardToggle" :locations="locations"></Map>
       </div>
     </div>
+  </div>
 </template>
 
 <script lang="ts">

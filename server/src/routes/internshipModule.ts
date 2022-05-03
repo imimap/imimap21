@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { param, query } from "express-validator";
+import { body, param, query } from "express-validator";
 import { Semester } from "../helpers/semesterHelper";
 import authMiddleware from "../authentication/middleware";
 import {
@@ -94,7 +94,7 @@ internshipModuleRouter.patch(
   "/:id/",
   authMiddleware(true),
   param("id").custom(isObjectId),
-  query([
+  body([
     "internships",
     "inSemester",
     "inSemesterOfStudy",

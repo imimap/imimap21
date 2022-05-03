@@ -4,4 +4,5 @@ export interface PdfDocument {
   id: string;
   events: Event[];
   status: string;
+  filePath: string;
 }

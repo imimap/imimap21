@@ -1,7 +1,7 @@
 import { Document, model, Model, PopulatedDoc, Schema, Types } from "mongoose";
 import { IPdfDocument, PdfDocument, PdfDocumentSchema } from "./pdfDocument";
 import { Semester } from "../helpers/semesterHelper";
-import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
+import { getIMIMapAdmin } from "../helpers/imimapAsAdminHelper";
 import { User } from "./user";
 import { EventSchema, IEvent } from "./event";
 import { IInternship, InternshipStatuses } from "./internship";
@@ -82,7 +82,7 @@ InternshipModuleSchema.methods.plan = async function () {
   const defaultSemester = Semester.getUpcoming().toString();
   const defaultSemesterOfStudy = 4;
   this.events.push({
-    creator: (await imimapAdmin)._id,
+    creator: (await getIMIMapAdmin())._id,
     accept: true,
     changes: {
       newSemester: defaultSemester,
@@ -220,7 +220,7 @@ export async function trySetPassed(document: Document): Promise<boolean> {
   const statusIsPlanned = document.get("status") === InternshipModuleStatuses.PLANNED;
   if (statusIsPlanned && aepPassed && longEnough) {
     document.get("events").push({
-      creator: (await imimapAdmin)._id,
+      creator: (await getIMIMapAdmin())._id,
       changes: {
         status: InternshipModuleStatuses.PASSED,
       },

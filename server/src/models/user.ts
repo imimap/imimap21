@@ -1,7 +1,7 @@
-import {Document, model, Model, Schema, Types} from "mongoose";
+import { Document, model, Model, Schema } from "mongoose";
 import { IStudentProfile, StudentProfileSchema } from "./studentProfile";
 import { isValidEmail } from "../helpers/emailAddressHelper";
-import {IInternship} from "./internship";
+import {IInternshipModule, InternshipModule} from "./internshipModule";
 
 export interface IUser extends Document {
   firstName?: string;
@@ -41,14 +41,26 @@ const UserSchema = new Schema({
   },
 });
 
-UserSchema.methods.hasOwnInternship = function (internshipId: string) {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+UserSchema.methods.hasOwnInternship = async function (internshipId: string): Promise<boolean> {
+  // eslint-disable-next-line
   // @ts-ignore
-  const internships = this.studentProfile?.internship.internships.map((internship: IInternship) => {
-    return internship._id;
-  });
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const that: IUser = this;
+  if (!that.studentProfile || !that.studentProfile?.internship) return false;
+  const internshipModule: IInternshipModule = await InternshipModule.findById(
+    that.studentProfile.internship
+  )
+    .select("internships")
+    .lean();
 
-  return internships.length > 0 && internships.indexOf(internshipId) > -1;
+  return (
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    internshipModule?.internships?.length > 0 &&
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    internshipModule?.internships?.indexOf(internshipId) > -1
+  );
 };
 
 export const User: Model<IUser> = model("User", UserSchema);
