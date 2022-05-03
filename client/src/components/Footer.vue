@@ -29,7 +29,6 @@ footer {
   background: $htw-gray-color;
   padding: 17px 0 18px 0;
   border-top: 1px solid #000;
-  margin-bottom: -20px;
   margin-top: 100px;
 }
 

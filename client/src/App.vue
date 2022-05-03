@@ -82,6 +82,7 @@ a {
 
 #app {
   height: 100%;
-  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 </style>

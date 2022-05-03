@@ -48,9 +48,13 @@ export default defineComponent({
   margin-bottom: 30px;
   margin-top: 50px;
   padding: 2em 1em;
-  box-shadow: 4px 6px 1px 0px rgb(0 0 0 / 30%);
+  box-shadow: 4px 6px 1px 0 rgb(0 0 0 / 30%);
   @include media-breakpoint-up(md) {
     padding: 2.5em 5em;
   }
+}
+
+main {
+  flex: 1;
 }
 </style>
