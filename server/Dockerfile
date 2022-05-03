@@ -1,17 +1,17 @@
-FROM node:fermium AS build
+FROM node:gallium-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm -g config set user root && npm install -g phantomjs-prebuilt && npm install
+RUN apk add --no-cache chromium && npm install
 COPY ./ ./
 RUN npm run build-ts
 EXPOSE 9000
 EXPOSE 9229
 ENTRYPOINT ["npm", "run", "watch"]
 
-FROM node:fermium
+FROM node:gallium-alpine
 WORKDIR /server
 COPY --from=build /app/package*.json ./
-RUN npm -g config set user root && npm install -g phantomjs-prebuilt && npm ci --only=production
+RUN apk add --no-cache chromium && npm ci --only=production
 COPY --from=build /app/dist/ ./dist/
 COPY --from=build /app/certs/ ./certs/
 EXPOSE 9000

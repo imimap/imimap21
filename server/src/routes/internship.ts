@@ -8,6 +8,7 @@ import {
   findInternships,
   findInternshipsAmount,
   findInternshipsSeenAmount,
+  generateRequestPdf,
   getInternshipLocations,
   getInternshipsById,
   markInternshipAsPassed,
@@ -140,12 +141,18 @@ internshipRouter.patch(
 );
 
 /* PDF endpoints */
-const idRegEx = /[0-9a-f]{24}/;
+internshipRouter.get(
+  "/:id/pdf/request",
+  authMiddleware(),
+  param("id").custom(isObjectId),
+  validate,
+  asyncHandler(generateRequestPdf)
+);
 
 internshipRouter.post(
   "/:id/pdf/request",
   authMiddleware(),
-  param("id").custom((id) => idRegEx.test(id)),
+  param("id").custom(isObjectId),
   body("accept").optional().isBoolean(),
   body("reject").optional().isBoolean(),
   validate,
@@ -155,7 +162,7 @@ internshipRouter.post(
 internshipRouter.post(
   "/:id/pdf/lsfEctsProof",
   authMiddleware(),
-  param("id").custom((id) => idRegEx.test(id)),
+  param("id").custom(isObjectId),
   body("accept").optional().isBoolean(),
   body("reject").optional().isBoolean(),
   validate,
@@ -165,7 +172,7 @@ internshipRouter.post(
 internshipRouter.post(
   "/:id/pdf/locationJustification",
   authMiddleware(),
-  param("id").custom((id) => idRegEx.test(id)),
+  param("id").custom(isObjectId),
   body("accept").optional().isBoolean(),
   body("reject").optional().isBoolean(),
   validate,
@@ -175,7 +182,7 @@ internshipRouter.post(
 internshipRouter.post(
   "/:id/pdf/contract",
   authMiddleware(),
-  param("id").custom((id) => idRegEx.test(id)),
+  param("id").custom(isObjectId),
   body("accept").optional().isBoolean(),
   body("reject").optional().isBoolean(),
   validate,
@@ -185,7 +192,7 @@ internshipRouter.post(
 internshipRouter.post(
   "/:id/pdf/bvgTicketExemption",
   authMiddleware(),
-  param("id").custom((id) => idRegEx.test(id)),
+  param("id").custom(isObjectId),
   body("accept").optional().isBoolean(),
   body("reject").optional().isBoolean(),
   validate,
@@ -195,7 +202,7 @@ internshipRouter.post(
 internshipRouter.post(
   "/:id/pdf/certificate",
   authMiddleware(),
-  param("id").custom((id) => idRegEx.test(id)),
+  param("id").custom(isObjectId),
   body("accept").optional().isBoolean(),
   body("reject").optional().isBoolean(),
   validate,
@@ -205,7 +212,7 @@ internshipRouter.post(
 internshipRouter.post(
   "/:id/pdf/report",
   authMiddleware(),
-  param("id").custom((id) => idRegEx.test(id)),
+  param("id").custom(isObjectId),
   body("accept").optional().isBoolean(),
   body("reject").optional().isBoolean(),
   validate,

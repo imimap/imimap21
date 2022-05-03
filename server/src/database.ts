@@ -1,9 +1,11 @@
 import * as mongoose from "mongoose";
 
+let dbConnection: mongoose.Mongoose | null = null;
+
 async function connect(): Promise<void> {
   const mongoDB = "mongodb://db:27017/imimap";
   try {
-    await mongoose.connect(mongoDB, {
+    dbConnection = await mongoose.connect(mongoDB, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,
@@ -18,4 +20,8 @@ async function connect(): Promise<void> {
   });
 }
 
-export default connect;
+async function disconnect(): Promise<void> {
+  if (dbConnection !== null && dbConnection) await dbConnection.disconnect();
+}
+
+export default { connect, disconnect };

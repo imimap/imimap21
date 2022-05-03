@@ -14,9 +14,11 @@ import localStrategy from "./authentication/localStrategy";
 import * as fileUpload from "express-fileupload";
 import authMiddleware, { pdfFileAuthMiddleware } from "./authentication/middleware";
 import * as morgan from "morgan";
+import { closePDFRenderer } from "./helpers/pdfHelper";
+import { Server } from "http";
 
 // load database
-(async () => await database())();
+(async () => await database.connect())();
 
 // Configuring port
 const port = process.env.PORT || 9000;
@@ -62,5 +64,19 @@ app.use(function (error: unknown, request: Request, response: Response, next: Ne
 });
 
 // Listening to port
-app.listen(port);
-console.log(`Listening on ${BASE_URL}`);
+const server = app.listen(port, () => console.log(`Listening on ${BASE_URL}`));
+
+function closeServer(server: Server) {
+  return new Promise<void>((resolve, reject) => {
+    if (!server.listening) resolve();
+    server.close((err) => (err === undefined ? resolve() : reject(err)));
+  });
+}
+
+async function close() {
+  await closePDFRenderer();
+  await database.disconnect();
+  await closeServer(server);
+}
+
+["SIGINT", "SIGTERM", "SIGHUP"].forEach((signal) => process.on(signal, close));
