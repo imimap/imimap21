@@ -2,7 +2,7 @@ import {
   Module, MutationTree, GetterTree, ActionTree,
 } from 'vuex';
 import { UserProfileState } from '@/store/types/UserProfileState';
-import { RootState } from '@/store/types/RootState';
+import { RootState } from '@/store/state';
 
 export const userProfileState: UserProfileState = {
   emailAddress: '',

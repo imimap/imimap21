@@ -3,7 +3,7 @@ import {
 } from 'vuex';
 import { NotificationsState } from '@/store/types/NotificationsState';
 import { Notification } from '@/store/types/Notification';
-import { RootState } from '@/store/types/RootState';
+import { RootState } from '@/store/state';
 
 export const notificationsState: NotificationsState = {
   notifications: [],
@@ -38,7 +38,7 @@ export const actions: ActionTree<NotificationsState, RootState> = {
   },
 };
 
-const notificationsModule: Module <NotificationsState, RootState> = {
+const notificationsModule: Module<NotificationsState, RootState> = {
   state: notificationsState,
   getters,
   mutations,

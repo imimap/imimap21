@@ -1,5 +1,5 @@
 import { Document, model, Model, Schema } from "mongoose";
-import { IAddress, AddressSchema } from "./address";
+import { AddressSchema, IAddress } from "./address";
 import { isoLanguages } from "../helpers/isoLanguages";
 import { companySizes } from "../helpers/companySizes";
 import { isValidEmail } from "../helpers/emailAddressHelper";
@@ -14,7 +14,7 @@ export interface ICompany extends Document {
   mainLanguage?: string;
   size?: string;
   comment?: string;
-  excludedFromSearch?: boolean;
+  excludedFromSearch: boolean;
 }
 
 const CompanySchema = new Schema({

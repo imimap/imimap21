@@ -1,5 +1,8 @@
-export function getCompanyObject(propsObject: any) {
-  const companyProps: { [k: string]: any } = {};
+export function getCompanyObject(
+  propsObject: Record<string, unknown>,
+  includeAdminProps = false
+): Record<string, unknown> {
+  const companyProps: Record<string, unknown> = {};
 
   //direct props of internship
   const directProps = [
@@ -11,8 +14,13 @@ export function getCompanyObject(propsObject: any) {
     "mainLanguage",
     "size",
   ];
+
+  if (includeAdminProps) {
+    ["comment", "excludedFromSearch"].forEach((prop) => directProps.push(prop));
+  }
+
   for (const prop of directProps) {
-    if (propsObject[prop]) companyProps[prop] = propsObject[prop];
+    if (propsObject[prop] !== undefined) companyProps[prop] = propsObject[prop];
   }
 
   //address props
