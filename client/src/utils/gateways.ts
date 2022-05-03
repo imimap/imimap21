@@ -1,4 +1,4 @@
-import apiClient from '@/utils/http-common';
+import apiClient, { API_HOST } from '@/utils/http-common';
 import { showErrorNotification } from '@/utils/notification';
 import Student from '@/models/Student';
 import Internship from '@/models/Internship';
@@ -187,5 +187,18 @@ export const loadPaymentTypes = async (): Promise<string[]> => {
     if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
     await showErrorNotification(`Fehler beim Laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`);
     return [];
+  }
+};
+
+export const loadPDFFile = async (filePath: string) => {
+  try {
+    const response = await apiClient.get(`${API_HOST}/${filePath}`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Laden der PDF-Datei [ERROR: ${err.message}]`);
+    return null;
   }
 };

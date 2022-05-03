@@ -16,7 +16,7 @@ function isValidPdf(path: string) {
 
 export interface IPdfDocument extends Document {
   events: IEvent[];
-  //path: string;
+  filePath: string;
   status: string;
 
   nextPath(): string;
@@ -130,5 +130,9 @@ PdfDocumentSchema.methods.reject = async function (creator: Types.ObjectId) {
   this.status = PdfDocumentStatuses.REJECTED;
   return (this.$parent() ?? this).save();
 };
+
+PdfDocumentSchema.virtual("filePath").get(function (this: IPdfDocument) {
+  return this.path();
+});
 
 export const PdfDocument: Model<IPdfDocument> = model("PdfDocument", PdfDocumentSchema);
