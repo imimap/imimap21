@@ -79,7 +79,7 @@
                         {{ $t("header.headerLinks.internshipSearch") }}
                       </router-link>
                     </li>
-                    <li class="nav-item imi-nav-item">
+                    <li class="nav-item imi-nav-item" v-if="hasInternshipModule">
                       <router-link
                         class="nav-link imi-nav-link imi-map-navlink"
                         :to="{
@@ -113,6 +113,11 @@ import { logoutUser, isAdmin } from '@/utils/auth';
 
 export default defineComponent({
   name: 'Header',
+  computed: {
+    hasInternshipModule(): boolean {
+      return this.$store.getters.getUserInternshipId !== null;
+    },
+  },
   methods: {
     switchLocale(locale: string) {
       this.$i18n.locale = locale;
@@ -121,7 +126,10 @@ export default defineComponent({
     logout() {
       logoutUser();
       this.$store.commit('resetUser');
-      this.$store.dispatch('addNotification', { text: 'Du wurdest erfolgreich ausgeloggt!', type: 'success' });
+      this.$store.dispatch('addNotification', {
+        text: 'Du wurdest erfolgreich ausgeloggt!',
+        type: 'success',
+      });
       this.$router.push({ name: 'Login' });
     },
     currentUserIsAdmin() {
@@ -133,8 +141,7 @@ export default defineComponent({
 
 <style lang="scss">
 .imimap-header {
-  background: url('/assets/topbar-background.png'), $htw-gray-color;
-  background-repeat: no-repeat;
+  background: url('/assets/topbar-background.png') no-repeat, $htw-gray-color;
   background-size: 100%;
   width: 100%;
   border-radius: 0 !important;
@@ -158,7 +165,6 @@ export default defineComponent({
   background: url('/assets/logo.png') no-repeat;
   position: relative;
   background-size: 100%;
-  margin-top: -20px;
   width: 130px;
   height: 130px;
   margin-top: 8px;
@@ -201,7 +207,6 @@ export default defineComponent({
   display: inline;
   vertical-align: top;
   font-size: 16px;
-  font-weight: bold;
   background-color: #77b900 !important;
   color: #fff !important;
   padding: 3px 8px 3px 8px;
