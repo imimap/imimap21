@@ -1,4 +1,4 @@
-FROM node:fermium-alpine AS dev
+FROM node:gallium-alpine AS dev
 WORKDIR /app
 COPY package*.json ./
 RUN apk add git && npm install
@@ -6,7 +6,7 @@ COPY ./ ./
 EXPOSE 8080
 ENTRYPOINT ["npm", "run", "serve"]
 
-FROM node:fermium-alpine as build
+FROM node:gallium-alpine as build
 WORKDIR /build
 COPY --from=dev /app/ ./
 RUN npm run build
