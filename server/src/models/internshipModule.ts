@@ -36,6 +36,13 @@ export interface IInternshipModule extends Document {
 
   rejectPostponement(creator: Types.ObjectId, reason?: string): Promise<IInternshipModule>;
 
+  editPostponement(
+    creator: Types.ObjectId,
+    updatedProps: Record<string, unknown>
+  ): Promise<IInternshipModule>;
+
+  getRecentPostponementRequest(): IEvent;
+
   passAep(creator: Types.ObjectId): Promise<IInternshipModule>;
 
   submitCompleteDocumentsPdf(creator: Types.ObjectId, newPath: string): Promise<IInternshipModule>;
@@ -78,7 +85,7 @@ const InternshipModuleSchema = new Schema<IInternshipModule>({
 /*******************/
 /*  Model Methods  */
 /*******************/
-InternshipModuleSchema.methods.plan = async function () {
+InternshipModuleSchema.methods.plan = async function (): Promise<IInternshipModule> {
   const defaultSemester = Semester.getUpcoming().toString();
   const defaultSemesterOfStudy = 4;
   this.events.push({
@@ -103,7 +110,7 @@ InternshipModuleSchema.methods.requestPostponement = async function (
   newSemester: string,
   newSemesterOfStudy: number,
   reason: string
-) {
+): Promise<IInternshipModule> {
   const user = await User.findById(creator);
   if (!user) throw new Error("Creator (User) with that objectId does not exist.");
 
@@ -131,13 +138,11 @@ InternshipModuleSchema.methods.requestPostponement = async function (
 InternshipModuleSchema.methods.acceptPostponement = async function (
   creator: Types.ObjectId,
   reason?: string
-) {
+): Promise<IInternshipModule> {
   const user = await User.findById(creator);
   if (!user?.isAdmin) throw new Error("Only Admins may accept a postponement.");
 
-  const recentPostponementRequest = this.events
-    .filter((e) => e.changes?.newSemester)
-    .reduce((event, next) => ((event.timestamp ?? 0) > (next.timestamp ?? 0) ? event : next));
+  const recentPostponementRequest = this.getRecentPostponementRequest();
   this.inSemester = recentPostponementRequest.changes?.newSemester as string;
   this.inSemesterOfStudy = recentPostponementRequest.changes?.newSemesterOfStudy as number;
 
@@ -160,7 +165,7 @@ InternshipModuleSchema.methods.acceptPostponement = async function (
 InternshipModuleSchema.methods.rejectPostponement = async function (
   creator: Types.ObjectId,
   reason?: string
-) {
+): Promise<IInternshipModule> {
   const user = await User.findById(creator);
   if (!user?.isAdmin) throw new Error("Only Admins may reject a postponement.");
 
@@ -176,6 +181,36 @@ InternshipModuleSchema.methods.rejectPostponement = async function (
   this.status = InternshipModuleStatuses.POSTPONEMENT_REJECTED;
 
   return this.save();
+};
+
+InternshipModuleSchema.methods.editPostponement = async function (
+  creator: Types.ObjectId,
+  updatedProps: Record<string, unknown>
+): Promise<IInternshipModule> {
+  const user = await User.findById(creator);
+  if (!user?.isAdmin) throw new Error("Only Admins may accept a postponement.");
+
+  const recentPostponementRequest = this.getRecentPostponementRequest();
+  if (recentPostponementRequest.changes === undefined) recentPostponementRequest.changes = {};
+
+  const updatableProps = ["newSemester", "newSemesterOfStudy"];
+  for (const prop of updatableProps) {
+    if (updatedProps[prop] !== undefined) {
+      recentPostponementRequest.changes[prop] = updatedProps[prop];
+    }
+  }
+
+  if (updatedProps.reason !== undefined)
+    recentPostponementRequest.comment = updatedProps.reason as string;
+
+  this.markModified("events");
+  return this.save();
+};
+
+InternshipModuleSchema.methods.getRecentPostponementRequest = function (): IEvent {
+  return this.events
+    .filter((e) => e.changes?.newSemester)
+    .reduce((event, next) => ((event.timestamp ?? 0) > (next.timestamp ?? 0) ? event : next));
 };
 
 InternshipModuleSchema.methods.passAep = async function (creator: Types.ObjectId) {

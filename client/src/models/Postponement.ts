@@ -1,5 +1,14 @@
+export interface PostponementRequester {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  studentProfile: {
+    studentId: string;
+  };
+}
+
 export default class Postponement {
-  id = '';
+  _id = '';
 
   newSemester = '';
 
@@ -7,10 +16,12 @@ export default class Postponement {
 
   reason = '';
 
-  user = {
-    id: '',
-    studentId: '',
+  user: PostponementRequester = {
+    _id: '',
     firstName: '',
     lastName: '',
+    studentProfile: {
+      studentId: '',
+    },
   }
 }
