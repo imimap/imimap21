@@ -35,7 +35,7 @@
         <div v-if="!isLoading" class="accordion" id="listAccordion">
           <div v-for="(row, index) in companiesWithSearch" v-bind:key="index"
                class="accordion-item">
-            <h2 class="accordion-header" v-bind:id="index">
+            <h2 class="accordion-header" v-bind:id="index.toString()">
               <button class="accordion-button collapsed"
                       type="button"
                       data-bs-toggle="collapse"
@@ -76,7 +76,7 @@
                   <b>Sprache:</b> {{ row.mainLanguage }}<br>
                   <b>Größe:</b> {{ row.size.toLocaleLowerCase() }}<br>
                   <b>Adresse:</b><br>
-                  {{ row.address?.street + ' ' + row.address?.number }}<br>
+                  {{ row.address?.street + ' ' + row.address?.streetNumber }}<br>
                   {{ row.address?.zip + ' ' + row.address?.city }}<br>
                   {{ row.address?.country }}<br>
                 </p>
@@ -180,7 +180,7 @@
               <div class="col-6">
                 <input type="text" class="form-control"
                        aria-describedby="number" placeholder="Nummer"
-                       v-model="companies[currentEditCompanyIndex].address.number" />
+                       v-model="companies[currentEditCompanyIndex].address.streetNumber" />
               </div>
             </div>
 
@@ -206,13 +206,13 @@
               <div class="col-6">
                 <input type="text" class="form-control"
                        aria-describedby="latitude" placeholder="Latitude"
-                       v-model="companies[currentEditCompanyIndex].address.latitude" />
+                       v-model="companies[currentEditCompanyIndex].address.coordinates.latitude" />
               </div>
 
               <div class="col-6">
                 <input type="text" class="form-control"
                        aria-describedby="longitude" placeholder="Longitude"
-                       v-model="companies[currentEditCompanyIndex].address.longitude" />
+                       v-model="companies[currentEditCompanyIndex].address.coordinates.longitude" />
               </div>
             </div>
           </div>
@@ -222,7 +222,7 @@
                   data-bs-dismiss="modal">Schließen</button>
           <button type="button"
                   class="btn btn-success"
-                  @click="updateCompany(currentEditCompanyIndex)"
+                  @click="updateCompany(companies[currentEditCompanyIndex].id)"
           >Speichern</button>
         </div>
       </div>
