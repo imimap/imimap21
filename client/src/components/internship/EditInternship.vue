@@ -104,15 +104,15 @@
           <div class="col">
             <div class="mb-3">
               <label for="supervisorFullName">{{ $t('company.supervisor.name') }}</label>
-              <input v-model="internship.supervisor.fullName"
+              <input :content="internship.supervisor?.fullName"
                      type="text"
                      class="form-control"
                      id="supervisorFullName"
-                     :placeholder="internship.supervisor.fullName ?? $t('company.supervisor.name')"/>
+                     :placeholder="internship.supervisor?.fullName ?? $t('company.supervisor.name')"/>
             </div>
             <div>
               <label for="supervisorEmail">{{ $t('company.supervisor.email') }}</label>
-              <input v-model="internship.supervisor.emailAddress "
+              <input :content="internship.supervisor?.emailAddress "
                      type="text"
                      class="form-control"
                      id="supervisorEmail"

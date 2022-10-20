@@ -1,3 +1,4 @@
+<!-- eslint-disable max-len -->
 <template>
   <div class="modal fade"
        id="internshipPartEditModal"
@@ -31,7 +32,7 @@
                    id="tasks"
                    aria-describedby="tasks"
                    :placeholder="internshipPart?.tasks"
-                   v-model="tasks"
+                   :content="internshipPart?.tasks"
             />
           </div>
 
@@ -42,7 +43,7 @@
                    id="operationalArea"
                    aria-describedby="operationalArea"
                    :placeholder="internshipPart?.operationalArea"
-                   v-model="operationalArea"
+                   :content="internshipPart?.operationalArea"
             />
           </div>
 
@@ -52,8 +53,8 @@
                    class="form-control"
                    id="programmingLanguages"
                    aria-describedby="programmingLanguages"
-                   :placeholder="internshipPart?.programmingLanguages"
-                   v-model="programmingLanguages"
+                   :placeholder="internshipPart?.programmingLanguages?.toString().split(',').join(', ')"
+                  :content="internshipPart?.programmingLanguages"
             />
           </div>
 
@@ -63,8 +64,8 @@
                    class="form-control"
                    id="livingCosts"
                    aria-describedby="livingCosts"
-                   :placeholder="internshipPart?.livingCosts"
-                   v-model.number="livingCosts"
+                   :placeholder="internshipPart?.livingCosts?.toString()"
+                   :content="internshipPart?.livingCosts"
             />
           </div>
 
@@ -74,8 +75,8 @@
                    class="form-control"
                    id="salary"
                    aria-describedby="salary"
-                   :placeholder="internshipPart?.salary"
-                   v-model.number="salary"
+                   :placeholder="internshipPart?.salary?.toString()"
+                   :content="internshipPart?.salary"
             />
           </div>
 
@@ -85,7 +86,7 @@
             <select class="form-select"
                     multiple
                     aria-label="multiple select example"
-                    v-model="paymentTypes"
+                    :content="internshipPart?.paymentTypes"
             >
               <option v-for="paymentType in availablePaymentTypes"
                       :key="paymentType"
@@ -124,8 +125,8 @@
                    class="form-control"
                    id="workingHoursPerWeek"
                    aria-describedby="workingHoursPerWeek"
-                   :placeholder="internshipPart?.workingHoursPerWeek"
-                   v-model.number="workingHoursPerWeek"
+                   :placeholder="internshipPart?.workingHoursPerWeek?.toString()"
+                   :content="internshipPart?.workingHoursPerWeek"
             />
           </div>
 
@@ -135,8 +136,8 @@
                    class="form-control"
                    id="supervisorName"
                    aria-describedby="supervisorName"
-                   :placeholder="internshipPart?.supervisor.fullName"
-                   v-model="supervisorFullName"
+                   :placeholder="internshipPart?.supervisor?.fullName"
+                   :content="internshipPart?.supervisor?.fullName"
             />
           </div>
 
@@ -145,8 +146,8 @@
                    class="form-control"
                    id="supervisorEmail"
                    aria-describedby="supervisorEmail"
-                   :placeholder="internshipPart?.supervisor.emailAddress"
-                   v-model="supervisorEmailAddress"
+                   :placeholder="internshipPart?.supervisor?.emailAddress"
+                   :content="internshipPart?.supervisor?.emailAddress"
             />
           </div>
 
@@ -180,7 +181,6 @@
 import { defineComponent, PropType } from 'vue';
 import Student from '@/models/Student';
 import Internship from '@/models/Internship';
-import { createPayloadFromChangedProps, jsDateToHTMLDate } from '@/utils/admin';
 import { loadPaymentTypes, updateInternship } from '@/utils/gateways';
 import { showSuccessNotification } from '@/utils/notification';
 
@@ -195,57 +195,41 @@ export default defineComponent({
   },
   emits: ['updateInternship'],
   data() {
-    const initialProps = {
-      tasks: undefined as string | undefined,
-      operationalArea: undefined as string | undefined,
-      programmingLanguages: undefined as string | undefined,
-      livingCosts: undefined as number | undefined,
-      salary: undefined as number | undefined,
-      paymentTypes: undefined as string[] | undefined,
-      startDate: jsDateToHTMLDate((this.internshipPart as unknown as Internship)?.startDate),
-      endDate: jsDateToHTMLDate((this.internshipPart as unknown as Internship)?.endDate),
-      workingHoursPerWeek: undefined as number | undefined,
-      supervisorFullName: undefined as string | undefined,
-      supervisorEmailAddress: undefined as string | undefined,
-    };
-
-    const updatableProperties = Object.keys(initialProps);
-
     return {
       availablePaymentTypes: [] as string[],
-      updatableProperties,
-      ...initialProps,
+      internshipPart: {} as Internship | undefined,
+      startDate: undefined as string | undefined,
+      endDate: undefined as string | undefined,
+
     };
   },
   async mounted() {
     this.availablePaymentTypes = await loadPaymentTypes();
   },
-  computed: {
-    internshipPart(): Internship | undefined {
-      return this.student?.studentProfile.internship.internships[this.internshipIndex];
-    },
+  async created() {
+    this.internshipPart = this.student?.studentProfile.internship.internships[this.internshipIndex];
   },
+
   methods: {
-    jsDateToHTMLDate,
+    normalizedDate(date: string | undefined): string | undefined {
+      if (!date) return undefined;
+      const dateWithoutTime = new Date(date).toISOString().split('T')[0].toString();
+      return dateWithoutTime;
+    },
     async updateInternshipPart() {
       if (!this.internshipPart) return;
-      const payload = createPayloadFromChangedProps(
-        this.updatableProperties,
-        this.$data,
-        this.internshipPart,
-      );
-      const updatedInternship = await updateInternship(this.internshipPart._id, payload);
+      this.internshipPart.startDate = this.normalizedDate(this.startDate)
+        ?? this.internshipPart.startDate;
+      this.internshipPart.endDate = this.normalizedDate(this.endDate)
+        ?? this.internshipPart.endDate;
+      const updatedInternship = await
+      updateInternship(this.internshipPart._id, this.internshipPart);
       if (updatedInternship === null) return;
       this.$emit('updateInternship', this.student?._id, this.internshipIndex, updatedInternship);
       await showSuccessNotification('Änderungen am Praktikum gespeichert');
       (this.$refs.closeButton as HTMLButtonElement).click();
-      this.reset();
     },
-    reset() {
-      this.updatableProperties.forEach((prop) => {
-        this.$data[prop] = undefined;
-      });
-    },
+
     isSelectedPaymentType(paymentType: string): boolean {
       if (!this.internshipPart || this.internshipPart?.paymentTypes.length === 0) {
         return false;
@@ -255,7 +239,18 @@ export default defineComponent({
   },
   watch: {
     student() {
-      this.reset();
+      this.internshipPart = undefined;
+      // eslint-disable-next-line max-len
+      this.internshipPart = this.student?.studentProfile.internship.internships[this.internshipIndex];
+      this.startDate = this.normalizedDate(this.internshipPart?.startDate);
+      this.endDate = this.normalizedDate(this.internshipPart?.endDate);
+    },
+    internshipIndex() {
+      this.internshipPart = undefined;
+      // eslint-disable-next-line max-len
+      this.internshipPart = this.student?.studentProfile.internship.internships[this.internshipIndex];
+      this.startDate = this.normalizedDate(this.internshipPart?.startDate);
+      this.endDate = this.normalizedDate(this.internshipPart?.endDate);
     },
   },
 });
