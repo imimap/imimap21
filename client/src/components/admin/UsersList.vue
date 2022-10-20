@@ -58,7 +58,7 @@ export default defineComponent({
   },
   data() {
     return {
-      selectedStudent: null as Student | null,
+      selectedStudent: undefined as Student | undefined,
       selectedInternshipIndex: 0,
       students: [] as Student[],
       isLoading: false,
