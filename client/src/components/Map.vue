@@ -11,8 +11,7 @@ export default defineComponent({
   name: 'Map',
   props: {
     locations: {
-      type: [] as PropType<MapLocation[]>,
-      default: [],
+      type: Array as PropType<MapLocation[]>,
     },
   },
   data() {
@@ -52,7 +51,7 @@ export default defineComponent({
       if (!this.locations) return;
       this.locations.forEach((location) => {
         const marker = new Marker([location.coordinates.latitude, location.coordinates.longitude])
-          .bindPopup(location.city)
+          .bindPopup(`${location.city}, ${location.country}`)
           .addTo(this.map as Map);
         this.markers.push(marker);
       });
@@ -64,5 +63,9 @@ export default defineComponent({
 <style lang="scss" scoped>
 #mapContainer {
   height: 500px;
+
+  @media screen and (min-width: 900px) {
+    height: 700px;
+  }
 }
 </style>

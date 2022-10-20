@@ -11,7 +11,7 @@ const search = {
   },
   form: {
     paymentOptions: {
-      standard: '(un)nbezahlten',
+      standard: '(un)bezahlten',
       paid: 'bezahlten',
       unpaid: 'unbezahlten',
     },

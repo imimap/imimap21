@@ -1,7 +1,7 @@
 <template>
   <div class="container" style="max-width: 100vw;">
     <p class="text-center p-1">
-      {{ $tc(resultCountText, resultCount) }}
+      {{ $tc(resultCountText as string, resultCount as number) }}
     </p>
     <table class="table table-striped table-sm table-borderless text-left">
       <tbody>
@@ -12,7 +12,7 @@
         <td class="font-weight-bold"></td>
       </tr>
       <!-- Result Loop -->
-      <template  v-if="searchResults.length > 0">
+      <template  v-if="searchResults != undefined && searchResults.length > 0">
         <template v-for="(searchResult) in searchResults"
                   v-bind:key="searchResult._id">
           <SearchResult
@@ -33,7 +33,8 @@
 </template>
 <script lang="ts">
 import SearchResult from '@/components/search/SearchResult.vue';
-import { defineComponent } from 'vue';
+import { Internship } from '@/store/types/Internship';
+import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
   name: 'SearchResultList',
@@ -41,7 +42,8 @@ export default defineComponent({
   props: {
     resultCount: Number,
     resultCountText: String,
-    searchResults: [],
+    searchResults: { type: Array as PropType<Internship[]> },
+
   },
 });
 </script>

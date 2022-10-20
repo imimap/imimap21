@@ -131,7 +131,7 @@
         <SearchResultList
           :result-count="resultCount"
           :search-results="searchResults"
-          result-count-text="search.results.resultCount">
+          :result-count-text="'search.results.resultCount'">
         </SearchResultList>
       </div>
       <div id="previous-search-results" class="search_results"
@@ -139,7 +139,7 @@
         <SearchResultList
           :result-count="previousResultCount"
           :search-results="previousSearchResults"
-          result-count-text="search.results.previousResultCount">
+          :result-count-text="'search.results.previousResultCount'">
         </SearchResultList>
       </div>
       <div id="map-results">
@@ -193,13 +193,15 @@ export default defineComponent({
     previousResultCount(): number {
       return this.previousSearchResults.length;
     },
-    locations(): MapLocation[] | null {
-      if (this.searchResults.length === 0) return null;
+    locations(): MapLocation[] | undefined {
+      if (this.searchResults.length === 0) return undefined;
       return this.searchResults.map(
         (searchResult) => ({
           city: searchResult.company.address.city,
           coordinates: searchResult.company.address.coordinates,
+          country: searchResult.company.address.city,
         }),
+
       );
     },
     modal(): Modal {
@@ -214,7 +216,7 @@ export default defineComponent({
     async searchOrShowModal() {
       const amountSeen = await this.getAmountOfSeenResults();
       const amountNew = await this.getAmountOfPossibleResults();
-      if (amountSeen < 12 && amountNew > 6) {
+      if (amountSeen !== undefined && amountSeen < 12 && amountNew !== undefined && amountNew > 6) {
         this.amountOfResults = amountNew;
         this.amountOfInternshipsSeen = amountSeen;
         this.modal.show();
@@ -255,8 +257,8 @@ export default defineComponent({
         await showErrorNotification(`Fehler beim laden der verfügbaren Programmiersprachen [ERROR: ${err.message}]`);
       }
     },
-    async getAmountOfPossibleResults(): Promise<number> {
-      let amount;
+    async getAmountOfPossibleResults(): Promise<number | undefined> {
+      let amount: number | PromiseLike<number>;
       try {
         const res = await http.get('/internships/amount', {
           params: {
@@ -267,20 +269,22 @@ export default defineComponent({
           },
         });
         amount = await res.data;
+        return amount;
       } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
         await showErrorNotification(`Fehler beim Laden der neuen Suchergebnisse [ERROR: ${err.message}]`);
       }
-      return amount;
+      return undefined;
     },
-    async getAmountOfSeenResults(): Promise<number> {
-      let amount;
+    async getAmountOfSeenResults(): Promise<number | undefined> {
+      let amount: number | PromiseLike<number>;
       try {
         const res = await http.get('/internships/seen/amount');
         amount = await res.data;
+        return amount;
       } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
         await showErrorNotification(`Fehler beim Laden der vorherigen Suchergebnisse [ERROR: ${err.message}]`);
       }
-      return amount;
+      return undefined;
     },
     async searchRequestForPreviousResults() {
       try {
@@ -313,6 +317,7 @@ export default defineComponent({
             seen,
           },
         });
+
         return res.data;
       } catch (err: any) {
         throw new Error(`Fehler beim Suchen nach Praktika [ERROR: ${err.message}]`);
