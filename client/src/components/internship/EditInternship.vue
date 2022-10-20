@@ -1,3 +1,4 @@
+<!-- eslint-disable max-len -->
 <template>
   <div class="container clear-top">
     <div id="form-block4" v-if="!loadingState">
@@ -7,45 +8,43 @@
           <div class="col">
             <label for="startDate">
               {{ $t("internship.form.startDate") }}
-              <span v-if="startDate">({{ $t("internship.form.currently") }}: {{startDate}})</span>
             </label>
-            <input v-model="newStartDate"
+            <input v-model="startDate"
                    type="date"
                    id="startDate"
                    class="form-control"
-                   :placeholder="startDate"/>
+                  />
           </div>
           <div class="col">
-            <label for="startDate">
+            <label for="endDate">
               {{ $t("internship.form.endDate") }}
-              <span v-if="endDate">({{ $t("internship.form.currently") }}: {{endDate}})</span>
             </label>
-            <input v-model="newEndDate"
+            <input v-model="endDate"
                    type="date"
                    id="endDate"
                    class="form-control"
-                   :placeholder="endDate"/>
+                   />
           </div>
         </div>
 
         <div class="row my-4">
           <div class="col">
             <label for="operationalArea">{{ $t('internship.form.operationalArea') }}</label>
-            <input v-model="newOperationalArea"
+            <input v-model="internship.operationalArea"
                    type="text"
                    class="form-control"
                    id="operationalArea"
-                   :placeholder="operationalArea ?? $t('internship.form.operationalArea')"/>
+                   :placeholder="internship.operationalArea ?? $t('internship.form.operationalArea')"/>
           </div>
           <div class="col">
             <label for="programmingLanguages">
               {{ $t('internship.form.programmingLanguages') }}
             </label>
-            <input v-model="newProgrammingLanguages"
+            <input v-model="internship.programmingLanguages"
                    type="text"
                    class="form-control"
                    id="programmingLanguages"
-                   :placeholder="programmingLanguages ?? $t('internship.form.programmingLanguages')"
+                   :placeholder="internship.programmingLanguages?.toString().split(',').join(', ') ?? $t('internship.form.programmingLanguages')"
             />
           </div>
         </div>
@@ -53,12 +52,12 @@
         <div class="row my-4">
           <div class="col">
             <label for="salary">{{ $t('internship.form.salary') }} (in Euro)</label>
-            <input v-model="newSalary"
+            <input v-model="internship.salary"
                    type="number"
                    min="0"
                    class="form-control"
                    id="salary"
-                   :placeholder="salary ?? $t('internship.form.salary')"/>
+                   :placeholder="internship.salary?.toString() ?? $t('internship.form.salary')"/>
           </div>
           <div class="col">
             <label for="paymentType">{{ $t('internship.form.paymentType') }}</label>
@@ -72,7 +71,7 @@
                        type="checkbox"
                        :value="paymentType"
                        :id="`checkbox-${paymentType}`"
-                       v-model="newPayment"/>
+                       v-model="internship.paymentTypes"/>
                 <label class="form-check-label" :for="`checkbox-${paymentType}`">
                   {{ paymentType }}
                 </label>
@@ -84,20 +83,20 @@
         <div class="row my-4">
           <div class="col">
             <label for="livingCosts">{{ $t('internship.form.livingCosts') }}</label>
-            <input v-model="newLivingCosts"
+            <input v-model="internship.livingCosts"
                    type="number"
                    min="0"
                    class="form-control"
                    id="livingCosts"
-                   :placeholder="livingCosts ?? $t('internship.form.livingCosts')"/>
+                   :placeholder="internship.livingCosts?.toString() ?? $t('internship.form.livingCosts')"/>
           </div>
           <div class="col">
             <label for="workingHoursPerWeek">{{ $t('internship.form.workingHoursPerWeek') }}</label>
-            <input v-model="newWorkingHoursPerWeek"
+            <input v-model="internship.workingHoursPerWeek"
                    min="0"
                    class="form-control"
                    id="workingHoursPerWeek"
-                   :placeholder="workingHoursPerWeek ?? $t('internship.form.workingHoursPerWeek')"/>
+                   :placeholder="internship.workingHoursPerWeek?.toString() ?? $t('internship.form.workingHoursPerWeek')"/>
           </div>
         </div>
 
@@ -105,29 +104,29 @@
           <div class="col">
             <div class="mb-3">
               <label for="supervisorFullName">{{ $t('company.supervisor.name') }}</label>
-              <input v-model="newSupervisorFullName"
+              <input v-model="internship.supervisor.fullName"
                      type="text"
                      class="form-control"
                      id="supervisorFullName"
-                     :placeholder="supervisorFullName ?? $t('company.supervisor.name')"/>
+                     :placeholder="internship.supervisor.fullName ?? $t('company.supervisor.name')"/>
             </div>
             <div>
               <label for="supervisorEmail">{{ $t('company.supervisor.email') }}</label>
-              <input v-model="newSupervisorEmail"
+              <input v-model="internship.supervisor.emailAddress "
                      type="text"
                      class="form-control"
                      id="supervisorEmail"
-                     :placeholder="supervisorEmail ?? $t('company.supervisor.email')"/>
+                     :placeholder="internship.supervisor?.emailAddress ?? $t('company.supervisor.email')"/>
             </div>
           </div>
           <div class="col">
             <label for="tasks">{{ $t('internship.form.tasks') }}</label>
-            <textarea v-model="newTasks"
+            <textarea v-model="internship.tasks"
                       class="form-control"
                       id="tasks"
                       cols="30"
                       rows="6"
-                      :placeholder="tasks ?? $t('internship.form.tasks')"/>
+                      :placeholder="internship.tasks ?? $t('internship.form.tasks')"/>
           </div>
         </div>
 
@@ -149,51 +148,17 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
-import { capitalizeFirstLetter, convertStringToArray } from '@/utils/stringHelper';
 import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
-
-const possibleInternshipFields = [
-  'startDate',
-  'endDate',
-  'operationalArea',
-  'salary',
-  'payment',
-  'livingCosts',
-  'workingHoursPerWeek',
-  'supervisorFullName',
-  'supervisorEmailAddress',
-  'tasks',
-];
+import Internship from '@/models/Internship';
 
 export default defineComponent({
   name: 'EditInternship',
   data() {
     return {
+      internship: {} as Internship,
       loadingState: true,
       startDate: null as string | null,
       endDate: null as string | null,
-      operationalArea: null,
-      programmingLanguages: null,
-      salary: null,
-      payment: null,
-      livingCosts: null,
-      workingHoursPerWeek: null,
-      supervisorFullName: null,
-      supervisorEmail: null,
-      tasks: null,
-
-      newStartDate: null,
-      newEndDate: null,
-      newOperationalArea: null,
-      newProgrammingLanguages: null,
-      newSalary: null,
-      newPayment: null,
-      newLivingCosts: null,
-      newWorkingHoursPerWeek: null,
-      newSupervisorFullName: null,
-      newSupervisorEmail: null,
-      newTasks: null,
-
       availablePaymentTypes: [] as string[],
     };
   },
@@ -202,51 +167,30 @@ export default defineComponent({
     await this.getInternship();
   },
   methods: {
-    normalizedDate(date: string): string {
+    normalizedDate(date: string | null): string | null {
+      if (!date) return null;
       const dateWithoutTime = new Date(date).toISOString().split('T')[0].toString();
       return dateWithoutTime;
-    },
-    updateData(data) {
-      this.startDate = this.normalizedDate(data.startDate) ?? this.startDate;
-      this.endDate = this.normalizedDate(data.startDate) ?? this.endDate;
-      this.operationalArea = data.operationalArea ?? this.operationalArea;
-      this.programmingLanguages = data.programmingLanguages.toString().split(',').join(', ') ?? this.programmingLanguages;
-      this.salary = data.salary ?? this.salary;
-      this.payment = data.paymentTypes ?? this.payment;
-      this.livingCosts = data.livingCosts ?? this.livingCosts;
-      this.workingHoursPerWeek = data.workingHoursPerWeek ?? this.workingHoursPerWeek;
-      this.supervisorFullName = data.supervisor.fullName ?? this.supervisorFullName;
-      this.supervisorEmail = data.supervisor.emailAddress ?? this.supervisorEmail;
-      this.tasks = data.tasks ?? this.tasks;
     },
     async getInternship() {
       try {
         const res = await http.get(`/internships/${this.$route.params.id}`);
-        this.updateData(res.data);
+        this.internship = res.data;
+        this.startDate = this.normalizedDate(this.internship.startDate);
+        this.endDate = this.normalizedDate(this.internship.endDate);
       } catch (err: any) {
         await showErrorNotification(`Fehler beim Abfragen der bisherigen Praktikumsinformationen [ERROR: ${err.message}]`);
       } finally {
         this.loadingState = false;
       }
     },
-    getInternshipObject(): { [k: string]: string | string[] } {
-      const internshipProps: { [k: string]: string | string[] } = {};
-
-      if (this.newProgrammingLanguages) {
-        internshipProps.proprammingLanguages = convertStringToArray(this.newProgrammingLanguages);
-      }
-
-      possibleInternshipFields.forEach((prop) => {
-        const newProp = `new${capitalizeFirstLetter(prop)}`;
-        if (this[newProp]) internshipProps[prop] = this[newProp];
-      });
-
-      return internshipProps;
-    },
     async save() {
       try {
-        const res = await http.patch(`/internships/${this.$route.params.id}`, this.getInternshipObject());
-        this.updateData(res.data);
+        this.internship.startDate = this.normalizedDate(this.startDate)
+        ?? this.internship.startDate;
+        this.internship.endDate = this.normalizedDate(this.endDate)
+        ?? this.internship.endDate;
+        await http.patch(`/internships/${this.$route.params.id}`, this.internship);
         await showSuccessNotification('Praktikum erfolgreich gespeichert!');
       } catch (err: any) {
         await showErrorNotification(`Fehler beim Speichern des Praktikums [ERROR: ${err.message}]`);
@@ -270,4 +214,5 @@ export default defineComponent({
   gap: 1.5rem;
   margin-top: .25rem;
 }
+
 </style>
