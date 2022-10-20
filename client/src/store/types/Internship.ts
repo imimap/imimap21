@@ -26,4 +26,5 @@ export interface Internship {
   certificatePdf: PdfDocument;
   events: Event[];
   status: string;
+  duration: number;
 }
