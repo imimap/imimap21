@@ -256,8 +256,7 @@ InternshipSchema.methods.durationInWeeksSoFar = function (): number {
   const document = this;
   let dateToCompareWith: Date = normalizeDate(new Date());
   if (document.startDate && document.startDate > dateToCompareWith) return 0;
-  if (document.endDate && document.endDate < dateToCompareWith)
-    dateToCompareWith = document.endDate;
+  if (document.endDate) dateToCompareWith = document.endDate;
   return getWeeksBetween(document?.startDate || dateToCompareWith, dateToCompareWith);
 };
 

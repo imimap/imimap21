@@ -190,7 +190,8 @@ export default defineComponent({
         ?? this.internship.startDate;
         this.internship.endDate = this.normalizedDate(this.endDate)
         ?? this.internship.endDate;
-        await http.patch(`/internships/${this.$route.params.id}`, this.internship);
+        const res = await http.patch(`/internships/${this.$route.params.id}`, this.internship);
+        console.log(res);
         await showSuccessNotification('Praktikum erfolgreich gespeichert!');
       } catch (err: any) {
         await showErrorNotification(`Fehler beim Speichern des Praktikums [ERROR: ${err.message}]`);
