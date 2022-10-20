@@ -194,7 +194,8 @@ export default defineComponent({
         console.log(res);
         await showSuccessNotification('Praktikum erfolgreich gespeichert!');
       } catch (err: any) {
-        await showErrorNotification(`Fehler beim Speichern des Praktikums [ERROR: ${err.message}]`);
+        await showErrorNotification(`Fehler beim Speichern
+        des Praktikums [ERROR: ${err.response.data.error.message}`);
       }
     },
     async getAvailablePaymentTypes() {
