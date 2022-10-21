@@ -1,4 +1,5 @@
 const address = {
+  heading: 'Adresse',
   street: 'Straße',
   nr: 'Nr',
   line: 'Adresszusatz',

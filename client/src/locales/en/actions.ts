@@ -3,6 +3,8 @@ const actions = {
   abort: 'abort',
   back: 'back',
   send: 'send',
+  edit: 'edit',
+  delete: 'delete',
 };
 
 export default actions;

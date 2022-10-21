@@ -5,3 +5,14 @@ export const capitalizeFirstLetter = (string: string): string => {
   const remainingChars = string.slice(1);
   return `${firstChar}${remainingChars}`;
 };
+
+declare global {
+  interface String {
+    capitalize(): string;
+  }
+}
+
+// eslint-disable-next-line no-extend-native
+String.prototype.capitalize = function capitalize() {
+  return capitalizeFirstLetter(this as string);
+};
