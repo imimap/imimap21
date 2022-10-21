@@ -17,7 +17,7 @@
                   ref="closeButton"
           />
         </div>
-        <div class="modal-body">
+        <div v-if="internshipPart != undefined" class="modal-body">
           <p>
             Praktikum von {{ student?.firstName }} {{ student?.lastName }}
             ({{ student?.studentProfile.studentId }})
@@ -31,8 +31,7 @@
                    class="form-control"
                    id="tasks"
                    aria-describedby="tasks"
-                   :placeholder="internshipPart?.tasks"
-                   :content="internshipPart?.tasks"
+                   v-model="internshipPart.tasks"
             />
           </div>
 
@@ -42,8 +41,7 @@
                    class="form-control"
                    id="operationalArea"
                    aria-describedby="operationalArea"
-                   :placeholder="internshipPart?.operationalArea"
-                   :content="internshipPart?.operationalArea"
+                   v-model="internshipPart.operationalArea"
             />
           </div>
 
@@ -53,8 +51,7 @@
                    class="form-control"
                    id="programmingLanguages"
                    aria-describedby="programmingLanguages"
-                   :placeholder="internshipPart?.programmingLanguages?.toString().split(',').join(', ')"
-                  :content="internshipPart?.programmingLanguages"
+                    v-model="internshipPart.programmingLanguages"
             />
           </div>
 
@@ -64,8 +61,7 @@
                    class="form-control"
                    id="livingCosts"
                    aria-describedby="livingCosts"
-                   :placeholder="internshipPart?.livingCosts?.toString()"
-                   :content="internshipPart?.livingCosts"
+                   v-model="internshipPart.livingCosts"
             />
           </div>
 
@@ -75,8 +71,7 @@
                    class="form-control"
                    id="salary"
                    aria-describedby="salary"
-                   :placeholder="internshipPart?.salary?.toString()"
-                   :content="internshipPart?.salary"
+                   v-model="internshipPart.salary"
             />
           </div>
 
@@ -86,7 +81,7 @@
             <select class="form-select"
                     multiple
                     aria-label="multiple select example"
-                    :content="internshipPart?.paymentTypes"
+                    v-model="internshipPart.paymentTypes"
             >
               <option v-for="paymentType in availablePaymentTypes"
                       :key="paymentType"
@@ -125,8 +120,7 @@
                    class="form-control"
                    id="workingHoursPerWeek"
                    aria-describedby="workingHoursPerWeek"
-                   :placeholder="internshipPart?.workingHoursPerWeek?.toString()"
-                   :content="internshipPart?.workingHoursPerWeek"
+                   v-model="internshipPart.workingHoursPerWeek"
             />
           </div>
 
@@ -136,8 +130,7 @@
                    class="form-control"
                    id="supervisorName"
                    aria-describedby="supervisorName"
-                   :placeholder="internshipPart?.supervisor?.fullName"
-                   :content="internshipPart?.supervisor?.fullName"
+                   v-model="supervisor.fullName"
             />
           </div>
 
@@ -146,8 +139,7 @@
                    class="form-control"
                    id="supervisorEmail"
                    aria-describedby="supervisorEmail"
-                   :placeholder="internshipPart?.supervisor?.emailAddress"
-                   :content="internshipPart?.supervisor?.emailAddress"
+                   v-model="supervisor.emailAddress"
             />
           </div>
 
@@ -156,7 +148,7 @@
             <textarea class="form-control"
                       id="comment"
                       aria-describedby="comment"
-                      :placeholder="internshipPart?.comment"
+                      v-model="internshipPart.comment"
             ></textarea>
           </div>
 
@@ -200,6 +192,10 @@ export default defineComponent({
       internshipPart: {} as Internship | undefined,
       startDate: undefined as string | undefined,
       endDate: undefined as string | undefined,
+      supervisor: {
+        fullName: undefined as string | undefined,
+        emailAddress: undefined as string | undefined,
+      },
 
     };
   },
@@ -222,6 +218,12 @@ export default defineComponent({
         ?? this.internshipPart.startDate;
       this.internshipPart.endDate = this.normalizedDate(this.endDate)
         ?? this.internshipPart.endDate;
+
+      if (this.internshipPart.supervisor === undefined) { this.internshipPart.supervisor = { fullName: '', emailAddress: '' }; }
+      this.internshipPart.supervisor.fullName = this.supervisor?.fullName
+      ?? this.internshipPart?.supervisor.fullName;
+      this.internshipPart.supervisor.emailAddress = this.supervisor?.emailAddress
+       ?? this.internshipPart?.supervisor.emailAddress;
       const updatedInternship = await
       updateInternship(this.internshipPart._id, this.internshipPart);
       if (updatedInternship === null) return;
@@ -236,21 +238,22 @@ export default defineComponent({
       }
       return this.internshipPart.paymentTypes.indexOf(paymentType) !== -1;
     },
+    updateProperties() {
+      this.internshipPart = undefined;
+      // eslint-disable-next-line max-len
+      this.internshipPart = this.student?.studentProfile.internship.internships[this.internshipIndex];
+      this.startDate = this.normalizedDate(this.internshipPart?.startDate);
+      this.endDate = this.normalizedDate(this.internshipPart?.endDate);
+      this.supervisor.fullName = this.internshipPart?.supervisor?.fullName;
+      this.supervisor.emailAddress = this.internshipPart?.supervisor?.emailAddress;
+    },
   },
   watch: {
     student() {
-      this.internshipPart = undefined;
-      // eslint-disable-next-line max-len
-      this.internshipPart = this.student?.studentProfile.internship.internships[this.internshipIndex];
-      this.startDate = this.normalizedDate(this.internshipPart?.startDate);
-      this.endDate = this.normalizedDate(this.internshipPart?.endDate);
+      this.updateProperties();
     },
     internshipIndex() {
-      this.internshipPart = undefined;
-      // eslint-disable-next-line max-len
-      this.internshipPart = this.student?.studentProfile.internship.internships[this.internshipIndex];
-      this.startDate = this.normalizedDate(this.internshipPart?.startDate);
-      this.endDate = this.normalizedDate(this.internshipPart?.endDate);
+      this.updateProperties();
     },
   },
 });

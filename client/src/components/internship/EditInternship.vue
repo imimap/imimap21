@@ -104,19 +104,19 @@
           <div class="col">
             <div class="mb-3">
               <label for="supervisorFullName">{{ $t('company.supervisor.name') }}</label>
-              <input :content="internship.supervisor?.fullName"
+              <input v-model="supervisor.fullName"
                      type="text"
                      class="form-control"
                      id="supervisorFullName"
-                     :placeholder="internship.supervisor?.fullName ?? $t('company.supervisor.name')"/>
+                     :placeholder="supervisor.fullName ?? $t('company.supervisor.name')"/>
             </div>
             <div>
               <label for="supervisorEmail">{{ $t('company.supervisor.email') }}</label>
-              <input :content="internship.supervisor?.emailAddress "
+              <input v-model="supervisor.emailAddress "
                      type="text"
                      class="form-control"
                      id="supervisorEmail"
-                     :placeholder="internship.supervisor?.emailAddress ?? $t('company.supervisor.email')"/>
+                     :placeholder="supervisor.emailAddress ?? $t('company.supervisor.email')"/>
             </div>
           </div>
           <div class="col">
@@ -160,6 +160,10 @@ export default defineComponent({
       startDate: null as string | null,
       endDate: null as string | null,
       availablePaymentTypes: [] as string[],
+      supervisor: {
+        fullName: undefined as string | undefined,
+        emailAddress: undefined as string | undefined,
+      },
     };
   },
   async created() {
@@ -178,6 +182,8 @@ export default defineComponent({
         this.internship = res.data;
         this.startDate = this.normalizedDate(this.internship.startDate);
         this.endDate = this.normalizedDate(this.internship.endDate);
+        this.supervisor.fullName = this.internship.supervisor.fullName;
+        this.supervisor.emailAddress = this.internship.supervisor.emailAddress;
       } catch (err: any) {
         await showErrorNotification(`Fehler beim Abfragen der bisherigen Praktikumsinformationen [ERROR: ${err.message}]`);
       } finally {
@@ -190,8 +196,12 @@ export default defineComponent({
         ?? this.internship.startDate;
         this.internship.endDate = this.normalizedDate(this.endDate)
         ?? this.internship.endDate;
-        const res = await http.patch(`/internships/${this.$route.params.id}`, this.internship);
-        console.log(res);
+        this.internship.supervisor.fullName = this.supervisor.fullName
+        ?? this.internship.supervisor.fullName;
+        this.internship.supervisor.emailAddress = this.supervisor.emailAddress
+        ?? this.internship.supervisor.emailAddress;
+
+        await http.patch(`/internships/${this.$route.params.id}`, this.internship);
         await showSuccessNotification('Praktikum erfolgreich gespeichert!');
       } catch (err: any) {
         await showErrorNotification(`Fehler beim Speichern
