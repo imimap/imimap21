@@ -75,7 +75,7 @@
                 Anfangsdatum
               </td>
               <td>
-                {{ startDate?.toLocaleDateString() }}
+                {{ startDate?.toLocaleDateString($i18n.locale, {day: "2-digit", month: "2-digit", year: "numeric"}) }}
               </td>
             </tr>
             <tr>
@@ -83,7 +83,7 @@
                 Enddatum
               </td>
               <td>
-                {{ endDate?.toLocaleDateString() }}
+                {{ endDate?.toLocaleDateString($i18n.locale, {day: "2-digit", month: "2-digit", year: "numeric"}) }}
               </td>
             </tr>
             <tr>
