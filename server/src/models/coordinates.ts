@@ -33,7 +33,8 @@ export const getCoordinates = async function (document: IAddress): Promise<ICoor
   const data = res.data;
   let coordinates;
 
-  if (data.status !== "OK") throw data.status + ". Could not get coordinates for " + addressString;
+  //if (data.status !== "OK") throw data.status + ". Could not get coordinates for " + addressString;
+  if (data.status !== "OK") return { latitude: 0, longitude: 0 };
   else coordinates = data.results[0].geometry.location;
 
   return {

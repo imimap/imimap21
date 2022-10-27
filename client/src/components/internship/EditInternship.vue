@@ -182,8 +182,10 @@ export default defineComponent({
         this.internship = res.data;
         this.startDate = this.normalizedDate(this.internship.startDate);
         this.endDate = this.normalizedDate(this.internship.endDate);
-        this.supervisor.fullName = this.internship.supervisor.fullName;
-        this.supervisor.emailAddress = this.internship.supervisor.emailAddress;
+        if (this.internship.supervisor) {
+          this.supervisor.fullName = this.internship.supervisor.fullName;
+          this.supervisor.emailAddress = this.internship.supervisor.emailAddress;
+        }
       } catch (err: any) {
         await showErrorNotification(`Fehler beim Abfragen der bisherigen Praktikumsinformationen [ERROR: ${err.message}]`);
       } finally {
@@ -192,14 +194,14 @@ export default defineComponent({
     },
     async save() {
       try {
-        this.internship.startDate = this.normalizedDate(this.startDate)
-        ?? this.internship.startDate;
-        this.internship.endDate = this.normalizedDate(this.endDate)
-        ?? this.internship.endDate;
-        this.internship.supervisor.fullName = this.supervisor.fullName
-        ?? this.internship.supervisor.fullName;
-        this.internship.supervisor.emailAddress = this.supervisor.emailAddress
-        ?? this.internship.supervisor.emailAddress;
+        // this.internship.startDate = this.normalizedDate(this.startDate)
+        // ?? this.internship.startDate;
+        // this.internship.endDate = this.normalizedDate(this.endDate)
+        // ?? this.internship?.endDate;
+        // this.internship.supervisor.fullName = this.supervisor.fullName
+        // ?? this.internship.supervisor?.fullName;
+        // this.internship.supervisor.emailAddress = this.supervisor.emailAddress
+        // ?? this.internship.supervisor?.emailAddress;
 
         await http.patch(`/internships/${this.$route.params.id}`, this.internship);
         await showSuccessNotification('Praktikum erfolgreich gespeichert!');
@@ -225,6 +227,19 @@ export default defineComponent({
   display: flex;
   gap: 1.5rem;
   margin-top: .25rem;
+}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #C8CFD5;
+  opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: #C8CFD5;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: #C8CFD5;
 }
 
 </style>

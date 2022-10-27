@@ -57,4 +57,5 @@ export default defineComponent({
 main {
   flex: 1;
 }
+
 </style>

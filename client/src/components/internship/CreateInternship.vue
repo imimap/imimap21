@@ -1,3 +1,4 @@
+<!-- eslint-disable max-len -->
 <template>
   <div class="container clear-top">
     <div id="form-block4">
@@ -63,7 +64,7 @@
                        type="checkbox"
                        :value="paymentType"
                        :id="`checkbox-${paymentType}`"
-                       v-model="payment"/>
+                       :content="payment"/>
                 <label class="form-check-label" :for="`checkbox-${paymentType}`">
                   {{ paymentType }}
                 </label>
@@ -108,12 +109,26 @@
                      type="text"
                      class="form-control"
                      id="company"
+                     @input="onChange"
                      :placeholder="$t('company.heading')"/>
+                <ul id="autocomplete-results"
+                    v-show="isOpen"
+                    class="autocomplete-results"
+                  >
+
+                <li v-for="(result, i) in results" :key="i"
+                  @click="setResult(result)"
+                  class="autocomplete-result"
+
+                  >
+                  {{ result }}
+                </li>
+              </ul>
             </div>
           </div>
           <div class="col">
             <label for="tasks">{{ $t('internship.form.tasks') }}</label>
-            <textarea v-model="tasks"
+            <textarea :content="tasks"
                       class="form-control"
                       id="tasks"
                       cols="30"
@@ -203,7 +218,7 @@
           </div>
           <div class="row mb-3">
             <div class="col">
-              <label for="newCompanyMainLanguage">{{ $t('address.street') }}</label>
+              <label for="newCompanyStreet" class="required">{{ $t('address.street') }}</label>
               <input v-model="newCompanyStreet"
                      type="text"
                      class="form-control"
@@ -211,7 +226,7 @@
                      :placeholder="$t('address.street')"/>
             </div>
             <div class="col">
-              <label for="newCompanyStreetNumber">{{ $t('address.nr') }}</label>
+              <label for="newCompanyStreetNumber" class="required">{{ $t('address.nr') }}</label>
               <input v-model="newCompanyStreetNumber"
                      type="text"
                      class="form-control"
@@ -229,7 +244,7 @@
                      :placeholder=" $t('address.line')"/>
             </div>
             <div class="col">
-              <label for="newCompanyZip">{{ $t('address.zip') }}</label>
+              <label for="newCompanyZip" class="required">{{ $t('address.zip') }}</label>
               <input v-model="newCompanyZip"
                      type="text"
                      class="form-control"
@@ -239,7 +254,7 @@
           </div>
           <div class="row mb-3">
             <div class="col">
-              <label for="newCompanyCity">{{ $t('address.city') }}</label>
+              <label for="newCompanyCity" class="required">{{ $t('address.city') }}</label>
               <input v-model="newCompanyCity"
                      type="text"
                      class="form-control"
@@ -247,7 +262,7 @@
                      :placeholder="$t('address.city')"/>
             </div>
             <div class="col">
-              <label for="newCompanyCountry">{{ $t('address.country') }}</label>
+              <label for="newCompanyCountry" class="required">{{ $t('address.country') }}</label>
               <input v-model="newCompanyCountry"
                      type="text"
                      class="form-control"
@@ -318,6 +333,14 @@ const possibleCompanyFields = [
   'country',
 ];
 
+const requiredCompanyFields = [
+  'street',
+  'streetNumber',
+  'zip',
+  'city',
+  'country',
+];
+
 // @TODO: Companies abfragen, wenn nicht neue erstellen und ID einfügen
 // @TODO: Formularfelder sind optional, Formular macht zum bearbeiten aber dennoch Sinn
 export default defineComponent({
@@ -347,7 +370,7 @@ export default defineComponent({
       payment: null,
       livingCosts: null,
       workingHoursPerWeek: null,
-      company: null,
+      company: '',
       supervisorFullName: null,
       supervisorEmailAddress: null,
       tasks: null,
@@ -358,11 +381,21 @@ export default defineComponent({
       existingCompany: {} as Company,
       // Component State
       toggleAddCompanyForm: false,
+      existingCompanies: [] as Company[],
+      results: [] as string[],
+      isOpen: false,
     };
   },
   created() {
     this.getAvailableLanguages();
     this.getAvailablePaymentTypes();
+    this.getExistingCompanies();
+  },
+  mounted() {
+    document.addEventListener('click', this.handleClickOutside);
+  },
+  unmounted() {
+    document.removeEventListener('click', this.handleClickOutside);
   },
   computed: {
     languages(): {language: string; languageName: string}[] {
@@ -372,12 +405,21 @@ export default defineComponent({
     },
   },
   methods: {
-    async save() {
-      if (this.company !== null && await this.companyExists()) await this.postInternship();
-      else this.toggleAddCompanyForm = true;
+    handleClickOutside(event) {
+      if (!this.$el.contains(event.target)) {
+        this.isOpen = false;
+      }
     },
-    async companyExists(): Promise<boolean> {
-      if (this.company === null) return false;
+    async save() {
+      if (this.company.length === 0) {
+        await this.$store.dispatch('addNotification', { text: 'Ein Firmenname muss eingetragen werden!', type: 'danger' });
+      } else if (await this.fetchCompany()) await this.postInternship();
+      else {
+        this.toggleAddCompanyForm = true;
+      }
+    },
+    async fetchCompany(): Promise<boolean> {
+      if (this.company === '') return false;
       try {
         const res = await http.get('/companies', { params: { companyName: this.company } });
         if (res.data === null) return false;
@@ -391,9 +433,14 @@ export default defineComponent({
       const companyProps: { [k: string]: string } = {};
 
       if (!this.company) {
-        throw new Error('Error: A company name needs to be entered!');
+        throw new Error('Ein Firmenname muss eingetragen werden!');
       }
       companyProps.companyName = this.company;
+
+      requiredCompanyFields.forEach((prop) => {
+        const newProp = `newCompany${capitalizeFirstLetter(prop)}`;
+        if (this[newProp] == null) throw new Error('Bitte ergänze die erforderlichen Firmendaten!');
+      });
 
       possibleCompanyFields.forEach((prop) => {
         const newProp = `newCompany${capitalizeFirstLetter(prop)}`;
@@ -403,18 +450,28 @@ export default defineComponent({
       return companyProps;
     },
     async createNewCompany() {
-      if (await this.companyExists()) {
+      if (await this.fetchCompany()) {
         this.toggleAddCompanyForm = !this.toggleAddCompanyForm;
       } else {
         try {
           const res = await http.post('/companies', this.getCompanyObject());
           this.existingCompany = res.data;
-          await this.$store.dispatch('addNotification', { text: 'Firma erfolgreich angelegt!', type: 'success' });
-          this.toggleAddCompanyForm = false;
-          this.clearNewCompanyForm();
+          if (res.data) {
+            await this.$store.dispatch('addNotification', { text: 'Firma erfolgreich angelegt!', type: 'success' });
+            this.toggleAddCompanyForm = false;
+            this.clearNewCompanyForm();
+          }
         } catch (err: any) {
           await showErrorNotification(err);
         }
+      }
+    },
+    async getExistingCompanies() {
+      try {
+        const res = await http.get('/companies');
+        this.existingCompanies = res.data;
+      } catch (err: any) {
+        await showErrorNotification(err);
       }
     },
     getInternshipObject(): { [k: string]: string | string[] } {
@@ -449,7 +506,7 @@ export default defineComponent({
         this.availableLanguages = res.data;
       } catch (err: any) {
         await this.$store.dispatch('addNotification', {
-          text: `Fehler beim laden der verfügbaren Sprachen [ERROR: ${err.message}]`,
+          text: `Fehler beim Laden der verfügbaren Sprachen [ERROR: ${err.message}]`,
           type: 'danger',
         });
       }
@@ -460,10 +517,31 @@ export default defineComponent({
         this.availablePaymentTypes = res.data;
       } catch (err: any) {
         await this.$store.dispatch('addNotification', {
-          text: `Fehler beim laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`,
+          text: `Fehler beim Laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`,
           type: 'danger',
         });
       }
+    },
+    filterResults() {
+      if (this.company !== null) {
+        const companies = this.existingCompanies.filter(
+          (c) => (c.companyName.toLowerCase().indexOf(this.company?.toLowerCase()) > -1),
+        );
+        this.results = companies.map((c) => c.companyName);
+      }
+      if (this.results.length > 0) { this.isOpen = true; } else { this.isOpen = false; }
+    },
+    onChange() {
+      if (this.company?.length > 3) {
+        this.filterResults();
+      } else {
+        this.results = [];
+        this.isOpen = false;
+      }
+    },
+    async setResult(result) {
+      this.company = result;
+      this.isOpen = false;
     },
     abortCompanyCreation() {
       this.toggleAddCompanyForm = false;
@@ -488,9 +566,45 @@ export default defineComponent({
 </script>
 
 <style scoped>
+
 .internship-payment-options {
   display: flex;
   gap: 1.5rem;
   margin-top: .25rem;
 }
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #C8CFD5;
+  opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: #C8CFD5;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: #C8CFD5;
+}
+
+.autocomplete-results {
+    padding: 0;
+    margin: 0;
+    border: 1px solid #eeeeee;
+    height: 120px;
+    min-height: 1em;
+    max-height: 6em;
+    overflow: auto;
+  }
+
+  .autocomplete-result {
+    list-style: none;
+    text-align: left;
+    padding: 4px 2px;
+    cursor: pointer;
+  }
+
+  .autocomplete-result:hover {
+    background-color: #77b900;
+    color: white;
+  }
 </style>

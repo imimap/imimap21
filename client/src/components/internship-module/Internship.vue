@@ -94,7 +94,11 @@
                 {{ duration }} Wochen;
                 lang genug für ein Teilpraktikum
               </td>
-              <td v-else>
+              <td v-if="duration && duration < 8">
+                {{ duration }} Wochen;
+                nicht lang genug
+              </td>
+              <td v-if="duration && duration >= 16">
                 {{ duration }} Wochen;
                 lang genug
               </td>

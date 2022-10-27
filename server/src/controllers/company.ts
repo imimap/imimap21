@@ -20,7 +20,7 @@ export async function getAllCompanies(
 
   const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
   if (!user) return next(new NotFound("User not found"));
-  if (!user.isAdmin) return next(new Forbidden("Only admins may get all companies."));
+  //if (!user.isAdmin) return next(new Forbidden("Only admins may get all companies."));
 
   const limit = typeof req.query.limit === "string" && parseInt(req.query.limit);
   const offset = typeof req.query.offset === "string" && parseInt(req.query.offset);
