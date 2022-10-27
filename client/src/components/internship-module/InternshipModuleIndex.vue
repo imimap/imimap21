@@ -74,10 +74,10 @@ export default defineComponent({
       return this.loadingState;
     },
     postponements(): Event[] {
-      return this.internshipModule.events.filter((event) => event.changes.status.includes('postponement'));
+      return this.internshipModule.events.filter((event) => event.changes.status?.includes('postponement'));
     },
     plannedInternshipModules(): Event[] {
-      return this.internshipModule.events.filter((event) => event.changes.status.includes('planned'));
+      return this.internshipModule.events.filter((event) => event.changes.status?.includes('planned'));
     },
     hasRequestedPostponements(): boolean {
       return this.postponements.length > 0;
