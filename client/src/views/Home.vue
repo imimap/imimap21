@@ -19,7 +19,7 @@
 import { defineComponent } from 'vue';
 import Map from '@/components/Map.vue';
 import http from '@/utils/http-common';
-import { Internship } from '@/store/types/Internship';
+import { MapLocation } from '@/store/types/MapLocation';
 
 export default defineComponent({
   name: 'Home',
@@ -28,7 +28,7 @@ export default defineComponent({
     return {
       selectedSemester: '',
       loadingState: false,
-      searchResults: [] as Internship[],
+      searchResults: [] as MapLocation[],
       availableSemesters: [] as string[],
     };
   },
@@ -68,3 +68,8 @@ export default defineComponent({
   },
 });
 </script>
+<style lang="scss">
+footer {
+  margin-top: 20px;
+}
+</style>

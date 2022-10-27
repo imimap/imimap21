@@ -9,9 +9,7 @@ import { Forbidden, NotFound } from "http-errors";
  */
 export async function getUser(emailAddress: string | undefined): Promise<IUser> {
   if (!emailAddress) throw new NotFound("User not found. No email address was provided.");
-  const user = await User.findOne({ emailAddress: emailAddress }).select(
-    "_id isAdmin studentProfile"
-  );
+  const user = await User.findOne({ emailAddress: emailAddress });
   if (!user) throw new NotFound("User not found");
   return user;
 }

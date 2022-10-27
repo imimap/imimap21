@@ -1,23 +1,24 @@
 <template>
-  <!-- Search Form -->
-  <div id="form-block4" class="text-left mt-5 mx-3">
-    <h4 class="mb-3">{{ $t("search.headline") }}</h4>
-    <div class="card text-white bg-htw-green mt-2 mb-4 ms-3">
-      <div class="card-body p-1">
-        <p class="card-text">
-          <strong>{{ $t("search.hint.hintHeading") }}</strong>
-          {{ $t("search.hint.hintContent") }}
-        </p>
+  <div class="container">
+    <!-- Search Form -->
+    <div id="form-block4" class="text-left mt-5 mx-3">
+      <h4 class="mb-3">{{ $t("search.headline") }}</h4>
+      <div class="card text-white bg-htw-green mt-2 mb-4 ms-3">
+        <div class="card-body p-1">
+          <p class="card-text">
+            <strong>{{ $t("search.hint.hintHeading") }}</strong>
+            {{ $t("search.hint.hintContent") }}
+          </p>
+        </div>
       </div>
-    </div>
-    <div class="container" style="max-width: 100vw;">
-      <form role="form"
-            v-on:submit.prevent>
-        <div id="search_options" class="row ps-3 row-cols-lg-auto g-3 align-items-center">
-          <i18n-t keypath="search.form.info"
-                  tag="div"
-                  class="form-inline search-option-text">
-            <template #payment>
+      <div class="container" style="max-width: 100vw;">
+        <form role="form"
+              v-on:submit.prevent>
+          <div id="search_options" class="row ps-3 row-cols-lg-auto g-3 align-items-center">
+            <i18n-t keypath="search.form.info"
+                    tag="div"
+                    class="form-inline search-option-text">
+              <template #payment>
                 <select class="form-select mx-2 my-2 w-auto h-auto"
                         v-model="paymentFilter"
                         id="search_paid">
@@ -32,8 +33,8 @@
                     </option>
                   </template>
                 </select>
-            </template>
-            <template #location>
+              </template>
+              <template #location>
                 <label class="sr-only" for="search_location">
                   {{ $t("search.form.location") }}
                 </label>
@@ -51,72 +52,72 @@
                     </option>
                   </template>
                 </select>
-            </template>
-            <template #orientation>
-              <label class="sr-only" for="search_orientation_id">
-                {{ $t("search.form.orientation") }}
-              </label>
-              <select class="form-select mx-2 my-2 w-auto h-auto"
-                      v-model="this.operationalAreaFilter"
-                      id="search_orientation_id">
-                <option :value="null">{{ $t("search.form.fun") }}</option>
-                <template v-if="this.availableOperationalAreas != null">
-                  <option v-for="(orientation, index) in this.availableOperationalAreas"
-                          v-bind:key="index"
-                          :value="orientation">
-                    {{ orientation }}
-                  </option>
-                </template>
-              </select>
-            </template>
-            <template #programmingLanguage>
-              <label class="sr-only" for="search_programming_language_id">
-                {{ $t("search.form.programmingLanguage") }}
-              </label>
-              <select class="form-select mx-2 my-2 w-auto h-auto"
-                      v-model="this.languageFilter"
-                      id="search_programming_language_id">
-                <option :value="null">{{ $t("search.form.interested") }}</option>
-                <template v-if="this.availableLanguages != null">
-                  <option v-for="(language, index) in this.availableLanguages"
-                          v-bind:key="index"
-                          :value="this.availableLanguages[index]">
-                          {{ language }}
-                  </option>
-                </template>
-              </select>
-            </template>
-          </i18n-t>
-        </div>
-        <div class="btn-group" role="group">
-          <div class="field me-2">
-            <button class="btn btn-htw-green"
-                    v-on:click="searchOrShowModal()">
-              {{ $t("search.form.search") }}
-            </button>
+              </template>
+              <template #orientation>
+                <label class="sr-only" for="search_orientation_id">
+                  {{ $t("search.form.orientation") }}
+                </label>
+                <select class="form-select mx-2 my-2 w-auto h-auto"
+                        v-model="this.operationalAreaFilter"
+                        id="search_orientation_id">
+                  <option :value="null">{{ $t("search.form.fun") }}</option>
+                  <template v-if="this.availableOperationalAreas != null">
+                    <option v-for="(orientation, index) in this.availableOperationalAreas"
+                            v-bind:key="index"
+                            :value="orientation">
+                      {{ orientation }}
+                    </option>
+                  </template>
+                </select>
+              </template>
+              <template #programmingLanguage>
+                <label class="sr-only" for="search_programming_language_id">
+                  {{ $t("search.form.programmingLanguage") }}
+                </label>
+                <select class="form-select mx-2 my-2 w-auto h-auto"
+                        v-model="this.languageFilter"
+                        id="search_programming_language_id">
+                  <option :value="null">{{ $t("search.form.interested") }}</option>
+                  <template v-if="this.availableLanguages != null">
+                    <option v-for="(language, index) in this.availableLanguages"
+                            v-bind:key="index"
+                            :value="this.availableLanguages[index]">
+                      {{ language }}
+                    </option>
+                  </template>
+                </select>
+              </template>
+            </i18n-t>
           </div>
-          <!-- @TODO: Zufallsorschlag implementieren -->
-          <form role="form" v-on:submit.prevent v-if="false">
-            <div class="field">
-              <button class="btn btn-htw-green">
-                {{ $t("search.form.random") }}
+          <div class="btn-group" role="group">
+            <div class="field me-2">
+              <button class="btn btn-htw-green"
+                      v-on:click="searchOrShowModal()">
+                {{ $t("search.form.search") }}
               </button>
             </div>
-          </form>
-        </div>
-      </form>
+            <!-- @TODO: Zufallsorschlag implementieren -->
+            <form role="form" v-on:submit.prevent v-if="false">
+              <div class="field">
+                <button class="btn btn-htw-green">
+                  {{ $t("search.form.random") }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
-  <!-- Too many results modal -->
-  <too-many-results :amount-of-results="amountOfResults"
-                    :amount-of-internships-seen="amountOfInternshipsSeen"
-                    v-on:search="searchRequest"/>
-  <!-- Search Results -->
-  <div id="form-block4" class="mx-3 my-3"
+    <!-- Too many results modal -->
+    <too-many-results :amount-of-results="amountOfResults"
+                      :amount-of-internships-seen="amountOfInternshipsSeen"
+                      v-on:search="searchRequest"/>
+    <!-- Search Results -->
+    <div id="form-block4" class="mx-3 my-3"
          v-if="!loadingState && resultCount <= 0 && previousResultCount <= 0">
       {{ $t("search.results.noResults") }}
-  </div>
-  <div id="form-block4" class="mx-3 my-3"
+    </div>
+    <div id="form-block4" class="mx-3 my-3"
          v-if="!loadingState && (resultCount > 0 || previousResultCount > 0)">
       <div class="text-center">
         <button type="button"
@@ -130,7 +131,7 @@
         <SearchResultList
           :result-count="resultCount"
           :search-results="searchResults"
-          result-count-text="search.results.resultCount">
+          :result-count-text="'search.results.resultCount'">
         </SearchResultList>
       </div>
       <div id="previous-search-results" class="search_results"
@@ -138,13 +139,14 @@
         <SearchResultList
           :result-count="previousResultCount"
           :search-results="previousSearchResults"
-          result-count-text="search.results.previousResultCount">
+          :result-count-text="'search.results.previousResultCount'">
         </SearchResultList>
       </div>
       <div id="map-results">
         <Map v-if="cardToggle" :locations="locations"></Map>
       </div>
     </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -191,13 +193,15 @@ export default defineComponent({
     previousResultCount(): number {
       return this.previousSearchResults.length;
     },
-    locations(): MapLocation[] | null {
-      if (this.searchResults.length === 0) return null;
+    locations(): MapLocation[] | undefined {
+      if (this.searchResults.length === 0) return undefined;
       return this.searchResults.map(
         (searchResult) => ({
           city: searchResult.company.address.city,
           coordinates: searchResult.company.address.coordinates,
+          country: searchResult.company.address.city,
         }),
+
       );
     },
     modal(): Modal {
@@ -212,7 +216,7 @@ export default defineComponent({
     async searchOrShowModal() {
       const amountSeen = await this.getAmountOfSeenResults();
       const amountNew = await this.getAmountOfPossibleResults();
-      if (amountSeen < 12 && amountNew > 6) {
+      if (amountSeen !== undefined && amountSeen < 12 && amountNew !== undefined && amountNew > 6) {
         this.amountOfResults = amountNew;
         this.amountOfInternshipsSeen = amountSeen;
         this.modal.show();
@@ -253,8 +257,8 @@ export default defineComponent({
         await showErrorNotification(`Fehler beim laden der verfügbaren Programmiersprachen [ERROR: ${err.message}]`);
       }
     },
-    async getAmountOfPossibleResults(): Promise<number> {
-      let amount;
+    async getAmountOfPossibleResults(): Promise<number | undefined> {
+      let amount: number | PromiseLike<number>;
       try {
         const res = await http.get('/internships/amount', {
           params: {
@@ -265,20 +269,22 @@ export default defineComponent({
           },
         });
         amount = await res.data;
+        return amount;
       } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
         await showErrorNotification(`Fehler beim Laden der neuen Suchergebnisse [ERROR: ${err.message}]`);
       }
-      return amount;
+      return undefined;
     },
-    async getAmountOfSeenResults(): Promise<number> {
-      let amount;
+    async getAmountOfSeenResults(): Promise<number | undefined> {
+      let amount: number | PromiseLike<number>;
       try {
         const res = await http.get('/internships/seen/amount');
         amount = await res.data;
+        return amount;
       } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
         await showErrorNotification(`Fehler beim Laden der vorherigen Suchergebnisse [ERROR: ${err.message}]`);
       }
-      return amount;
+      return undefined;
     },
     async searchRequestForPreviousResults() {
       try {
@@ -311,6 +317,7 @@ export default defineComponent({
             seen,
           },
         });
+
         return res.data;
       } catch (err: any) {
         throw new Error(`Fehler beim Suchen nach Praktika [ERROR: ${err.message}]`);

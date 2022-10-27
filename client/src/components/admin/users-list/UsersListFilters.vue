@@ -47,7 +47,7 @@
              aria-label="Suche"
              aria-describedby="suche"
              v-model="search"
-             @change="$emit('searchChange', search)"
+             @input="$emit('searchChange', search)"
       >
       <div id="emailHelp" class="form-text">Matrikelnummer oder Nachname</div>
     </div>

@@ -5,14 +5,13 @@ import { Semester } from "../helpers/semesterHelper";
 import { InternshipModule } from "../models/internshipModule";
 import { Types } from "mongoose";
 import { UploadedFile } from "express-fileupload";
-import * as pdf from "html-pdf";
 import {
   getAuthorizedUser,
   getAuthorizedUserWithInternshipModule,
   getUser,
   getUserWithInternshipModule,
 } from "../helpers/userHelper";
-import { buildHtmlTemplate, saveFile } from "../helpers/pdfHelper";
+import { buildHtmlTemplate, buildPDFFile, saveFile } from "../helpers/pdfHelper";
 import { User } from "../models/user";
 import { constants } from "http2";
 import * as QueryString from "qs";
@@ -293,7 +292,7 @@ export async function findInternshipsAmount(
   let user;
   try {
     user = await getUserWithInternshipModule(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -311,8 +310,7 @@ export async function findInternshipsAmount(
     }
   }
 
-  const select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
-  const projection = getProjection(select);
+  const projection = getProjection(INTERNSHIP_FIELDS_VISIBLE_FOR_USER);
   projection.company = { $first: "$company" };
   const facet = {
     $facet: {
@@ -358,7 +356,7 @@ export async function findInternshipsSeenAmount(
   let user;
   try {
     user = await getUser(req.user?.email);
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -825,15 +823,7 @@ export async function generateRequestPdf(
 
   // Build PDF file
   const template = await buildHtmlTemplate("request.html", user, internship);
-  try {
-    pdf
-      .create(template, { format: "A4", border: "20px", header: { height: "50px" } })
-      .toStream((err, stream) => {
-        if (err) throw err;
-        res.setHeader("Content-Type", "application/pdf");
-        stream.pipe(res);
-      });
-  } catch (e) {
-    next(new BadRequest(e));
-  }
+  const pdf = await buildPDFFile(template);
+  res.setHeader("Content-Type", "application/pdf");
+  res.send(pdf);
 }

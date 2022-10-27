@@ -41,7 +41,6 @@ import { defineComponent } from 'vue';
 import Student from '@/models/Student';
 import { getStudent, getStudentsList } from '@/utils/gateways';
 import { getDateString, getInternshipModuleDuration, getTimeDifferenceDays } from '@/utils/admin';
-import internshipModuleStatusColors from '@/models/InternshipModuleStatus';
 import UsersListFilters from '@/components/admin/users-list/UsersListFilters.vue';
 import StudentEntry from '@/components/admin/users-list/StudentEntry.vue';
 import EditInternshipModal from '@/components/admin/modals/EditInternshipModal.vue';
@@ -59,13 +58,12 @@ export default defineComponent({
   },
   data() {
     return {
-      selectedStudent: null as Student | null,
+      selectedStudent: undefined as Student | undefined,
       selectedInternshipIndex: 0,
       students: [] as Student[],
       isLoading: false,
       statusFilter: '',
       search: '',
-      internshipModuleStatusColors,
     };
   },
   computed: {

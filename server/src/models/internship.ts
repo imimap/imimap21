@@ -6,7 +6,7 @@ import { getWeeksBetween, isValidDateRange, normalizeDate } from "../helpers/dat
 import { ICompany } from "./company";
 import { User } from "./user";
 import { EventSchema, IEvent } from "./event";
-import { imimapAdmin } from "../helpers/imimapAsAdminHelper";
+import { getIMIMapAdmin } from "../helpers/imimapAsAdminHelper";
 
 export enum InternshipStatuses {
   UNKNOWN = "unknown",
@@ -159,14 +159,14 @@ function internshipRequestComplete(document: Document) {
   return true;
 }
 
-export async function trySetRequested(document: Document) {
+export async function trySetRequested(document: Document): Promise<void> {
   // Check if request is filled in completely
   const status = document.get("status");
   const complete = internshipRequestComplete(document);
   if (complete && status === InternshipStatuses.PLANNED) {
     // If status is 'planned', set to 'requested'
     document.get("events").push({
-      creator: (await imimapAdmin)._id,
+      creator: (await getIMIMapAdmin())._id,
       changes: {
         status: InternshipStatuses.REQUESTED,
       },
@@ -175,7 +175,7 @@ export async function trySetRequested(document: Document) {
   } else if (!complete && status !== InternshipStatuses.PLANNED) {
     // Set status back to 'planned'
     document.get("events").push({
-      creator: (await imimapAdmin)._id,
+      creator: (await getIMIMapAdmin())._id,
       changes: {
         status: InternshipStatuses.PLANNED,
       },
@@ -184,7 +184,7 @@ export async function trySetRequested(document: Document) {
   }
 }
 
-export async function trySetReadyForGrading(document: Document) {
+export async function trySetReadyForGrading(document: Document): Promise<void> {
   if (document.get("status") !== InternshipStatuses.OVER) return;
 
   const reportPdf = document.get("reportPdf");
@@ -194,7 +194,7 @@ export async function trySetReadyForGrading(document: Document) {
   if (!certificatePdf) return;
 
   document.get("events").push({
-    creator: (await imimapAdmin)._id,
+    creator: (await getIMIMapAdmin())._id,
     changes: {
       status: InternshipStatuses.READY_FOR_GRADING,
     },
@@ -311,12 +311,12 @@ InternshipSchema.methods.markAsOver = async function (creator: Types.ObjectId) {
   return this.save();
 };
 
-export async function tryMarkAsOver(document: Document) {
+export async function tryMarkAsOver(internship: IInternship): Promise<IInternship | undefined> {
   // Check if user is admin
-  if (document.get("endDate") <= Date.now()) {
-    document.set("status", InternshipStatuses.OVER);
+  if (internship.get("endDate") <= Date.now()) {
+    internship.set("status", InternshipStatuses.OVER);
 
-    return document.save();
+    return internship.save();
   }
 }
 

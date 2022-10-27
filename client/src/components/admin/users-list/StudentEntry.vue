@@ -29,11 +29,13 @@
             </div>
             <div class="col-2 text-center">
               <h6 class="list-item-label">Status</h6>
-              <span :class=
-                      "`badge rounded-pill ${internshipModuleStatusColors[internship.status]}`"
-              >
+              <span :class="['badge', 'rounded-pill', statusBadgeColors[internship.status]]">
                 {{ internship.status }}
               </span>
+            </div>
+            <div class="col-2 text-center">
+              <h6 class="list-item-label">AEP</h6>
+              <span :class="['badge','rounded-pill', aepBadgeColor]">{{ aepStatus }}</span>
             </div>
           </div>
         </div>
@@ -97,7 +99,6 @@
 /* eslint-disable no-alert */
 import { defineComponent, PropType } from 'vue';
 import { getDateString, getInternshipModuleDuration, getTimeDifferenceDays } from '@/utils/admin';
-import internshipModuleStatusColors from '@/models/InternshipModuleStatus';
 import Student from '@/models/Student';
 import { clearStudentSearch, markAepPassedOnInternshipModule } from '@/utils/gateways';
 import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
@@ -119,12 +120,24 @@ export default defineComponent({
   emits: ['editInternshipModule', 'editInternshipPart', 'updateStudent', 'updateInternship'],
   data() {
     return {
-      internshipModuleStatusColors,
+      statusBadgeColors: {
+        unknown: 'bg-secondary',
+        planned: 'bg-primary',
+        'postponement requested': 'bg-warning',
+        'postponement rejected': 'bg-secondary',
+        passed: 'bg-success',
+      },
     };
   },
   computed: {
     internship(): InternshipModule {
       return this.student.studentProfile.internship;
+    },
+    aepStatus(): string {
+      return this.internship.aepPassed ? 'bestanden' : 'offen';
+    },
+    aepBadgeColor(): string {
+      return this.internship.aepPassed ? 'bg-success' : 'bg-secondary';
     },
   },
   methods: {

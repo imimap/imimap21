@@ -33,7 +33,7 @@
           <div v-for="(row, index) in postponementRequestsWithSearch"
                v-bind:key="index"
                class="accordion-item">
-            <h2 class="accordion-header" v-bind:id="index">
+            <h2 class="accordion-header" v-bind:id="index.toString()">
               <button class="accordion-button collapsed"
                       type="button"
                       data-bs-toggle="collapse"
@@ -121,7 +121,6 @@ import {
   acceptPostponement, rejectPostponement, getPostponementsList, getUser,
 } from '@/utils/gateways';
 import Postponement from '@/models/Postponement';
-import Student from '@/models/Student';
 
 export default defineComponent({
   name: 'PostponementsList',
