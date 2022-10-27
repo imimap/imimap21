@@ -209,14 +209,24 @@ export const updatePostponement = async (
   }
 };
 
-// TODO: Also used in Home. Consolidate
 export const loadAvailableSemesters = async (): Promise<string[]> => {
   try {
     const res = await apiClient.get('/info/semesters');
     return await res.data;
   } catch (err: any) {
     if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
-    await showErrorNotification(`Fehler beim Abfragen der verfügbaren semester [ERROR: ${err.message}]`);
+    await showErrorNotification(`Fehler beim Abfragen der verfügbaren Semester [ERROR: ${err.message}]`);
+    return [];
+  }
+};
+
+export const loadUpcomingSemesters = async (): Promise<string[]> => {
+  try {
+    const res = await apiClient.get('/info/semesters/upcoming');
+    return await res.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Abfragen der kommenden Semester [ERROR: ${err.message}]`);
     return [];
   }
 };

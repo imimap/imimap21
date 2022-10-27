@@ -6,7 +6,7 @@
         <option value="">All</option>
         <option v-for="(semester, index) in availableSemesters"
                 v-bind:key="index"
-                v-bind:semester="semester">
+        >
           {{ semester }}
         </option>
       </select>
@@ -20,6 +20,7 @@ import { defineComponent } from 'vue';
 import Map from '@/components/Map.vue';
 import http from '@/utils/http-common';
 import { MapLocation } from '@/store/types/MapLocation';
+import { loadAvailableSemesters } from '@/utils/gateways';
 
 export default defineComponent({
   name: 'Home',
@@ -50,20 +51,9 @@ export default defineComponent({
         this.loadingState = false;
       }
     },
-    async getAvailableSemesters() {
-      try {
-        const res = await http.get('/info/semesters/upcoming');
-        this.availableSemesters = await res.data;
-      } catch (err: any) {
-        await this.$store.dispatch('addNotification', {
-          text: `Fehler beim Abfragen der verfügbaren semester [ERROR: ${err.message}]`,
-          type: 'danger',
-        });
-      }
-    },
   },
   async created() {
-    await this.getAvailableSemesters();
+    this.availableSemesters = await loadAvailableSemesters();
     await this.searchInternshipBySemester();
   },
 });

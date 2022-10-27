@@ -9,7 +9,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="postponementEditModalLabel">
-            Verschiebungsantrag bearbeiten
+            {{ $t("postponement.actions.edit") }}
           </h5>
           <button type="button"
                   class="btn-close"
@@ -20,12 +20,14 @@
         </div>
         <div class="modal-body">
           <p>
-            für {{ student?.firstName }} {{ student?.lastName }}
+            {{ $t("postponement.for") }} {{ student?.firstName }} {{ student?.lastName }}
             ({{ student?.studentProfile.studentId }})
           </p>
 
           <div class="mb-3">
-            <label for="newSemesterOfStudy" class="form-label">Hochschulsemester</label>
+            <label for="newSemesterOfStudy" class="form-label">
+              {{ $t("postponement.semester") }}
+            </label>
             <input type="number"
                    min="1"
                    class="form-control"
@@ -37,18 +39,23 @@
           </div>
 
           <div class="mb-3">
-            <label for="newSemester" class="form-label">Fachsemester</label>
-            <input type="text"
-                   class="form-control"
-                   id="newSemester"
-                   aria-describedby="newSemester"
-                   :placeholder="postponement?.newSemester"
-                   v-model="newSemester"
-            >
+            <label for="newSemester" class="form-label">
+              {{ $t("postponement.semesterOfStudy") }}
+            </label>
+            <select v-model="newSemester" class="form-select" id="newSemester">
+              <option
+                v-for="semester in upcomingSemesters"
+                :key="semester"
+                :value="semester"
+                :selected="semester === postponement?.newSemester"
+              >
+                {{ semester }}
+              </option>
+            </select>
           </div>
 
           <div class="mb-3">
-            <label for="reason" class="form-label">Grund</label>
+            <label for="reason" class="form-label">{{ $t("postponement.reason") }}</label>
             <textarea class="form-control"
                       id="reason"
                       aria-describedby="reason"
@@ -59,9 +66,11 @@
 
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            {{ $t("actions.abort") }}
+          </button>
           <button type="button" class="btn btn-success" @click="updatePostponement">
-            Speichern
+            {{ $t("actions.save") }}
           </button>
         </div>
       </div>
@@ -74,7 +83,7 @@ import { defineComponent, PropType } from 'vue';
 import Postponement, { PostponementRequester } from '@/models/Postponement';
 import { createPayloadFromChangedProps } from '@/utils/admin';
 import { showSuccessNotification } from '@/utils/notification';
-import { updatePostponement } from '@/utils/gateways';
+import { loadUpcomingSemesters, updatePostponement } from '@/utils/gateways';
 
 export default defineComponent({
   name: 'EditPostponementModal',
@@ -99,6 +108,7 @@ export default defineComponent({
     return {
       updatableProperties,
       ...initialProps,
+      upcomingSemesters: [] as string[],
     };
   },
   methods: {
@@ -117,15 +127,18 @@ export default defineComponent({
       this.reset();
     },
     reset() {
-      this.newSemesterOfStudy = undefined;
-      this.newSemester = undefined;
-      this.reason = undefined;
+      this.updatableProperties.forEach((prop) => {
+        this[prop] = this.postponement?.[prop];
+      });
     },
   },
   watch: {
     postponement() {
       this.reset();
     },
+  },
+  async mounted() {
+    this.upcomingSemesters = await loadUpcomingSemesters();
   },
 });
 </script>
