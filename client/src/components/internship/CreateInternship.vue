@@ -3,17 +3,21 @@
   <div class="container clear-top">
     <div id="form-block4">
       <h3>{{ $t("internship.heading.create") }}</h3>
+      <div class="explanation">
+        <p><span style="color: red">* </span> {{ $t("internship.explanation.redStar") }}</p>
+        <p><span style="color: blue">* </span> {{ $t("internship.explanation.blueStar") }}</p>
+      </div>
       <form v-on:submit.prevent>
         <div class="row my-4">
           <div class="col">
-            <label for="startDate">{{ $t("internship.form.startDate") }}</label>
+            <label for="startDate" class="semi-required">{{ $t("internship.form.startDate") }}</label>
             <input v-model="startDate"
                    type="date"
                    id="startDate"
                    class="form-control"/>
           </div>
           <div class="col">
-            <label for="startDate">{{ $t("internship.form.endDate") }}</label>
+            <label for="endDate" class="semi-required">{{ $t("internship.form.endDate") }}</label>
             <input v-model="endDate"
                    type="date"
                    id="endDate"
@@ -23,7 +27,7 @@
 
         <div class="row my-4">
           <div class="col">
-            <label for="operationalArea">{{ $t('internship.form.operationalArea') }}</label>
+            <label for="operationalArea" class="semi-required">{{ $t('internship.form.operationalArea') }}</label>
             <input v-model="operationalArea"
                    type="text"
                    class="form-control"
@@ -75,7 +79,7 @@
 
         <div class="row my-4">
           <div class="col">
-            <label for="workingHoursPerWeek">{{ $t('internship.form.workingHoursPerWeek') }}</label>
+            <label for="workingHoursPerWeek" class="semi-required">{{ $t('internship.form.workingHoursPerWeek') }}</label>
             <input v-model="workingHoursPerWeek"
                    type="number"
                    min="0"
@@ -88,7 +92,7 @@
         <div class="row my-4">
           <div class="col">
             <div class="mb-3">
-              <label for="supervisorFullName">{{ $t('company.supervisor.name') }}</label>
+              <label for="supervisorFullName" class="semi-required">{{ $t('company.supervisor.name') }}</label>
               <input v-model="supervisorFullName"
                      type="text"
                      class="form-control"
@@ -96,7 +100,7 @@
                      :placeholder="$t('company.supervisor.name')"/>
             </div>
             <div class="mb-3">
-              <label for="supervisorEmail">{{ $t('company.supervisor.email') }}</label>
+              <label for="supervisorEmail" class="semi-required">{{ $t('company.supervisor.email') }}</label>
               <input v-model="supervisorEmailAddress"
                      type="text"
                      class="form-control"
@@ -127,7 +131,7 @@
             </div>
           </div>
           <div class="col">
-            <label for="tasks">{{ $t('internship.form.tasks') }}</label>
+            <label for="tasks" class="semi-required">{{ $t('internship.form.tasks') }}</label>
             <textarea :content="tasks"
                       class="form-control"
                       id="tasks"
@@ -291,7 +295,7 @@
           </div>
         </div>
         <div class="row mt-3">
-          <a href="javascript:history.back()">{{ $t("actions.back") }}</a>
+          <a href="javascript:history.back()" ref="closeModal">{{ $t("actions.back") }}</a>
         </div>
       </form>
     </div>
@@ -391,12 +395,6 @@ export default defineComponent({
     this.getAvailablePaymentTypes();
     this.getExistingCompanies();
   },
-  mounted() {
-    document.addEventListener('click', this.handleClickOutside);
-  },
-  unmounted() {
-    document.removeEventListener('click', this.handleClickOutside);
-  },
   computed: {
     languages(): {language: string; languageName: string}[] {
       return Object.keys(this.availableLanguages).flatMap(
@@ -405,11 +403,6 @@ export default defineComponent({
     },
   },
   methods: {
-    handleClickOutside(event) {
-      if (!this.$el.contains(event.target)) {
-        this.isOpen = false;
-      }
-    },
     async save() {
       if (this.company.length === 0) {
         await this.$store.dispatch('addNotification', { text: 'Ein Firmenname muss eingetragen werden!', type: 'danger' });
@@ -495,6 +488,7 @@ export default defineComponent({
     async postInternship() {
       try {
         await http.post('/internships', this.getInternshipObject());
+        (this.$refs.closeModal as HTMLAnchorElement).click();
         await this.$store.dispatch('addNotification', { text: 'Praktikum erfolgreich angelegt!', type: 'success' });
       } catch (err: any) {
         await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
@@ -606,5 +600,10 @@ export default defineComponent({
   .autocomplete-result:hover {
     background-color: #77b900;
     color: white;
+  }
+
+  .explanation > p {
+    margin: 0;
+    font-size: 14px;
   }
 </style>

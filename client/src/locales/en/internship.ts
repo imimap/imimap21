@@ -3,6 +3,10 @@ const internship = {
     create: 'New Internship',
     edit: 'Edit Internship',
   },
+  explanation: {
+    redStar: 'Fields with this star are required for creating an internship.',
+    blueStar: 'These fields have to be filled in for the official internship application.',
+  },
   form: {
     currently: 'currently',
     startDate: 'start date',
