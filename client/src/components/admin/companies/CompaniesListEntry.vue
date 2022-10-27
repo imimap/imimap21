@@ -10,15 +10,15 @@
         <div class="container">
           <div class="row">
             <div class="col-3">
-              <h6 class="list-item-label">Unternehmen</h6>
+              <h6 class="list-item-label">{{ $t('company.heading') }}</h6>
               <span class="fw-bold">{{ company.companyName }}</span>
             </div>
             <div class="col-3">
-              <h6 class="list-item-label">Zweig</h6>
+              <h6 class="list-item-label">{{ $t('company.branch') }}</h6>
               <span class="fw-bold">{{ company.branchName }}</span>
             </div>
             <div class="col-3">
-              <h6 class="list-item-label">Ort</h6>
+              <h6 class="list-item-label">{{ $t('company.location') }}</h6>
               <span class="fw-bold">{{ location }}</span>
             </div>
           </div>
@@ -35,7 +35,7 @@
         <h3>{{ location }}</h3>
         <div class="row">
           <div class="col-6">
-            <strong>Adresse:</strong>
+            <strong>{{ $t('address.heading') }}:</strong>
             <p>
               {{ company.address?.street }} {{ company.address?.streetNumber }}<br>
               {{ company.address?.additionalLines }}<br v-if="company.address?.additionalLines">
@@ -46,23 +46,25 @@
           <div class="col-6">
             <ul>
               <li>
-                <strong>Industrie:</strong> {{ company.industry }}
+                <strong>{{ $t('company.industry') }}:</strong> {{ company.industry }}
               </li>
               <li>
-                <strong>Website: </strong>
+                <strong>{{ $t('company.website') }}: </strong>
                 <a :href="company.website" target="_blank">{{ company.website }}</a>
               </li>
               <li>
-                <strong>Sprache:</strong> {{ company.prettyPrintLanguage() }}
+                <strong>{{ $t('company.mainLanguage') }}:</strong> {{
+                  company.prettyPrintLanguage()
+                }}
               </li>
               <li>
-                <strong>Größe:</strong> {{ company.prettyPrintSize() }}
+                <strong>{{ $t('company.size') }}:</strong> {{ company.prettyPrintSize() }}
               </li>
               <li>
-                <strong>Unsichtbar in der Suche:</strong> {{ excludedFromSearch }}
+                <strong>{{ $t('company.hidden') }}:</strong> {{ excludedFromSearch }}
               </li>
               <li>
-                <strong>Kommentar:</strong> {{ company.comment }}
+                <strong>{{ $t('general.comment') }}:</strong> {{ company.comment }}
               </li>
             </ul>
           </div>
@@ -74,13 +76,13 @@
                 data-bs-target="#companyEditModal"
                 @click="$emit('editCompany', company)"
         >
-          Bearbeiten
+          {{ $t('actions.edit').capitalize() }}
         </button>
         <button type="button"
                 class="btn btn-danger"
                 @click="deleteCompany"
         >
-          Löschen
+          {{ $t('actions.delete').capitalize() }}
         </button>
       </div>
     </div>
@@ -109,7 +111,7 @@ export default defineComponent({
       return `${this.company.address?.city}, ${this.company.address?.country}`;
     },
     excludedFromSearch(): string {
-      return this.company.excludedFromSearch ? 'Ja' : 'Nein';
+      return this.company.excludedFromSearch ? this.$t('general.yes') : this.$t('general.no');
     },
   },
   methods: {
