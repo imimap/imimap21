@@ -8,7 +8,7 @@
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="companyEditModalLabel">Firma bearbeiten</h5>
+          <h5 class="modal-title" id="companyEditModalLabel">{{ $t("company.actions.edit") }}</h5>
           <button type="button"
                   class="btn-close"
                   data-bs-dismiss="modal"
@@ -18,7 +18,7 @@
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label for="name" class="form-label">Name</label>
+            <label for="name" class="form-label">{{ $t("company.name") }}</label>
             <input type="text" class="form-control" id="name"
                    aria-describedby="name"
                    :placeholder="company?.companyName"
@@ -27,7 +27,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="branchName" class="form-label">Zweig Name</label>
+            <label for="branchName" class="form-label">{{ $t("company.branchName") }}</label>
             <input type="text" class="form-control" id="branchName"
                    aria-describedby="branchName"
                    :placeholder="company?.branchName"
@@ -36,7 +36,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="industry" class="form-label">Industrie</label>
+            <label for="industry" class="form-label">{{ $t("company.industry") }}</label>
             <input type="text" class="form-control" id="industry"
                    aria-describedby="industry"
                    :placeholder="company?.industry"
@@ -45,7 +45,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="industry" class="form-label">Website</label>
+            <label for="industry" class="form-label">{{ $t("company.website") }}</label>
             <input type="text" class="form-control" id="website"
                    aria-describedby="website"
                    :placeholder="company?.website"
@@ -54,13 +54,16 @@
           </div>
 
           <div class="mb-3">
-            <label for="mainLanguage" class="form-label">Sprache</label>
+            <label for="mainLanguage" class="form-label">{{ $t("company.mainLanguage") }}</label>
             <select id="mainLanguage"
                     class="form-select"
                     aria-describedby="mainLanguage"
                     @change="changeLanguage"
             >
-              <option value="" :selected="!company?.mainLanguage">Bitte auswählen</option>
+              <option value="" :selected="!company?.mainLanguage">{{
+                  $t("company.select")
+                }}
+              </option>
               <option v-for="[id, language] in languages"
                       :key="id"
                       :value="id"
@@ -72,7 +75,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="comment" class="form-label">Kommentar</label>
+            <label for="comment" class="form-label">{{ $t("general.comment") }}</label>
             <textarea class="form-control"
                       id="comment"
                       :placeholder="company?.comment"
@@ -81,7 +84,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="excludedFromSearch" class="form-label">Unsichtbar in der Suche</label>
+            <label for="excludedFromSearch" class="form-label">{{ $t("company.hidden") }}</label>
             <div class="form-check form-switch">
               <input class="form-check-input"
                      type="checkbox"
@@ -93,7 +96,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="size" class="form-label">Größe</label>
+            <label for="size" class="form-label">{{ $t("company.size") }}</label>
             <select
               class="form-select"
               aria-label="Größe"
@@ -114,7 +117,9 @@
             <legend>Adresse</legend>
             <div class="mb-2 row g-2 align-items-center">
               <div class="col-9">
-                <label for="street" class="form-label">Straße</label>
+                <label for="street" class="form-label">{{
+                    $t("address.street").capitalize()
+                  }}</label>
                 <input type="text"
                        class="form-control"
                        id="street"
@@ -125,7 +130,7 @@
               </div>
 
               <div class="col-3">
-                <label for="number" class="form-label">Nr.</label>
+                <label for="number" class="form-label">{{ $t("address.nr").capitalize() }}</label>
                 <input type="text"
                        class="form-control"
                        aria-describedby="number"
@@ -137,7 +142,9 @@
             </div>
 
             <div class="col-12 mb-2">
-              <label for="additionalLines" class="form-label">Zusätzliche Angaben</label>
+              <label for="additionalLines" class="form-label">{{
+                  $t("address.line").capitalize()
+                }}</label>
               <input type="text"
                      class="form-control"
                      aria-describedby="additionalLines"
@@ -149,7 +156,7 @@
 
             <div class="mb-2 row g-2 align-items-center">
               <div class="col-3">
-                <label for="zip" class="form-label">PLZ</label>
+                <label for="zip" class="form-label">{{ $t("address.zip").capitalize() }}</label>
                 <input type="text"
                        class="form-control"
                        aria-describedby="zip"
@@ -160,7 +167,7 @@
               </div>
 
               <div class="col-9">
-                <label for="city" class="form-label">Stadt</label>
+                <label for="city" class="form-label">{{ $t("address.city").capitalize() }}</label>
                 <input type="text"
                        class="form-control"
                        aria-describedby="city"
@@ -171,7 +178,9 @@
               </div>
 
               <div class="col-12">
-                <label for="country" class="form-label">Land</label>
+                <label for="country" class="form-label">{{
+                    $t("address.country").capitalize()
+                  }}</label>
                 <input type="text"
                        class="form-control"
                        aria-describedby="country"
@@ -185,13 +194,13 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            Schließen
+            {{ $t("actions.abort").capitalize() }}
           </button>
           <button type="button"
                   class="btn btn-success"
                   @click="updateCompany"
           >
-            Speichern
+            {{ $t("actions.save").capitalize() }}
           </button>
         </div>
       </div>

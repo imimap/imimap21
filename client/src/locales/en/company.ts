@@ -19,6 +19,7 @@ const company = {
   hidden: 'Excluded from search',
   actions: {
     save: 'Save company',
+    edit: 'Edit company',
   },
 };
 

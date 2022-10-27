@@ -19,6 +19,7 @@ const company = {
   hidden: 'Unsichtbar in der Suche',
   actions: {
     save: 'Firma speichern',
+    edit: 'Firma bearbeiten',
   },
 };
 
