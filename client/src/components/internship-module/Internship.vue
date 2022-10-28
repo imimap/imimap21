@@ -75,7 +75,8 @@
                 Anfangsdatum
               </td>
               <td>
-                {{ startDate?.toLocaleDateString($i18n.locale, {day: "2-digit", month: "2-digit", year: "numeric"}) }}
+                {{ startDate?.toLocaleDateString($i18n.locale,
+                {day: "2-digit", month: "2-digit", year: "numeric"}) }}
               </td>
             </tr>
             <tr>
@@ -83,20 +84,21 @@
                 Enddatum
               </td>
               <td>
-                {{ endDate?.toLocaleDateString($i18n.locale, {day: "2-digit", month: "2-digit", year: "numeric"}) }}
+                {{ endDate?.toLocaleDateString($i18n.locale,
+                {day: "2-digit", month: "2-digit", year: "numeric"}) }}
               </td>
             </tr>
             <tr>
               <td style="width:20%">
                 Dauer
               </td>
-              <td v-if="duration && duration < 16">
+              <td v-if="duration && duration < 16 && duration >= 8">
                 {{ duration }} Wochen;
                 lang genug für ein Teilpraktikum
               </td>
               <td v-if="duration && duration < 8">
                 {{ duration }} Wochen;
-                nicht lang genug
+                nicht lang genug – ein Teilpraktikum muss mindestent 8 Wochen lang sein.
               </td>
               <td v-if="duration && duration >= 16">
                 {{ duration }} Wochen;
@@ -255,6 +257,8 @@ export default defineComponent({
       return this.internship != null ? new Date(this.internship.endDate) : null;
     },
     duration(): number | null {
+      console.log(this.internship?.duration);
+
       return this.internship != null ? Math.round(this.internship.duration * 10) / 10 : null;
     },
     requestPdfState(): string | null {

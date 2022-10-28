@@ -1,3 +1,4 @@
+<!-- eslint-disable max-len -->
 <template>
   <div class="container clear-top">
     <div id="form-block4" v-if="!loadingState">
@@ -193,12 +194,18 @@ export default defineComponent({
       try {
         this.internship.startDate = this.normalizedDate(this.startDate)
         ?? this.internship.startDate;
-        this.internship.endDate = this.normalizedDate(this.endDate)
+        if (this.endDate || this.internship?.endDate) {
+          this.internship.endDate = this.normalizedDate(this.endDate)
         ?? this.internship?.endDate;
-        this.internship.supervisor.fullName = this.supervisor.fullName
+        }
+        if (this.supervisor.fullName || this.internship.supervisor?.fullName) {
+          this.internship.supervisor.fullName = this.supervisor.fullName
         ?? this.internship.supervisor?.fullName;
-        this.internship.supervisor.emailAddress = this.supervisor.emailAddress
+        }
+        if (this.supervisor.emailAddress || this.internship.supervisor?.emailAddress) {
+          this.internship.supervisor.emailAddress = this.supervisor.emailAddress
         ?? this.internship.supervisor?.emailAddress;
+        }
 
         await http.patch(`/internships/${this.$route.params.id}`, this.internship);
         await showSuccessNotification('Praktikum erfolgreich gespeichert!');
