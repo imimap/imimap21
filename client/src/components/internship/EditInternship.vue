@@ -1,4 +1,3 @@
-<!-- eslint-disable max-len -->
 <template>
   <div class="container clear-top">
     <div id="form-block4" v-if="!loadingState">
@@ -38,8 +37,7 @@
             <input v-model="internship.operationalArea"
                    type="text"
                    class="form-control"
-                   id="operationalArea"
-                   :placeholder="internship.operationalArea ?? $t('internship.form.operationalArea')"/>
+                   id="operationalArea" />
           </div>
           <div class="col">
             <label for="programmingLanguages">
@@ -49,7 +47,7 @@
                    type="text"
                    class="form-control"
                    id="programmingLanguages"
-                   :placeholder="internship.programmingLanguages?.toString().split(',').join(', ') ?? $t('internship.form.programmingLanguages')"
+
             />
           </div>
         </div>
@@ -61,8 +59,7 @@
                    type="number"
                    min="0"
                    class="form-control"
-                   id="salary"
-                   :placeholder="internship.salary?.toString() ?? $t('internship.form.salary')"/>
+                   id="salary" />
           </div>
           <div class="col">
             <label for="paymentType">{{ $t('internship.form.paymentType') }}</label>
@@ -92,16 +89,14 @@
                    type="number"
                    min="0"
                    class="form-control"
-                   id="livingCosts"
-                   :placeholder="internship.livingCosts?.toString() ?? $t('internship.form.livingCosts')"/>
+                   id="livingCosts" />
           </div>
           <div class="col">
             <label for="workingHoursPerWeek">{{ $t('internship.form.workingHoursPerWeek') }}</label>
             <input v-model="internship.workingHoursPerWeek"
                    min="0"
                    class="form-control"
-                   id="workingHoursPerWeek"
-                   :placeholder="internship.workingHoursPerWeek?.toString() ?? $t('internship.form.workingHoursPerWeek')"/>
+                   id="workingHoursPerWeek" />
           </div>
         </div>
 
@@ -112,16 +107,14 @@
               <input v-model="supervisor.fullName"
                      type="text"
                      class="form-control"
-                     id="supervisorFullName"
-                     :placeholder="supervisor.fullName ?? $t('company.supervisor.name')"/>
+                     id="supervisorFullName" />
             </div>
             <div>
               <label for="supervisorEmail" class="semi-required">{{ $t('company.supervisor.email') }}</label>
               <input v-model="supervisor.emailAddress "
                      type="text"
                      class="form-control"
-                     id="supervisorEmail"
-                     :placeholder="supervisor.emailAddress ?? $t('company.supervisor.email')"/>
+                     id="supervisorEmail" />
             </div>
           </div>
           <div class="col">
@@ -130,8 +123,7 @@
                       class="form-control"
                       id="tasks"
                       cols="30"
-                      rows="6"
-                      :placeholder="internship.tasks ?? $t('internship.form.tasks')"/>
+                      rows="6" />
           </div>
         </div>
 

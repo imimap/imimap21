@@ -18,5 +18,5 @@ export const isValidDateRange = (startDate: Date, endDate: Date): boolean => {
 export const getWeeksBetween = (startDate: Date, endDate: Date): number => {
   endDate = normalizeDate(endDate);
   startDate = normalizeDate(startDate);
-  return Math.round((endDate.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
+  return Math.round((endDate.getTime() - startDate.getTime() + 1) / (7 * 24 * 60 * 60 * 1000));
 };
