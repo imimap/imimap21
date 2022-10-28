@@ -15,7 +15,7 @@ export interface Internship {
   startDate: string;
   endDate: string;
   workingHoursPerWeek: number;
-  supervisor: { fullName: string; email: string };
+  supervisor: { fullName: string; emailAddress: string };
   comment: string;
   reportPdf: PdfDocument;
   requestPdf: PdfDocument;
@@ -26,4 +26,5 @@ export interface Internship {
   certificatePdf: PdfDocument;
   events: Event[];
   status: string;
+  duration: number;
 }

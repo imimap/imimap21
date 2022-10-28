@@ -28,7 +28,7 @@
                    id="requestPdfFileInput"
                    type="file"
                    ref="requestPdfFile"
-                   v-on:change="previewRequestPdf($event.target.files[0])"/>
+                   v-on:change="previewRequestPdf(($event.target as HTMLInputElement).files?.[0])"/>
             {{ requestPdf.name }}
           </div>
         </div>
@@ -75,7 +75,7 @@
                 Anfangsdatum
               </td>
               <td>
-                {{ startDate }}
+                {{ startDate?.toLocaleDateString($i18n.locale, {day: "2-digit", month: "2-digit", year: "numeric"}) }}
               </td>
             </tr>
             <tr>
@@ -83,15 +83,20 @@
                 Enddatum
               </td>
               <td>
-                {{ internship.endDate }}
+                {{ endDate?.toLocaleDateString($i18n.locale, {day: "2-digit", month: "2-digit", year: "numeric"}) }}
               </td>
             </tr>
             <tr>
               <td style="width:20%">
                 Dauer
               </td>
-              <td>
-                lang genug für ein Teilpraktikum (13.86 Wochen)
+              <td v-if="duration && duration < 16">
+                {{ duration }} Wochen;
+                lang genug für ein Teilpraktikum
+              </td>
+              <td v-else>
+                {{ duration }} Wochen;
+                lang genug
               </td>
             </tr>
             <tr>
@@ -99,7 +104,7 @@
                 Einsatzgebiet
               </td>
               <td>
-                {{ internship.operationalArea }}
+                {{ internship?.operationalArea }}
               </td>
             </tr>
             <tr>
@@ -107,7 +112,7 @@
                 Aufgaben
               </td>
               <td>
-                {{ internship.tasks }}
+                {{ internship?.tasks }}
               </td>
             </tr>
             </tbody>
@@ -198,7 +203,7 @@
                 Status des Praktikums
               </td>
               <td>
-                {{ this.internship.status }}
+                {{ internship?.status }}
               </td>
             </tr>
             <tr>
@@ -214,7 +219,7 @@
         </div>
       </div>
       <div class="my-3">
-        <router-link :to="{ name: 'EditInternship', params: { id: this.internship._id } }">
+        <router-link :to="{ name: 'EditInternship', params: { id: internship?._id } }">
           Bearbeiten
         </router-link>
       </div>
@@ -242,6 +247,12 @@ export default defineComponent({
     startDate(): Date | null {
       return this.internship != null ? new Date(this.internship.startDate) : null;
     },
+    endDate(): Date | null {
+      return this.internship != null ? new Date(this.internship.endDate) : null;
+    },
+    duration(): number | null {
+      return this.internship != null ? Math.round(this.internship.duration * 10) / 10 : null;
+    },
     requestPdfState(): string | null {
       return this.internship != null ? this.internship.requestPdf.status : null;
     },
@@ -265,7 +276,8 @@ export default defineComponent({
     },
   },
   methods: {
-    previewRequestPdf(file) {
+    previewRequestPdf(file: File | undefined) {
+      if (!file) return;
       this.requestPdf = file;
     },
     async uploadRequestPdf() {
