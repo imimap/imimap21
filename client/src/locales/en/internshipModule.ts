@@ -11,6 +11,38 @@ const internshipModule = {
     buttonConfirm: 'Yes - I consent to the processing of my data for the mentioned purposes.',
     buttonDecline: 'No - I do not consent to the processing of my data for the mentioned purposes.',
   },
+  forms: {
+    uploadApplication: 'Upload internship application',
+    uploadContract: 'Upload internship contract',
+    uploadReport: 'Upload report',
+    uploadCertificate: 'Upload certificate',
+    pickPDF: 'Pick internship application as pdf',
+    uploadNow: 'Upload application',
+    cancel: 'Cancel',
+  },
+  internship: 'Internship',
+  information: 'Information',
+  semester: 'Semester',
+  startDate: 'Start date',
+  endDate: 'End date',
+  duration: 'Duration',
+  weeks: 'weeks',
+  longEnoughForPartial: 'long enough for partial internship.',
+  longEnough: 'long enough.',
+  notLongEnough: 'not long enough – a partial internship has to be at least 8 weeks long.',
+  operationalArea: 'Operational Area',
+  tasks: 'Tasks',
+  status: {
+    internship: 'Internship status',
+    overview: 'Status overview',
+    application: 'Application status',
+    contract: 'Contract status',
+    report: 'Report status',
+    certificate: 'Certificate status',
+  },
+  comment: 'Comment',
+  edit: 'Edit',
+
 };
 
 export default internshipModule;

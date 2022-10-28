@@ -664,7 +664,6 @@ export async function updateInternship(
     changes: internshipProps,
     comment: "Internship updated",
   };
-  console.log(internshipProps);
 
   internshipToUpdate.events.push(updateEvent);
 

@@ -11,6 +11,39 @@ const internshipModule = {
     buttonConfirm: 'Ja - Ich bin mit der Verarbeitung meiner Daten zu den genannten Zwecken einverstanden.',
     buttonDecline: 'Nein - Ich bin mit der Verarbeitung meiner Daten zu den genannten Zwecken nicht einverstanden.',
   },
+  forms: {
+    uploadApplication: 'Praktikumsantrag hochladen',
+    uploadContract: 'Praktikumsvertrag hochladen',
+    uploadReport: 'Bericht hochladen',
+    uploadCertificate: 'Zertifikat hochladen',
+    pickPDF: 'Praktikumsantrag als PDF auswählen',
+    uploadNow: 'Antrag hochladen',
+    cancel: 'Abbrechen',
+  },
+  internship: 'Praktikum',
+  information: 'Information',
+  semester: 'Semester',
+  startDate: 'Anfangsdatum',
+  endDate: 'Enddatum',
+  duration: 'Dauer',
+  weeks: 'Wochen',
+  longEnoughForPartial: 'lang genug für ein Teilpraktikum.',
+  longEnough: 'lang genug.',
+  notLongEnough: 'nicht lang genug – ein Teilpraktikum muss mindestent 8 Wochen lang sein.',
+  operationalArea: 'Einsatzgebiet',
+  tasks: 'Aufgaben',
+
+  status: {
+    internship: 'Status des Praktikums',
+    overview: 'Statusübersicht',
+    application: 'Status der Anmeldung',
+    contract: 'Status des Vertrags',
+    report: 'Status des Berichts',
+    certificate: 'Status des Zertifikats',
+  },
+  comment: 'Kommentar',
+  edit: 'Bearbeiten',
+
 };
 
 export default internshipModule;
