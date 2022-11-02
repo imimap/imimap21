@@ -92,17 +92,11 @@
               <td style="width:20%">
                 {{ $t("internshipModule.duration") }}
               </td>
-              <td v-if="duration && duration < 16 && duration >= 8">
-                {{ duration }} {{ $t("internshipModule.weeks") }};
-                {{ $t("internshipModule.longEnoughForPartial") }}
-              </td>
-              <td v-if="duration && duration < 8">
-                {{ duration }} {{ $t("internshipModule.weeks") }};;
-                {{ $t("internshipModule.notLongEnough") }}
-              </td>
-              <td v-if="duration && duration >= 16">
-                {{ duration }}{{ $t("internshipModule.weeks") }};;
-                {{ $t("internshipModule.longEnough") }}
+              <td v-if="duration">
+                 {{ duration}} {{ $t("internshipModule.weeks") }};
+                <span v-if="duration < 16 && duration >= 8">{{ $t("internshipModule.longEnoughForPartial") }}</span>
+                <span v-if="duration < 8"> {{ $t("internshipModule.notLongEnough") }}</span>
+                <span v-if="duration >= 16">  {{ $t("internshipModule.longEnough") }}</span>
               </td>
             </tr>
             <tr>
