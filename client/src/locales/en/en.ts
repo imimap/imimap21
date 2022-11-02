@@ -9,6 +9,7 @@ import postponement from '@/locales/en/postponement';
 import home from '@/locales/en/home';
 import student from '@/locales/en/student';
 import help from '@/locales/en/help';
+import adminDashboard from '@/locales/en/adminDashboard';
 
 const en = {
   header,
@@ -22,6 +23,7 @@ const en = {
   home,
   student,
   help,
+  adminDashboard,
 };
 
 export default en;

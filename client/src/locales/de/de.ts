@@ -9,6 +9,7 @@ import postponement from '@/locales/de/postponement';
 import home from '@/locales/de/home';
 import student from '@/locales/de/student';
 import help from '@/locales/de/help';
+import adminDashboard from '@/locales/de/adminDashboard';
 
 const de = {
   header,
@@ -22,6 +23,7 @@ const de = {
   home,
   student,
   help,
+  adminDashboard,
 };
 
 export default de;
