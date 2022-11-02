@@ -61,73 +61,76 @@ export interface IInternship extends Document {
   forcePass(creator: Types.ObjectId): Promise<IInternship>;
 }
 
-export const InternshipSchema = new Schema<IInternship>({
-  startDate: {
-    default: Semester.getUpcoming().startDate(),
-    type: Date,
-  },
-  endDate: {
-    type: Date,
-  },
-  company: {
-    ref: "Company",
-    type: Schema.Types.ObjectId,
-  },
-  tasks: {
-    type: String,
-    trim: true,
-  },
-  operationalArea: {
-    type: String,
-    trim: true,
-  },
-  programmingLanguages: [
-    {
+export const InternshipSchema = new Schema<IInternship>(
+  {
+    startDate: {
+      default: Semester.getUpcoming().startDate(),
+      type: Date,
+    },
+    endDate: {
+      type: Date,
+    },
+    company: {
+      ref: "Company",
+      type: Schema.Types.ObjectId,
+    },
+    tasks: {
       type: String,
       trim: true,
     },
-  ],
-  livingCosts: {
-    min: 0,
-    type: Number,
-  },
-  salary: {
-    default: 0,
-    min: 0,
-    type: Number,
-  },
-  paymentTypes: [
-    {
-      default: PaymentTypes.UNCHARTED,
-      enum: PaymentTypes,
+    operationalArea: {
       type: String,
+      trim: true,
     },
-  ],
-  workingHoursPerWeek: {
-    default: 40,
-    min: 0,
-    type: Number,
-  },
-  supervisor: SupervisorSchema,
-  requestPdf: { type: PdfDocumentSchema, default: { events: [] } },
-  lsfEctsProofPdf: { type: PdfDocumentSchema, default: { events: [] } },
-  locationJustificationPdf: { type: PdfDocumentSchema, default: { events: [] } },
-  contractPdf: { type: PdfDocumentSchema, default: { events: [] } },
-  bvgTicketExemptionPdf: { type: PdfDocumentSchema, default: { events: [] } },
-  certificatePdf: { type: PdfDocumentSchema, default: { events: [] } },
-  reportPdf: { type: PdfDocumentSchema, default: { events: [] } },
-  status: {
-    type: String,
-    required: true,
-    enum: InternshipStatuses,
-    default: InternshipStatuses.UNKNOWN,
-  },
-  events: [
-    {
-      type: EventSchema,
+    programmingLanguages: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
+    livingCosts: {
+      min: 0,
+      type: Number,
     },
-  ],
-});
+    salary: {
+      default: 0,
+      min: 0,
+      type: Number,
+    },
+    paymentTypes: [
+      {
+        default: PaymentTypes.UNCHARTED,
+        enum: PaymentTypes,
+        type: String,
+      },
+    ],
+    workingHoursPerWeek: {
+      default: 40,
+      min: 0,
+      type: Number,
+    },
+    supervisor: SupervisorSchema,
+    requestPdf: { type: PdfDocumentSchema, default: { events: [] } },
+    lsfEctsProofPdf: { type: PdfDocumentSchema, default: { events: [] } },
+    locationJustificationPdf: { type: PdfDocumentSchema, default: { events: [] } },
+    contractPdf: { type: PdfDocumentSchema, default: { events: [] } },
+    bvgTicketExemptionPdf: { type: PdfDocumentSchema, default: { events: [] } },
+    certificatePdf: { type: PdfDocumentSchema, default: { events: [] } },
+    reportPdf: { type: PdfDocumentSchema, default: { events: [] } },
+    status: {
+      type: String,
+      required: true,
+      enum: InternshipStatuses,
+      default: InternshipStatuses.UNKNOWN,
+    },
+    events: [
+      {
+        type: EventSchema,
+      },
+    ],
+  },
+  { toJSON: { virtuals: true } }
+);
 
 export const requiredFields = [
   "startDate",
@@ -253,8 +256,7 @@ InternshipSchema.methods.durationInWeeksSoFar = function (): number {
   const document = this;
   let dateToCompareWith: Date = normalizeDate(new Date());
   if (document.startDate && document.startDate > dateToCompareWith) return 0;
-  if (document.endDate && document.endDate < dateToCompareWith)
-    dateToCompareWith = document.endDate;
+  if (document.endDate) dateToCompareWith = document.endDate;
   return getWeeksBetween(document?.startDate || dateToCompareWith, dateToCompareWith);
 };
 
@@ -354,5 +356,9 @@ InternshipSchema.methods.forcePass = async function (creator: Types.ObjectId) {
 
   return this.save();
 };
+
+InternshipSchema.virtual("duration").get(function (this: IInternship) {
+  return this.durationInWeeksSoFar();
+});
 
 export const Internship: Model<IInternship> = model("Internship", InternshipSchema);

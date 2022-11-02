@@ -562,17 +562,8 @@ function getInternshipObject(propsObject: Record<string, unknown>) {
   if (propsObject.companyId !== undefined) internshipProps.company = propsObject.companyId;
 
   //supervisor props
-  if (
-    propsObject.supervisorFullName !== undefined ||
-    propsObject.supervisorEmailAddress !== undefined
-  ) {
-    internshipProps["supervisor"] = {};
-    if (propsObject.supervisorFullName !== undefined)
-      (internshipProps["supervisor"] as Record<string, unknown>).fullName =
-        propsObject.supervisorFullName;
-    if (propsObject.supervisorEmailAddress !== undefined)
-      (internshipProps["supervisor"] as Record<string, unknown>).emailAddress =
-        propsObject.supervisorEmailAddress;
+  if (propsObject.supervisor !== undefined) {
+    internshipProps["supervisor"] = propsObject.supervisor;
   }
 
   return internshipProps;
