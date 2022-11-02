@@ -214,7 +214,8 @@
         </div>
       </div>
       <div class="my-3">
-        <router-link :to="{ name: 'EditInternship', params: { id: this.internship._id } }">
+        <router-link v-if="this.internship.status !== 'passed'"
+        :to="{ name: 'EditInternship', params: { id: this.internship._id } }">
           Bearbeiten
         </router-link>
       </div>
