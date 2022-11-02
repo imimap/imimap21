@@ -6,7 +6,9 @@ import company from '@/locales/de/company';
 import address from '@/locales/de/address';
 import actions from '@/locales/de/actions';
 import postponement from '@/locales/de/postponement';
-import home from './home';
+import home from '@/locales/de/home';
+import student from '@/locales/de/student';
+import help from '@/locales/de/help';
 
 const de = {
   header,
@@ -18,6 +20,8 @@ const de = {
   actions,
   postponement,
   home,
+  student,
+  help,
 };
 
 export default de;

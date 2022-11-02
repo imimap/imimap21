@@ -1,17 +1,16 @@
 <template>
 <div class="container">
   <div id="form-block4" class="text-left mt-5 mx-3">
-    <h3> Persönliche Details</h3>
+    <h3>{{ $t("student.details") }}</h3>
     <div class="alert alert-primary">
         <small>
-          <label class="required_application">Die mit </label>
-          markierten Felder werden für einen vollständigen Antrag benötigt.
-          Speichern kannst du aber auch, ohne diese auszufüllen.
+          <label class="required_application">{{ $t("student.requiredFieldsPart1") }}</label>
+          {{ $t("student.requiredFieldsPart2") }}
         </small>
     </div>
     <div class="row mb-3">
       <div class="col-md-4">
-        Matrikelnummer<br>
+        {{ $t("student.matriculationNumber") }}<br>
         <span class="form-control-static pl-2 pt-5">
           {{ userProfile.studentProfile.studentId.substring(
           2,
@@ -32,7 +31,7 @@
       <div class="col-md-4">
         <div class="field">
           <div class="form-group" data-children-count="1">
-            <label class="required_application" for="studentFirstName">Vorname</label>
+            <label class="required_application" for="studentFirstName"> {{ $t("student.firstName") }}</label>
             <input maxlength="50"
                    class="form-control"
                    size="50"
@@ -46,7 +45,7 @@
       <div class="col-md-4">
         <div class="field">
           <div class="form-group" data-children-count="1">
-            <label class="required_application" for="studentLastName">Nachname</label>
+            <label class="required_application" for="studentLastName"> {{ $t("student.surname") }}</label>
             <input
               maxlength="50"
               class="form-control"
@@ -71,8 +70,8 @@
             data-disable-with="Informationen speichern"
             v-on:click="save()"
           >
-            Informationen speichern
-          </button>
+          {{ $t("student.save") }}
+        </button>
         </div>
       </div>
     </div>
