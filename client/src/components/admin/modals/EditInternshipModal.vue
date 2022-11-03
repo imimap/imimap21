@@ -9,8 +9,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="internshipModuleEditModalLabel">
-            Praktikumsmodul bearbeiten
-          </h5>
+            {{ $t("userList.editInternshipModal.edit") }}</h5>
           <button type="button"
                   class="btn-close"
                   data-bs-dismiss="modal"
@@ -20,12 +19,12 @@
         </div>
         <div class="modal-body">
           <p>
-            für {{ student?.firstName }} {{ student?.lastName }}
+            {{ $t("userList.editInternshipModal.for") }} {{ student?.firstName }} {{ student?.lastName }}
             ({{ student?.studentProfile.studentId }})
           </p>
 
           <div class="mb-3">
-            <label for="inSemester" class="form-label">Fachsemester</label>
+            <label for="inSemester" class="form-label">{{ $t("userList.editInternshipModal.semester") }}</label>
             <input type="text"
                    class="form-control"
                    id="inSemester"
@@ -36,7 +35,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="inSemesterOfStudy" class="form-label">Hochschulsemester</label>
+            <label for="inSemesterOfStudy" class="form-label">{{ $t("userList.editInternshipModal.universitySemester") }}</label>
             <input type="number"
                    min="1"
                    class="form-control"
@@ -48,7 +47,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="AepPassed" class="form-label">AEP bestanden</label>
+            <label for="AepPassed" class="form-label">{{ $t("userList.editInternshipModal.aep") }}</label>
             <div class="form-check form-switch">
               <input class="form-check-input"
                      type="checkbox"
@@ -61,12 +60,12 @@
 
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t("userList.editInternshipModal.close") }}</button>
           <button type="button"
                   class="btn btn-success"
                   @click="updateInternshipModule"
           >
-            Speichern
+          {{ $t("userList.editInternshipModal.save") }}
           </button>
         </div>
       </div>

@@ -17,32 +17,32 @@
       </h6>
       <div class="row">
         <div class="col-lg-4 col-md-12 mb-2">
-          <span class="fw-bold list-item-label">Dauer</span><br>
-          {{ duration.weeks }} Wochen, {{ duration.days }} Tage
+          <span class="fw-bold list-item-label"> {{ $t("userList.internshipPart.duration") }}</span><br>
+          {{ duration.weeks }} {{ $t("userList.internshipPart.weeks") }}, {{ duration.days }} {{ $t("userList.internshipPart.days") }}
         </div>
         <div class="col-lg-8 col-md-12 mb-2 status-internship-part">
           <span class="fw-bold list-item-label">Status</span>
           <br>
           <ul class="list-group">
-            <UsersListStatusItem text="Antrag"
+            <UsersListStatusItem :text="$t('userList.internshipPart.application')"
                                  :item="internship.requestPdf"
             />
-            <UsersListStatusItem text="ECTS-Nachweis"
+            <UsersListStatusItem :text="$t('userList.internshipPart.ectProof')"
                                  :item="internship.lsfEctsProofPdf"
             />
-            <UsersListStatusItem text="Ortsnachweis"
+            <UsersListStatusItem :text="$t('userList.internshipPart.locationProof')"
                                  :item="internship.locationJustificationPdf"
             />
-            <UsersListStatusItem text="Praktikumsvertrag"
+            <UsersListStatusItem :text="$t('userList.internshipPart.contract')"
                                  :item="internship.contractPdf"
             />
-            <UsersListStatusItem text="BVG Ticket Ausnahme"
+            <UsersListStatusItem :text="$t('userList.internshipPart.bvg')"
                                  :item="internship.bvgTicketExemptionPdf"
             />
-            <UsersListStatusItem text="Praktikumszeugnis"
+            <UsersListStatusItem :text="$t('userList.internshipPart.certificate')"
                                  :item="internship.certificatePdf"
             />
-            <UsersListStatusItem text="Praktikumsbericht"
+            <UsersListStatusItem :text="$t('userList.internshipPart.report')"
                                  :item="internship.reportPdf"
             />
           </ul>
@@ -53,24 +53,24 @@
       <button class="btn btn-success btn-sm me-2"
               @click="approveApplication(internship._id)"
       >
-        Antrag genehmigen
-      </button>
+      {{ $t("userList.internshipPart.approveApplication") }}
+     </button>
       <button class="btn btn-success btn-sm me-2"
               @click="markAsComplete(internship._id)"
       >
-        Anrechenbar markieren
+      {{ $t("userList.internshipPart.markEligible") }}
       </button>
       <button type="button" class="btn btn-secondary btn-sm me-2"
               data-bs-toggle="modal"
               data-bs-target="#internshipPartEditModal"
               @click="$emit('editInternshipPart', index)"
       >
-        Details bearbeiten
+      {{ $t("userList.internshipPart.editDetails") }}
       </button>
       <button class="btn btn-danger btn-sm me-2"
               @click="deleteInternshipPart(internship._id)"
       >
-        Löschen
+      {{ $t("userList.internshipPart.delete") }}
       </button>
     </div>
   </div>

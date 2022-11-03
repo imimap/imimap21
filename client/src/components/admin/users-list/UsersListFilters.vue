@@ -6,9 +6,9 @@
               v-model="sorting"
               @change="$emit('sortingChange', sorting)"
       >
-        <option selected value="">Sortieren nach...</option>
-        <option value="lastName">Nachname</option>
-        <option value="studentId">Matrikelnummer</option>
+        <option selected value="">{{ $t("userList.sortBy") }}</option>
+        <option value="lastName">{{ $t("userList.lastName") }}</option>
+        <option value="studentId">{{ $t("userList.matriculationNumber") }}</option>
       </select>
     </div>
     <div class="col-lg-3 col-md-12 mb-3">
@@ -17,7 +17,7 @@
               v-model="semester"
               @change="$emit('semesterChange', semester)"
       >
-        <option selected value="">Alle Semester</option>
+        <option selected value="">{{ $t("userList.allSemesters") }}</option>
         <option v-for="semester in availableSemesters"
                 :key="semester"
                 :value="semester"
@@ -32,7 +32,7 @@
               v-model="filter"
               @change="$emit('filterChange', filter)"
       >
-        <option selected value="">Alle Status...</option>
+        <option selected value="">{{ $t("userList.allStatus") }}</option>
         <option v-for="status in availableStatuses"
                 :key="status"
                 :value="status">
@@ -43,16 +43,16 @@
     <div class="col-lg-3 col-md-12 mb-3">
       <input type="text"
              class="form-control"
-             placeholder="Suche..."
+             :placeholder="$t('userList.search')"
              aria-label="Suche"
              aria-describedby="suche"
              v-model="search"
              @input="$emit('searchChange', search)"
       >
-      <div id="emailHelp" class="form-text">Matrikelnummer oder Nachname</div>
+      <div id="emailHelp" class="form-text">{{ $t("userList.matriculationOrLastName") }}</div>
     </div>
     <div class="col-lg-3 col-md-12 mb-3 offset-lg-9 reset">
-      <button @click="reset">Zurücksetzen</button>
+      <button @click="reset">{{ $t("userList.reset") }}</button>
     </div>
   </div>
 </template>
