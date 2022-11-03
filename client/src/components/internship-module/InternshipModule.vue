@@ -49,7 +49,7 @@
 
     <div class="row">
       <div class="card-deck d-flex">
-        <InternshipComponent
+        <InternshipComponent @deleteInternship="deleteInternship"
           v-for="internship in this.internshipModule.internships"
           v-bind:key="internship._id"
           v-bind:internship="internship"
@@ -87,7 +87,7 @@ export default defineComponent({
   components: {
     InternshipComponent,
   },
-  emits: ['replaceInternship'],
+  emits: ['replaceInternship', 'getUserInternship'],
   computed: {
     ...mapState(['userProfile']),
     durations(): number[] | null {
@@ -112,6 +112,9 @@ export default defineComponent({
   methods: {
     replaceInternship(newInternship: Internship) {
       this.$emit('replaceInternship', newInternship);
+    },
+    deleteInternship() {
+      this.$emit('getUserInternship');
     },
   },
 });
