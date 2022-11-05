@@ -268,8 +268,10 @@ export default defineComponent({
       this.reset();
     },
     reset() {
+      if (!this.company) return;
       this.updatableProperties.forEach((prop) => {
-        this.$data[prop] = undefined;
+        if (prop in (this.company as Company)) this.$data[prop] = this.company?.[prop];
+        else this.$data[prop] = this.company?.address[prop];
       });
     },
     changeLanguage(event: Event) {
@@ -280,6 +282,11 @@ export default defineComponent({
     },
     changeExcludedFromSearch(event: Event) {
       this.excludedFromSearch = Boolean((event.target as HTMLInputElement).checked);
+    },
+  },
+  watch: {
+    company() {
+      this.reset();
     },
   },
 });
