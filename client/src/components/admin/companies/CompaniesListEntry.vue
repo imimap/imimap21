@@ -78,12 +78,12 @@
         >
           {{ $t('actions.edit').capitalize() }}
         </button>
-        <button type="button"
+        <!--<button type="button"
                 class="btn btn-danger"
                 @click="deleteCompany"
         >
           {{ $t('actions.delete').capitalize() }}
-        </button>
+        </button>-->
       </div>
     </div>
   </div>
@@ -94,8 +94,6 @@
 /* eslint-disable no-alert */
 import { defineComponent, PropType } from 'vue';
 import Company from '@/models/Company';
-import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
-import { deleteCompany } from '@/utils/gateways';
 
 export default defineComponent({
   name: 'CompaniesListEntry',
@@ -115,6 +113,10 @@ export default defineComponent({
     },
   },
   methods: {
+    /*
+    Commented out for now, since companies should not be deleted while there are still some
+    internships associated with them.
+
     async deleteCompany() {
       const userDoubleChecked = window.confirm('Unternehmen wirklich löschen?');
       if (!userDoubleChecked) return;
@@ -126,6 +128,7 @@ export default defineComponent({
       await showSuccessNotification('Unternehmen gelöscht!');
       this.$emit('removeCompany', this.company);
     },
+    */
   },
 });
 </script>
