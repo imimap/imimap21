@@ -3,8 +3,8 @@
     <div id="form-block4" class="text-left">
     <h4 class="mb-5">
       {{  `${userProfile.firstName} ${userProfile.lastName}
-      's Praktikum im ${internshipModule.inSemester}
-      (${internshipModule.inSemesterOfStudy}. Fachsemester)` }}
+      's Praktikum im ${internshipModule?.inSemester}
+      (${internshipModule?.inSemesterOfStudy}. Fachsemester)` }}
     </h4>
     <div class="card mt-3 mb-3">
       <div class="card-body">
@@ -22,7 +22,7 @@
               <!-- @TODO: internshipModule.status-->
               <td>Praxisphase 1: Fachpraktikum im Ausland</td>
               <td>
-                {{ internshipModule.status !== 'passed' ? 'noch offen' : 'bestanden' }}
+                {{ internshipModule?.status !== 'passed' ? 'noch offen' : 'bestanden' }}
               </td>
             </tr>
             <tr>
@@ -30,7 +30,7 @@
               <th scope="row">B20.1</th>
               <!-- @TODO: internshipModule.aepPassed-->
               <td>Auswertung von Erfahrungen am Praxisplatz</td>
-              <td>{{ internshipModule.aepPassed ? 'bestanden' : 'noch offen'}}</td>
+              <td>{{ internshipModule?.aepPassed ? 'bestanden' : 'noch offen'}}</td>
             </tr>
             <tr>
               <th></th>
@@ -64,9 +64,6 @@
       <router-link :to="{ name: 'CreatePostponement' }">
         Weitere Verschiebung beantragen
       </router-link>
-    </div>
-    <div>
-      <a href="javascript:history.back()">Zurück</a>
     </div>
   </div>
   </div>
