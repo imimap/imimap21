@@ -222,6 +222,8 @@
         <router-link :to="{ name: 'EditInternship', params: { id: internship?._id } }">
           Bearbeiten
         </router-link>
+        <button v-if="internship?.status == 'unknown' || internship?.status == 'planned'"
+        @click="deleteInternship(internship?._id)" class="delete-button">Löschen</button>
       </div>
     </div>
   </div>
@@ -231,6 +233,8 @@
 import { defineComponent, PropType } from 'vue';
 import { Internship } from '@/store/types/Internship';
 import http from '@/utils/http-common';
+import store from '@/store';
+import { showErrorNotification } from '@/utils/notification';
 
 export default defineComponent({
   name: 'Internship',
@@ -239,7 +243,7 @@ export default defineComponent({
       requestPdf: {} as File,
     };
   },
-  emits: ['updateInternship'],
+  emits: ['updateInternship', 'deleteInternship'],
   props: {
     internship: {} as PropType<Internship>,
   },
@@ -297,6 +301,25 @@ export default defineComponent({
         console.log(err);
       }
     },
+    async deleteInternship(internshipId: string | undefined) {
+      if (!internshipId) return;
+      const userDoubleChecked = window.confirm('Praktikum wirklich löschen?');
+      if (userDoubleChecked) {
+        try {
+          const res = await http.delete(`/internships/${internshipId}`);
+          if (res.status === 204) {
+            await store.dispatch('addNotification', {
+              text: 'Praktikum gelöscht!',
+              type: 'success',
+            });
+            this.$emit('deleteInternship');
+          }
+        } catch (err: any) {
+          if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+          await showErrorNotification(`Fehler beim Löschen vom Praktikum ${internshipId} [ERROR: ${err.message}]`);
+        }
+      }
+    },
   },
 });
 </script>
@@ -304,5 +327,16 @@ export default defineComponent({
 <style lang="scss">
 .internship-card {
   flex: 0 0 calc(50% - 1rem);
+}
+
+.delete-button {
+  background: none;
+  color: $danger;
+  border: none;
+  padding: 0;
+  padding-left: 5px;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
 }
 </style>
