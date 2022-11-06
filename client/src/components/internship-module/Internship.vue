@@ -1,53 +1,5 @@
 <template>
-  <div
-    class="text-left modal fade"
-    id="requestPdfModal"
-    tabindex="-1"
-    aria-labelledby="consentModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">
-            {{ $t("internshipModule.forms.uploadApplication") }}
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close">
-          </button>
-        </div>
-        <div class="modal-body text-left">
-          <div>
-            <label for="requestPdfFileInput"
-                   class="form-label">
-                   {{ $t("internshipModule.forms.pickPDF") }}
-            </label>
-            <input class="form-control form-control-lg"
-                   id="requestPdfFileInput"
-                   type="file"
-                   ref="requestPdfFile"
-                   v-on:change="previewRequestPdf(($event.target as HTMLInputElement).files?.[0])"/>
-            {{ requestPdf.name }}
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-htw-green"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-            v-on:click="uploadRequestPdf">
-            {{ $t("internshipModule.forms.uploadNow") }}
-          </button>
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
-            {{ $t("internshipModule.forms.cancel") }}
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <UploadPDFModal :internship-id="internship?._id" :pdf-type="pdfType" @updateInternship="data => $emit('updateInternship', data)"/>
 
   <div class="card internship-card border-htw-green">
     <div class="card-header">
@@ -127,85 +79,34 @@
           </p>
           <table class="table table-striped table-sm table-borderless">
             <tbody>
-            <tr>
-              <td style="width:40%">
-                {{ $t("internshipModule.status.application") }}
+            <tr v-for="(name, type) in pdfFiles" :key="type">
+              <td>
+                {{ name }}
               </td>
               <td class="text-right">
-                <template v-if="requestPdfState === 'unknown'">
+                <template v-if="getPdfState(type) === 'unknown'">
                   <button class="btn btn-htw-green"
                           data-bs-toggle="modal"
-                          data-bs-target="#requestPdfModal">
-                          {{ $t("internshipModule.forms.uploadApplication") }}
+                          data-bs-target="#uploadPdfModal"
+                          @click="pdfType = type"
+                  >
+                    Hochladen
                   </button>
                 </template>
                 <template v-else>
-                  {{ requestPdfState }}
+                  {{ getPdfState(type) }}
                 </template>
               </td>
             </tr>
             <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.status.contract") }}              </td>
               <td>
-                <template v-if="contractPdfState === 'unknown'">
-                  <button class="btn btn-htw-green"
-                          data-bs-toggle="modal"
-                          data-bs-target="#requestPdfModal"
-                          disabled>
-                          {{ $t("internshipModule.forms.uploadContract") }}
-                  </button>
-                </template>
-                <template v-else>
-                  {{ contractPdfState }}
-                </template>
-              </td>
-            </tr>
-            <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.status.report") }}
-              </td>
-              <td>
-                <template v-if="reportPdfState === 'unknown'">
-                  <button class="btn btn-htw-green"
-                          data-bs-toggle="modal"
-                          data-bs-target="#requestPdfModal"
-                          disabled>
-                          {{ $t("internshipModule.forms.uploadReport") }}
-                  </button>
-                </template>
-                <template v-else>
-                  {{ reportPdfState }}
-                </template>
-              </td>
-            </tr>
-            <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.status.certificate") }}
-              </td>
-              <td>
-                <template v-if="certificatePdfState === 'unknown'">
-                  <button class="btn btn-htw-green"
-                          data-bs-toggle="modal"
-                          data-bs-target="#requestPdfModal"
-                          disabled>
-                          {{ $t("internshipModule.forms.uploadCertificate") }}
-                  </button>
-                </template>
-                <template v-else>
-                  {{ certificatePdfState }}
-                </template>
-              </td>
-            </tr>
-            <tr>
-              <td style="width:20%">
                 {{ $t("internshipModule.status.internship") }}
               </td>
               <td>
                 <p class="mb-1">{{ internshipStatus }}</p>
                 <br>
                 <!-- Status: planned -->
-                <div v-if="internship?.status == 'planned'">
+                <div v-if="internship?.status === 'planned'">
                   <div v-if="missingDocuments && missingDocuments?.length > 0" >
                     {{ $t("internshipModule.status.missingPart1") }}
                     <span class="fw-bold">{{ $t("internshipModule.status.documents") }}</span>
@@ -225,16 +126,16 @@
                     <p>{{ $t("internshipModule.status.pleaseEditInternship") }}</p>
                   </div>
                 </div>
-                  <!-- Status: requested -->
-                <div v-if="internship?.status == 'requested'">
+                <!-- Status: requested -->
+                <div v-if="internship?.status === 'requested'">
                   <p> {{ $t("internshipModule.status.requestedExplanation") }}</p>
                 </div>
-                 <!-- Status: approved -->
-                 <div v-if="internship?.status == 'approved'">
+                <!-- Status: approved -->
+                <div v-if="internship?.status === 'approved'">
                   <p> {{ $t("internshipModule.status.approvedExplanation") }}</p>
                 </div>
                 <!-- Status: over -->
-                <div v-if="internship?.status == 'over'">
+                <div v-if="internship?.status === 'over'">
                   <div v-if="missingProof && missingProof?.length > 0" >
                     {{ $t("internshipModule.status.missingProofPart1") }}
                     <span class="fw-bold">{{ $t("internshipModule.status.documents") }}</span>
@@ -245,11 +146,11 @@
                   </div>
                 </div>
                 <!-- Status: readyForGrading -->
-                <div v-if="internship?.status == 'readyForGrading'">
+                <div v-if="internship?.status === 'readyForGrading'">
                   <p> {{ $t("internshipModule.status.readyForGradingExplanation") }}</p>
                 </div>
                 <!-- Status: passed -->
-                <div v-if="internship?.status == 'passed'">
+                <div v-if="internship?.status === 'passed'">
                   <p> {{ $t("internshipModule.status.passedExplanation") }}</p>
                 </div>
               </td>
@@ -270,7 +171,7 @@
         <router-link v-if="internship?.status !== 'passed'" :to="{ name: 'EditInternship', params: { id: internship?._id } }">
           Bearbeiten
         </router-link>
-        <button v-if="internship?.status == 'unknown' || internship?.status == 'planned'"
+        <button v-if="internship?.status === 'unknown' || internship?.status === 'planned'"
         @click="deleteInternship(internship?._id)" class="delete-button">Löschen</button>
       </div>
     </div>
@@ -280,15 +181,26 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import { Internship } from '@/store/types/Internship';
+import UploadPDFModal from '@/components/internship/UploadPDFModal.vue';
 import http from '@/utils/http-common';
-import store from '@/store';
-import { showErrorNotification } from '@/utils/notification';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
 
 export default defineComponent({
   name: 'Internship',
+  components: { UploadPDFModal },
   data() {
     return {
-      requestPdf: {} as File,
+      pdfType: 'request',
+      // TODO: Replace map with translations after merging dev
+      pdfFiles: {
+        request: 'Anmeldung',
+        lsfEctsProof: 'ECTS-Nachweis',
+        locationJustification: 'Ortsnachweis',
+        contract: 'Praktikumsvertrag',
+        bvgTicketExemption: 'BVG Ticket Ausnahme',
+        certificate: 'Praktikumszeugnis',
+        report: 'Praktikumsbericht',
+      },
     };
   },
   emits: ['updateInternship', 'deleteInternship'],
@@ -304,27 +216,6 @@ export default defineComponent({
     },
     duration(): number | null {
       return this.internship != null ? Math.round(this.internship.duration * 10) / 10 : null;
-    },
-    requestPdfState(): string | null {
-      return this.internship != null ? this.internship.requestPdf.status : null;
-    },
-    contractPdfState(): string | null {
-      return this.internship != null ? this.internship.contractPdf.status : null;
-    },
-    lsfEctsProofPdfState(): string | null {
-      return this.internship != null ? this.internship.lsfEctsProofPdf.status : null;
-    },
-    locationJustificationPdfState(): string | null {
-      return this.internship != null ? this.internship.locationJustificationPdf.status : null;
-    },
-    bvgTicketExemptionRequestPdfState(): string | null {
-      return this.internship != null ? this.internship.bvgTicketExemptionRequestPdf.status : null;
-    },
-    certificatePdfState(): string | null {
-      return this.internship != null ? this.internship.certificatePdf.status : null;
-    },
-    reportPdfState(): string | null {
-      return this.internship != null ? this.internship.reportPdf.status : null;
     },
     internshipStatus(): string | null {
       const currentStatus = this.internship != null ? this.internship.status : null;
@@ -386,26 +277,9 @@ export default defineComponent({
     },
   },
   methods: {
-    previewRequestPdf(file: File | undefined) {
-      if (!file) return;
-      this.requestPdf = file;
-    },
-    async uploadRequestPdf() {
-      try {
-        const formData = new FormData();
-        formData.append('pdf', this.requestPdf);
-        const res = await http.post(
-          `/internships/${this.internship?._id}/pdf/request`,
-          formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          },
-        );
-        await this.$emit('updateInternship', res.data);
-      } catch (err: any) {
-        console.log(err);
-      }
+    getPdfState(pdfType: string): string | null {
+      if (!this.internship) return null;
+      return this.internship[`${pdfType}Pdf`].status;
     },
     async deleteInternship(internshipId: string | undefined) {
       if (!internshipId) return;
@@ -414,10 +288,7 @@ export default defineComponent({
         try {
           const res = await http.delete(`/internships/${internshipId}`);
           if (res.status === 204) {
-            await store.dispatch('addNotification', {
-              text: 'Praktikum gelöscht!',
-              type: 'success',
-            });
+            await showSuccessNotification('Praktikum gelöscht!');
             this.$emit('deleteInternship');
           }
         } catch (err: any) {
