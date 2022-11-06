@@ -57,8 +57,7 @@
               <div class="form-check internship-payment-option"
                    v-for="(paymentType, index) in availablePaymentTypes"
                    v-bind:key="index"
-                   v-bind:paymentType="paymentType"
-                    id="paymentType">
+                   id="paymentType">
                 <input class="form-check-input"
                        type="checkbox"
                        :value="paymentType"
@@ -153,7 +152,7 @@
                      type="email"
                      class="form-control"
                      id="newCompanyEmailAddress"
-                    :placeholder="$t('company.email')"/>
+                     :placeholder="$t('company.email')"/>
             </div>
           </div>
           <div class="row mb-3">
@@ -183,7 +182,6 @@
                 <option value="">{{ $t("company.select") }}</option>
                 <option v-for="(language, index) in languages"
                         v-bind:key="index"
-                        v-bind:language="language"
                         :value="language.language">
                   {{ language.languageName }}
                 </option>
@@ -288,7 +286,7 @@ import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
 import { Company } from '@/store/types/Company';
 import { showErrorNotification } from '@/utils/notification';
-import { convertStringToArray, capitalizeFirstLetter } from '@/utils/stringHelper';
+import { capitalizeFirstLetter, convertStringToArray } from '@/utils/stringHelper';
 
 const possibleInternshipFields = [
   'startDate',
@@ -344,7 +342,7 @@ export default defineComponent({
       operationalArea: null,
       programmingLanguages: null,
       salary: null,
-      payment: null,
+      payment: [],
       livingCosts: null,
       workingHoursPerWeek: null,
       company: null,
@@ -352,7 +350,7 @@ export default defineComponent({
       supervisorEmailAddress: null,
       tasks: null,
       // Form Select Field Options
-      availableLanguages: {} as {[key: string]: {name: string; nativeName: string}},
+      availableLanguages: {} as { [key: string]: { name: string; nativeName: string } },
       availablePaymentTypes: [] as string[],
       // Company Object after check for existing Company or after creating a new company
       existingCompany: {} as Company,
@@ -365,7 +363,7 @@ export default defineComponent({
     this.getAvailablePaymentTypes();
   },
   computed: {
-    languages(): {language: string; languageName: string}[] {
+    languages(): { language: string; languageName: string }[] {
       return Object.keys(this.availableLanguages).flatMap(
         (lang) => ({ language: lang, languageName: this.availableLanguages[lang].name }),
       );
