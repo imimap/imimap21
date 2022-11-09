@@ -11,11 +11,14 @@
 }
 
 .required::after {
-  content:" *";
+  content: " *";
   color: $danger;
 }
 
 .semi-required::after {
   content:" *";
   color: blue;
+}
+.form-control::placeholder {
+  color: #95a1ac;
 }

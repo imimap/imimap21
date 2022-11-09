@@ -6,14 +6,20 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
+import { LOAD_LANGUAGES } from '@/store/actions';
 
 export default defineComponent({
   name: 'App',
+  methods: {
+    async loadAPIContent(): Promise<void> {
+      await this.$store.dispatch(LOAD_LANGUAGES);
+    },
+  },
   mounted() {
     //  [App.vue specific] When App.vue is finish loading finish the progress bar
     this.$Progress.finish();
   },
-  created() {
+  async created() {
     this.$Progress.start();
     this.$router.beforeEach((to, from, next) => {
       // does the page we want to go to have a meta.progress object
@@ -41,6 +47,8 @@ export default defineComponent({
       this.$Progress.fail();
       throw error;
     });
+
+    await this.loadAPIContent();
   },
 });
 </script>
@@ -62,8 +70,7 @@ body {
   line-height: 1.5;
   color: $htw-gray-color;
   text-align: left;
-  background-color: #fff;
-  background: url('/assets/bg.gif');
+  background: #fff url('/assets/bg.gif');
   font-family: 'Merriweather Sans', sans-serif;
 }
 

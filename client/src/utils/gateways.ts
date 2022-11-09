@@ -3,6 +3,7 @@ import { showErrorNotification } from '@/utils/notification';
 import Student from '@/models/Student';
 import Internship from '@/models/Internship';
 import InternshipModule from '@/models/InternshipModule';
+import Company from '@/models/Company';
 
 export const getStudentsList = async (semester: string | undefined): Promise<Student[]> => apiClient
   .get(`/students${semester !== undefined ? `?semester=${semester}` : ''}`)
@@ -124,19 +125,41 @@ export const markInternshipAsPassed = async (
   }
 };
 
-export const getCompaniesList = async () => apiClient.get('/companies')
-  .then((res) => res.data)
-  .catch((err) => {
-    console.log(err);
+export const getCompaniesList = async (): Promise<Company[]> => {
+  try {
+    const response = await apiClient.get('/companies');
+    return response.data.map((company) => Company.parseFromAPIResponseData(company));
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Laden der Unternehmen [ERROR: ${err.message}]`);
     return [];
-  });
+  }
+};
 
-export const getCompany = async (id: string) => apiClient.get(`/companies/${id}`)
-  .then((res) => res.data)
-  .catch((err) => {
-    console.log(err);
-    return [];
-  });
+export const updateCompany = async (
+  companyId: string,
+  payload: unknown,
+): Promise<Company | null> => {
+  try {
+    const response = await apiClient.patch(`/companies/${companyId}`, payload);
+    return Company.parseFromAPIResponseData(response.data);
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Updaten vom Unternehmen ${companyId} [ERROR: ${err.message}]`);
+    return null;
+  }
+};
+
+export const deleteCompany = async (companyId: string): Promise<boolean> => {
+  try {
+    await apiClient.delete(`/companies/${companyId}`);
+    return true;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Löschen des Unternehmens ${companyId} [ERROR: ${err.message}]`);
+    return false;
+  }
+};
 
 export const getPostponementsList = async () => apiClient.get('/postponement-requests')
   .then((res) => res.data)

@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/user";
-import { Forbidden, NotFound, BadRequest } from "http-errors";
+import { BadRequest, Forbidden, NotFound } from "http-errors";
 import { Company } from "../models/company";
 import { getCompanyObject } from "../helpers/companyHelper";
+import { constants } from "http2";
 
 /**
  * Returns all companies to admins
@@ -53,7 +54,7 @@ export async function getCompanyById(
 }
 
 /**
- * Returns a companies that fits a certain company name and optionally branch name
+ * Returns a company that fits a certain company name and optionally branch name
  * @param req
  * @param res
  * @param next
@@ -111,7 +112,7 @@ export async function getCities(req: Request, res: Response, next: NextFunction)
   const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
   if (!user) return next(new NotFound("User not found"));
 
-  const options: { [k: string]: any } = {};
+  const options: Record<string, unknown> = {};
   if (req.params.country) options["address.country"] = req.params.country;
 
   const cities: string[] = await Company.find(options).distinct("address.city");
@@ -156,7 +157,7 @@ export async function createCompany(
     const companyProps = getCompanyObject(req.body);
     const newCompany = new Company(companyProps);
     savedCompany = await newCompany.save();
-  } catch (e: any) {
+  } catch (e) {
     return next(e);
   }
 
@@ -182,14 +183,34 @@ export async function updateCompany(
   const companyToUpdate = await Company.findById(req.params.id);
   if (!companyToUpdate) return next(new NotFound("Company not found"));
 
-  const companyProps = getCompanyObject(req.body);
+  const companyProps = getCompanyObject(req.body, true);
   for (const prop in companyProps) {
+    const propPath = prop.split(".");
+    let propToUpdate = companyToUpdate;
+    while (propPath.length > 1) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      propToUpdate = propToUpdate[propPath.shift()];
+    }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    companyToUpdate[prop] = companyProps[prop];
+    propToUpdate[propPath.shift()] = companyProps[prop];
   }
 
   const savedCompany = await companyToUpdate.save();
 
   res.json(savedCompany);
+}
+
+export async function deleteCompany(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  if (!req.params.id) return next(new BadRequest("Please provide a company id"));
+  const result = await Company.findByIdAndDelete(req.params.id);
+  if (!result) return next(new NotFound("Company not found"));
+
+  res.statusCode = constants.HTTP_STATUS_NO_CONTENT;
+  res.send();
 }
