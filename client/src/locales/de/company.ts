@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 const company = {
   heading: 'Firma',
   attention: 'Achtung!',
