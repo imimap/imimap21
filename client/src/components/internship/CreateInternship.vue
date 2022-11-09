@@ -113,21 +113,7 @@
                      type="text"
                      class="form-control"
                      id="company"
-                     @input="onChange"
                      :placeholder="$t('company.heading')"/>
-                <ul id="autocomplete-results"
-                    v-show="isOpen"
-                    class="autocomplete-results"
-                  >
-
-                <li v-for="(result, i) in results" :key="i"
-                  @click="setResult(result)"
-                  class="autocomplete-result"
-
-                  >
-                  {{ result }}
-                </li>
-              </ul>
             </div>
           </div>
           <div class="col">
@@ -299,6 +285,32 @@
         </div>
       </form>
     </div>
+    <div v-if="toggleSelectExistingCompany" class="modal fade show"
+    tabindex="-1" aria-labelledby="exampleModalLabel" aria-modal="true" role="dialog"
+    style="display:block">
+      <div class="overlay">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <p>{{ $t("internship.modal.heading") }}</p>
+              <button type="button" class="btn-close" @click="hideCompanySelectionModal()"></button>
+            </div>
+            <div class="modal-body">
+            <p style="font-weight: bold">{{ existingCompany.companyName }}</p>
+            <p v-if="existingCompany.address.street">{{ existingCompany.address.street }}
+              <slot v-if="existingCompany.address.streetNumber">{{existingCompany.address.streetNumber}} </slot>
+            </p>
+            <p v-if="existingCompany.address.zip">{{ existingCompany.address.zip }}</p>
+            <p v-if="existingCompany.address.country">{{ existingCompany.address.country }}</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-htw-green" @click="postInternship()">{{ $t("internship.modal.accept") }}</button>
+              <button type="button" class="btn btn-secondary" @click="hideCompanySelectionModal(), toggleAddCompanyForm = true">{{ $t("internship.modal.decline") }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -345,8 +357,6 @@ const requiredCompanyFields = [
   'country',
 ];
 
-// @TODO: Companies abfragen, wenn nicht neue erstellen und ID einfügen
-// @TODO: Formularfelder sind optional, Formular macht zum bearbeiten aber dennoch Sinn
 export default defineComponent({
   name: 'CreateInternship',
   data() {
@@ -383,17 +393,15 @@ export default defineComponent({
       availablePaymentTypes: [] as string[],
       // Company Object after check for existing Company or after creating a new company
       existingCompany: {} as Company,
+      newCompanyCreated: false,
       // Component State
       toggleAddCompanyForm: false,
-      existingCompanies: [] as Company[],
-      results: [] as string[],
-      isOpen: false,
+      toggleSelectExistingCompany: false,
     };
   },
   created() {
     this.getAvailableLanguages();
     this.getAvailablePaymentTypes();
-    this.getExistingCompanies();
   },
   computed: {
     languages(): {language: string; languageName: string}[] {
@@ -406,9 +414,18 @@ export default defineComponent({
     async save() {
       if (this.company.length === 0) {
         await this.$store.dispatch('addNotification', { text: 'Ein Firmenname muss eingetragen werden!', type: 'danger' });
-      } else if (await this.fetchCompany()) await this.postInternship();
-      else {
-        this.toggleAddCompanyForm = true;
+      } else if (!this.newCompanyCreated || (this.newCompanyCreated && this.existingCompany.companyName !== this.company)) {
+        try {
+          const result = await this.fetchCompany();
+          if (!result) this.toggleAddCompanyForm = true;
+          else {
+            this.showCompanySelectionModal();
+          }
+        } catch (err: any) {
+          await showErrorNotification(err);
+        }
+      } else {
+        await this.postInternship();
       }
     },
     async fetchCompany(): Promise<boolean> {
@@ -443,30 +460,20 @@ export default defineComponent({
       return companyProps;
     },
     async createNewCompany() {
-      if (await this.fetchCompany()) {
-        this.toggleAddCompanyForm = !this.toggleAddCompanyForm;
-      } else {
-        try {
-          const res = await http.post('/companies', this.getCompanyObject());
-          this.existingCompany = res.data;
-          if (res.data) {
-            await this.$store.dispatch('addNotification', { text: 'Firma erfolgreich angelegt!', type: 'success' });
-            this.toggleAddCompanyForm = false;
-            this.clearNewCompanyForm();
-          }
-        } catch (err: any) {
-          await showErrorNotification(err);
-        }
-      }
-    },
-    async getExistingCompanies() {
       try {
-        const res = await http.get('/companies');
-        this.existingCompanies = res.data;
+        const res = await http.post('/companies', this.getCompanyObject());
+        this.existingCompany = res.data;
+        if (res.data) {
+          await this.$store.dispatch('addNotification', { text: 'Firma erfolgreich angelegt!', type: 'success' });
+          this.toggleAddCompanyForm = false;
+          this.newCompanyCreated = true;
+          this.clearNewCompanyForm();
+        }
       } catch (err: any) {
         await showErrorNotification(err);
       }
     },
+
     getInternshipObject(): { [k: string]: string | string[] } {
       const internshipProps: { [k: string]: string | string[] } = {};
 
@@ -489,6 +496,7 @@ export default defineComponent({
       try {
         await http.post('/internships', this.getInternshipObject());
         (this.$refs.closeModal as HTMLAnchorElement).click();
+        document.body.classList.remove('modal-open');
         await this.$store.dispatch('addNotification', { text: 'Praktikum erfolgreich angelegt!', type: 'success' });
       } catch (err: any) {
         await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
@@ -516,27 +524,6 @@ export default defineComponent({
         });
       }
     },
-    filterResults() {
-      if (this.company !== null) {
-        const companies = this.existingCompanies.filter(
-          (c) => (c.companyName.toLowerCase().indexOf(this.company?.toLowerCase()) > -1),
-        );
-        this.results = companies.map((c) => c.companyName);
-      }
-      if (this.results.length > 0) { this.isOpen = true; } else { this.isOpen = false; }
-    },
-    onChange() {
-      if (this.company?.length > 3) {
-        this.filterResults();
-      } else {
-        this.results = [];
-        this.isOpen = false;
-      }
-    },
-    async setResult(result) {
-      this.company = result;
-      this.isOpen = false;
-    },
     abortCompanyCreation() {
       this.toggleAddCompanyForm = false;
       this.clearNewCompanyForm();
@@ -555,12 +542,34 @@ export default defineComponent({
       this.newCompanyCity = null;
       this.newCompanyCountry = null;
     },
+    showCompanySelectionModal() {
+      this.toggleSelectExistingCompany = true;
+      document.body.classList.add('modal-open');
+    },
+    hideCompanySelectionModal() {
+      this.existingCompany = {} as Company;
+      this.toggleSelectExistingCompany = false;
+      document.body.classList.remove('modal-open');
+    },
   },
 });
 </script>
 
-<style scoped>
-
+<style scoped lang="scss">
+.overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(1px);
+}
+.modal-content {
+  p {
+    margin-bottom: 0.5em;
+  }
+}
 .internship-payment-options {
   display: flex;
   gap: 1.5rem;

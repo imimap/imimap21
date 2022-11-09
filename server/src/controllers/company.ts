@@ -20,7 +20,7 @@ export async function getAllCompanies(
 
   const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
   if (!user) return next(new NotFound("User not found"));
-  //if (!user.isAdmin) return next(new Forbidden("Only admins may get all companies."));
+  if (!user.isAdmin) return next(new Forbidden("Only admins may get all companies."));
 
   const limit = typeof req.query.limit === "string" && parseInt(req.query.limit);
   const offset = typeof req.query.offset === "string" && parseInt(req.query.offset);
@@ -85,7 +85,9 @@ export async function searchCompanyByName(
   searchOptions.excludedFromSearch = false;
 
   let select = null;
-  if (!user.isAdmin) select = "companyName branchName address.country";
+  if (!user.isAdmin)
+    select =
+      "companyName branchName address.country address.city address.street address.streetNumber";
 
   const companies = await Company.findOne(searchOptions).select(select).lean();
 

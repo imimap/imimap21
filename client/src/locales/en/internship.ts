@@ -19,6 +19,11 @@ const internship = {
     livingCosts: 'cost of living',
     tasks: 'tasks',
   },
+  modal: {
+    heading: 'Did you mean this company?',
+    accept: 'Yes, take this one',
+    decline: 'No, enter different company',
+  },
 };
 
 export default internship;

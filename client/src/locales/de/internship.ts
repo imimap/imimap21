@@ -19,6 +19,11 @@ const internship = {
     livingCosts: 'Lebenshaltungskosten',
     tasks: 'Aufgaben',
   },
+  modal: {
+    heading: 'Meintest du vielleicht diese Firma?',
+    accept: 'Ja, übernehmen',
+    decline: 'Nein, andere Firma eintragen',
+  },
 };
 
 export default internship;
