@@ -28,7 +28,7 @@
                    id="requestPdfFileInput"
                    type="file"
                    ref="requestPdfFile"
-                   v-on:change="previewRequestPdf($event.target.files[0])"/>
+                   v-on:change="previewRequestPdf(($event.target as HTMLInputElement).files?.[0])"/>
             {{ requestPdf.name }}
           </div>
         </div>
@@ -75,7 +75,7 @@
                 Anfangsdatum
               </td>
               <td>
-                {{ startDate }}
+                {{ startDate?.toLocaleDateString($i18n.locale, {day: "2-digit", month: "2-digit", year: "numeric"}) }}
               </td>
             </tr>
             <tr>
@@ -83,15 +83,20 @@
                 Enddatum
               </td>
               <td>
-                {{ internship.endDate }}
+                {{ endDate?.toLocaleDateString($i18n.locale, {day: "2-digit", month: "2-digit", year: "numeric"}) }}
               </td>
             </tr>
             <tr>
               <td style="width:20%">
                 Dauer
               </td>
-              <td>
-                lang genug für ein Teilpraktikum (13.86 Wochen)
+              <td v-if="duration && duration < 16">
+                {{ duration }} Wochen;
+                lang genug für ein Teilpraktikum
+              </td>
+              <td v-else>
+                {{ duration }} Wochen;
+                lang genug
               </td>
             </tr>
             <tr>
@@ -99,7 +104,7 @@
                 Einsatzgebiet
               </td>
               <td>
-                {{ internship.operationalArea }}
+                {{ internship?.operationalArea }}
               </td>
             </tr>
             <tr>
@@ -107,7 +112,7 @@
                 Aufgaben
               </td>
               <td>
-                {{ internship.tasks }}
+                {{ internship?.tasks }}
               </td>
             </tr>
             </tbody>
@@ -198,7 +203,7 @@
                 Status des Praktikums
               </td>
               <td>
-                {{ this.internship.status }}
+                {{ internship?.status }}
               </td>
             </tr>
             <tr>
@@ -214,9 +219,11 @@
         </div>
       </div>
       <div class="my-3">
-        <router-link :to="{ name: 'EditInternship', params: { id: this.internship._id } }">
+        <router-link :to="{ name: 'EditInternship', params: { id: internship?._id } }">
           Bearbeiten
         </router-link>
+        <button v-if="internship?.status == 'unknown' || internship?.status == 'planned'"
+        @click="deleteInternship(internship?._id)" class="delete-button">Löschen</button>
       </div>
     </div>
   </div>
@@ -226,6 +233,8 @@
 import { defineComponent, PropType } from 'vue';
 import { Internship } from '@/store/types/Internship';
 import http from '@/utils/http-common';
+import store from '@/store';
+import { showErrorNotification } from '@/utils/notification';
 
 export default defineComponent({
   name: 'Internship',
@@ -234,13 +243,19 @@ export default defineComponent({
       requestPdf: {} as File,
     };
   },
-  emits: ['updateInternship'],
+  emits: ['updateInternship', 'deleteInternship'],
   props: {
     internship: {} as PropType<Internship>,
   },
   computed: {
     startDate(): Date | null {
       return this.internship != null ? new Date(this.internship.startDate) : null;
+    },
+    endDate(): Date | null {
+      return this.internship != null ? new Date(this.internship.endDate) : null;
+    },
+    duration(): number | null {
+      return this.internship != null ? Math.round(this.internship.duration * 10) / 10 : null;
     },
     requestPdfState(): string | null {
       return this.internship != null ? this.internship.requestPdf.status : null;
@@ -265,7 +280,8 @@ export default defineComponent({
     },
   },
   methods: {
-    previewRequestPdf(file) {
+    previewRequestPdf(file: File | undefined) {
+      if (!file) return;
       this.requestPdf = file;
     },
     async uploadRequestPdf() {
@@ -285,6 +301,25 @@ export default defineComponent({
         console.log(err);
       }
     },
+    async deleteInternship(internshipId: string | undefined) {
+      if (!internshipId) return;
+      const userDoubleChecked = window.confirm('Praktikum wirklich löschen?');
+      if (userDoubleChecked) {
+        try {
+          const res = await http.delete(`/internships/${internshipId}`);
+          if (res.status === 204) {
+            await store.dispatch('addNotification', {
+              text: 'Praktikum gelöscht!',
+              type: 'success',
+            });
+            this.$emit('deleteInternship');
+          }
+        } catch (err: any) {
+          if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+          await showErrorNotification(`Fehler beim Löschen vom Praktikum ${internshipId} [ERROR: ${err.message}]`);
+        }
+      }
+    },
   },
 });
 </script>
@@ -292,5 +327,16 @@ export default defineComponent({
 <style lang="scss">
 .internship-card {
   flex: 0 0 calc(50% - 1rem);
+}
+
+.delete-button {
+  background: none;
+  color: $danger;
+  border: none;
+  padding: 0;
+  padding-left: 5px;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
 }
 </style>

@@ -7,15 +7,15 @@
       </li>
       <li class="nav-item me-2">
         <router-link class="nav-link" :class="{ active: isUsersRoute }"
-                     to="users">Praktika</router-link>
+                     to="users">{{ $t("adminDashboard.internships.name") }}</router-link>
       </li>
       <li class="nav-item me-2">
         <router-link class="nav-link" :class="{ active: isCompaniesRoute }"
-                     to="companies">Unternehmen</router-link>
+                     to="companies">{{ $t("adminDashboard.companies.name") }}</router-link>
       </li>
       <li class="nav-item me-2">
         <router-link class="nav-link" :class="{ active: isPostponementsRoute }"
-                     to="postponements">Verschiebungen</router-link>
+                     to="postponements">{{ $t("adminDashboard.postponements.name") }}</router-link>
       </li>
     </ul>
   </div>

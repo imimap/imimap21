@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 const internshipModule = {
   consent: {
     headline: 'Einverständniserklärung Datenverarbeitung',
@@ -10,6 +11,23 @@ const internshipModule = {
     buttonConfirm: 'Ja - Ich bin mit der Verarbeitung meiner Daten zu den genannten Zwecken einverstanden.',
     buttonDecline: 'Nein - Ich bin mit der Verarbeitung meiner Daten zu den genannten Zwecken nicht einverstanden.',
   },
+  moduleName: {
+    name: 'Modulname',
+    b20: 'Praxisphase 1: Fachpraktikum im Ausland',
+    b201: 'Auswertung von Erfahrungen am Praxisplatz',
+    b202: 'Fachpraktikum',
+  },
+  status: {
+    currentStatus: 'Status',
+    open: 'noch offen',
+    passed: 'bestanden',
+  },
+  moduleNumber: 'Modulnummer',
+  newPartialInternship: 'Weiteres Teilpraktikum eintragen',
+  newPostponement: 'Weitere Verschiebung beantragen',
+  internship: 's Praktikum im',
+  semester: 'Fachsemester)',
+
 };
 
 export default internshipModule;

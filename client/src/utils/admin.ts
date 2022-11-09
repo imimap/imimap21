@@ -8,7 +8,9 @@ export const getDateString = (ISODateString: string): string => {
 
 export const getTimeDifferenceDays = (start: string, end: string): number => {
   const startDate = new Date(start);
+  startDate.setHours(0, 0, 0, 0);
   const endDate = new Date(end);
+  endDate.setHours(0, 0, 0, 0);
   return (endDate.getTime() - startDate.getTime()) / 1000 / 60 / 60 / 24;
 };
 

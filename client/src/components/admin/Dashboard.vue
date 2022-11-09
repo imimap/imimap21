@@ -12,10 +12,10 @@
                 <span class="visually-hidden">Loading...</span>
               </div>
             </div>
-            <p class="card-text">unvollständige Praktika</p>
+            <p class="card-text">{{ $t("adminDashboard.internships.incomplete") }}</p>
 
             <router-link class="btn btn-success text-white"
-                         to="users">Praktika bearbeiten</router-link>
+                         to="users">{{ $t("adminDashboard.internships.edit") }}</router-link>
           </div>
         </div>
       </div>
@@ -30,10 +30,10 @@
                 <span class="visually-hidden">Loading...</span>
               </div>
             </div>
-            <p class="card-text">Offene Verschiebungsanträge</p>
+            <p class="card-text">{{ $t("adminDashboard.postponements.open") }}</p>
 
             <router-link class="btn btn-success text-white"
-                         to="postponements">Verschiebungen bearbeiten</router-link>
+                         to="postponements">{{ $t("adminDashboard.postponements.edit") }}</router-link>
           </div>
         </div>
       </div>
@@ -48,10 +48,10 @@
                 <span class="visually-hidden">Loading...</span>
               </div>
             </div>
-            <p class="card-text">Eingetragene Unternehmen</p>
+            <p class="card-text">{{ $t("adminDashboard.companies.registered") }}</p>
 
             <router-link class="btn btn-success text-white"
-                         to="companies">Unternehmen bearbeiten</router-link>
+                         to="companies">{{ $t("adminDashboard.companies.edit") }}</router-link>
           </div>
         </div>
       </div>

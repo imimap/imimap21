@@ -562,17 +562,8 @@ function getInternshipObject(propsObject: Record<string, unknown>) {
   if (propsObject.companyId !== undefined) internshipProps.company = propsObject.companyId;
 
   //supervisor props
-  if (
-    propsObject.supervisorFullName !== undefined ||
-    propsObject.supervisorEmailAddress !== undefined
-  ) {
-    internshipProps["supervisor"] = {};
-    if (propsObject.supervisorFullName !== undefined)
-      (internshipProps["supervisor"] as Record<string, unknown>).fullName =
-        propsObject.supervisorFullName;
-    if (propsObject.supervisorEmailAddress !== undefined)
-      (internshipProps["supervisor"] as Record<string, unknown>).emailAddress =
-        propsObject.supervisorEmailAddress;
+  if (propsObject.supervisor !== undefined) {
+    internshipProps["supervisor"] = propsObject.supervisor;
   }
 
   return internshipProps;
@@ -696,7 +687,15 @@ export async function deleteInternship(
     return next(e);
   }
 
-  if (!user.isAdmin) return next(new Forbidden("Only admins may delete an internship"));
+  const internship = await Internship.findById(req.params.id);
+  if (!internship) return next(new NotFound("Internship not found"));
+
+  if (
+    internship.status !== InternshipStatuses.PLANNED &&
+    internship.status !== InternshipStatuses.UNKNOWN
+  ) {
+    if (!user.isAdmin) return next(new Forbidden("Only admins may delete an internship"));
+  }
 
   const result = await Internship.findByIdAndDelete(req.params.id);
   if (!result) return next(new NotFound("Internship not found"));

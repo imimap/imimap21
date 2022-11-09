@@ -7,7 +7,8 @@
     <!-- Praktikum gefunden -->
     <complete-internship v-if="internshipModuleHasBeenPlanned"
                          v-bind:internshipModule="internshipModule"
-                          v-on:replaceInternship="replaceInternship"/>
+                          v-on:replaceInternship="replaceInternship"
+                          v-on:getUserInternship="getUserInternship"/>
   </template>
 </template>
 
