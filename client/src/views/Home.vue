@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex justify-content-center pb-3">
     <div class="mt-1">
-      Zeige mir Praktika im
+      {{ $t("home.showResults") }}
       <select v-model="selectedSemester" v-on:change="search">
         <option value="">All</option>
         <option v-for="(semester, index) in availableSemesters"

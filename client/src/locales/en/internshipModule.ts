@@ -39,9 +39,23 @@ const internshipModule = {
     contract: 'Contract status',
     report: 'Report status',
     certificate: 'Certificate status',
+    currentStatus: 'Status',
+    open: 'open',
+    passed: 'passed',
   },
   comment: 'Comment',
   edit: 'Edit',
+  moduleName: {
+    name: 'Module name',
+    b20: 'Practical phase 1: Internship abroad',
+    b201: 'Evaluation of experiences at the practice site',
+    b202: 'Internship',
+  },
+  moduleNumber: 'Module number',
+  newPartialInternship: 'Enter another partial internship',
+  newPostponement: 'Request another postponement',
+  internshipModule: "'s internship in",
+  semesterModule: 'semester)',
 
 };
 

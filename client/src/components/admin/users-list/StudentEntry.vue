@@ -14,15 +14,15 @@
               <span class="fw-bold">{{ student.lastName + ", " + student.firstName }}</span>
             </div>
             <div class="col-2">
-              <h6 class="list-item-label">Matrikelnr.</h6>
+              <h6 class="list-item-label">{{ $t("userList.studentEntry.matriculationNumber") }}</h6>
               <span>{{ student.studentProfile.studentId }}</span>
             </div>
             <div class="col-2">
-              <h6 class="list-item-label">Praktika</h6>
+              <h6 class="list-item-label">{{ $t("userList.studentEntry.internships") }}</h6>
               <span>{{ internship.internships.length }}</span>
             </div>
             <div class="col-2">
-              <h6 class="list-item-label">Gesamtdauer</h6>
+              <h6 class="list-item-label">{{ $t("userList.studentEntry.duration") }}</h6>
               <span>
                 {{ getInternshipModuleDuration(internship.internships) }}
               </span>
@@ -50,7 +50,7 @@
         <div class="container">
           <div class="row">
             <div class="col-8">
-              <h5>Praktika</h5>
+              <h5>{{ $t("userList.studentEntry.internships") }}</h5>
               <InternshipPart v-for="(internshipPart, internshipIndex) in internship.internships"
                               :key="internshipIndex"
                               :internship="internshipPart"
@@ -68,14 +68,14 @@
                         @click="passAEP(internship._id,
                                     `${student.firstName} ${student.lastName}`)"
                 >
-                  AEP bestanden markieren
+                {{ $t("userList.studentEntry.passAEP") }}
                 </button>
                 <button type="button"
                         class="btn btn-secondary"
                         :disabled="student.studentProfile.internshipsSeen.length === 0"
                         @click="clearSearch"
                 >
-                  Suchanfragen zurücksetzen
+                {{ $t("userList.studentEntry.resetSearchLimit") }}
                 </button>
                 <button type="button"
                         class="btn btn-secondary"
@@ -83,7 +83,7 @@
                         data-bs-target="#internshipModuleEditModal"
                         @click="$emit('editInternshipModule', student)"
                 >
-                  Details bearbeiten
+                {{ $t("userList.studentEntry.editDetails") }}
                 </button>
               </div>
             </div>
@@ -134,7 +134,7 @@ export default defineComponent({
       return this.student.studentProfile.internship;
     },
     aepStatus(): string {
-      return this.internship.aepPassed ? 'bestanden' : 'offen';
+      return this.internship.aepPassed ? `${this.$t('userList.studentEntry.passed')}` : `${this.$t('userList.studentEntry.open')}`;
     },
     aepBadgeColor(): string {
       return this.internship.aepPassed ? 'bg-success' : 'bg-secondary';
@@ -145,30 +145,30 @@ export default defineComponent({
     getInternshipModuleDuration,
     getTimeDifferenceDays,
     async passAEP() {
-      const userDoubleChecked = window.confirm('AEP zum Praktikumsmodul wirklich '
-        + 'als bestanden markieren?');
+      const userDoubleChecked = window.confirm(`${this.$t('userList.notifications.confirmAEP')}`);
       if (!userDoubleChecked) return;
       const apiResponse = await markAepPassedOnInternshipModule(
         this.student.studentProfile.internship._id,
       );
       if (!('status' in apiResponse) || apiResponse.status !== 200) {
-        await showErrorNotification('Das AEP konnte nicht als bestanden markiert werden.');
+        await showErrorNotification(`${this.$t('userList.notifications.aepError')}`);
         return;
       }
-      await showSuccessNotification(`Das AEP für ${this.student.firstName} ${this.student.lastName} als bestanden markiert.`);
+      // eslint-disable-next-line max-len
+      await showSuccessNotification(`${this.$t('userList.notifications.aepSuccessPart1')}${this.student.firstName} ${this.student.lastName}${this.$t('userList.notifications.aepSuccessPart2')}`);
       this.$emit('updateStudent', this.student._id);
     },
     async clearSearch() {
-      const userDoubleChecked = window.confirm(`Suchanfragen für ${this.student.firstName}
-      ${this.student.lastName} zurücksetzen?`);
+      const userDoubleChecked = window.confirm(`${this.$t('userList.notifications.confrimResetSearchResultPart1')}${this.student.firstName}
+      ${this.student.lastName}${this.$t('userList.notifications.confrimResetSearchResultPart2')}`);
       if (!userDoubleChecked) return;
       const apiResponse = await clearStudentSearch(this.student._id);
       if (!('status' in apiResponse) || apiResponse.status !== 204) {
-        await showErrorNotification('Die Suche konnte nicht zurückgesetzt werden.');
+        await showErrorNotification(`${this.$t('userList.notifications.resetSearchResultError')}`);
         return;
       }
-      await showSuccessNotification(`Die Suche wurde für ${this.student.firstName}
-      ${this.student.lastName} wurde zurückgesetzt.`);
+      await showSuccessNotification(`${this.$t('userList.notifications.resetSearchResultPart1')}${this.student.firstName}
+      ${this.student.lastName}${this.$t('userList.notifications.resetSearchResultPart2')}`);
       this.$emit('updateStudent', this.student._id);
     },
     editInternshipPart(internshipPartIndex: number) {

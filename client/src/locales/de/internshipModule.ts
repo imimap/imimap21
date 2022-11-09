@@ -40,9 +40,23 @@ const internshipModule = {
     contract: 'Status des Vertrags',
     report: 'Status des Berichts',
     certificate: 'Status des Zertifikats',
+    currentStatus: 'Status',
+    open: 'noch offen',
+    passed: 'bestanden',
   },
   comment: 'Kommentar',
   edit: 'Bearbeiten',
+  moduleName: {
+    name: 'Modulname',
+    b20: 'Praxisphase 1: Fachpraktikum im Ausland',
+    b201: 'Auswertung von Erfahrungen am Praxisplatz',
+    b202: 'Fachpraktikum',
+  },
+  moduleNumber: 'Modulnummer',
+  newPartialInternship: 'Weiteres Teilpraktikum eintragen',
+  newPostponement: 'Weitere Verschiebung beantragen',
+  internshipModule: 's Praktikum im',
+  semesterModule: 'Fachsemester)',
 
 };
 
