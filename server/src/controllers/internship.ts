@@ -644,6 +644,14 @@ export async function updateInternship(
   if (!internshipToUpdate) return next(new NotFound("Internship not found"));
 
   const mutableProps = ["salary", "paymentTypes", "livingCosts"];
+
+  if (!user.isAdmin && internshipToUpdate.status === InternshipStatuses.PASSED) {
+    return next(
+      new Forbidden(
+        "It is not allowed to edit an internship when it is passed. Please contact your internship officer."
+      )
+    );
+  }
   if (
     !user.isAdmin &&
     internshipToUpdate.status !== InternshipStatuses.PLANNED &&
