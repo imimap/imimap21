@@ -8,15 +8,19 @@ const company = {
     email: 'Email der Betreuer:in',
   },
   name: 'Firmenname',
+  branch: 'Zweig',
   branchName: 'Name der Zweigstelle',
+  location: 'Standort',
   email: 'Email der Firma',
   industry: 'Industrie',
   website: 'Webseite',
   mainLanguage: 'Hauptsprache',
   select: 'Bitte auswählen',
   size: 'Größe',
+  hidden: 'Unsichtbar in der Suche',
   actions: {
     save: 'Firma speichern',
+    edit: 'Firma bearbeiten',
   },
 };
 
