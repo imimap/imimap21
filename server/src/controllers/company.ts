@@ -67,8 +67,14 @@ export async function searchCompanyByName(
   if (!user) return next(new NotFound("User not found"));
 
   const searchOptions: { [k: string]: any } = {};
+  const cn = req.query.companyName as string;
 
-  if (req.query.companyName) {
+  if (cn) {
+    if (cn.length < 2) {
+      //so students won't find companies by randomly typing one letter
+      res.json(null);
+      return;
+    }
     searchOptions.companyName = {
       $regex: req.query.companyName,
       $options: "i",
