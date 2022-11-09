@@ -32,7 +32,6 @@
               <td>{{ $t("internshipModule.moduleName.b201") }}</td>
               <td v-if="internshipModule?.aepPassed">{{ $t("internshipModule.status.passed") }}</td>
               <td v-else>{{ $t("internshipModule.status.open") }}</td>
-
             </tr>
             <tr>
               <th></th>
@@ -51,7 +50,7 @@
 
     <div class="row">
       <div class="card-deck d-flex">
-        <InternshipComponent
+        <InternshipComponent @deleteInternship="deleteInternship"
           v-for="internship in this.internshipModule.internships"
           v-bind:key="internship._id"
           v-bind:internship="internship"
@@ -66,9 +65,6 @@
       <router-link :to="{ name: 'CreatePostponement' }">
         {{ $t("internshipModule.newPostponement") }}
       </router-link>
-    </div>
-    <div>
-      <a href="javascript:history.back()">Zurück</a>
     </div>
   </div>
   </div>
@@ -89,7 +85,7 @@ export default defineComponent({
   components: {
     InternshipComponent,
   },
-  emits: ['replaceInternship'],
+  emits: ['replaceInternship', 'getUserInternship'],
   computed: {
     ...mapState(['userProfile']),
     durations(): number[] | null {
@@ -114,6 +110,9 @@ export default defineComponent({
   methods: {
     replaceInternship(newInternship: Internship) {
       this.$emit('replaceInternship', newInternship);
+    },
+    deleteInternship() {
+      this.$emit('getUserInternship');
     },
   },
 });

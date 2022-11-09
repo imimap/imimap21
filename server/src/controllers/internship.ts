@@ -687,7 +687,15 @@ export async function deleteInternship(
     return next(e);
   }
 
-  if (!user.isAdmin) return next(new Forbidden("Only admins may delete an internship"));
+  const internship = await Internship.findById(req.params.id);
+  if (!internship) return next(new NotFound("Internship not found"));
+
+  if (
+    internship.status !== InternshipStatuses.PLANNED &&
+    internship.status !== InternshipStatuses.UNKNOWN
+  ) {
+    if (!user.isAdmin) return next(new Forbidden("Only admins may delete an internship"));
+  }
 
   const result = await Internship.findByIdAndDelete(req.params.id);
   if (!result) return next(new NotFound("Internship not found"));
