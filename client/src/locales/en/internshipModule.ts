@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 const internshipModule = {
   consent: {
     headline: 'Privacy Declaration',
@@ -10,6 +11,23 @@ const internshipModule = {
     buttonConfirm: 'Yes - I consent to the processing of my data for the mentioned purposes.',
     buttonDecline: 'No - I do not consent to the processing of my data for the mentioned purposes.',
   },
+  moduleName: {
+    name: 'Module name',
+    b20: 'Practical phase 1: Internship abroad',
+    b201: 'Evaluation of experiences at the practice site',
+    b202: 'Internship',
+  },
+  status: {
+    currentStatus: 'Status',
+    open: 'open',
+    passed: 'passed',
+  },
+  moduleNumber: 'Module number',
+  newPartialInternship: 'Enter another partial internship',
+  newPostponement: 'Request another postponement',
+  internship: "'s internship in",
+  semester: 'semester)',
+
 };
 
 export default internshipModule;

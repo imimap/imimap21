@@ -2,35 +2,36 @@
   <div class="container">
     <div id="form-block4" class="text-left">
     <h4 class="mb-5">
-      {{  `${userProfile.firstName} ${userProfile.lastName}
-      's Praktikum im ${internshipModule?.inSemester}
-      (${internshipModule?.inSemesterOfStudy}. Fachsemester)` }}
+      <span> {{  `${userProfile.firstName} ${userProfile.lastName}` }}</span>
+      <span>
+        {{$t("internshipModule.internship") }}
+      </span>
+      <span>{{ ` ${internshipModule?.inSemester} (${internshipModule?.inSemesterOfStudy}. ` }}</span>
+      <span>{{ $t("internshipModule.semester") }}</span>
     </h4>
     <div class="card mt-3 mb-3">
       <div class="card-body">
         <table class="table table-sm table-borderless">
           <thead>
             <tr>
-              <th scope="col" colspan="2">Modulnummer</th>
-              <th scope="col">Modulname</th>
-              <th scope="col">Status</th>
+              <th scope="col" colspan="2">{{ $t("internshipModule.moduleNumber") }}</th>
+              <th scope="col">{{ $t("internshipModule.moduleName.name") }}</th>
+              <th scope="col">{{ $t("internshipModule.status.currentStatus") }}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <th scope="row" colspan="2">B20</th>
-              <!-- @TODO: internshipModule.status-->
-              <td>Praxisphase 1: Fachpraktikum im Ausland</td>
-              <td>
-                {{ internshipModule?.status !== 'passed' ? 'noch offen' : 'bestanden' }}
-              </td>
+              <td>{{ $t("internshipModule.moduleName.b20") }}</td>
+              <td v-if="internshipModule?.status == 'passed'">{{ $t("internshipModule.status.passed") }}</td>
+              <td v-else>{{ $t("internshipModule.status.open") }}</td>
             </tr>
             <tr>
               <th></th>
               <th scope="row">B20.1</th>
-              <!-- @TODO: internshipModule.aepPassed-->
-              <td>Auswertung von Erfahrungen am Praxisplatz</td>
-              <td>{{ internshipModule?.aepPassed ? 'bestanden' : 'noch offen'}}</td>
+              <td>{{ $t("internshipModule.moduleName.b201") }}</td>
+              <td v-if="internshipModule?.aepPassed">{{ $t("internshipModule.status.passed") }}</td>
+              <td v-else>{{ $t("internshipModule.status.open") }}</td>
             </tr>
             <tr>
               <th></th>
@@ -39,8 +40,8 @@
               @TODO: alle internships die den Status passed
               @TODO: haben sollen zusammen eine Dauer von >= 16 Wochen haben
               -->
-              <td>Fachpraktikum</td>
-              <td>noch offen</td>
+              <td>{{ $t("internshipModule.moduleName.b202") }}</td>
+              <td>{{ $t("internshipModule.status.open") }} TODO</td>
             </tr>
           </tbody>
         </table>
@@ -59,10 +60,10 @@
     </div>
     <div class="module-internship-options mt-3 mb-5 d-flex">
       <router-link :to="{name: 'CreateInternship'}">
-        Weiteres Teilpraktikum eintragen
+        {{ $t("internshipModule.newPartialInternship") }}
       </router-link>
       <router-link :to="{ name: 'CreatePostponement' }">
-        Weitere Verschiebung beantragen
+        {{ $t("internshipModule.newPostponement") }}
       </router-link>
     </div>
   </div>
