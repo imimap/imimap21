@@ -1,21 +1,27 @@
+<!-- eslint-disable max-len -->
 <template>
   <div class="container clear-top">
     <div id="form-block4" v-if="!loadingState">
       <h3>{{ $t("internship.heading.edit") }}</h3>
+      <div class="explanation">
+        <p>Felder mit dem roten <span style="color: red">*</span> sind Pflichtfelder für das Anlegen eines Praktikums.</p>
+        <p>Um dein Praktikum offiziell zu beantragen, müssen zusätzlich alle Felder mit dem blauen <span style="color: blue">*</span> ausgefüllt werden.</p>
+      </div>
       <form v-on:submit.prevent>
         <div class="row my-4">
           <div class="col">
-            <label for="startDate">
+            <label for="startDate" class="semi-required">
               {{ $t("internship.form.startDate") }}
             </label>
             <input v-model="startDate"
                    type="date"
                    id="startDate"
                    class="form-control"
+
                   />
           </div>
           <div class="col">
-            <label for="endDate">
+            <label for="endDate" class="semi-required">
               {{ $t("internship.form.endDate") }}
             </label>
             <input v-model="endDate"
@@ -28,7 +34,7 @@
 
         <div class="row my-4">
           <div class="col">
-            <label for="operationalArea">{{ $t('internship.form.operationalArea') }}</label>
+            <label for="operationalArea" class="semi-required">{{ $t('internship.form.operationalArea') }}</label>
             <input v-model="internship.operationalArea"
                    type="text"
                    class="form-control"
@@ -98,14 +104,14 @@
         <div class="row my-4">
           <div class="col">
             <div class="mb-3">
-              <label for="supervisorFullName">{{ $t('company.supervisor.name') }}</label>
+              <label for="supervisorFullName" class="semi-required">{{ $t('company.supervisor.name') }}</label>
               <input v-model="supervisor.fullName"
                      type="text"
                      class="form-control"
                      id="supervisorFullName" />
             </div>
             <div>
-              <label for="supervisorEmail">{{ $t('company.supervisor.email') }}</label>
+              <label for="supervisorEmail" class="semi-required">{{ $t('company.supervisor.email') }}</label>
               <input v-model="supervisor.emailAddress "
                      type="text"
                      class="form-control"
@@ -113,7 +119,7 @@
             </div>
           </div>
           <div class="col">
-            <label for="tasks">{{ $t('internship.form.tasks') }}</label>
+            <label for="tasks" class="semi-required">{{ $t('internship.form.tasks') }}</label>
             <textarea v-model="internship.tasks"
                       class="form-control"
                       id="tasks"
@@ -174,8 +180,10 @@ export default defineComponent({
         this.internship = res.data;
         this.startDate = this.normalizedDate(this.internship.startDate);
         this.endDate = this.normalizedDate(this.internship.endDate);
-        this.supervisor.fullName = this.internship.supervisor.fullName;
-        this.supervisor.emailAddress = this.internship.supervisor.emailAddress;
+        if (this.internship.supervisor) {
+          this.supervisor.fullName = this.internship.supervisor.fullName;
+          this.supervisor.emailAddress = this.internship.supervisor.emailAddress;
+        }
       } catch (err: any) {
         await showErrorNotification(`Fehler beim Abfragen der bisherigen Praktikumsinformationen [ERROR: ${err.message}]`);
       } finally {
@@ -186,12 +194,18 @@ export default defineComponent({
       try {
         this.internship.startDate = this.normalizedDate(this.startDate)
         ?? this.internship.startDate;
-        this.internship.endDate = this.normalizedDate(this.endDate)
-        ?? this.internship.endDate;
-        this.internship.supervisor.fullName = this.supervisor.fullName
-        ?? this.internship.supervisor.fullName;
-        this.internship.supervisor.emailAddress = this.supervisor.emailAddress
-        ?? this.internship.supervisor.emailAddress;
+        if (this.endDate || this.internship?.endDate) {
+          this.internship.endDate = this.normalizedDate(this.endDate)
+        ?? this.internship?.endDate;
+        }
+        if (this.supervisor.fullName || this.internship.supervisor?.fullName) {
+          this.internship.supervisor.fullName = this.supervisor.fullName
+        ?? this.internship.supervisor?.fullName;
+        }
+        if (this.supervisor.emailAddress || this.internship.supervisor?.emailAddress) {
+          this.internship.supervisor.emailAddress = this.supervisor.emailAddress
+        ?? this.internship.supervisor?.emailAddress;
+        }
 
         await http.patch(`/internships/${this.$route.params.id}`, this.internship);
         await showSuccessNotification('Praktikum erfolgreich gespeichert!');
@@ -218,5 +232,22 @@ export default defineComponent({
   gap: 1.5rem;
   margin-top: .25rem;
 }
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #C8CFD5;
+  opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: #C8CFD5;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: #C8CFD5;
+}
+.explanation > p {
+    margin: 0;
+    font-size: 14px;
+  }
 
 </style>

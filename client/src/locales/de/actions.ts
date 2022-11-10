@@ -1,10 +1,10 @@
 const actions = {
-  save: 'speichern',
-  abort: 'abbrechen',
-  back: 'zurück',
-  send: 'abschicken',
-  edit: 'bearbeiten',
-  delete: 'löschen',
+  save: 'Speichern',
+  abort: 'Abbrechen',
+  back: 'Zurück',
+  send: 'Abschicken',
+  edit: 'Bearbeiten',
+  delete: 'Löschen',
 };
 
 export default actions;

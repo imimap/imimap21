@@ -1,18 +1,23 @@
+<!-- eslint-disable max-len -->
 <template>
   <div class="container clear-top">
     <div id="form-block4">
       <h3>{{ $t("internship.heading.create") }}</h3>
+      <div class="explanation">
+        <p><span style="color: red">* </span> {{ $t("internship.explanation.redStar") }}</p>
+        <p><span style="color: blue">* </span> {{ $t("internship.explanation.blueStar") }}</p>
+      </div>
       <form v-on:submit.prevent>
         <div class="row my-4">
           <div class="col">
-            <label for="startDate">{{ $t("internship.form.startDate") }}</label>
+            <label for="startDate" class="semi-required">{{ $t("internship.form.startDate") }}</label>
             <input v-model="startDate"
                    type="date"
                    id="startDate"
                    class="form-control"/>
           </div>
           <div class="col">
-            <label for="startDate">{{ $t("internship.form.endDate") }}</label>
+            <label for="endDate" class="semi-required">{{ $t("internship.form.endDate") }}</label>
             <input v-model="endDate"
                    type="date"
                    id="endDate"
@@ -22,7 +27,7 @@
 
         <div class="row my-4">
           <div class="col">
-            <label for="operationalArea">{{ $t('internship.form.operationalArea') }}</label>
+            <label for="operationalArea" class="semi-required">{{ $t('internship.form.operationalArea') }}</label>
             <input v-model="operationalArea"
                    type="text"
                    class="form-control"
@@ -63,7 +68,7 @@
                        type="checkbox"
                        :value="paymentType"
                        :id="`checkbox-${paymentType}`"
-                       v-model="payment"/>
+                       :content="payment"/>
                 <label class="form-check-label" :for="`checkbox-${paymentType}`">
                   {{ paymentType }}
                 </label>
@@ -74,7 +79,7 @@
 
         <div class="row my-4">
           <div class="col">
-            <label for="workingHoursPerWeek">{{ $t('internship.form.workingHoursPerWeek') }}</label>
+            <label for="workingHoursPerWeek" class="semi-required">{{ $t('internship.form.workingHoursPerWeek') }}</label>
             <input v-model="workingHoursPerWeek"
                    type="number"
                    min="0"
@@ -87,7 +92,7 @@
         <div class="row my-4">
           <div class="col">
             <div class="mb-3">
-              <label for="supervisorFullName">{{ $t('company.supervisor.name') }}</label>
+              <label for="supervisorFullName" class="semi-required">{{ $t('company.supervisor.name') }}</label>
               <input v-model="supervisorFullName"
                      type="text"
                      class="form-control"
@@ -95,7 +100,7 @@
                      :placeholder="$t('company.supervisor.name')"/>
             </div>
             <div class="mb-3">
-              <label for="supervisorEmail">{{ $t('company.supervisor.email') }}</label>
+              <label for="supervisorEmail" class="semi-required">{{ $t('company.supervisor.email') }}</label>
               <input v-model="supervisorEmailAddress"
                      type="text"
                      class="form-control"
@@ -112,8 +117,8 @@
             </div>
           </div>
           <div class="col">
-            <label for="tasks">{{ $t('internship.form.tasks') }}</label>
-            <textarea v-model="tasks"
+            <label for="tasks" class="semi-required">{{ $t('internship.form.tasks') }}</label>
+            <textarea :content="tasks"
                       class="form-control"
                       id="tasks"
                       cols="30"
@@ -203,7 +208,7 @@
           </div>
           <div class="row mb-3">
             <div class="col">
-              <label for="newCompanyMainLanguage">{{ $t('address.street') }}</label>
+              <label for="newCompanyStreet" class="required">{{ $t('address.street') }}</label>
               <input v-model="newCompanyStreet"
                      type="text"
                      class="form-control"
@@ -211,7 +216,7 @@
                      :placeholder="$t('address.street')"/>
             </div>
             <div class="col">
-              <label for="newCompanyStreetNumber">{{ $t('address.nr') }}</label>
+              <label for="newCompanyStreetNumber" class="required">{{ $t('address.nr') }}</label>
               <input v-model="newCompanyStreetNumber"
                      type="text"
                      class="form-control"
@@ -229,7 +234,7 @@
                      :placeholder=" $t('address.line')"/>
             </div>
             <div class="col">
-              <label for="newCompanyZip">{{ $t('address.zip') }}</label>
+              <label for="newCompanyZip" class="required">{{ $t('address.zip') }}</label>
               <input v-model="newCompanyZip"
                      type="text"
                      class="form-control"
@@ -239,7 +244,7 @@
           </div>
           <div class="row mb-3">
             <div class="col">
-              <label for="newCompanyCity">{{ $t('address.city') }}</label>
+              <label for="newCompanyCity" class="required">{{ $t('address.city') }}</label>
               <input v-model="newCompanyCity"
                      type="text"
                      class="form-control"
@@ -247,7 +252,7 @@
                      :placeholder="$t('address.city')"/>
             </div>
             <div class="col">
-              <label for="newCompanyCountry">{{ $t('address.country') }}</label>
+              <label for="newCompanyCountry" class="required">{{ $t('address.country') }}</label>
               <input v-model="newCompanyCountry"
                      type="text"
                      class="form-control"
@@ -276,9 +281,35 @@
           </div>
         </div>
         <div class="row mt-3">
-          <a href="javascript:history.back()">{{ $t("actions.back") }}</a>
+          <a href="javascript:history.back()" ref="closeModal">{{ $t("actions.back") }}</a>
         </div>
       </form>
+    </div>
+    <div v-if="toggleSelectExistingCompany" class="modal fade show"
+    tabindex="-1" aria-labelledby="exampleModalLabel" aria-modal="true" role="dialog"
+    style="display:block">
+      <div class="overlay">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <p>{{ $t("internship.modal.heading") }}</p>
+              <button type="button" class="btn-close" @click="hideCompanySelectionModal()"></button>
+            </div>
+            <div class="modal-body">
+            <p style="font-weight: bold">{{ existingCompany.companyName }}</p>
+            <p v-if="existingCompany.address.street">{{ existingCompany.address.street }}
+              <slot v-if="existingCompany.address.streetNumber">{{existingCompany.address.streetNumber}} </slot>
+            </p>
+            <p v-if="existingCompany.address.zip">{{ existingCompany.address.zip }}</p>
+            <p v-if="existingCompany.address.country">{{ existingCompany.address.country }}</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-htw-green" @click="postInternship()">{{ $t("internship.modal.accept") }}</button>
+              <button type="button" class="btn btn-secondary" @click="hideCompanySelectionModal(), toggleAddCompanyForm = true">{{ $t("internship.modal.decline") }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -318,8 +349,14 @@ const possibleCompanyFields = [
   'country',
 ];
 
-// @TODO: Companies abfragen, wenn nicht neue erstellen und ID einfügen
-// @TODO: Formularfelder sind optional, Formular macht zum bearbeiten aber dennoch Sinn
+const requiredCompanyFields = [
+  'street',
+  'streetNumber',
+  'zip',
+  'city',
+  'country',
+];
+
 export default defineComponent({
   name: 'CreateInternship',
   data() {
@@ -347,7 +384,7 @@ export default defineComponent({
       payment: null,
       livingCosts: null,
       workingHoursPerWeek: null,
-      company: null,
+      company: '',
       supervisorFullName: null,
       supervisorEmailAddress: null,
       tasks: null,
@@ -356,8 +393,10 @@ export default defineComponent({
       availablePaymentTypes: [] as string[],
       // Company Object after check for existing Company or after creating a new company
       existingCompany: {} as Company,
+      newCompanyCreated: false,
       // Component State
       toggleAddCompanyForm: false,
+      toggleSelectExistingCompany: false,
     };
   },
   created() {
@@ -373,11 +412,24 @@ export default defineComponent({
   },
   methods: {
     async save() {
-      if (this.company !== null && await this.companyExists()) await this.postInternship();
-      else this.toggleAddCompanyForm = true;
+      if (this.company.length === 0) {
+        await this.$store.dispatch('addNotification', { text: 'Ein Firmenname muss eingetragen werden!', type: 'danger' });
+      } else if (!this.newCompanyCreated || (this.newCompanyCreated && this.existingCompany.companyName !== this.company)) {
+        try {
+          const result = await this.fetchCompany();
+          if (!result) this.toggleAddCompanyForm = true;
+          else {
+            this.showCompanySelectionModal();
+          }
+        } catch (err: any) {
+          await showErrorNotification(err);
+        }
+      } else {
+        await this.postInternship();
+      }
     },
-    async companyExists(): Promise<boolean> {
-      if (this.company === null) return false;
+    async fetchCompany(): Promise<boolean> {
+      if (this.company === '') return false;
       try {
         const res = await http.get('/companies', { params: { companyName: this.company } });
         if (res.data === null) return false;
@@ -391,9 +443,14 @@ export default defineComponent({
       const companyProps: { [k: string]: string } = {};
 
       if (!this.company) {
-        throw new Error('Error: A company name needs to be entered!');
+        throw new Error('Ein Firmenname muss eingetragen werden!');
       }
       companyProps.companyName = this.company;
+
+      requiredCompanyFields.forEach((prop) => {
+        const newProp = `newCompany${capitalizeFirstLetter(prop)}`;
+        if (this[newProp] == null) throw new Error('Bitte ergänze die erforderlichen Firmendaten!');
+      });
 
       possibleCompanyFields.forEach((prop) => {
         const newProp = `newCompany${capitalizeFirstLetter(prop)}`;
@@ -403,20 +460,20 @@ export default defineComponent({
       return companyProps;
     },
     async createNewCompany() {
-      if (await this.companyExists()) {
-        this.toggleAddCompanyForm = !this.toggleAddCompanyForm;
-      } else {
-        try {
-          const res = await http.post('/companies', this.getCompanyObject());
-          this.existingCompany = res.data;
+      try {
+        const res = await http.post('/companies', this.getCompanyObject());
+        this.existingCompany = res.data;
+        if (res.data) {
           await this.$store.dispatch('addNotification', { text: 'Firma erfolgreich angelegt!', type: 'success' });
           this.toggleAddCompanyForm = false;
+          this.newCompanyCreated = true;
           this.clearNewCompanyForm();
-        } catch (err: any) {
-          await showErrorNotification(err);
         }
+      } catch (err: any) {
+        await showErrorNotification(err);
       }
     },
+
     getInternshipObject(): { [k: string]: string | string[] } {
       const internshipProps: { [k: string]: string | string[] } = {};
 
@@ -438,6 +495,8 @@ export default defineComponent({
     async postInternship() {
       try {
         await http.post('/internships', this.getInternshipObject());
+        (this.$refs.closeModal as HTMLAnchorElement).click();
+        document.body.classList.remove('modal-open');
         await this.$store.dispatch('addNotification', { text: 'Praktikum erfolgreich angelegt!', type: 'success' });
       } catch (err: any) {
         await this.$store.dispatch('addNotification', { text: `${err.response.data.error.message}`, type: 'danger' });
@@ -449,7 +508,7 @@ export default defineComponent({
         this.availableLanguages = res.data;
       } catch (err: any) {
         await this.$store.dispatch('addNotification', {
-          text: `Fehler beim laden der verfügbaren Sprachen [ERROR: ${err.message}]`,
+          text: `Fehler beim Laden der verfügbaren Sprachen [ERROR: ${err.message}]`,
           type: 'danger',
         });
       }
@@ -460,7 +519,7 @@ export default defineComponent({
         this.availablePaymentTypes = res.data;
       } catch (err: any) {
         await this.$store.dispatch('addNotification', {
-          text: `Fehler beim laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`,
+          text: `Fehler beim Laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`,
           type: 'danger',
         });
       }
@@ -483,14 +542,77 @@ export default defineComponent({
       this.newCompanyCity = null;
       this.newCompanyCountry = null;
     },
+    showCompanySelectionModal() {
+      this.toggleSelectExistingCompany = true;
+      document.body.classList.add('modal-open');
+    },
+    hideCompanySelectionModal() {
+      this.existingCompany = {} as Company;
+      this.toggleSelectExistingCompany = false;
+      document.body.classList.remove('modal-open');
+    },
   },
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(1px);
+}
+.modal-content {
+  p {
+    margin-bottom: 0.5em;
+  }
+}
 .internship-payment-options {
   display: flex;
   gap: 1.5rem;
   margin-top: .25rem;
 }
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #C8CFD5;
+  opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: #C8CFD5;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: #C8CFD5;
+}
+
+.autocomplete-results {
+    padding: 0;
+    margin: 0;
+    border: 1px solid #eeeeee;
+    height: 120px;
+    min-height: 1em;
+    max-height: 6em;
+    overflow: auto;
+  }
+
+  .autocomplete-result {
+    list-style: none;
+    text-align: left;
+    padding: 4px 2px;
+    cursor: pointer;
+  }
+
+  .autocomplete-result:hover {
+    background-color: #77b900;
+    color: white;
+  }
+
+  .explanation > p {
+    margin: 0;
+    font-size: 14px;
+  }
 </style>

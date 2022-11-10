@@ -74,6 +74,10 @@ body {
   font-family: 'Merriweather Sans', sans-serif;
 }
 
+body.modal-open {
+  overflow: hidden;
+}
+
 @include media-breakpoint-up(md) {
   html, body {
     min-height: 100%;
@@ -92,4 +96,5 @@ a {
   display: flex;
   flex-direction: column;
 }
+
 </style>

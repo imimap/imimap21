@@ -9,7 +9,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">
-            Praktikumsantrag hochladen
+            {{ $t("internshipModule.forms.uploadApplication") }}
           </h5>
           <button
             type="button"
@@ -22,7 +22,7 @@
           <div>
             <label for="requestPdfFileInput"
                    class="form-label">
-              Praktikumsantrag als PDF auswählen
+                   {{ $t("internshipModule.forms.pickPDF") }}
             </label>
             <input class="form-control form-control-lg"
                    id="requestPdfFileInput"
@@ -39,10 +39,10 @@
             data-bs-dismiss="modal"
             aria-label="Close"
             v-on:click="uploadRequestPdf">
-            Antrag hochladen
+            {{ $t("internshipModule.forms.uploadNow") }}
           </button>
           <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
-            Abbrechen
+            {{ $t("internshipModule.forms.cancel") }}
           </button>
         </div>
       </div>
@@ -51,57 +51,57 @@
 
   <div class="card internship-card border-htw-green">
     <div class="card-header">
-      <h5 class="card-title">Praktikum</h5>
+      <h5 class="card-title"> {{ $t("internshipModule.internship") }}</h5>
     </div>
     <div class="card-body">
       <div class="card mb-3 p-0">
         <div class="card-body pt-3 pb-0">
           <p class="card-text">
-            <strong> Informationen </strong>
+            <strong> {{ $t("internshipModule.information") }} </strong>
           </p>
           <table class="table table-striped table-sm table-borderless">
             <tbody>
             <tr>
               <td style="width:20%">
-                Semester
+                {{ $t("internshipModule.semester") }}
               </td>
               <td>
                 <!-- @TODO: inSemester am internship fehlt -->
-                5
+                5 (TODO)
               </td>
             </tr>
             <tr>
               <td style="width:20%">
-                Anfangsdatum
+                {{ $t("internshipModule.startDate") }}
               </td>
               <td>
-                {{ startDate?.toLocaleDateString($i18n.locale, {day: "2-digit", month: "2-digit", year: "numeric"}) }}
+                {{ startDate?.toLocaleDateString($i18n.locale,
+                {day: "2-digit", month: "2-digit", year: "numeric"}) }}
               </td>
             </tr>
             <tr>
               <td style="width:20%">
-                Enddatum
+                {{ $t("internshipModule.endDate") }}
               </td>
               <td>
-                {{ endDate?.toLocaleDateString($i18n.locale, {day: "2-digit", month: "2-digit", year: "numeric"}) }}
+                {{ endDate?.toLocaleDateString($i18n.locale,
+                {day: "2-digit", month: "2-digit", year: "numeric"}) }}
               </td>
             </tr>
             <tr>
               <td style="width:20%">
-                Dauer
+                {{ $t("internshipModule.duration") }}
               </td>
-              <td v-if="duration && duration < 16">
-                {{ duration }} Wochen;
-                lang genug für ein Teilpraktikum
-              </td>
-              <td v-else>
-                {{ duration }} Wochen;
-                lang genug
+              <td v-if="duration">
+                 {{ duration}} {{ $t("internshipModule.weeks") }};
+                <span v-if="duration < 16 && duration >= 8">{{ $t("internshipModule.longEnoughForPartial") }}</span>
+                <span v-if="duration < 8"> {{ $t("internshipModule.notLongEnough") }}</span>
+                <span v-if="duration >= 16">  {{ $t("internshipModule.longEnough") }}</span>
               </td>
             </tr>
             <tr>
               <td style="width:20%">
-                Einsatzgebiet
+                {{ $t("internshipModule.operationalArea") }}
               </td>
               <td>
                 {{ internship?.operationalArea }}
@@ -109,7 +109,7 @@
             </tr>
             <tr>
               <td style="width:20%">
-                Aufgaben
+                {{ $t("internshipModule.tasks") }}
               </td>
               <td>
                 {{ internship?.tasks }}
@@ -123,20 +123,20 @@
       <div class="card mb-3 p-0">
         <div class="card-body pt-3 pb-0">
           <p class="card-text">
-            <strong> Statusübersicht </strong>
+            <strong> {{ $t("internshipModule.status.overview") }} </strong>
           </p>
           <table class="table table-striped table-sm table-borderless">
             <tbody>
             <tr>
               <td style="width:40%">
-                Status der Anmeldung
+                {{ $t("internshipModule.status.application") }}
               </td>
               <td class="text-right">
                 <template v-if="requestPdfState === 'unknown'">
                   <button class="btn btn-htw-green"
                           data-bs-toggle="modal"
                           data-bs-target="#requestPdfModal">
-                    Praktikumsantrag hochladen
+                          {{ $t("internshipModule.forms.uploadApplication") }}
                   </button>
                 </template>
                 <template v-else>
@@ -146,15 +146,14 @@
             </tr>
             <tr>
               <td style="width:20%">
-                Status des Vertrags
-              </td>
+                {{ $t("internshipModule.status.contract") }}              </td>
               <td>
                 <template v-if="contractPdfState === 'unknown'">
                   <button class="btn btn-htw-green"
                           data-bs-toggle="modal"
                           data-bs-target="#requestPdfModal"
                           disabled>
-                    Praktikumsvertrag hochladen
+                          {{ $t("internshipModule.forms.uploadContract") }}
                   </button>
                 </template>
                 <template v-else>
@@ -164,7 +163,7 @@
             </tr>
             <tr>
               <td style="width:20%">
-                Status des Berichts
+                {{ $t("internshipModule.status.report") }}
               </td>
               <td>
                 <template v-if="reportPdfState === 'unknown'">
@@ -172,7 +171,7 @@
                           data-bs-toggle="modal"
                           data-bs-target="#requestPdfModal"
                           disabled>
-                    Praktikumsbericht hochladen
+                          {{ $t("internshipModule.forms.uploadReport") }}
                   </button>
                 </template>
                 <template v-else>
@@ -182,7 +181,7 @@
             </tr>
             <tr>
               <td style="width:20%">
-                Status des Zertifikats
+                {{ $t("internshipModule.status.certificate") }}
               </td>
               <td>
                 <template v-if="certificatePdfState === 'unknown'">
@@ -190,7 +189,7 @@
                           data-bs-toggle="modal"
                           data-bs-target="#requestPdfModal"
                           disabled>
-                    Praktikumszertifikat hochladen
+                          {{ $t("internshipModule.forms.uploadCertificate") }}
                   </button>
                 </template>
                 <template v-else>
@@ -200,7 +199,7 @@
             </tr>
             <tr>
               <td style="width:20%">
-                Status des Praktikums
+                {{ $t("internshipModule.status.internship") }}
               </td>
               <td>
                 {{ internship?.status }}
@@ -208,7 +207,7 @@
             </tr>
             <tr>
               <td style="width:20%">
-                Kommentar
+                {{ $t("internshipModule.comment") }}
               </td>
               <td>
                 Life? Don't talk to me about life.

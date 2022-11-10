@@ -3,6 +3,10 @@ const internship = {
     create: 'Neues Praktikum',
     edit: 'Praktikum bearbeiten',
   },
+  explanation: {
+    redStar: 'Felder mit diesem Sternchen sind Pflicht für das Anlegen eines Praktikums.',
+    blueStar: 'Diese Felder müssen für den offiziellen Antrag ausgefüllt sein.',
+  },
   form: {
     currently: 'momentan',
     startDate: 'Anfangsdatum',
@@ -14,6 +18,11 @@ const internship = {
     workingHoursPerWeek: 'Arbeitsstunden pro Woche',
     livingCosts: 'Lebenshaltungskosten',
     tasks: 'Aufgaben',
+  },
+  modal: {
+    heading: 'Meintest du vielleicht diese Firma?',
+    accept: 'Ja, übernehmen',
+    decline: 'Nein, andere Firma eintragen',
   },
 };
 

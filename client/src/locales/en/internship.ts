@@ -3,6 +3,10 @@ const internship = {
     create: 'New Internship',
     edit: 'Edit Internship',
   },
+  explanation: {
+    redStar: 'Fields with this star are required for creating an internship.',
+    blueStar: 'These fields have to be filled in for the official internship application.',
+  },
   form: {
     currently: 'currently',
     startDate: 'start date',
@@ -14,6 +18,11 @@ const internship = {
     workingHoursPerWeek: 'working hours per week',
     livingCosts: 'cost of living',
     tasks: 'tasks',
+  },
+  modal: {
+    heading: 'Did you mean this company?',
+    accept: 'Yes, take this one',
+    decline: 'No, enter different company',
   },
 };
 

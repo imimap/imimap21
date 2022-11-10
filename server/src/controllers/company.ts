@@ -67,9 +67,15 @@ export async function searchCompanyByName(
   const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
   if (!user) return next(new NotFound("User not found"));
 
-  const searchOptions: Record<string, unknown> = {};
+  const searchOptions: { [k: string]: any } = {};
+  const cn = req.query.companyName as string;
 
-  if (req.query.companyName) {
+  if (cn) {
+    if (cn.length < 2) {
+      //so students won't find companies by randomly typing one letter
+      res.json(null);
+      return;
+    }
     searchOptions.companyName = {
       $regex: req.query.companyName,
       $options: "i",
@@ -86,7 +92,9 @@ export async function searchCompanyByName(
   searchOptions.excludedFromSearch = false;
 
   let select = null;
-  if (!user.isAdmin) select = "companyName branchName address.country";
+  if (!user.isAdmin)
+    select =
+      "companyName branchName address.country address.city address.street address.streetNumber";
 
   const companies = await Company.findOne(searchOptions).select(select).lean();
 

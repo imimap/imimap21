@@ -4,10 +4,10 @@
     <h4 class="mb-5">
       <span> {{  `${userProfile.firstName} ${userProfile.lastName}` }}</span>
       <span>
-        {{$t("internshipModule.internship") }}
+        {{$t("internshipModule.internshipModule") }}
       </span>
       <span>{{ ` ${internshipModule?.inSemester} (${internshipModule?.inSemesterOfStudy}. ` }}</span>
-      <span>{{ $t("internshipModule.semester") }}</span>
+      <span>{{ $t("internshipModule.semesterModule") }}</span>
     </h4>
     <div class="card mt-3 mb-3">
       <div class="card-body">
