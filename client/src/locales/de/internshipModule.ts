@@ -50,6 +50,7 @@ const internshipModule = {
     over: 'beendet',
     readyForGrading: 'fertig zur Benotung',
     passed: 'bestanden',
+    missingDocuments: 'Folgende <strong>Unterlagen</strong> fehlen für die Beantragung deines Praktikums:',
   },
   comment: 'Kommentar',
   edit: 'Bearbeiten',

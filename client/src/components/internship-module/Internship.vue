@@ -206,7 +206,7 @@
               <br>
               <p v-if="internship?.status == 'planned'">
               <span v-if="missingDocuments && missingDocuments?.length > 0" >
-                Folgende <strong>Unterlagen</strong> fehlen für die Beantragung deines Praktikums:
+                {{ $t("internshipModule.status.missingDocuments") }}
                 <ul v-for="doc in missingDocuments" :key="doc">
                   <li>{{ doc }}</li>
                 </ul>
