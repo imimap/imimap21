@@ -147,7 +147,7 @@ export const requiredPdfs = ["lsfEctsProofPdf", "contractPdf", "requestPdf"];
 function internshipRequestComplete(document: Document) {
   // Check if all required fields exist
   for (const field of requiredFields) {
-    if (!document.get(field)) return false;
+    if (!document.get(field) || document.get(field).length < 1) return false;
   }
   // Check if all required pdf files exist
   for (const pdf of requiredPdfs) {
