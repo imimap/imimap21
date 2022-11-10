@@ -3,6 +3,7 @@ import { showErrorNotification } from '@/utils/notification';
 import Student from '@/models/Student';
 import Internship from '@/models/Internship';
 import InternshipModule from '@/models/InternshipModule';
+import Postponement from '@/models/Postponement';
 import Company from '@/models/Company';
 
 export const getStudentsList = async (semester: string | undefined): Promise<Student[]> => apiClient
@@ -161,42 +162,71 @@ export const deleteCompany = async (companyId: string): Promise<boolean> => {
   }
 };
 
-export const getPostponementsList = async () => apiClient.get('/postponement-requests')
-  .then((res) => res.data)
-  .catch((err) => {
-    console.log(err);
+export const getPostponementsList = async (): Promise<Postponement[]> => {
+  try {
+    const response = await apiClient.get('/postponement-requests');
+    return response.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Laden der Verschiebungsanträge [ERROR: ${err.message}]`);
     return [];
-  });
+  }
+};
 
-export const getPostponement = async (id: string) => apiClient.get(`/postponement-requests/${id}`)
-  .then((res) => res.data)
-  .catch((err) => {
-    console.log(err);
-    return [];
-  });
+export const acceptPostponement = async (id: string): Promise<boolean> => {
+  try {
+    await apiClient.patch(`/postponement-requests/${id}/accept`);
+    return true;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Akzeptieren des Verschiebungsantrags [ERROR: ${err.message}]`);
+    return false;
+  }
+};
 
-export const acceptPostponement = async (id: string) => apiClient.patch(`/postponement-requests/${id}/accept`)
-  .then((res) => res)
-  .catch((err) => {
-    console.log(err);
-    return [];
-  });
+export const rejectPostponement = async (id: string): Promise<boolean> => {
+  try {
+    await apiClient.patch(`/postponement-requests/${id}/reject`);
+    return true;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Ablehnen des Verschiebungsantrags [ERROR: ${err.message}]`);
+    return false;
+  }
+};
 
-export const rejectPostponement = async (id: string) => apiClient.patch(`/postponement-requests/${id}/reject`)
-  .then((res) => res)
-  .catch((err) => {
-    console.log(err);
-    return [];
-  });
+export const updatePostponement = async (
+  id: string,
+  payload: unknown,
+): Promise<Postponement | null> => {
+  try {
+    const response = await apiClient.patch(`/postponement-requests/${id}`, payload);
+    return response.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Updaten vom Verschiebungsantrag ${id} [ERROR: ${err.message}]`);
+    return null;
+  }
+};
 
-// TODO: Also used in Home. Consolidate
 export const loadAvailableSemesters = async (): Promise<string[]> => {
   try {
     const res = await apiClient.get('/info/semesters');
     return await res.data;
   } catch (err: any) {
     if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
-    await showErrorNotification(`Fehler beim Abfragen der verfügbaren semester [ERROR: ${err.message}]`);
+    await showErrorNotification(`Fehler beim Abfragen der verfügbaren Semester [ERROR: ${err.message}]`);
+    return [];
+  }
+};
+
+export const loadUpcomingSemesters = async (): Promise<string[]> => {
+  try {
+    const res = await apiClient.get('/info/semesters/upcoming');
+    return await res.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Abfragen der kommenden Semester [ERROR: ${err.message}]`);
     return [];
   }
 };
