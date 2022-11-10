@@ -202,7 +202,24 @@
                 {{ $t("internshipModule.status.internship") }}
               </td>
               <td>
-                {{ internship?.status }}
+                {{ internshipStatus }}
+              <br>
+              <p v-if="internship?.status == 'planned'">
+              <span v-if="missingDocuments && missingDocuments?.length > 0" >
+                Folgende <strong>Unterlagen</strong> fehlen für die Beantragung deines Praktikums:
+                <ul v-for="doc in missingDocuments" :key="doc">
+                  <li>{{ doc }}</li>
+                </ul>
+                <p>Bitte lade diese hier noch hoch.</p>
+              </span>
+              <span v-if="missingFields && missingFields?.length > 0">Folgende <strong>Angaben</strong> fehlen für die Beantragung deines Praktikums:
+                <ul v-for="field in missingFields" :key="field">
+                  <li>{{ field }}</li>
+                </ul>
+                <p>Bitte bearbeite dafür dein Praktikum nochmal.</p>
+              </span>
+
+              </p>
               </td>
             </tr>
             <tr>
@@ -276,6 +293,47 @@ export default defineComponent({
     },
     reportPdfState(): string | null {
       return this.internship != null ? this.internship.reportPdf.status : null;
+    },
+    internshipStatus(): string | null {
+      const currentStatus = this.internship != null ? this.internship.status : null;
+      if (!currentStatus) return null;
+      const s = `internshipModule.status.${currentStatus}`;
+      return `${this.$t(s)}`;
+    },
+    missingFields(): string[] | null {
+      if (!this.internship) return null;
+      const requiredFields = [
+        'startDate',
+        'endDate',
+        'operationalArea',
+        'tasks',
+        'workingHoursPerWeek',
+      ];
+      const missingFields = [] as string[];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const field of requiredFields) {
+        if (!Object.prototype.hasOwnProperty.call(this.internship, field)) missingFields.push(field);
+      }
+      // nested object
+      if (!Object.prototype.hasOwnProperty.call(this.internship, 'supervisor')) {
+        missingFields.push('supervisor.fullName');
+        missingFields.push('supervisor.emailAddress');
+      } else {
+        if (!Object.prototype.hasOwnProperty.call(this.internship.supervisor, 'fullName')) missingFields.push('supervisor.fullName');
+        if (!Object.prototype.hasOwnProperty.call(this.internship.supervisor, 'emailAddress')) missingFields.push('supervisor.emailAddress');
+      }
+
+      return missingFields;
+    },
+    missingDocuments(): string[] | null {
+      if (!this.internship) return null;
+      const requiredPdfs = ['lsfEctsProofPdf', 'contractPdf', 'requestPdf'];
+      const missingDocuments = [] as string[];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const doc of requiredPdfs) {
+        if (this.internship[doc].status === 'unknown') missingDocuments.push(doc);
+      }
+      return missingDocuments;
     },
   },
   methods: {

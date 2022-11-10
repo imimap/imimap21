@@ -204,8 +204,10 @@ export default defineComponent({
           }
         }
         if (this.supervisor.emailAddress || this.internship.supervisor?.emailAddress) {
-          this.internship.supervisor.emailAddress = this.supervisor.emailAddress
+          if (!this.internship.supervisor) { this.internship.supervisor = { emailAddress: this.supervisor.emailAddress }; } else {
+            this.internship.supervisor.emailAddress = this.supervisor.emailAddress
         ?? this.internship.supervisor?.emailAddress;
+          }
         }
 
         await http.patch(`/internships/${this.$route.params.id}`, this.internship);

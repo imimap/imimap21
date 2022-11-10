@@ -232,7 +232,6 @@ InternshipSchema.pre("save", async function () {
     case InternshipStatuses.PLANNED:
     case InternshipStatuses.APPROVED:
     case InternshipStatuses.REJECTED:
-      console.log("here");
       await trySetRequested(this);
       break;
     case InternshipStatuses.OVER:
