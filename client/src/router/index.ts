@@ -1,11 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import {
-  getAuthUserProfile,
-  getUserInfo,
-  isAdmin,
-  isLoggedIn,
-  storeAuthUser,
-  storeAuthUserProfile,
+  getAuthUserProfile, getUserInfo, isAdmin, isLoggedIn, storeAuthUser, storeAuthUserProfile,
 } from '@/utils/auth';
 import Layout from '@/layouts/Layout.vue';
 import Home from '@/views/Home.vue';
@@ -13,7 +8,7 @@ import Search from '@/views/Search.vue';
 import Admin from '@/views/Admin.vue';
 import UsersList from '@/components/admin/UsersList.vue';
 import CompaniesList from '@/components/admin/companies/CompaniesList.vue';
-import * as AdminPostponementsList from '@/components/admin/PostponementsList.vue';
+import * as AdminPostponementsList from '@/components/admin/postponement-requests/PostponementsList.vue';
 import Dashboard from '@/components/admin/Dashboard.vue';
 import InternshipModule from '@/views/InternshipModule.vue';
 import CreateInternshipModule from '@/components/internship-module/CreateInternshipModule.vue';
