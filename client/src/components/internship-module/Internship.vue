@@ -202,24 +202,26 @@
                 {{ $t("internshipModule.status.internship") }}
               </td>
               <td>
-                {{ internshipStatus }}
+                <p class="mb-1">{{ internshipStatus }}</p>
               <br>
-              <p v-if="internship?.status == 'planned'">
-              <span v-if="missingDocuments && missingDocuments?.length > 0" >
-                {{ $t("internshipModule.status.missingDocuments") }}
-                <ul v-for="doc in missingDocuments" :key="doc">
-                  <li>{{ doc }}</li>
-                </ul>
-                <p>Bitte lade diese hier noch hoch.</p>
-              </span>
-              <span v-if="missingFields && missingFields?.length > 0">Folgende <strong>Angaben</strong> fehlen für die Beantragung deines Praktikums:
-                <ul v-for="field in missingFields" :key="field">
-                  <li>{{ field }}</li>
-                </ul>
-                <p>Bitte bearbeite dafür dein Praktikum nochmal.</p>
-              </span>
-
-              </p>
+                <div v-if="internship?.status == 'planned' && missingDocuments && missingDocuments?.length > 0" >
+                  {{ $t("internshipModule.status.missingPart1") }}
+                  <span class="fw-bold">{{ $t("internshipModule.status.documents") }}</span>
+                  {{$t("internshipModule.status.missingPart2") }}
+                  <ul class="mt-2" v-for="doc in missingDocuments" :key="doc">
+                    <li>{{ doc }}</li>
+                  </ul>
+                  <p>{{ $t("internshipModule.status.pleaseUpload") }}</p>
+                <div v-if="missingFields && missingFields?.length > 0">
+                  {{ $t("internshipModule.status.missingPart1") }}
+                  <span class="fw-bold">{{ $t("internshipModule.status.details") }}</span>
+                  {{$t("internshipModule.status.missingPart2") }}
+                  <ul class="mt-2" v-for="field in missingFields" :key="field">
+                    <li>{{ field }}</li>
+                  </ul>
+                  <p>{{ $t("internshipModule.status.pleaseEditInternship") }}</p>
+                </div>
+               </div>
               </td>
             </tr>
             <tr>
@@ -303,35 +305,39 @@ export default defineComponent({
     missingFields(): string[] | null {
       if (!this.internship) return null;
       const requiredFields = [
-        'startDate',
-        'endDate',
-        'operationalArea',
-        'tasks',
-        'workingHoursPerWeek',
+        { startDate: `${this.$t('internshipModule.startDate')}` },
+        { endDate: `${this.$t('internshipModule.endDate')}` },
+        { operationalArea: `${this.$t('internshipModule.operationalArea')}` },
+        { tasks: `${this.$t('internshipModule.tasks')}` },
+        { workingHoursPerWeek: `${this.$t('internshipModule.workingHoursPerWeek')}` },
+
       ];
       const missingFields = [] as string[];
       // eslint-disable-next-line no-restricted-syntax
       for (const field of requiredFields) {
-        if (!Object.prototype.hasOwnProperty.call(this.internship, field)) missingFields.push(field);
+        if (!Object.prototype.hasOwnProperty.call(this.internship, Object.keys(field)[0])) missingFields.push(Object.values(field)[0]);
       }
+      const supervisorExists = Object.prototype.hasOwnProperty.call(this.internship, 'supervisor');
       // nested object
-      if (!Object.prototype.hasOwnProperty.call(this.internship, 'supervisor')) {
-        missingFields.push('supervisor.fullName');
-        missingFields.push('supervisor.emailAddress');
-      } else {
-        if (!Object.prototype.hasOwnProperty.call(this.internship.supervisor, 'fullName')) missingFields.push('supervisor.fullName');
-        if (!Object.prototype.hasOwnProperty.call(this.internship.supervisor, 'emailAddress')) missingFields.push('supervisor.emailAddress');
+      if (!supervisorExists || !Object.prototype.hasOwnProperty.call(this.internship.supervisor, 'fullName')) {
+        missingFields.push(`${this.$t('company.supervisor.name')}`);
       }
-
+      if (!supervisorExists || !Object.prototype.hasOwnProperty.call(this.internship.supervisor, 'emailAddress')) {
+        missingFields.push(`${this.$t('company.supervisor.email')}`);
+      }
       return missingFields;
     },
     missingDocuments(): string[] | null {
       if (!this.internship) return null;
-      const requiredPdfs = ['lsfEctsProofPdf', 'contractPdf', 'requestPdf'];
+      const requiredPdfs = [
+        { lsfEctsProofPdf: `${this.$t('internshipModule.status.lsfEctsProofPdf')}` },
+        { contractPdf: `${this.$t('internshipModule.status.contractPdf')}` },
+        { requestPdf: `${this.$t('internshipModule.status.requestPdf')}` },
+      ];
       const missingDocuments = [] as string[];
       // eslint-disable-next-line no-restricted-syntax
       for (const doc of requiredPdfs) {
-        if (this.internship[doc].status === 'unknown') missingDocuments.push(doc);
+        if (this.internship[Object.keys(doc)[0]].status === 'unknown') missingDocuments.push(Object.values(doc)[0]);
       }
       return missingDocuments;
     },

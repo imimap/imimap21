@@ -32,6 +32,7 @@ const internshipModule = {
   notLongEnough: 'not long enough – a partial internship has to be at least 8 weeks long.',
   operationalArea: 'Operational Area',
   tasks: 'Tasks',
+  workingHoursPerWeek: 'Working Hours per week',
   status: {
     internship: 'Internship status',
     overview: 'Status overview',
@@ -49,6 +50,15 @@ const internshipModule = {
     over: 'over',
     readyForGrading: 'ready for grading',
     passed: 'passed',
+    missingPart1: 'The following ',
+    missingPart2: 'are missing for officially requesting your internship:',
+    documents: 'documents',
+    details: 'details',
+    pleaseUpload: 'Please upload them here as well.',
+    pleaseEditInternship: 'Please edit your internship details once again for that.',
+    lsfEctsProofPdf: 'LSF Proof',
+    contractPdf: 'Internship contract',
+    requestPdf: 'Internship application',
 
   },
   comment: 'Comment',
