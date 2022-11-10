@@ -142,12 +142,7 @@ export const requiredFields = [
   "supervisor.emailAddress",
 ];
 
-export const requiredPdfs = [
-  "lsfEctsProofPdf",
-  "locationJustificationPdf",
-  "contractPdf",
-  //TODO: eventually add "requestPdf",
-];
+export const requiredPdfs = ["lsfEctsProofPdf", "contractPdf", "requestPdf"];
 
 function internshipRequestComplete(document: Document) {
   // Check if all required fields exist
@@ -237,6 +232,7 @@ InternshipSchema.pre("save", async function () {
     case InternshipStatuses.PLANNED:
     case InternshipStatuses.APPROVED:
     case InternshipStatuses.REJECTED:
+      console.log("here");
       await trySetRequested(this);
       break;
     case InternshipStatuses.OVER:

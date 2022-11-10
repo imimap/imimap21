@@ -199,8 +199,9 @@ export default defineComponent({
         ?? this.internship?.endDate;
         }
         if (this.supervisor.fullName || this.internship.supervisor?.fullName) {
-          this.internship.supervisor.fullName = this.supervisor.fullName
-        ?? this.internship.supervisor?.fullName;
+          if (!this.internship.supervisor) { this.internship.supervisor = { fullName: this.supervisor.fullName }; } else {
+            this.internship.supervisor.fullName = this.supervisor.fullName ?? this.internship.supervisor?.fullName;
+          }
         }
         if (this.supervisor.emailAddress || this.internship.supervisor?.emailAddress) {
           this.internship.supervisor.emailAddress = this.supervisor.emailAddress
