@@ -218,8 +218,8 @@
         </div>
       </div>
       <div class="my-3">
-        <router-link :to="{ name: 'EditInternship', params: { id: internship?._id } }">
-          {{ $t("internshipModule.edit") }}
+        <router-link v-if="internship?.status !== 'passed'" :to="{ name: 'EditInternship', params: { id: internship?._id } }">
+          Bearbeiten
         </router-link>
         <button v-if="internship?.status == 'unknown' || internship?.status == 'planned'"
         @click="deleteInternship(internship?._id)" class="delete-button">Löschen</button>
