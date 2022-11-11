@@ -27,8 +27,10 @@
                 {{ $t("internshipModule.startDate") }}
               </td>
               <td>
-                {{ startDate?.toLocaleDateString($i18n.locale,
-                {day: "2-digit", month: "2-digit", year: "numeric"}) }}
+                {{
+                  startDate?.toLocaleDateString($i18n.locale,
+                    {day: "2-digit", month: "2-digit", year: "numeric"})
+                }}
               </td>
             </tr>
             <tr>
@@ -36,8 +38,10 @@
                 {{ $t("internshipModule.endDate") }}
               </td>
               <td>
-                {{ endDate?.toLocaleDateString($i18n.locale,
-                {day: "2-digit", month: "2-digit", year: "numeric"}) }}
+                {{
+                  endDate?.toLocaleDateString($i18n.locale,
+                    {day: "2-digit", month: "2-digit", year: "numeric"})
+                }}
               </td>
             </tr>
             <tr>
@@ -45,7 +49,7 @@
                 {{ $t("internshipModule.duration") }}
               </td>
               <td v-if="duration">
-                 {{ duration}} {{ $t("internshipModule.weeks") }};
+                {{ duration }} {{ $t("internshipModule.weeks") }};
                 <span v-if="duration < 16 && duration >= 8">{{ $t("internshipModule.longEnoughForPartial") }}</span>
                 <span v-if="duration < 8"> {{ $t("internshipModule.notLongEnough") }}</span>
                 <span v-if="duration >= 16">  {{ $t("internshipModule.longEnough") }}</span>
@@ -84,18 +88,17 @@
                 {{ name }}
               </td>
               <td class="text-right">
-                <template v-if="getPdfState(type) === 'unknown'">
-                  <button class="btn btn-htw-green"
-                          data-bs-toggle="modal"
-                          data-bs-target="#uploadPdfModal"
-                          @click="pdfType = type"
-                  >
-                    Hochladen
-                  </button>
-                </template>
-                <template v-else>
-                  {{ getPdfState(type) }}
-                </template>
+                <a
+                  v-if="getPdfState(type) === 'unknown'"
+                  href="#" data-bs-toggle="modal"
+                  data-bs-target="#uploadPdfModal"
+                  @click.prevent="pdfType = type"
+                >
+                  {{ $t("internshipModule.forms.upload") }}
+                </a>
+                <span v-else :class="['badge', getPdfStatusBadgeClass(getPdfState(type))]">
+                  {{ $t(`internshipModule.pdfStatus.${getPdfState(type)}`) }}
+                </span>
               </td>
             </tr>
             <tr>
@@ -156,7 +159,7 @@
               </td>
             </tr>
             <tr>
-              <td style="width:20%">
+              <td>
                 {{ $t("internshipModule.comment") }}
               </td>
               <td>
@@ -169,10 +172,15 @@
       </div>
       <div class="my-3">
         <router-link v-if="internship?.status !== 'passed'" :to="{ name: 'EditInternship', params: { id: internship?._id } }">
-          Bearbeiten
+          {{ $t("internshipModule.edit") }}
         </router-link>
-        <button v-if="internship?.status === 'unknown' || internship?.status === 'planned'"
-        @click="deleteInternship(internship?._id)" class="delete-button">Löschen</button>
+        <button
+          v-if="internship?.status === 'unknown' || internship?.status === 'planned'"
+          @click="deleteInternship(internship?._id)"
+          class="delete-button"
+        >
+          {{ $t("internshipModule.delete") }}
+        </button>
       </div>
     </div>
   </div>
@@ -189,18 +197,20 @@ export default defineComponent({
   name: 'Internship',
   components: { UploadPDFModal },
   data() {
+    const pdfFiles = [
+      'request',
+      'lsfEctsProof',
+      'locationJustification',
+      'contract',
+      'bvgTicketExemption',
+      'certificate',
+      'report',
+    ].reduce((map, value) => ({ ...map, [value]: this.$t(`internshipModule.pdfTypes.${value}`) }), {});
+    console.debug(pdfFiles);
+
     return {
       pdfType: 'request',
-      // TODO: Replace map with translations after merging dev
-      pdfFiles: {
-        request: 'Anmeldung',
-        lsfEctsProof: 'ECTS-Nachweis',
-        locationJustification: 'Ortsnachweis',
-        contract: 'Praktikumsvertrag',
-        bvgTicketExemption: 'BVG Ticket Ausnahme',
-        certificate: 'Praktikumszeugnis',
-        report: 'Praktikumsbericht',
-      },
+      pdfFiles,
     };
   },
   emits: ['updateInternship', 'deleteInternship'],
@@ -280,6 +290,18 @@ export default defineComponent({
     getPdfState(pdfType: string): string | null {
       if (!this.internship) return null;
       return this.internship[`${pdfType}Pdf`].status;
+    },
+    getPdfStatusBadgeClass(pdfState: string): string {
+      switch (pdfState) {
+        case 'submitted':
+          return 'bg-warning';
+        case 'accepted':
+          return 'bg-success';
+        case 'rejected':
+          return 'bg-danger';
+        default:
+          return 'bg-secondary';
+      }
     },
     async deleteInternship(internshipId: string | undefined) {
       if (!internshipId) return;

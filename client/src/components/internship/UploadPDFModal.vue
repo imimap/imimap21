@@ -9,7 +9,9 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Praktikumsantrag hochladen</h5>
+          <h5 class="modal-title" id="exampleModalLabel">
+            {{ $t("internshipModule.forms.uploadFile", {file: $t(`internshipModule.pdfTypes.${pdfType}`)}) }}
+          </h5>
           <button
             type="button"
             class="btn-close"
@@ -19,7 +21,9 @@
         </div>
         <div class="modal-body text-left">
           <div>
-            <label for="pdfFileInput" class="form-label">Praktikumsantrag als PDF auswählen</label>
+            <label for="pdfFileInput" class="form-label">
+              {{ $t("internshipModule.forms.pickPDF") }}
+            </label>
             <input
               class="form-control form-control-lg"
               id="pdfFileInput"
@@ -37,9 +41,11 @@
             aria-label="Close"
             @click="uploadPdf"
           >
-            Antrag hochladen
+            {{ $t("internshipModule.forms.upload") }}
           </button>
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Abbrechen</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+            {{ $t("internshipModule.forms.cancel") }}
+          </button>
         </div>
       </div>
     </div>
