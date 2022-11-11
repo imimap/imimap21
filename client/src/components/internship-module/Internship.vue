@@ -206,7 +206,6 @@ export default defineComponent({
       'certificate',
       'report',
     ].reduce((map, value) => ({ ...map, [value]: this.$t(`internshipModule.pdfTypes.${value}`) }), {});
-    console.debug(pdfFiles);
 
     return {
       pdfType: 'request',
