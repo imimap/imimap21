@@ -87,25 +87,32 @@
               <td>
                 {{ name }}
               </td>
-              <td class="text-right">
-                <a
-                  v-if="getPdfState(type) === 'unknown'"
-                  href="#" data-bs-toggle="modal"
-                  data-bs-target="#uploadPdfModal"
-                  @click.prevent="pdfType = type"
-                >
-                  {{ $t("internshipModule.forms.upload") }}
-                </a>
-                <span v-else :class="['badge', getPdfStatusBadgeClass(getPdfState(type))]">
-                  {{ $t(`internshipModule.pdfStatus.${getPdfState(type)}`) }}
-                </span>
-              </td>
+              <template v-for="pdfState in [getPdfState(type)]" :key="pdfState">
+                <td>
+                  <a
+                    v-if="pdfState === 'unknown' || pdfState === 'rejected'"
+                    href="#" data-bs-toggle="modal"
+                    data-bs-target="#uploadPdfModal"
+                    @click.prevent="pdfType = type"
+                  >
+                    {{ $t(`internshipModule.forms.${pdfState === 'unknown' ? 'upload' : 'reUpload'}`) }}
+                  </a>
+                </td>
+                <td class="text-end">
+                  <span
+                    v-if="pdfState !== 'unknown'"
+                    :class="['badge', getPdfStatusBadgeClass(pdfState)]"
+                  >
+                    {{ $t(`internshipModule.pdfStatus.${pdfState}`) }}
+                  </span>
+                </td>
+              </template>
             </tr>
             <tr>
               <td>
                 {{ $t("internshipModule.status.internship") }}
               </td>
-              <td>
+              <td colspan="2" class="text-end">
                 <p class="mb-1">{{ internshipStatus }}</p>
                 <br>
                 <!-- Status: planned -->
@@ -162,7 +169,7 @@
               <td>
                 {{ $t("internshipModule.comment") }}
               </td>
-              <td>
+              <td colspan="2" class="text-end">
                 Life? Don't talk to me about life.
               </td>
             </tr>

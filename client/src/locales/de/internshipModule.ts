@@ -15,6 +15,7 @@ const internshipModule = {
     uploadFile: '{file} hochladen',
     pickPDF: 'PDF-Datei auswählen',
     upload: 'Hochladen',
+    reUpload: 'Neu hochladen',
     cancel: 'Abbrechen',
   },
   pdfTypes: {

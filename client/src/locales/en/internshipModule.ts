@@ -15,6 +15,7 @@ const internshipModule = {
     uploadFile: 'Upload {file}',
     pickPDF: 'Pick PDF file',
     upload: 'Upload',
+    reUpload: 'Re-upload',
     cancel: 'Cancel',
   },
   pdfTypes: {
