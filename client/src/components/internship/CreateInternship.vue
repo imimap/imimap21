@@ -463,6 +463,10 @@ export default defineComponent({
       try {
         const res = await http.post('/companies', this.getCompanyObject());
         this.existingCompany = res.data;
+        if (res.data.error) {
+          await showErrorNotification(res.data.error.message);
+          return;
+        }
         if (res.data) {
           await this.$store.dispatch('addNotification', { text: 'Firma erfolgreich angelegt!', type: 'success' });
           this.toggleAddCompanyForm = false;

@@ -28,13 +28,11 @@ export const getCoordinates = async function (document: IAddress): Promise<ICoor
   const url = encodeURI(
     "https://maps.googleapis.com/maps/api/geocode/json?address=" + addressString + "&key=" + key
   );
-
   const res = await axios.get(url);
   const data = res.data;
   let coordinates;
 
-  //if (data.status !== "OK") throw data.status + ". Could not get coordinates for " + addressString;
-  if (data.status !== "OK") return { latitude: 0, longitude: 0 };
+  if (data.status !== "OK") throw data.status + ". Could not get coordinates for " + addressString;
   else coordinates = data.results[0].geometry.location;
 
   return {
