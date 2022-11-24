@@ -464,7 +464,7 @@ export default defineComponent({
         const res = await http.post('/companies', this.getCompanyObject());
         this.existingCompany = res.data;
         if (res.data.error) {
-          await showErrorNotification(res.data.error.message);
+          await this.$store.dispatch('addNotification', { text: `${res.data.error.message}`, type: 'danger' });
           return;
         }
         if (res.data) {
