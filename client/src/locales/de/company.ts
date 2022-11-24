@@ -16,7 +16,12 @@ const company = {
   website: 'Webseite',
   mainLanguage: 'Hauptsprache',
   select: 'Bitte auswählen',
-  size: 'Größe',
+  size: {
+    info: 'Größe',
+    big: 'mehr als 250 Angestellte',
+    medium: 'weniger als 250 Angestellte',
+    small: 'weniger als 50 Angsetellte',
+  },
   hidden: 'Unsichtbar in der Suche',
   actions: {
     save: 'Firma speichern',

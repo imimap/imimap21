@@ -195,14 +195,14 @@
               </select>
             </div>
             <div class="col">
-              <label for="newCompanySize">{{ $t("company.size") }}</label>
+              <label for="newCompanySize">{{ $t("company.size.info") }}</label>
               <select v-model="newCompanySize"
                       id="newCompanySize"
                       class="form-control">
                 <option value="">{{ $t("company.select") }}</option>
-                <option value="big">mehr als 250 Angestellte</option>
-                <option value="medium">weniger als 250 Angestellte</option>
-                <option value="small">weniger als 50 Angestellte</option>
+                <option value="big">{{ $t("company.size.big") }}</option>
+                <option value="medium">{{ $t("company.size.medium") }}</option>
+                <option value="small">{{ $t("company.size.small") }}</option>
               </select>
             </div>
           </div>

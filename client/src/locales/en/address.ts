@@ -1,11 +1,11 @@
 const address = {
   heading: 'Address',
-  street: 'street',
-  nr: 'nr',
-  line: 'additional lines',
-  zip: 'zip code',
-  city: 'city',
-  country: 'country',
+  street: 'Street',
+  nr: 'No',
+  line: 'Additional lines',
+  zip: 'Zip code',
+  city: 'City',
+  country: 'Country',
 };
 
 export default address;
