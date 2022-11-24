@@ -57,7 +57,7 @@
                    :placeholder="$t('internship.form.salary')"/>
           </div>
           <div class="col">
-            <label for="paymentType">{{ $t('internship.form.paymentType') }}</label>
+            <label for="paymentType">{{ $t('internship.form.paymentType.info') }}</label>
             <div class="form-group d-flex internship-payment-options">
               <div class="form-check internship-payment-option"
                    v-for="(paymentType, index) in availablePaymentTypes"
@@ -410,6 +410,12 @@ export default defineComponent({
       );
     },
   },
+  watch: {
+    $route() {
+      this.availablePaymentTypes = [];
+      this.getAvailablePaymentTypes();
+    },
+  },
   methods: {
     async save() {
       if (this.company.length === 0) {
@@ -516,7 +522,13 @@ export default defineComponent({
     async getAvailablePaymentTypes() {
       try {
         const res = await http.get('/info/payment-types');
-        this.availablePaymentTypes = res.data;
+        const st = 'internship.form.paymentType.';
+        if (res.data) {
+          // eslint-disable-next-line no-restricted-syntax
+          for (const pt of res.data) {
+            this.availablePaymentTypes.push(`${this.$t(st + pt.replace(/\s/g, ''))}`);
+          }
+        }
       } catch (err: any) {
         await this.$store.dispatch('addNotification', {
           text: `Fehler beim Laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`,
@@ -551,6 +563,7 @@ export default defineComponent({
       this.toggleSelectExistingCompany = false;
       document.body.classList.remove('modal-open');
     },
+
   },
 });
 </script>
