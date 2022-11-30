@@ -175,9 +175,9 @@ export async function updateCompany(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
-  if (!user) return next(new NotFound("User not found"));
-  if (!user.isAdmin) return next(new Forbidden("Only admins may edit companies"));
+  // const user = await User.findOne({ emailAddress: req.user?.email }).lean().select("isAdmin");
+  // if (!user) return next(new NotFound("User not found"));
+  // if (!user.isAdmin ) return next(new Forbidden("Only admins may edit companies"));
 
   if (!req.params.id) return next(new BadRequest("Please provide a company id."));
   const companyToUpdate = await Company.findById(req.params.id);

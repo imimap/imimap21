@@ -225,6 +225,7 @@ export default defineComponent({
     const initialProps = {
       companyName: undefined as string | undefined,
       branchName: undefined as string | undefined,
+      emailAddress: undefined as string | undefined,
       industry: undefined as string | undefined,
       website: undefined as string | undefined,
       mainLanguage: undefined as string | undefined,
