@@ -290,8 +290,9 @@ import http from '@/utils/http-common';
 import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
 import Internship from '@/models/Internship';
 import { createPayloadFromChangedProps } from '@/utils/admin';
-import { updateCompany } from '@/utils/gateways';
+import { getAvailableLanguages, updateCompany, loadPaymentTypes } from '@/utils/gateways';
 import { Company } from '@/store/types/Company';
+import { onBeforeRouteUpdate } from 'vue-router';
 
 export default defineComponent({
   name: 'EditInternship',
@@ -331,7 +332,7 @@ export default defineComponent({
     };
   },
   async created() {
-    this.getAvailableLanguages();
+    this.availableLanguages = await getAvailableLanguages();
     await this.getAvailablePaymentTypes();
     await this.getInternship();
   },
@@ -341,12 +342,14 @@ export default defineComponent({
         (lang) => ({ language: lang, languageName: this.availableLanguages[lang].name }),
       );
     },
-
   },
+
   watch: {
-    $route() {
-      this.availablePaymentTypes = [];
-      this.getAvailablePaymentTypes();
+    async $route(to, from) {
+      if (this.$route.params.locale && to.params.locale !== from.params.locale) {
+        this.availablePaymentTypes = [];
+        await this.getAvailablePaymentTypes();
+      }
     },
   },
   methods: {
@@ -413,24 +416,13 @@ export default defineComponent({
         des Praktikums [ERROR: ${err.response.data.error.message}`);
       }
     },
-    async getAvailableLanguages() {
-      try {
-        const res = await http.get('/info/languages');
-        this.availableLanguages = res.data;
-      } catch (err: any) {
-        await this.$store.dispatch('addNotification', {
-          text: `Fehler beim Laden der verfügbaren Sprachen [ERROR: ${err.message}]`,
-          type: 'danger',
-        });
-      }
-    },
     async getAvailablePaymentTypes() {
       try {
-        const res = await http.get('/info/payment-types');
+        const paymentTypes = await loadPaymentTypes();
         const st = 'internship.form.paymentType.';
-        if (res.data) {
+        if (paymentTypes.length > 0) {
           // eslint-disable-next-line no-restricted-syntax
-          for (const pt of res.data) {
+          for (const pt of paymentTypes) {
             this.availablePaymentTypes.push(`${this.$t(st + pt.replace(/\s/g, ''))}`);
           }
         }
