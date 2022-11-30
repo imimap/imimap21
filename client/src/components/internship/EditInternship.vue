@@ -292,7 +292,6 @@ import Internship from '@/models/Internship';
 import { createPayloadFromChangedProps } from '@/utils/admin';
 import { getAvailableLanguages, updateCompany, loadPaymentTypes } from '@/utils/gateways';
 import { Company } from '@/store/types/Company';
-import { onBeforeRouteUpdate } from 'vue-router';
 
 export default defineComponent({
   name: 'EditInternship',
@@ -343,7 +342,6 @@ export default defineComponent({
       );
     },
   },
-
   watch: {
     async $route(to, from) {
       if (this.$route.params.locale && to.params.locale !== from.params.locale) {
@@ -385,12 +383,15 @@ export default defineComponent({
     },
     async save() {
       try {
+        // update dates
         this.internship.startDate = this.normalizedDate(this.startDate)
         ?? this.internship.startDate;
         if (this.endDate || this.internship?.endDate) {
           this.internship.endDate = this.normalizedDate(this.endDate)
         ?? this.internship?.endDate;
         }
+        // update supervisor
+
         if (this.supervisor.fullName || this.internship.supervisor?.fullName) {
           if (!this.internship.supervisor) { this.internship.supervisor = { fullName: this.supervisor.fullName }; } else {
             this.internship.supervisor.fullName = this.supervisor.fullName ?? this.internship.supervisor?.fullName;
@@ -409,6 +410,7 @@ export default defineComponent({
           this.internship.company,
         );
         await updateCompany((this.internship.company as unknown as Company)._id, payload);
+
         await http.patch(`/internships/${this.$route.params.id}`, this.internship);
         await showSuccessNotification('Praktikum erfolgreich gespeichert!');
       } catch (err: any) {
