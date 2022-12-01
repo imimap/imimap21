@@ -1,15 +1,15 @@
 <template>
   <div class="container">
     <div id="form-block4" class="text-left">
-      <h3>Deine beantragten Verschiebungen</h3>
+      <h3>{{ $t('postponement.sectionTitle') }}</h3>
       <div class="row mt-3">
         <table class="table">
           <thead>
           <tr>
-            <th scope="col">Neues Semester</th>
-            <th scope="col">Neues Fachsemester</th>
-            <th scope="col">Begründung</th>
-            <th scope="col">Status</th>
+            <th scope="col">{{ $t('postponement.newSemester') }}</th>
+            <th scope="col">{{ $t('postponement.newSemesterOfStudy') }}</th>
+            <th scope="col">{{ $t('postponement.reason') }}</th>
+            <th scope="col">{{ $t('postponement.currentStatus') }}</th>
           </tr>
           </thead>
           <tbody>
@@ -22,7 +22,7 @@
             <td>{{ postponement.reason }}</td>
             <td>
               <span :class="['badge', `bg-${getStatusColor(postponement.status)}`]">
-                {{ postponement.status }}
+                {{ $t(`postponement.status.${postponement.status}`) }}
               </span>
             </td>
           </tr>
