@@ -5,10 +5,12 @@
     <!-- Kein Praktikum aber Verschiebungen -->
     <postponements-list v-if="hasRequestedPostponements" :postponementEvents="postponements"/>
     <!-- Praktikum gefunden -->
-    <complete-internship v-if="internshipModuleHasBeenPlanned"
-                         v-bind:internshipModule="internshipModule"
-                         v-on:replaceInternship="replaceInternship"
-                         v-on:getUserInternship="getUserInternship"/>
+    <complete-internship
+      v-if="internshipModuleHasBeenPlanned"
+      :internshipModule="internshipModule"
+      @replaceInternship="replaceInternship"
+      @getUserInternship="getUserInternship"
+    />
   </template>
 </template>
 

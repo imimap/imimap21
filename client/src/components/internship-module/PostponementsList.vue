@@ -21,7 +21,7 @@
             <td>{{ postponement.newSemesterOfStudy }}</td>
             <td>{{ postponement.reason }}</td>
             <td>
-              <span class="badge" :class="['badge', `bg-${getStatusColor(postponement.status)}`]">
+              <span :class="['badge', `bg-${getStatusColor(postponement.status)}`]">
                 {{ postponement.status }}
               </span>
             </td>
