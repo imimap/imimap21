@@ -286,3 +286,16 @@ export const uploadPDFFile = async (internshipId: string, pdfFile: File, pdfType
     return null;
   }
 };
+
+export const generateRequestPdf = async (internshipId: string) => {
+  try {
+    const response = await apiClient.get(`/internships/${internshipId}/pdf/request`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Laden der PDF-Datei [ERROR: ${err.message}]`);
+    return null;
+  }
+};

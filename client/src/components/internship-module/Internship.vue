@@ -3,29 +3,23 @@
 
   <div class="card internship-card border-htw-green">
     <div class="card-header">
-      <h5 class="card-title"> {{ $t("internshipModule.internship") }}</h5>
+      <h5 class="card-title">{{ $t("internshipModule.internship") }}</h5>
     </div>
     <div class="card-body">
       <div class="card mb-3 p-0">
         <div class="card-body pt-3 pb-0">
           <p class="card-text">
-            <strong> {{ $t("internshipModule.information") }} </strong>
+            <strong>{{ $t("internshipModule.information") }}</strong>
           </p>
           <table class="table table-striped table-sm table-borderless">
             <tbody>
             <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.semester") }}
-              </td>
-              <td>
-                <!-- @TODO: inSemester am internship fehlt -->
-                5 (TODO)
-              </td>
+              <td>{{ $t("internshipModule.semester") }}</td>
+              <!-- @TODO: inSemester am internship fehlt -->
+              <td>5 (TODO)</td>
             </tr>
             <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.startDate") }}
-              </td>
+              <td>{{ $t("internshipModule.startDate") }}</td>
               <td>
                 {{
                   startDate?.toLocaleDateString($i18n.locale,
@@ -34,9 +28,7 @@
               </td>
             </tr>
             <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.endDate") }}
-              </td>
+              <td>{{ $t("internshipModule.endDate") }}</td>
               <td>
                 {{
                   endDate?.toLocaleDateString($i18n.locale,
@@ -45,9 +37,7 @@
               </td>
             </tr>
             <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.duration") }}
-              </td>
+              <td>{{ $t("internshipModule.duration") }}</td>
               <td v-if="duration">
                 {{ duration }} {{ $t("internshipModule.weeks") }};
                 <span v-if="duration < 16 && duration >= 8">{{ $t("internshipModule.longEnoughForPartial") }}</span>
@@ -56,24 +46,18 @@
               </td>
             </tr>
             <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.operationalArea") }}
-              </td>
-              <td>
-                {{ internship?.operationalArea }}
-              </td>
+              <td>{{ $t("internshipModule.operationalArea") }}</td>
+              <td>{{ internship?.operationalArea }}</td>
             </tr>
             <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.tasks") }}
-              </td>
-              <td>
-                {{ internship?.tasks }}
-              </td>
+              <td>{{ $t("internshipModule.tasks") }}</td>
+              <td>{{ internship?.tasks }}</td>
             </tr>
             </tbody>
           </table>
-
+          <p v-if="internship?.status === 'planned'" class="text-center">
+            <a href="#" @click.prevent="loadRequestPdf">Antrag generieren</a>
+          </p>
         </div>
       </div>
       <div class="card mb-3 p-0">
@@ -84,10 +68,11 @@
           <table class="table table-striped table-sm table-borderless">
             <tbody>
             <tr v-for="(name, type) in pdfFiles" :key="type">
-              <td>
-                {{ name }}
-              </td>
               <template v-for="pdfState in [getPdfState(type)]" :key="pdfState">
+                <td>
+                  <template v-if="pdfState === 'unknown'">{{ name }}</template>
+                  <a v-else href="#" @click.prevent="openPDF(type)">{{ name }}</a>
+                </td>
                 <td>
                   <a
                     v-if="pdfState === 'unknown' || pdfState === 'rejected'"
@@ -199,6 +184,7 @@ import { Internship } from '@/store/types/Internship';
 import UploadPDFModal from '@/components/internship/UploadPDFModal.vue';
 import http from '@/utils/http-common';
 import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
+import { generateRequestPdf, loadPDFFile } from '@/utils/gateways';
 
 export default defineComponent({
   name: 'Internship',
@@ -293,6 +279,11 @@ export default defineComponent({
     },
   },
   methods: {
+    async loadRequestPdf(): Promise<void> {
+      if (!this.internship) return;
+      const requestPdf = await generateRequestPdf(this.internship._id);
+      window.open(URL.createObjectURL(requestPdf), '_blank');
+    },
     getPdfState(pdfType: string): string | null {
       if (!this.internship) return null;
       return this.internship[`${pdfType}Pdf`].status;
@@ -308,6 +299,11 @@ export default defineComponent({
         default:
           return 'bg-secondary';
       }
+    },
+    async openPDF(pdfType: string): Promise<void> {
+      if (!this.internship) return;
+      const pdfFile = await loadPDFFile(this.internship[`${pdfType}Pdf`].filePath);
+      window.open(URL.createObjectURL(pdfFile), '_blank');
     },
     async deleteInternship(internshipId: string | undefined) {
       if (!internshipId) return;

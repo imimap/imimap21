@@ -17,6 +17,8 @@ const internshipModule = {
     upload: 'Hochladen',
     reUpload: 'Neu hochladen',
     cancel: 'Abbrechen',
+    download: 'Herunterladen',
+    view: 'Öffnen',
   },
   pdfTypes: {
     request: 'Anmeldung',

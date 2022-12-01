@@ -40,6 +40,7 @@
             data-bs-dismiss="modal"
             aria-label="Close"
             @click="uploadPdf"
+            :disabled="pdfFile === null"
           >
             {{ $t("internshipModule.forms.upload") }}
           </button>

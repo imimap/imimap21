@@ -17,6 +17,8 @@ const internshipModule = {
     upload: 'Upload',
     reUpload: 'Re-upload',
     cancel: 'Cancel',
+    download: 'Download',
+    view: 'View',
   },
   pdfTypes: {
     request: 'Application',
