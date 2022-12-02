@@ -97,15 +97,15 @@
               <td>
                 {{ $t("internshipModule.status.internship") }}
               </td>
-              <td colspan="2" class="text-end">
+              <td colspan="2">
                 <p class="mb-1">{{ internshipStatus }}</p>
                 <br>
                 <!-- Status: planned -->
                 <div v-if="internship?.status === 'planned'">
-                  <div v-if="missingDocuments && missingDocuments?.length > 0" >
+                  <div v-if="missingDocuments && missingDocuments?.length > 0">
                     {{ $t("internshipModule.status.missingPart1") }}
                     <span class="fw-bold">{{ $t("internshipModule.status.documents") }}</span>
-                    {{$t("internshipModule.status.missingPart2") }}
+                    {{ $t("internshipModule.status.missingPart2") }}
                     <ul class="mt-2" v-for="doc in missingDocuments" :key="doc">
                       <li>{{ doc }}</li>
                     </ul>
@@ -114,7 +114,7 @@
                   <div v-if="missingFields && missingFields?.length > 0">
                     {{ $t("internshipModule.status.missingPart1") }}
                     <span class="fw-bold">{{ $t("internshipModule.status.details") }}</span>
-                    {{$t("internshipModule.status.missingPart2") }}
+                    {{ $t("internshipModule.status.missingPart2") }}
                     <ul class="mt-2" v-for="field in missingFields" :key="field">
                       <li>{{ field }}</li>
                     </ul>
@@ -131,10 +131,10 @@
                 </div>
                 <!-- Status: over -->
                 <div v-if="internship?.status === 'over'">
-                  <div v-if="missingProof && missingProof?.length > 0" >
+                  <div v-if="missingProof && missingProof?.length > 0">
                     {{ $t("internshipModule.status.missingProofPart1") }}
                     <span class="fw-bold">{{ $t("internshipModule.status.documents") }}</span>
-                    {{$t("internshipModule.status.missingProofPart2") }}
+                    {{ $t("internshipModule.status.missingProofPart2") }}
                     <ul class="mt-2" v-for="doc in missingProof" :key="doc">
                       <li>{{ doc }}</li>
                     </ul>
@@ -154,7 +154,7 @@
               <td>
                 {{ $t("internshipModule.comment") }}
               </td>
-              <td colspan="2" class="text-end">
+              <td colspan="2">
                 Life? Don't talk to me about life.
               </td>
             </tr>
