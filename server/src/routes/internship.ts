@@ -7,7 +7,7 @@ import {
   deleteInternship,
   findInternships,
   findInternshipsAmount,
-  findInternshipsSeenAmount,
+  findCompaniesSeenAmount,
   generateRequestPdf,
   getInternshipLocations,
   getInternshipsById,
@@ -61,7 +61,7 @@ internshipRouter.get(
   "/seen/amount",
   authMiddleware(),
   validate,
-  asyncHandler(findInternshipsSeenAmount)
+  asyncHandler(findCompaniesSeenAmount)
 );
 
 // @TODO: Wäre praktisch wenn die Company hier direkt gepopulated werden würde

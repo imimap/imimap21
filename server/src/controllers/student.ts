@@ -76,7 +76,7 @@ export async function clearInternshipSearchHistory(
   if (!user || !user.studentProfile)
     return next(new NotFound(`Student with id ${req.params.id} not found`));
 
-  user.studentProfile.internshipsSeen = [];
+  user.studentProfile.companiesSeen = [];
   await user.save();
   res.statusCode = constants.HTTP_STATUS_NO_CONTENT;
   res.send();

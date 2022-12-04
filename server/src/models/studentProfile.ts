@@ -1,11 +1,11 @@
 import { Document, PopulatedDoc, Schema } from "mongoose";
 import { isValidStudentId } from "../helpers/studentIdHelper";
+import { ICompany } from "./company";
 import { IInternshipModule } from "./internshipModule";
-import { IInternship } from "./internship";
 
 export interface IStudentProfile {
   studentId: string;
-  internshipsSeen?: PopulatedDoc<IInternship & Document>[];
+  companiesSeen?: PopulatedDoc<ICompany & Document>[];
   internship?: PopulatedDoc<IInternshipModule & Document>;
 }
 
@@ -21,9 +21,9 @@ export const StudentProfileSchema = new Schema(
       trim: true,
       lowercase: true,
     },
-    internshipsSeen: [
+    companiesSeen: [
       {
-        ref: "Internship",
+        ref: "Company",
         type: Schema.Types.ObjectId,
       },
     ],

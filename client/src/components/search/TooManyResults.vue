@@ -22,7 +22,7 @@
         <div class="modal-body text-left">
           <p>
             {{ $tc("search.tooManyResults.resultCount", amountOfResults) }}
-            {{ $tc("search.tooManyResults.previousResultCount", amountOfInternshipsSeen) }}
+            {{ $tc("search.tooManyResults.previousResultCount", amountOfCompaniesSeen) }}
           </p>
           <p> {{ $t("search.tooManyResults.question") }} </p>
         </div>
@@ -52,7 +52,7 @@ export default defineComponent({
   name: 'TooManyResults',
   props: {
     amountOfResults: Number,
-    amountOfInternshipsSeen: Number,
+    amountOfCompaniessSeen: Number,
   },
   emits: ['search'],
 });

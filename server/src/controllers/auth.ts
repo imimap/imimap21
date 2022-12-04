@@ -16,7 +16,7 @@ async function createStudentProfile(user: Express.User): Promise<IStudentProfile
   return {
     studentId: user.id,
     internship: internshipModule.id,
-    internshipsSeen: [],
+    companiesSeen: [],
   };
 }
 

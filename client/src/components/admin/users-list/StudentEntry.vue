@@ -72,7 +72,7 @@
                 </button>
                 <button type="button"
                         class="btn btn-secondary"
-                        :disabled="student.studentProfile.internshipsSeen.length === 0"
+                        :disabled="student.studentProfile.companiesSeen.length === 0"
                         @click="clearSearch"
                 >
                 {{ $t("userList.studentEntry.resetSearchLimit") }}

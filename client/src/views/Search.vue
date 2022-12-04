@@ -110,7 +110,7 @@
     </div>
     <!-- Too many results modal -->
     <too-many-results :amount-of-results="amountOfResults"
-                      :amount-of-internships-seen="amountOfInternshipsSeen"
+                      :amount-of-internships-seen="amountOfCompaniesSeen"
                       v-on:search="searchRequest"/>
     <!-- Search Results -->
     <div id="form-block4" class="mx-3 my-3"
@@ -183,7 +183,7 @@ export default defineComponent({
       cardToggle: false,
       loadingState: true,
       amountOfResults: 0,
-      amountOfInternshipsSeen: 0,
+      amountOfCompaniesSeen: 0,
     };
   },
   computed: {
@@ -218,7 +218,7 @@ export default defineComponent({
       const amountNew = await this.getAmountOfPossibleResults();
       if (amountSeen !== undefined && amountSeen < 12 && amountNew !== undefined && amountNew > 6) {
         this.amountOfResults = amountNew;
-        this.amountOfInternshipsSeen = amountSeen;
+        this.amountOfCompaniesSeen = amountSeen;
         this.modal.show();
       } else {
         this.modal.hide();
@@ -269,6 +269,8 @@ export default defineComponent({
           },
         });
         amount = await res.data;
+        console.log(this.countryFilter, this.operationalAreaFilter, this.languageFilter, this.paymentFilter, amount);
+
         return amount;
       } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
         await showErrorNotification(`Fehler beim Laden der neuen Suchergebnisse [ERROR: ${err.message}]`);
@@ -278,7 +280,7 @@ export default defineComponent({
     async getAmountOfSeenResults(): Promise<number | undefined> {
       let amount: number | PromiseLike<number>;
       try {
-        const res = await http.get('/internships/seen/amount');
+        const res = await http.get('/internships/seen/amount'); // TODO
         amount = await res.data;
         return amount;
       } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
