@@ -425,7 +425,7 @@ export default defineComponent({
         if (paymentTypes.length > 0) {
           // eslint-disable-next-line no-restricted-syntax
           for (const pt of paymentTypes) {
-            this.availablePaymentTypes.push(`${this.$t(st + pt.replace(/\s/g, ''))}`);
+            this.availablePaymentTypes.push(this.$t(st + pt.replace(/\s/g, '')));
           }
         }
       } catch (err: any) {
