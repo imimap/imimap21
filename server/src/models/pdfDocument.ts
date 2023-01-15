@@ -1,7 +1,7 @@
 import { Document, model, Model, Schema, Types } from "mongoose";
 import { getRecentValueForPropSetByEvent } from "../helpers/eventQueryHelper";
 import { User } from "./user";
-import { EventSchema, IEvent } from "./event";
+import { EventSchema, EventTypes, IEvent } from "./event";
 
 export enum PdfDocumentStatuses {
   UNKNOWN = "unknown",
@@ -84,6 +84,7 @@ PdfDocumentSchema.methods.submit = async function (creator: Types.ObjectId, newP
     );
 
   this.events.push({
+    type: EventTypes.PDF_UPDATE,
     creator: creator,
     changes: {
       newPath: newPath,
@@ -105,6 +106,7 @@ PdfDocumentSchema.methods.accept = async function (creator: Types.ObjectId, newP
     );
 
   const event: IEvent = {
+    type: EventTypes.PDF_UPDATE,
     creator: creator,
     accept: true,
   };
@@ -124,6 +126,7 @@ PdfDocumentSchema.methods.reject = async function (creator: Types.ObjectId) {
   if (!user?.isAdmin) throw new Error("Only Admins may  reject a pdf.");
 
   this.events.push({
+    type: EventTypes.PDF_UPDATE,
     creator: creator,
     accept: false,
   });

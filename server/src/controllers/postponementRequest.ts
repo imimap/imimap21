@@ -8,10 +8,12 @@ import { User } from "../models/user";
 import { Role } from "../authentication/user";
 import { BadRequest, Forbidden, NotFound } from "http-errors";
 import { constants } from "http2";
+import { EventTypes } from "../models/event";
 
 export async function listPostponementRequests(req: Request, res: Response): Promise<void> {
   const postponementRequests = await InternshipModule.aggregate([
     {
+      // Match all internship modules with the status POSTPONEMENT_REQUESTED
       $match: {
         status: InternshipModuleStatuses.POSTPONEMENT_REQUESTED,
       },
@@ -21,21 +23,18 @@ export async function listPostponementRequests(req: Request, res: Response): Pro
         postponementEvent: {
           $reduce: {
             input: {
+              // Find all events regarding postponement requests
               $filter: {
                 input: "$events",
                 as: "event",
                 cond: {
-                  $and: [
-                    { $gt: ["$$event.changes.newSemester", null] },
-                    {
-                      $or: [{ $eq: ["$$event.accept", false] }, { $lte: ["$$event.accept", null] }],
-                    },
-                  ],
+                  $eq: ["$$event.type", EventTypes.INTERNSHIP_MODULE_POSTPONEMENT],
                 },
               },
             },
             initialValue: 0,
             in: {
+              // Reduce events list to the most recent entry
               $cond: {
                 if: { $gt: ["$$value.timestamp", "$$this.timestamp"] },
                 then: "$$value",

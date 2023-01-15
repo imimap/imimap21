@@ -1,4 +1,5 @@
 export interface Event {
+  _id: string;
   timestamp: number;
   creator: string;
   changes: {
@@ -7,4 +8,5 @@ export interface Event {
   };
   accept?: boolean;
   comment?: string;
+  type: string;
 }

@@ -3,12 +3,14 @@
     <!-- Kein Praktikum gefunden -->
     <no-complete-internship v-if="internshipModule.status === 'unknown'"/>
     <!-- Kein Praktikum aber Verschiebungen -->
-    <postponements-list v-if="hasRequestedPostponements" v-bind:postponements="postponements"/>
+    <postponements-list v-if="hasRequestedPostponements" :postponementEvents="postponements"/>
     <!-- Praktikum gefunden -->
-    <complete-internship v-if="internshipModuleHasBeenPlanned"
-                         v-bind:internshipModule="internshipModule"
-                          v-on:replaceInternship="replaceInternship"
-                          v-on:getUserInternship="getUserInternship"/>
+    <complete-internship
+      v-if="internshipModuleHasBeenPlanned"
+      :internshipModule="internshipModule"
+      @replaceInternship="replaceInternship"
+      @getUserInternship="getUserInternship"
+    />
   </template>
 </template>
 
@@ -40,9 +42,7 @@ export default defineComponent({
     async getUserInternship() {
       try {
         const res = await http.get('/internship-modules/my');
-        this.internshipModule = {
-          ...res.data,
-        };
+        this.internshipModule = res.data;
         this.loadingState = false;
       } catch (err: any) {
         console.log(err);
@@ -74,16 +74,13 @@ export default defineComponent({
       return this.loadingState;
     },
     postponements(): Event[] {
-      return this.internshipModule.events.filter((event) => event.changes.status?.includes('postponement'));
-    },
-    plannedInternshipModules(): Event[] {
-      return this.internshipModule.events.filter((event) => event.changes.status?.includes('planned'));
+      return this.internshipModule.events.filter((event) => event.type === 'internshipModule.postponement');
     },
     hasRequestedPostponements(): boolean {
       return this.postponements.length > 0;
     },
     internshipModuleHasBeenPlanned(): boolean {
-      return this.plannedInternshipModules.length > 0;
+      return this.internshipModule.events.filter((event) => event.changes.status?.includes('planned')).length > 0;
     },
     hasInternships(): boolean {
       return this.internshipModule.internships.length > 0;

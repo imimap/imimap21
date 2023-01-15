@@ -15,6 +15,7 @@ import { buildHtmlTemplate, buildPDFFile, saveFile } from "../helpers/pdfHelper"
 import { User } from "../models/user";
 import { constants } from "http2";
 import * as QueryString from "qs";
+import { EventTypes } from "../models/event";
 
 const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
   "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes status";
@@ -593,6 +594,7 @@ export async function createInternship(
   const newInternship = new Internship(internshipProps);
   newInternship.events = [
     {
+      type: EventTypes.INTERNSHIP_CREATE,
       creator: user._id,
       changes: internshipProps,
       comment: "New internship created",
@@ -668,6 +670,7 @@ export async function updateInternship(
 
   const internshipProps = getInternshipObject(req.body);
   const updateEvent = {
+    type: EventTypes.INTERNSHIP_UPDATE,
     creator: user._id,
     changes: internshipProps,
     comment: "Internship updated",
