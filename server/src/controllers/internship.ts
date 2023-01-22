@@ -795,3 +795,51 @@ export async function generateRequestPdf(
   res.setHeader("Content-Type", "application/pdf");
   res.send(pdf);
 }
+
+export async function addComment(req: Request, res: Response, next: NextFunction): Promise<void> {
+  let user;
+  try {
+    user = await getAuthorizedUser(req.user?.email, req.params.id);
+  } catch (e) {
+    return next(e);
+  }
+
+  if (!user.isAdmin) return next(new Forbidden("Only admins may mark internships as passed"));
+
+  const internship = await Internship.findById(req.params.id);
+  if (!internship) return next(new NotFound("Internship not found"));
+
+  internship.comments.push({
+    author: user._id,
+    content: req.body.content,
+  });
+  const updatedInternship = await internship.save();
+
+  res.json(updatedInternship);
+}
+
+export async function deleteComment(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  let user: IUser;
+  try {
+    user = await getAuthorizedUser(req.user?.email, req.params.id);
+  } catch (e) {
+    return next(e);
+  }
+
+  const internship = await Internship.findById(req.params.id);
+  if (!internship) return next(new NotFound("Internship not found"));
+
+  const commentIndex = internship.comments.findIndex(
+    (c) => c._id?.equals(req.params.commentId) && c.author.equals(user._id)
+  );
+  if (commentIndex === -1) return next(new NotFound("Comment not found"));
+
+  internship.comments.splice(commentIndex, 1);
+  const updatedInternship = await internship.save();
+
+  res.json(updatedInternship);
+}

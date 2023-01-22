@@ -2,8 +2,10 @@ import { Router } from "express";
 import { body, param, query } from "express-validator";
 import authMiddleware from "../authentication/middleware";
 import {
+  addComment,
   approveInternshipApplication,
   createInternship,
+  deleteComment,
   deleteInternship,
   getSearchResults,
   generateRequestPdf,
@@ -200,6 +202,24 @@ internshipRouter.post(
   body("reject").optional().isBoolean(),
   validate,
   asyncHandler(submitPdf("reportPdf"))
+);
+
+internshipRouter.post(
+  "/:id/comment",
+  authMiddleware(true),
+  param("id").custom(isObjectId),
+  body("content").isString(),
+  validate,
+  asyncHandler(addComment)
+);
+
+internshipRouter.delete(
+  "/:id/comment/:commentId",
+  authMiddleware(true),
+  param("id").custom(isObjectId),
+  param("commentId").custom(isObjectId),
+  validate,
+  asyncHandler(deleteComment)
 );
 
 export default internshipRouter;
