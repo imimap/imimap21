@@ -231,7 +231,6 @@ export const loadUpcomingSemesters = async (): Promise<string[]> => {
   }
 };
 
-// TODO: Also used in CreateInternship. Consolidate
 export const loadPaymentTypes = async (): Promise<string[]> => {
   try {
     const res = await apiClient.get('/info/payment-types');
@@ -240,6 +239,17 @@ export const loadPaymentTypes = async (): Promise<string[]> => {
     if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
     await showErrorNotification(`Fehler beim Laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`);
     return [];
+  }
+};
+
+export const getAvailableLanguages = async () => {
+  try {
+    const res = await apiClient.get('/info/languages');
+    return res.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Laden der verfügbaren Sprachen [ERROR: ${err.message}]`);
+    return null;
   }
 };
 
