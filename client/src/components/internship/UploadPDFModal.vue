@@ -86,6 +86,7 @@ export default defineComponent({
   watch: {
     pdfType() {
       (this.$refs.pdfFileInput as HTMLInputElement).value = '';
+      this.pdfFile = null;
     },
   },
 });
