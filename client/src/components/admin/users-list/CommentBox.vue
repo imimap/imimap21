@@ -5,7 +5,7 @@
       name="comment"
       id="comment"
       v-model="comment"
-      placeholder="Leave a comment"
+      :placeholder="$t('userList.internshipPart.commentPlaceholder')"
       @keydown.meta.enter="post"
       @keydown.ctrl.enter="post"
     />
@@ -15,7 +15,7 @@
         :disabled="!postingAllowed"
         @click="post"
       >
-        Comment
+        {{ $t('userList.internshipPart.postComment') }}
       </button>
     </div>
   </div>

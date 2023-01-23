@@ -32,6 +32,9 @@ const userList = {
     bvg: 'BVG Ticket Befreiung',
     certificate: 'Praktikumszeugnis',
     report: 'Praktikumsbericht',
+    comments: 'Kommentare',
+    commentPlaceholder: 'Hinterlasse einen Kommentar',
+    postComment: 'Kommentieren',
   },
   editInternshipModal: {
     edit: 'Praktikumsmodul bearbeiten',
@@ -53,6 +56,5 @@ const userList = {
     resetSearchResultPart2: ' wurde zurückgesetzt.',
     resetSearchResultError: 'Die Suchanfragen konnten nicht zurückgesetzt werden.',
   },
-
 };
 export default userList;

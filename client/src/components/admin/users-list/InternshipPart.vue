@@ -58,7 +58,7 @@
     </div>
     <div class="card-footer">
       <details>
-        <summary class="fw-bold">Comments</summary>
+        <summary class="fw-bold">{{ $t('userList.internshipPart.comments') }}</summary>
         <CommentBox
           :internship-id="internship._id"
           @update-internship="(i) => $emit('updateInternship', index, i)"
