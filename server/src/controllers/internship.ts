@@ -12,10 +12,11 @@ import {
   getUserWithInternshipModule,
 } from "../helpers/userHelper";
 import { buildHtmlTemplate, buildPDFFile, saveFile } from "../helpers/pdfHelper";
-import { User } from "../models/user";
+import { IUser, User } from "../models/user";
 import { constants } from "http2";
 import * as QueryString from "qs";
 import { EventTypes } from "../models/event";
+import * as path from "path";
 
 const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
   "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes status";
@@ -118,7 +119,7 @@ export async function getRandomInternship(
 }
 
 /**
- * Returns information on internships that fit certain search criteria eg. company.companyName or
+ * Returns information on internships that fit certain search criteria e.g. company.companyName or
  * programmingLanguage.
  * Returns administration information for admins only.
  * Default offset is 0. Default amount of internships returned for admins is 50.
@@ -279,7 +280,7 @@ function getProjection(select: string) {
 }
 
 /**
- * Returns amount of internships that fit certain search criteria eg. company.companyName or
+ * Returns amount of internships that fit certain search criteria e.g. company.companyName or
  * programmingLanguage.
  * @param req
  * @param res
@@ -797,9 +798,11 @@ export function submitPdf(
 
     // Save uploaded file
     const pdf = req.files.pdf as UploadedFile;
-    const uploadPath =
-      internship.get(pdfProperty).nextPath() ??
-      `pdfs/${user.studentProfile?.studentId}/${Types.ObjectId()}/${Types.ObjectId()}.pdf`;
+    const student = await getStudentDetails(user, internship._id);
+    const nextFileId = internship.get(pdfProperty).nextFileId();
+    const pdfType = pdfProperty.replace("Pdf", "");
+    const fileName = `${student.id}_${student.name}_${pdfType}_${nextFileId}.pdf`;
+    const uploadPath = path.join("pdfs", student.id, fileName);
     const error = await saveFile(pdf, uploadPath);
     if (error) return next(new InternalServerError(error.message));
 
@@ -812,6 +815,52 @@ export function submitPdf(
 
     res.json(updatedPdf);
   };
+}
+
+/**
+ * Get student id from authenticated user or, if auth user is admin
+ * from database using the internship id.
+ * @param user The authenticated user
+ * @param internshipId The internship id to use for database lookup
+ *                     if authenticated user is not the student
+ */
+async function getStudentDetails(
+  user: IUser,
+  internshipId: Types.ObjectId
+): Promise<{ id: string; name: string }> {
+  if (user.studentProfile) {
+    return {
+      id: user.studentProfile.studentId,
+      name: user.lastName ?? "no-name",
+    };
+  } else {
+    const student = await getUserFromInternshipId(internshipId);
+    if (!student.studentProfile)
+      throw new Error("Student without student profile detected. This should never be the case!");
+    return {
+      id: student.studentProfile.studentId,
+      name: student.lastName ?? "no-name",
+    };
+  }
+}
+
+/**
+ * Find the user whom the given internship id belongs to.
+ * @param internshipId The internship id of the user
+ */
+async function getUserFromInternshipId(internshipId: Types.ObjectId): Promise<IUser> {
+  const users = await User.aggregate([
+    {
+      $lookup: {
+        from: "internshipmodules",
+        localField: "studentProfile.internship",
+        foreignField: "_id",
+        as: "internship",
+      },
+    },
+    { $match: { "internship.internships": internshipId } },
+  ]);
+  return users[0];
 }
 
 export async function generateRequestPdf(

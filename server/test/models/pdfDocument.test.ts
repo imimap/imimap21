@@ -64,7 +64,7 @@ describe("PdfDocument", () => {
     it("can be accepted by an admin via event and get a new path", async () => {
       const pdfDocument = await PdfDocument.findOne({});
       const previousPath = pdfDocument?.path();
-      const newPath = pdfDocument?.nextPath();
+      const newPath = "pdfs/s0100000/s0100000_testname_report_3.pdf";
 
       const savedDocument = await pdfDocument?.accept(ADMIN_USER_ID, newPath);
 

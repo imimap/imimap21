@@ -24,26 +24,33 @@
           <span class="fw-bold list-item-label">Status</span>
           <br>
           <ul class="list-group">
-            <UsersListStatusItem :text="$t('userList.internshipPart.application')"
-                                 :item="internship.requestPdf"
+            <UsersListStatusItem
+              :text="$t('userList.internshipPart.application')"
+              :item="internship.requestPdf"
             />
-            <UsersListStatusItem :text="$t('userList.internshipPart.ectProof')"
-                                 :item="internship.lsfEctsProofPdf"
+            <UsersListStatusItem
+              :text="$t('userList.internshipPart.ectProof')"
+              :item="internship.lsfEctsProofPdf"
             />
-            <UsersListStatusItem :text="$t('userList.internshipPart.locationProof')"
-                                 :item="internship.locationJustificationPdf"
+            <UsersListStatusItem
+              :text="$t('userList.internshipPart.locationProof')"
+              :item="internship.locationJustificationPdf"
             />
-            <UsersListStatusItem :text="$t('userList.internshipPart.contract')"
-                                 :item="internship.contractPdf"
+            <UsersListStatusItem
+              :text="$t('userList.internshipPart.contract')"
+              :item="internship.contractPdf"
             />
-            <UsersListStatusItem :text="$t('userList.internshipPart.bvg')"
-                                 :item="internship.bvgTicketExemptionPdf"
+            <UsersListStatusItem
+              :text="$t('userList.internshipPart.bvg')"
+              :item="internship.bvgTicketExemptionPdf"
             />
-            <UsersListStatusItem :text="$t('userList.internshipPart.certificate')"
-                                 :item="internship.certificatePdf"
+            <UsersListStatusItem
+              :text="$t('userList.internshipPart.certificate')"
+              :item="internship.certificatePdf"
             />
-            <UsersListStatusItem :text="$t('userList.internshipPart.report')"
-                                 :item="internship.reportPdf"
+            <UsersListStatusItem
+              :text="$t('userList.internshipPart.report')"
+              :item="internship.reportPdf"
             />
           </ul>
         </div>
@@ -53,24 +60,24 @@
       <button class="btn btn-success btn-sm me-2"
               @click="approveApplication(internship._id)"
       >
-      {{ $t("userList.internshipPart.approveApplication") }}
-     </button>
+        {{ $t("userList.internshipPart.approveApplication") }}
+      </button>
       <button class="btn btn-success btn-sm me-2"
               @click="markAsComplete(internship._id)"
       >
-      {{ $t("userList.internshipPart.markEligible") }}
+        {{ $t("userList.internshipPart.markEligible") }}
       </button>
       <button type="button" class="btn btn-secondary btn-sm me-2"
               data-bs-toggle="modal"
               data-bs-target="#internshipPartEditModal"
               @click="$emit('editInternshipPart', index)"
       >
-      {{ $t("userList.internshipPart.editDetails") }}
+        {{ $t("userList.internshipPart.editDetails") }}
       </button>
       <button class="btn btn-danger btn-sm me-2"
               @click="deleteInternshipPart(internship._id)"
       >
-      {{ $t("userList.internshipPart.delete") }}
+        {{ $t("userList.internshipPart.delete") }}
       </button>
     </div>
   </div>
@@ -81,13 +88,9 @@
 /* eslint-disable no-alert */
 import { defineComponent, PropType } from 'vue';
 import { getDateString, getTimeDifferenceDays } from '@/utils/admin';
-import Internship from '@/models/Internship';
+import { Internship } from '@/store/types/Internship';
 import UsersListStatusItem from '@/components/admin/users-list/UsersListStatusItem.vue';
-import {
-  approveInternshipApplication,
-  deleteInternship,
-  markInternshipAsPassed,
-} from '@/utils/gateways';
+import { approveInternshipApplication, deleteInternship, markInternshipAsPassed } from '@/utils/gateways';
 import { showErrorNotification } from '@/utils/notification';
 
 export default defineComponent({

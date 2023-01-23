@@ -11,7 +11,32 @@ export enum PdfDocumentStatuses {
 }
 
 function isValidPdf(path: string) {
-  return /pdfs\/s0[0-9]{6}\/[0-9a-f]{24}\/[0-9a-f]{24}\.pdf$/.test(path); //example: pdfs/s0555949/507f1f77bcf86cd799439011/requestPdf-01.pdf
+  //example: pdfs/s0555949/s0555949_Schultz_report_3.pdf
+  const pathParts = path.split("/");
+  if (pathParts.length != 3) return false;
+  // Test root directory
+  if (pathParts[0] !== "pdfs") return false;
+  // Test student id directory
+  if (!/^s0[0-9]{6}$/.test(pathParts[1])) return false;
+  // Test filename
+  return /^s0[0-9]{6}_\p{L}+_(request|lsfEctsProof|locationJustification|contract|bvgTicketExemption|certificate|report)_[0-9]+\.pdf$/u.test(
+    pathParts[2]
+  );
+}
+
+class FilePathError extends Error {
+  static readonly SUBMIT_NEW_FILE_ERROR = new this(
+    "Invalid file path. File paths should be local and should follow this convention: " +
+      "pdfs/<student-id>/<student-id>_<last-name>_<pdf-type>_<version-number>.pdf"
+  );
+
+  static readonly EXISTING_FILE_ERROR = new this(
+    "The most recent file was saved using an invalid file path or file name."
+  );
+
+  constructor(message?: string) {
+    super(message);
+  }
 }
 
 export interface IPdfDocument extends Document {
@@ -19,7 +44,7 @@ export interface IPdfDocument extends Document {
   filePath: string;
   status: string;
 
-  nextPath(): string;
+  nextFileId(): number;
 
   submit(creator: Types.ObjectId, newPath: string): Promise<IPdfDocument>;
 
@@ -60,28 +85,23 @@ PdfDocumentSchema.methods.path = function () {
   return getRecentValueForPropSetByEvent("newPath", this);
 };
 
-// when generating the next pdf path, this method should be used
-// it makes sure that the versioning is correct
-PdfDocumentSchema.methods.nextPath = function () {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
+PdfDocumentSchema.methods.nextFileId = function () {
   const currentPath: string = this.path();
-  if (!currentPath) return null;
-  const pathParts = currentPath.split("/");
-  pathParts.pop();
-  return pathParts.join("/") + "/" + Types.ObjectId() + ".pdf";
+  if (!currentPath) return 0;
+  const regexMatches = currentPath.match(/([0-9]+)\.pdf$/);
+  if (!regexMatches || regexMatches.length !== 2) throw FilePathError.EXISTING_FILE_ERROR;
+  try {
+    return Number.parseInt(regexMatches[1]) + 1;
+  } catch (e) {
+    throw FilePathError.EXISTING_FILE_ERROR;
+  }
 };
 
 PdfDocumentSchema.methods.submit = async function (creator: Types.ObjectId, newPath: string) {
   const user = await User.findById(creator);
   if (!user) throw new Error("Creator (User) with that objectId does not exist.");
 
-  if (!isValidPdf(newPath))
-    throw new Error(
-      "Path is foreign or has invalid name. " +
-        "PDF needs to be saved on own server and be saved under a student id and document object id, " +
-        "as well as the version."
-    );
+  if (!isValidPdf(newPath)) throw FilePathError.SUBMIT_NEW_FILE_ERROR;
 
   this.events.push({
     type: EventTypes.PDF_UPDATE,
@@ -98,12 +118,7 @@ PdfDocumentSchema.methods.accept = async function (creator: Types.ObjectId, newP
   const user = await User.findById(creator);
   if (!user?.isAdmin) throw new Error("Only Admins may accept a pdf.");
 
-  if (newPath && !isValidPdf(newPath))
-    throw new Error(
-      "Path is foreign or has invalid name. " +
-        "PDF needs to be saved on own server and be saved under a student id and document object id, " +
-        "as well as the version."
-    );
+  if (newPath && !isValidPdf(newPath)) throw FilePathError.SUBMIT_NEW_FILE_ERROR;
 
   const event: IEvent = {
     type: EventTypes.PDF_UPDATE,
@@ -123,7 +138,7 @@ PdfDocumentSchema.methods.accept = async function (creator: Types.ObjectId, newP
 
 PdfDocumentSchema.methods.reject = async function (creator: Types.ObjectId) {
   const user = await User.findById(creator);
-  if (!user?.isAdmin) throw new Error("Only Admins may  reject a pdf.");
+  if (!user?.isAdmin) throw new Error("Only Admins may reject a pdf.");
 
   this.events.push({
     type: EventTypes.PDF_UPDATE,
