@@ -288,3 +288,16 @@ export const deleteComment = async (internshipId: string, commentId: string): Pr
     return null;
   }
 };
+
+export const postComment = async (internshipId: string, comment: string): Promise<Internship | null> => {
+  try {
+    const response = await apiClient.post(`/internships/${internshipId}/comments`, {
+      content: comment,
+    });
+    return response.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Hinterlassen des Kommentars [ERROR: ${err.message}]`);
+    return null;
+  }
+};

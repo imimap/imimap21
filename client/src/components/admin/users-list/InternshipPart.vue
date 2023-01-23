@@ -59,6 +59,10 @@
     <div class="card-footer">
       <details>
         <summary class="fw-bold">Comments</summary>
+        <CommentBox
+          :internship-id="internship._id"
+          @update-internship="(i) => $emit('updateInternship', index, i)"
+        />
         <AdminComment
           v-for="comment in comments"
           :key="comment._id"
@@ -99,18 +103,20 @@
 /* eslint-disable no-alert */
 import { defineComponent, PropType } from 'vue';
 import { getDateString, getTimeDifferenceDays } from '@/utils/admin';
+import { showErrorNotification } from '@/utils/notification';
+import {
+  approveInternshipApplication, deleteComment, deleteInternship, markInternshipAsPassed, updateInternship,
+} from '@/utils/gateways';
+import { Comment } from '@/store/types/Comment';
 import { Internship } from '@/store/types/Internship';
 import UsersListStatusItem from '@/components/admin/users-list/UsersListStatusItem.vue';
-import {
-  approveInternshipApplication, deleteComment, deleteInternship, markInternshipAsPassed,
-} from '@/utils/gateways';
-import { showErrorNotification } from '@/utils/notification';
 import AdminComment from '@/components/admin/users-list/AdminComment.vue';
-import { Comment } from '@/store/types/Comment';
+import CommentBox from '@/components/admin/users-list/CommentBox.vue';
 
 export default defineComponent({
   name: 'InternshipPart',
   components: {
+    CommentBox,
     AdminComment,
     UsersListStatusItem,
   },
@@ -138,6 +144,7 @@ export default defineComponent({
     },
   },
   methods: {
+    updateInternship,
     getDateString,
     getTimeDifferenceDays,
     async approveApplication(internshipId: string) {

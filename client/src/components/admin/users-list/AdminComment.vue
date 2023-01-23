@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <div class="card-body card-text">
-      {{ comment.content }}
+      <pre class="mb-0">{{ comment.content }}</pre>
     </div>
     <div class="card-footer">
       <span class="text-muted">
@@ -67,6 +67,7 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .card-footer {
+  font-size: 0.9em;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -77,5 +78,10 @@ button {
   background: transparent;
   padding: 0.2em;
   display: flex;
+}
+
+pre {
+  font-family: var(--bs-body-font-family);
+  font-size: 1em;
 }
 </style>
