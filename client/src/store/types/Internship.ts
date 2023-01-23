@@ -1,6 +1,7 @@
 import { Event } from '@/store/types/Event';
 import { Company } from '@/store/types/Company';
 import { PdfDocument } from '@/store/types/PdfDocument';
+import { Comment } from '@/store/types/Comment';
 
 export interface Internship {
   _id: string;
@@ -27,4 +28,5 @@ export interface Internship {
   events: Event[];
   status: string;
   duration: number;
+  comments: Comment[];
 }

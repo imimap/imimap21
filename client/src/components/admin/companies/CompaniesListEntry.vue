@@ -54,7 +54,7 @@
               </li>
               <li>
                 <strong>{{ $t('company.mainLanguage') }}:</strong> {{
-                  company.prettyPrintLanguage()
+                  $store.getters.prettyPrintLanguage(company.mainLanguage)
                 }}
               </li>
               <li>

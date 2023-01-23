@@ -39,11 +39,11 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
       if (error) return next(error);
       if (!user) return next(new Unauthorized(info.message));
       // User successfully authenticated, check if user exists
-      const userEntity = await User.findOne({ emailAddress: user.email });
+      let userEntity = await User.findOne({ emailAddress: user.email });
       // Create user account if it doesn't exist
-      if (!userEntity) await createUser(user);
+      if (!userEntity) userEntity = await createUser(user);
       // Send auth token and user profile
-      res.json({ token: generateAuthToken(user) });
+      res.json({ token: generateAuthToken(user, userEntity._id) });
     }
   )(req, res, next);
 }

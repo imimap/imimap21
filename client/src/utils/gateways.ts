@@ -26,30 +26,8 @@ export const getStudent = async (studentId: string): Promise<Student | null> => 
   }
 };
 
-// TODO: Basically the same as getStudent above. Consolidate
-export const getUser = async (id) => apiClient.get(`/students/${id}`)
-  .then((res) => res.data)
-  .catch((err) => {
-    console.log(err);
-    return [];
-  });
-
 export const clearStudentSearch = async (id: string) => apiClient.patch(`/students/${id}/clear-search`)
   .then((res) => res)
-  .catch((err) => {
-    console.log(err);
-    return [];
-  });
-
-export const getInternshipModulesList = async () => apiClient.get('/internship-modules')
-  .then((res) => res.data)
-  .catch((err) => {
-    console.log(err);
-    return [];
-  });
-
-export const getInternshipModule = async (id: string) => apiClient.get(`/internship-modules/${id}`)
-  .then((res) => res.data)
   .catch((err) => {
     console.log(err);
     return [];
@@ -296,6 +274,17 @@ export const generateRequestPdf = async (internshipId: string) => {
   } catch (err: any) {
     if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
     await showErrorNotification(`Fehler beim Laden der PDF-Datei [ERROR: ${err.message}]`);
+    return null;
+  }
+};
+
+export const deleteComment = async (internshipId: string, commentId: string): Promise<Internship | null> => {
+  try {
+    const response = await apiClient.delete(`/internships/${internshipId}/comments/${commentId}`);
+    return response.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Löschen des Kommentars [ERROR: ${err.message}]`);
     return null;
   }
 };

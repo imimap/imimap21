@@ -57,6 +57,17 @@
       </div>
     </div>
     <div class="card-footer">
+      <details>
+        <summary class="fw-bold">Comments</summary>
+        <AdminComment
+          v-for="comment in comments"
+          :key="comment._id"
+          :comment="comment"
+          @delete-comment="deleteAdminComment(comment)"
+        />
+      </details>
+    </div>
+    <div class="card-footer">
       <button class="btn btn-success btn-sm me-2"
               @click="approveApplication(internship._id)"
       >
@@ -90,12 +101,17 @@ import { defineComponent, PropType } from 'vue';
 import { getDateString, getTimeDifferenceDays } from '@/utils/admin';
 import { Internship } from '@/store/types/Internship';
 import UsersListStatusItem from '@/components/admin/users-list/UsersListStatusItem.vue';
-import { approveInternshipApplication, deleteInternship, markInternshipAsPassed } from '@/utils/gateways';
+import {
+  approveInternshipApplication, deleteComment, deleteInternship, markInternshipAsPassed,
+} from '@/utils/gateways';
 import { showErrorNotification } from '@/utils/notification';
+import AdminComment from '@/components/admin/users-list/AdminComment.vue';
+import { Comment } from '@/store/types/Comment';
 
 export default defineComponent({
   name: 'InternshipPart',
   components: {
+    AdminComment,
     UsersListStatusItem,
   },
   props: {
@@ -116,6 +132,9 @@ export default defineComponent({
       const weeks = Math.floor(durationInDays / 7);
       const days = Math.floor(durationInDays) % 7;
       return { weeks, days };
+    },
+    comments(): Comment[] {
+      return this.internship.comments.slice().reverse();
     },
   },
   methods: {
@@ -148,6 +167,21 @@ export default defineComponent({
       await deleteInternship(internshipId);
       this.$emit('updateInternship', this.index, null);
     },
+    async deleteAdminComment(comment: Comment) {
+      const updatedInternship = await deleteComment(this.internship._id, comment._id);
+      if (!updatedInternship) return;
+      this.$emit('updateInternship', this.index, updatedInternship);
+    },
   },
 });
 </script>
+
+<style scoped lang="scss">
+details[open] > * {
+  margin-bottom: 1em;
+
+  &:first-child, &:last-child {
+    margin-bottom: 0.5em;
+  }
+}
+</style>

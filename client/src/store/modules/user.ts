@@ -1,5 +1,5 @@
 import {
-  Module, MutationTree, GetterTree, ActionTree,
+  ActionTree, GetterTree, Module, MutationTree,
 } from 'vuex';
 import { UserState } from '@/store/types/UserState';
 import { RootState } from '@/store/state';
@@ -14,7 +14,7 @@ export const userState: UserState = {
 };
 
 export const getters: GetterTree<UserState, RootState> = {
-  getUser(state): UserState {
+  getAuthUser(state): UserState {
     return state;
   },
 };
@@ -44,7 +44,7 @@ export const actions: ActionTree<UserState, RootState> = {
   },
 };
 
-const userModule: Module <UserState, RootState> = {
+const userModule: Module<UserState, RootState> = {
   state: userState,
   getters,
   mutations,

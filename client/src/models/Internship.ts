@@ -1,4 +1,5 @@
 import Company from '@/models/Company';
+import { Comment } from '@/store/types/Comment';
 
 export default class Internship {
   _id = '';
@@ -42,4 +43,6 @@ export default class Internship {
   certificatePdf = '';
 
   events = [];
+
+  comments = [] as Comment[];
 }

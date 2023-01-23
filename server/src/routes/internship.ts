@@ -205,7 +205,7 @@ internshipRouter.post(
 );
 
 internshipRouter.post(
-  "/:id/comment",
+  "/:id/comments",
   authMiddleware(true),
   param("id").custom(isObjectId),
   body("content").isString(),
@@ -214,7 +214,7 @@ internshipRouter.post(
 );
 
 internshipRouter.delete(
-  "/:id/comment/:commentId",
+  "/:id/comments/:commentId",
   authMiddleware(true),
   param("id").custom(isObjectId),
   param("commentId").custom(isObjectId),

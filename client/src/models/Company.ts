@@ -1,7 +1,5 @@
 import Address from '@/models/Address';
 import Coordinates from '@/models/Coordinates';
-import store from '@/store';
-import Language from '@/store/types/Language';
 
 export const companySizes = {
   big: 'mehr als 250 Angestellte',
@@ -88,10 +86,5 @@ export default class Company {
 
   public prettyPrintSize(): string {
     return companySizes[this.size];
-  }
-
-  public prettyPrintLanguage(): string {
-    const language: Language = store.getters.getLanguages.get(this.mainLanguage);
-    return language.prettyPrint();
   }
 }
