@@ -110,7 +110,7 @@
     </div>
     <!-- Too many results modal -->
     <too-many-results :amount-of-results="amountOfResults"
-                      :amount-of-internships-seen="amountOfCompaniesSeen"
+                      :amount-of-companies-seen="amountOfCompaniesSeen"
                       v-on:search="searchRequest"/>
     <!-- Search Results -->
     <div id="form-block4" class="mx-3 my-3"
@@ -260,14 +260,15 @@ export default defineComponent({
     async getAmountOfPossibleResults(): Promise<number | undefined> {
       let amount: number | PromiseLike<number>;
       try {
-        const res = await http.get('/internships/amount', {
-          params: {
-            country: this.countryFilter,
-            operationalArea: this.operationalAreaFilter,
-            programmingLanguage: this.languageFilter,
-            paymentType: this.paymentFilter,
-          },
-        });
+        const res = await http.get('/companies/possibleResults/amount',
+          {
+            params: {
+              country: this.countryFilter,
+              operationalArea: this.operationalAreaFilter,
+              programmingLanguage: this.languageFilter,
+              paymentType: this.paymentFilter,
+            },
+          });
         amount = await res.data;
         console.log(this.countryFilter, this.operationalAreaFilter, this.languageFilter, this.paymentFilter, amount);
 
@@ -280,7 +281,7 @@ export default defineComponent({
     async getAmountOfSeenResults(): Promise<number | undefined> {
       let amount: number | PromiseLike<number>;
       try {
-        const res = await http.get('/internships/seen/amount'); // TODO
+        const res = await http.get('/companies/seen/amount');
         amount = await res.data;
         return amount;
       } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage

@@ -4,6 +4,13 @@ import { BadRequest, Forbidden, NotFound } from "http-errors";
 import { Company } from "../models/company";
 import { getCompanyObject } from "../helpers/companyHelper";
 import { constants } from "http2";
+import { getUser, getUserWithInternshipModule } from "../helpers/userHelper";
+import {
+  createInternshipQueryOptions,
+  getProjection,
+  INTERNSHIP_FIELDS_VISIBLE_FOR_USER,
+} from "./internship";
+import { Internship, InternshipStatuses } from "../models/internship";
 
 /**
  * Returns all companies to admins
@@ -213,4 +220,89 @@ export async function deleteCompany(
 
   res.statusCode = constants.HTTP_STATUS_NO_CONTENT;
   res.send();
+}
+
+/**
+ * Returns amount of seen internships
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function findCompaniesSeenAmount(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  let user;
+  try {
+    user = await getUser(req.user?.email);
+  } catch (e) {
+    return next(e);
+  }
+  res.json(user.studentProfile?.companiesSeen?.length || 0);
+}
+
+/**
+ * Returns amount of internships that fit certain search criteria eg. company.companyName or
+ * programmingLanguage.
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function findCompaniesPossibleResultsAmount( //find all internships fitting criteria, but check if companies appear twice -> count companies, not internships
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  let user;
+  try {
+    user = await getUserWithInternshipModule(req.user?.email);
+  } catch (e) {
+    return next(e);
+  }
+
+  // Create Options
+  const options = createInternshipQueryOptions(req.query);
+
+  if (!user.isAdmin && options.length !== 0) {
+    options["company.excludedFromSearch"] = false;
+    options.status = InternshipStatuses.PASSED;
+    const excludedInternships = user.studentProfile?.internship.internships || [];
+    if (excludedInternships.length > 0) {
+      options._id = {
+        $nin: excludedInternships,
+      };
+    }
+  }
+
+  const projection = getProjection(INTERNSHIP_FIELDS_VISIBLE_FOR_USER);
+  projection.company = { $first: "$company" };
+  //gets internships matching criteria but groups the ones in the same company and returns the count
+  const pipeline: unknown[] = [
+    {
+      $lookup: {
+        from: "companies",
+        localField: "company",
+        foreignField: "_id",
+        as: "company",
+      },
+    },
+    {
+      $match: options,
+    },
+    {
+      $group: {
+        // without $count stage in next step printable like: internships.forEach((i) => console.log(`${i._id}, ${i.name}: ${i.companyCount}`));
+        _id: "$company._id",
+        name: { $first: "$company.companyName" },
+        companyCount: { $sum: 1 },
+      },
+    },
+    {
+      $count: "internshipsCount",
+    },
+  ];
+
+  const internships = await Internship.aggregate(pipeline);
+  res.json(internships[0].internshipsCount);
 }

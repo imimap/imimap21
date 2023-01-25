@@ -17,7 +17,7 @@ import { constants } from "http2";
 import * as QueryString from "qs";
 import { ICompany } from "../models/company";
 
-const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
+export const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
   "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes status";
 const INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN =
   "startDate endDate workingHoursPerWeek supervisor";
@@ -282,7 +282,7 @@ async function queryInternships(
   return internships;
 }
 
-function createInternshipQueryOptions(query: QueryString.ParsedQs) {
+export function createInternshipQueryOptions(query: QueryString.ParsedQs) {
   const options: { [k: string]: unknown } = {};
 
   if (Object.keys(query).length === 0) {
@@ -324,97 +324,11 @@ function createInternshipQueryOptions(query: QueryString.ParsedQs) {
   return options;
 }
 
-function getProjection(select: string) {
+export function getProjection(select: string) {
   return select.split(" ").reduce((p: { [key: string]: unknown }, field) => {
     p[field] = 1;
     return p;
   }, {});
-}
-
-/**
- * Returns amount of internships that fit certain search criteria eg. company.companyName or
- * programmingLanguage.
- * @param req
- * @param res
- * @param next
- */
-export async function findInternshipsAmount(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  let user;
-  try {
-    user = await getUserWithInternshipModule(req.user?.email);
-  } catch (e) {
-    return next(e);
-  }
-
-  // Create Options
-  const options = createInternshipQueryOptions(req.query);
-
-  if (!user.isAdmin) {
-    options["company.excludedFromSearch"] = false;
-    options.status = InternshipStatuses.PASSED;
-    const excludedInternships = user.studentProfile?.internship.internships || [];
-    if (excludedInternships.length > 0) {
-      options._id = {
-        $nin: excludedInternships,
-      };
-    }
-  }
-
-  const projection = getProjection(INTERNSHIP_FIELDS_VISIBLE_FOR_USER);
-  projection.company = { $first: "$company" };
-  const facet = {
-    $facet: {
-      totalCount: [
-        {
-          $count: "count",
-        },
-      ],
-    },
-  };
-  const pipeline: unknown[] = [
-    {
-      $lookup: {
-        from: "companies",
-        localField: "company",
-        foreignField: "_id",
-        as: "company",
-      },
-    },
-    { $project: projection },
-  ];
-  if (Object.keys(options).length > 0) pipeline.push({ $match: options });
-  pipeline.push(facet);
-
-  const internships = await Internship.aggregate(pipeline);
-
-  const count = internships[0].totalCount.length > 0 ? internships[0].totalCount[0].count : 0;
-
-  res.json(count);
-}
-
-/**
- * Returns amount of seen internships
- * @param req
- * @param res
- * @param next
- */
-export async function findCompaniesSeenAmount(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  let user;
-  try {
-    user = await getUser(req.user?.email);
-  } catch (e) {
-    return next(e);
-  }
-
-  res.json(user.studentProfile?.companiesSeen?.length || 0);
 }
 
 /**
