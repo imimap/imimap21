@@ -113,6 +113,14 @@
                       :amount-of-companies-seen="amountOfCompaniesSeen"
                       v-on:search="searchRequest"/>
     <!-- Search Results -->
+    <div id="previous-search-results" class="search_results"
+           v-if="previousResultCount > 0 && !resultsShown">
+        <SearchResultList
+          :result-count="previousResultCount"
+          :search-results="previousSearchResults"
+          :result-count-text="'search.results.previousResultCount'">
+        </SearchResultList>
+      </div>
     <div id="form-block4" class="mx-3 my-3"
          v-if="!loadingState && resultCount <= 0 && previousResultCount <= 0">
       {{ $t("search.results.noResults") }}
@@ -134,14 +142,14 @@
           :result-count-text="'search.results.resultCount'">
         </SearchResultList>
       </div>
-      <div id="previous-search-results" class="search_results"
+      <!-- <div id="previous-search-results" class="search_results"
            v-if="!cardToggle && previousResultCount > 0">
         <SearchResultList
           :result-count="previousResultCount"
           :search-results="previousSearchResults"
           :result-count-text="'search.results.previousResultCount'">
         </SearchResultList>
-      </div>
+      </div> -->
       <div id="map-results">
         <Map v-if="cardToggle" :locations="locations"></Map>
       </div>
@@ -173,7 +181,7 @@ export default defineComponent({
       availableLanguages: null,
       // Searchresults after query
       searchResults: [] as Internship[],
-      previousSearchResults: [] as Internship[],
+      previousSearchResults: [] as Internship[] | undefined,
       // Selected filters
       paymentFilter: null,
       countryFilter: null,
@@ -184,14 +192,17 @@ export default defineComponent({
       loadingState: true,
       amountOfResults: 0,
       amountOfCompaniesSeen: 0,
+      resultsShown: false,
     };
   },
+
   computed: {
     resultCount(): number {
       return this.searchResults.length;
     },
     previousResultCount(): number {
-      return this.previousSearchResults.length;
+      if (this.previousSearchResults) return this.previousSearchResults.length;
+      return 0;
     },
     locations(): MapLocation[] | undefined {
       if (this.searchResults.length === 0) return undefined;
@@ -216,7 +227,7 @@ export default defineComponent({
     async searchOrShowModal() {
       const amountSeen = await this.getAmountOfSeenResults();
       const amountNew = await this.getAmountOfPossibleResults();
-      if (amountSeen !== undefined && amountSeen < 12 && amountNew !== undefined && amountNew > 6) {
+      if (amountSeen !== undefined && amountSeen < 12 && amountNew !== undefined && amountNew > 0) {
         this.amountOfResults = amountNew;
         this.amountOfCompaniesSeen = amountSeen;
         this.modal.show();
@@ -260,17 +271,15 @@ export default defineComponent({
     async getAmountOfPossibleResults(): Promise<number | undefined> {
       let amount: number | PromiseLike<number>;
       try {
-        const res = await http.get('/companies/possibleResults/amount',
-          {
-            params: {
-              country: this.countryFilter,
-              operationalArea: this.operationalAreaFilter,
-              programmingLanguage: this.languageFilter,
-              paymentType: this.paymentFilter,
-            },
-          });
+        const res = await http.get('/companies/possibleResults/amount', {
+          params: {
+            country: this.countryFilter,
+            operationalArea: this.operationalAreaFilter,
+            programmingLanguage: this.languageFilter,
+            paymentType: this.paymentFilter,
+          },
+        });
         amount = await res.data;
-        console.log(this.countryFilter, this.operationalAreaFilter, this.languageFilter, this.paymentFilter, amount);
 
         return amount;
       } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
@@ -281,7 +290,7 @@ export default defineComponent({
     async getAmountOfSeenResults(): Promise<number | undefined> {
       let amount: number | PromiseLike<number>;
       try {
-        const res = await http.get('/companies/seen/amount');
+        const res = await http.get('/companies/seen/amount'); // TODO
         amount = await res.data;
         return amount;
       } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
@@ -289,25 +298,44 @@ export default defineComponent({
       }
       return undefined;
     },
-    async searchRequestForPreviousResults() {
-      try {
-        this.previousSearchResults = await this.getSearchResults(true);
-      } catch (err: any) {
-        await showErrorNotification(`Fehler beim Durchsuchen der vorherigen Suchergebnisse [ERROR: ${err.message}]`);
-      }
-    },
+    // async searchRequestForPreviousResults() {
+    //   try {
+    //     this.previousSearchResults = await this.getSearchResults(true);
+    //   } catch (err: any) {
+    //     await showErrorNotification(`Fehler beim Durchsuchen der vorherigen Suchergebnisse [ERROR: ${err.message}]`);
+    //   }
+    // },
     async searchRequestForNewResults() {
       try {
         this.searchResults = await this.getSearchResults(false);
+        this.previousSearchResults = this.searchResults; // Todo: concat new results with old resuls
       } catch (err: any) {
         await showErrorNotification(`Fehler beim Suchen nach neuen Suchergebnisse [ERROR: ${err.message}]`);
       }
     },
+    async getInternshipsOfCompaniesSeen() {
+      let internships: Internship[];
+      const amountSeen = await this.getAmountOfSeenResults();
+
+      if (!amountSeen || amountSeen === 0) return [];
+      this.amountOfCompaniesSeen = amountSeen;
+
+      try {
+        const res = await http.get('/companies/seen/results'); // TODO
+        internships = await res.data;
+        console.log('here', internships);
+        return internships;
+      } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
+        await showErrorNotification(`Fehler beim Laden der vorherigen Suchergebnisse [ERROR: ${err.message}]`);
+      }
+      return undefined;
+    },
     async searchRequest() {
       this.loadingState = true;
-      await this.searchRequestForPreviousResults();
+      // await this.searchRequestForPreviousResults();
       await this.searchRequestForNewResults();
       this.loadingState = false;
+      this.resultsShown = true;
     },
     async getSearchResults(seen: boolean) {
       try {
@@ -318,6 +346,7 @@ export default defineComponent({
             programmingLanguage: this.languageFilter,
             paymentType: this.paymentFilter,
             seen,
+            internshipsOfCompaniesSeen: this.previousSearchResults,
           },
         });
 
@@ -332,6 +361,9 @@ export default defineComponent({
     this.getAvailablePaymentOptions();
     this.getAvailableOrientations();
     this.getAvailableLanguages();
+  },
+  async mounted() {
+    this.previousSearchResults = await this.getInternshipsOfCompaniesSeen();
   },
 });
 </script>

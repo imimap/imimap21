@@ -42,7 +42,7 @@ export default defineComponent({
   props: {
     resultCount: Number,
     resultCountText: String,
-    searchResults: { type: Array as PropType<Internship[]> },
+    searchResults: { type: Array as PropType<Record<string, any>[]> },
 
   },
 });

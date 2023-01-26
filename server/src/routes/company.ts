@@ -11,6 +11,7 @@ import {
   findCompaniesPossibleResultsAmount,
   getCompanyById,
   updateCompany,
+  findInternshipsOfSeenCompanies,
 } from "../controllers/company";
 
 const companyRouter = Router();
@@ -57,6 +58,12 @@ companyRouter.get(
   asyncHandler(findCompaniesSeenAmount)
 );
 
+companyRouter.get(
+  "/seen/results",
+  authMiddleware(),
+  validate,
+  asyncHandler(findInternshipsOfSeenCompanies)
+);
 const standardPostParams = [
   //company
   "companyName",

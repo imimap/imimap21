@@ -8,6 +8,7 @@ import { getUser, getUserWithInternshipModule } from "../helpers/userHelper";
 import {
   createInternshipQueryOptions,
   getProjection,
+  INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN,
   INTERNSHIP_FIELDS_VISIBLE_FOR_USER,
 } from "./internship";
 import { Internship, InternshipStatuses } from "../models/internship";
@@ -223,7 +224,7 @@ export async function deleteCompany(
 }
 
 /**
- * Returns amount of seen internships
+ * Returns amount of seen companies
  * @param req
  * @param res
  * @param next
@@ -240,6 +241,52 @@ export async function findCompaniesSeenAmount(
     return next(e);
   }
   res.json(user.studentProfile?.companiesSeen?.length || 0);
+}
+
+/**
+ * Returns seen companies
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function findInternshipsOfSeenCompanies(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  let user;
+  try {
+    user = await getUser(req.user?.email);
+  } catch (e) {
+    return next(e);
+  }
+  if (!user.studentProfile?.companiesSeen) res.json([]);
+
+  let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
+  if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
+  const projection = getProjection(select);
+  projection.company = { $first: "$company" };
+
+  const pipeline: unknown[] = [
+    {
+      $lookup: {
+        from: "companies",
+        localField: "company",
+        foreignField: "_id",
+        as: "company",
+      },
+    },
+    { $project: projection },
+    {
+      $match: {
+        "company._id": {
+          $in: user.studentProfile?.companiesSeen,
+        },
+      },
+    },
+  ];
+  const internships = await Internship.aggregate(pipeline);
+  res.json(internships);
 }
 
 /**
