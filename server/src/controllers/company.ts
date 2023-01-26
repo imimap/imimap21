@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { User } from "../models/user";
+import { IUser, User } from "../models/user";
 import { BadRequest, Forbidden, NotFound } from "http-errors";
 import { Company } from "../models/company";
 import { getCompanyObject } from "../helpers/companyHelper";
@@ -261,7 +261,12 @@ export async function findInternshipsOfSeenCompanies(
     return next(e);
   }
   if (!user.studentProfile?.companiesSeen) res.json([]);
+  const internships = await collectInternships(user);
 
+  res.json(internships);
+}
+
+export async function collectInternships(user: IUser): Promise<typeof Internship[]> {
   let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
   if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
   const projection = getProjection(select);
@@ -286,7 +291,7 @@ export async function findInternshipsOfSeenCompanies(
     },
   ];
   const internships = await Internship.aggregate(pipeline);
-  res.json(internships);
+  return internships;
 }
 
 /**

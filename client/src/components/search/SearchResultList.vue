@@ -33,7 +33,6 @@
 </template>
 <script lang="ts">
 import SearchResult from '@/components/search/SearchResult.vue';
-import { Internship } from '@/store/types/Internship';
 import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({

@@ -1,7 +1,11 @@
 <template>
   <div class="container">
+    <div v-show="amountOfCompaniesSeen >= 12" id="form-block4" class="text-left mt-5 mx-3">
+    <p>Sorry, du hast all deine Verusche aufgebraucht! Bitte wende dich an die Praktikumsverwaltung, falls du dein Limit zurücksetzen musst.</p>
+    </div>
+
     <!-- Search Form -->
-    <div id="form-block4" class="text-left mt-5 mx-3">
+    <div v-show="amountOfCompaniesSeen < 12" id="form-block4" class="text-left mt-5 mx-3">
       <h4 class="mb-3">{{ $t("search.headline") }}</h4>
       <div class="card text-white bg-htw-green mt-2 mb-4 ms-3">
         <div class="card-body p-1">
@@ -181,7 +185,7 @@ export default defineComponent({
       availableLanguages: null,
       // Searchresults after query
       searchResults: [] as Internship[],
-      previousSearchResults: [] as Internship[] | undefined,
+      previousSearchResults: [] as Internship[] || [],
       // Selected filters
       paymentFilter: null,
       countryFilter: null,
@@ -201,7 +205,7 @@ export default defineComponent({
       return this.searchResults.length;
     },
     previousResultCount(): number {
-      if (this.previousSearchResults) return this.previousSearchResults.length;
+      if (this.previousSearchResults.length > 0) return this.previousSearchResults.length;
       return 0;
     },
     locations(): MapLocation[] | undefined {
@@ -226,9 +230,9 @@ export default defineComponent({
   methods: {
     async searchOrShowModal() {
       const amountSeen = await this.getAmountOfSeenResults();
-      const amountNew = await this.getAmountOfPossibleResults();
-      if (amountSeen !== undefined && amountSeen < 12 && amountNew !== undefined && amountNew > 0) {
-        this.amountOfResults = amountNew;
+      const possibleResults = await this.getAmountOfPossibleResults();
+      if (amountSeen !== undefined && amountSeen < 12 && possibleResults !== undefined && possibleResults > 0) {
+        this.amountOfResults = possibleResults;
         this.amountOfCompaniesSeen = amountSeen;
         this.modal.show();
       } else {
@@ -307,8 +311,11 @@ export default defineComponent({
     // },
     async searchRequestForNewResults() {
       try {
-        this.searchResults = await this.getSearchResults(false);
-        this.previousSearchResults = this.searchResults; // Todo: concat new results with old resuls
+        this.searchResults = await this.getSearchResults();
+        const getInternshipsOfCompaniesSeen = await this.getInternshipsOfCompaniesSeen();
+        console.log('mietz', getInternshipsOfCompaniesSeen);
+
+        this.previousSearchResults = getInternshipsOfCompaniesSeen || [];// TODO check if correct
       } catch (err: any) {
         await showErrorNotification(`Fehler beim Suchen nach neuen Suchergebnisse [ERROR: ${err.message}]`);
       }
@@ -337,7 +344,7 @@ export default defineComponent({
       this.loadingState = false;
       this.resultsShown = true;
     },
-    async getSearchResults(seen: boolean) {
+    async getSearchResults() {
       try {
         const res = await http.get('/internships', {
           params: {
@@ -345,8 +352,6 @@ export default defineComponent({
             operationalArea: this.operationalAreaFilter,
             programmingLanguage: this.languageFilter,
             paymentType: this.paymentFilter,
-            seen,
-            internshipsOfCompaniesSeen: this.previousSearchResults,
           },
         });
 
@@ -363,7 +368,7 @@ export default defineComponent({
     this.getAvailableLanguages();
   },
   async mounted() {
-    this.previousSearchResults = await this.getInternshipsOfCompaniesSeen();
+    this.previousSearchResults = await this.getInternshipsOfCompaniesSeen() || [];
   },
 });
 </script>
