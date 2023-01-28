@@ -29,8 +29,8 @@ const search = {
   },
   results: {
     noResults: 'Keine Praktika gefunden. Versuche es mit weniger spezifischen Suchkriterien.',
-    resultCount: 'Kein passendes Unternehmen gefunden | 1 passendes Unternehmen für deine Suche | {n} passende Unternehmen für deine Suche',
-    previousResultCount: '0 frühere Ergebnisse | 1 Praktikum bei bisher gesehener Firmen aus früherer Suche | {n} Praktika bei bisher gesehenen Firmen aus früherer Suche',
+    resultCount: 'Kein passendes Praktikum gefunden | 1 passendes Praktikum für deine Suche | {n} passende Praktika für deine Suche',
+    previousResultCount: '0 frühere Ergebnisse | 1 Praktikum bei bisher gesehener Firmen aus früheren Suchn | {n} Praktika bei bisher gesehenen Firmen aus früherern Suchen',
   },
   showMap: 'Karte zeigen',
   company: 'Firma',
@@ -44,8 +44,8 @@ const search = {
   programmingLanguages: 'Programmiersprachen: ',
   tooManyResults: {
     headline: 'Achtung',
-    resultCount: 'Es wurden {n} Treffer gefunden.',
-    previousResultCount: 'Du hast bisher {n} von 12 möglichen Suchergebnissen gesehen.',
+    resultCount: 'Es wurden {n} neue Firmen gefunden, die du bisher nicht gesehen hast.',
+    previousResultCount: 'Du hast bisher {n} von 12 möglichen Firmen gesehen. Es werden dir maximal 12 Firmen angezeigt. Wenn du diese gesehen hast, kannst du keine neue Suche starten.',
     question: 'Was möchtest du tun?',
     buttonConfirm: 'Zeige mir trotzdem die Ergebnisse!',
     buttonDecline: 'Ich möchte die Suche konkretisieren',

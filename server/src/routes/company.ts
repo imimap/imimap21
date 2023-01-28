@@ -8,7 +8,7 @@ import {
   deleteCompany,
   getAllCompanies,
   findCompaniesSeenAmount,
-  findCompaniesPossibleResultsAmount,
+  findNewCompaniesAmount,
   getCompanyById,
   updateCompany,
   findInternshipsOfSeenCompanies,
@@ -48,7 +48,7 @@ companyRouter.get(
   authMiddleware(),
   query(standardQueryParams).toUpperCase(),
   validate,
-  asyncHandler(findCompaniesPossibleResultsAmount)
+  asyncHandler(findNewCompaniesAmount)
 );
 
 companyRouter.get(

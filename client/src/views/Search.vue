@@ -113,7 +113,7 @@
       </div>
     </div>
     <!-- Too many results modal -->
-    <too-many-results :amount-of-results="amountOfResults"
+    <too-many-results :amount-of-company-results="amountOfCompanies"
                       :amount-of-companies-seen="amountOfCompaniesSeen"
                       v-on:search="searchRequest"/>
     <!-- Search Results -->
@@ -126,11 +126,11 @@
         </SearchResultList>
       </div>
     <div id="form-block4" class="mx-3 my-3"
-         v-if="!loadingState && resultCount <= 0 && previousResultCount <= 0">
+         v-if="!loadingState && resultCount <= 0">
       {{ $t("search.results.noResults") }}
     </div>
     <div id="form-block4" class="mx-3 my-3"
-         v-if="!loadingState && (resultCount > 0 || previousResultCount > 0)">
+         v-if="!loadingState && (resultCount > 0 )">
       <div class="text-center">
         <button type="button"
                 class="btn btn-htw-green text-white mb-3"
@@ -146,14 +146,6 @@
           :result-count-text="'search.results.resultCount'">
         </SearchResultList>
       </div>
-      <!-- <div id="previous-search-results" class="search_results"
-           v-if="!cardToggle && previousResultCount > 0">
-        <SearchResultList
-          :result-count="previousResultCount"
-          :search-results="previousSearchResults"
-          :result-count-text="'search.results.previousResultCount'">
-        </SearchResultList>
-      </div> -->
       <div id="map-results">
         <Map v-if="cardToggle" :locations="locations"></Map>
       </div>
@@ -194,7 +186,7 @@ export default defineComponent({
       // Component state
       cardToggle: false,
       loadingState: true,
-      amountOfResults: 0,
+      amountOfCompanies: 0,
       amountOfCompaniesSeen: 0,
       resultsShown: false,
     };
@@ -230,14 +222,14 @@ export default defineComponent({
   methods: {
     async searchOrShowModal() {
       const amountSeen = await this.getAmountOfSeenResults();
-      const possibleResults = await this.getAmountOfPossibleResults();
-      if (amountSeen !== undefined && amountSeen < 12 && possibleResults !== undefined && possibleResults > 0) {
-        this.amountOfResults = possibleResults;
+      const amountOfCompanies = await this.getAmountOfPossibleNewResults(); // TODO: calculate how many
+      if (amountSeen !== undefined && amountSeen < 12 && amountOfCompanies !== undefined && amountOfCompanies > 0) {
+        this.amountOfCompanies = amountOfCompanies;
         this.amountOfCompaniesSeen = amountSeen;
         this.modal.show();
       } else {
-        this.modal.hide();
         await this.searchRequest();
+        this.modal.hide();
       }
     },
     async getAvailableCountries() {
@@ -272,7 +264,7 @@ export default defineComponent({
         await showErrorNotification(`Fehler beim laden der verfügbaren Programmiersprachen [ERROR: ${err.message}]`);
       }
     },
-    async getAmountOfPossibleResults(): Promise<number | undefined> {
+    async getAmountOfPossibleNewResults(): Promise<number | undefined> {
       let amount: number | PromiseLike<number>;
       try {
         const res = await http.get('/companies/possibleResults/amount', {
@@ -294,7 +286,7 @@ export default defineComponent({
     async getAmountOfSeenResults(): Promise<number | undefined> {
       let amount: number | PromiseLike<number>;
       try {
-        const res = await http.get('/companies/seen/amount'); // TODO
+        const res = await http.get('/companies/seen/amount');
         amount = await res.data;
         return amount;
       } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
@@ -302,20 +294,13 @@ export default defineComponent({
       }
       return undefined;
     },
-    // async searchRequestForPreviousResults() {
-    //   try {
-    //     this.previousSearchResults = await this.getSearchResults(true);
-    //   } catch (err: any) {
-    //     await showErrorNotification(`Fehler beim Durchsuchen der vorherigen Suchergebnisse [ERROR: ${err.message}]`);
-    //   }
-    // },
+
     async searchRequestForNewResults() {
       try {
         this.searchResults = await this.getSearchResults();
         const getInternshipsOfCompaniesSeen = await this.getInternshipsOfCompaniesSeen();
-        console.log('mietz', getInternshipsOfCompaniesSeen);
 
-        this.previousSearchResults = getInternshipsOfCompaniesSeen || [];// TODO check if correct
+        this.previousSearchResults = getInternshipsOfCompaniesSeen || [];
       } catch (err: any) {
         await showErrorNotification(`Fehler beim Suchen nach neuen Suchergebnisse [ERROR: ${err.message}]`);
       }
@@ -328,9 +313,8 @@ export default defineComponent({
       this.amountOfCompaniesSeen = amountSeen;
 
       try {
-        const res = await http.get('/companies/seen/results'); // TODO
+        const res = await http.get('/companies/seen/results');
         internships = await res.data;
-        console.log('here', internships);
         return internships;
       } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
         await showErrorNotification(`Fehler beim Laden der vorherigen Suchergebnisse [ERROR: ${err.message}]`);
@@ -339,7 +323,6 @@ export default defineComponent({
     },
     async searchRequest() {
       this.loadingState = true;
-      // await this.searchRequestForPreviousResults();
       await this.searchRequestForNewResults();
       this.loadingState = false;
       this.resultsShown = true;

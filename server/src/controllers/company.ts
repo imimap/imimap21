@@ -266,7 +266,7 @@ export async function findInternshipsOfSeenCompanies(
   res.json(internships);
 }
 
-export async function collectInternships(user: IUser): Promise<typeof Internship[]> {
+export async function collectInternships(user: IUser): Promise<any[]> {
   let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
   if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
   const projection = getProjection(select);
@@ -301,7 +301,7 @@ export async function collectInternships(user: IUser): Promise<typeof Internship
  * @param res
  * @param next
  */
-export async function findCompaniesPossibleResultsAmount( //find all internships fitting criteria, but check if companies appear twice -> count companies, not internships
+export async function findNewCompaniesAmount( //find all internships fitting criteria, but check if companies appear twice -> count companies, not internships
   req: Request,
   res: Response,
   next: NextFunction
@@ -350,11 +350,19 @@ export async function findCompaniesPossibleResultsAmount( //find all internships
         companyCount: { $sum: 1 },
       },
     },
-    {
-      $count: "internshipsCount",
-    },
   ];
 
   const internships = await Internship.aggregate(pipeline);
-  res.json(internships[0].internshipsCount);
+  if (internships.length == 0) res.json(0);
+  else {
+    let count = 0;
+    for (const c in internships) {
+      for (const i in internships[c]._id) {
+        if (user.studentProfile?.companiesSeen?.indexOf(internships[c]._id[i]) === -1) {
+          count++;
+        }
+      }
+    }
+    res.json(count);
+  }
 }

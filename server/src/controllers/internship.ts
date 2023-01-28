@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { BadRequest, Forbidden, InternalServerError, NotFound } from "http-errors";
-import { Internship, InternshipStatuses, PaymentTypes } from "../models/internship";
+import { IInternship, Internship, InternshipStatuses, PaymentTypes } from "../models/internship";
 import { Semester } from "../helpers/semesterHelper";
 import { InternshipModule } from "../models/internshipModule";
 import { Types } from "mongoose";
@@ -16,9 +16,7 @@ import { IUser, User } from "../models/user";
 import { constants } from "http2";
 import * as QueryString from "qs";
 import { ICompany } from "../models/company";
-import { collectInternships, findIC, findInternshipsOfSeenCompanies } from "./company";
-import axios from "axios";
-import router from "../routes";
+import { collectInternships } from "./company";
 
 export const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
   "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes status";
@@ -151,7 +149,7 @@ export async function findInternships(
   // Create Options
   const options: { [k: string]: unknown } = createInternshipQueryOptions(req.query);
   const excludedCompanies = [] as ICompany[];
-  const internshipsOfSeenCompanies = await collectInternships(user);
+  let internshipsOfSeenCompanies = await collectInternships(user);
 
   if (!user.isAdmin) {
     options["company.excludedFromSearch"] = false;
@@ -162,20 +160,11 @@ export async function findInternships(
       const company = (i as unknown as InstanceType<typeof Internship>).company;
       excludedCompanies.push(company);
     }
-    // if (user.studentProfile?.companiesSeen && user.studentProfile.companiesSeen.length > 0) {
-    //   const companiesSeen = user.studentProfile.companiesSeen;
-    //   // excludedCompanies = excludedCompanies.concat(companiesSeen);
-    // }
     if (excludedCompanies.length > 0) {
       options._id = {
         $nin: excludedCompanies,
       };
     }
-    // if (req.query.seen === "true") {
-    //   options._id = {
-    //     $in: user.studentProfile?.companiesSeen || [],
-    //   };
-    // }
   }
 
   // Set select: Which fields to select?
@@ -217,45 +206,42 @@ export async function findInternships(
     },
   ];
 
-  let companiesWithInternships = [];
+  let companiesWithInternships: any[] = [];
   const searchResults = [];
 
   // Add newly returned internships to companiesSeen
   if (!user.isAdmin && user.studentProfile) {
     if (!user.studentProfile.companiesSeen) user.studentProfile.companiesSeen = [];
     companiesWithInternships = await queryCompaniesWithInternships(user, pipeline, limit, offset);
-    companiesWithInternships.forEach((i) =>
-      console.log(`${i._id}, ${i.name}, ${i.internships}: ${i.companyCount}`)
-    );
     let processed = 0;
-    console.log("here", user.studentProfile.companiesSeen);
+    internshipsOfSeenCompanies = internshipsOfSeenCompanies.map((i) => i._id);
 
     for (const company in companiesWithInternships) {
-      if (processed < limit) {
-        for (const internship in companiesWithInternships[company].internships) {
-          if (
-            //internship has already been seen and meets criteria -> add to results
-            internshipsOfSeenCompanies.indexOf(
-              companiesWithInternships[company].internships[internship]._id
-            ) !== -1
-          ) {
-            searchResults.push(companiesWithInternships[company].internships[internship]);
-          } else if (
-            user.studentProfile.companiesSeen.indexOf(companiesWithInternships[company]._id) !== -1
-          ) {
-            searchResults.push(companiesWithInternships[company].internships[internship]);
-          } else {
+      for (const internship in companiesWithInternships[company].internships) {
+        if (
+          //internship fits search criteria and has already been seen->add to results
+          internshipsOfSeenCompanies.some((doc) =>
+            doc.equals(companiesWithInternships[company].internships[internship]._id)
+          )
+        ) {
+          searchResults.push(companiesWithInternships[company].internships[internship]);
+        } else if (
+          //internship fits criteria but has not been seen, but the company had been seen
+          user.studentProfile.companiesSeen.some((doc) =>
+            doc.equals(companiesWithInternships[company]._id)
+          )
+        ) {
+          searchResults.push(companiesWithInternships[company].internships[internship]);
+        } else {
+          if (processed < limit) {
             //internship has not been seen and meets criteria --> add to result and increase processed count
             searchResults.push(companiesWithInternships[company].internships[internship]);
             user.studentProfile.companiesSeen.push(companiesWithInternships[company]._id);
             processed++;
           }
         }
-        await user.save();
       }
-
-      // console.log("searchResults", searchResults);
-      console.log("companiesSeen", user.studentProfile.companiesSeen);
+      await user.save();
     }
   }
   res.json(searchResults);

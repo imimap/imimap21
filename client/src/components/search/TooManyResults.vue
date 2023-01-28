@@ -21,7 +21,7 @@
         </div>
         <div class="modal-body text-left">
           <p>
-            {{ $tc("search.tooManyResults.resultCount", this.amountOfResults) }}
+            {{ $tc("search.tooManyResults.resultCount", this.amountOfCompanyResults) }}
             {{ $tc("search.tooManyResults.previousResultCount", this.amountOfCompaniesSeen) }}
           </p>
           <p> {{ $t("search.tooManyResults.question") }} </p>
@@ -51,7 +51,7 @@ import { defineComponent } from 'vue';
 export default defineComponent({
   name: 'TooManyResults',
   props: {
-    amountOfResults: Number,
+    amountOfCompanyResults: Number,
     amountOfCompaniesSeen: Number,
   },
   emits: ['search'],

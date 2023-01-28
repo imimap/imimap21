@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 const search = {
   headline: 'Internship Search',
   hint: {
@@ -27,7 +28,7 @@ const search = {
   },
   results: {
     noResults: 'No internships found. Try again with less specific search criteria.',
-    resultCount: 'No company fitting the criteria | One company fitting the criteria | {n} companies fitting the criteria',
+    resultCount: 'No internship fitting the criteria | One internship fitting the criteria | {n} internships fitting the criteria',
     previousResultCount: '0 results of previous searches | 1 internship at previously found company | {n} internships at previously found companies',
   },
   showMap: 'Show map',
@@ -42,8 +43,8 @@ const search = {
   programmingLanguages: 'Programming languages: ',
   tooManyResults: {
     headline: 'Caution',
-    resultCount: '{n} internships have been found.',
-    previousResultCount: 'You have already seen {n} of 12 possible search results.',
+    resultCount: '{n} companies at various internships have been found.',
+    previousResultCount: 'You have already seen {n} of 12 possible company results. A maximum of 12 companies will be displayed. Once you have seen these, you cannot start a new search.',
     question: 'What do you want to do?',
     buttonConfirm: 'Show the results anyway!',
     buttonDecline: 'I want to concretise my search.',
