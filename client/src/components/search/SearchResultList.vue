@@ -23,7 +23,12 @@
             :company-website="searchResult.company?.website"
             :operational-area="searchResult.operationalArea"
             :programming-languages="searchResult.programmingLanguages"
-            :tasks="searchResult.tasks">
+            :tasks="searchResult.tasks"
+            :start-date="searchResult.startDate"
+            :end-date="searchResult.endDate"
+            :working-hours-per-week="searchResult.workingHoursPerWeek"
+            :supervisor="searchResult.supervisor"
+            >
           </SearchResult>
         </template>
       </template>

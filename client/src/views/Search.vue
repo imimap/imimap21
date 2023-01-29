@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div v-show="amountOfCompaniesSeen >= 12" id="form-block4" class="text-left mt-5 mx-3">
-    <p>Sorry, du hast all deine Verusche aufgebraucht! Bitte wende dich an die Praktikumsverwaltung, falls du dein Limit zurücksetzen musst.</p>
+    <p>{{ $t("search.limitReached") }}</p>
     </div>
 
     <!-- Search Form -->
@@ -27,9 +27,9 @@
                         v-model="paymentFilter"
                         id="search_paid">
                   <option :value="null">{{ $t("search.form.paymentOptions.standard") }}</option>
-                  <template v-if="this.availablePaymentOptions != null">
+                  <template v-if="availablePaymentOptions != null">
                     <option
-                      v-for="(paymentOption, index) in this.availablePaymentOptions"
+                      v-for="(paymentOption, index) in availablePaymentOptions"
                       v-bind:key="index"
                       v-bind:paymentOption="paymentOption"
                       :value="paymentOption">
@@ -43,12 +43,12 @@
                   {{ $t("search.form.location") }}
                 </label>
                 <select class="form-select mx-2 my-2 w-auto h-auto"
-                        v-model="this.countryFilter"
+                        v-model="countryFilter"
                         id="search_location">
                   <option :value="null"> {{ $t("search.form.niceLocation") }}</option>
-                  <template v-if="this.availableCountries != null">
+                  <template v-if="availableCountries != null">
                     <option
-                      v-for="(country, index) in this.availableCountries"
+                      v-for="(country, index) in availableCountries"
                       v-bind:key="index"
                       v-bind:country="country"
                       :value="country">
@@ -62,11 +62,11 @@
                   {{ $t("search.form.orientation") }}
                 </label>
                 <select class="form-select mx-2 my-2 w-auto h-auto"
-                        v-model="this.operationalAreaFilter"
+                        v-model="operationalAreaFilter"
                         id="search_orientation_id">
                   <option :value="null">{{ $t("search.form.fun") }}</option>
-                  <template v-if="this.availableOperationalAreas != null">
-                    <option v-for="(orientation, index) in this.availableOperationalAreas"
+                  <template v-if="availableOperationalAreas != null">
+                    <option v-for="(orientation, index) in availableOperationalAreas"
                             v-bind:key="index"
                             :value="orientation">
                       {{ orientation }}
@@ -79,13 +79,13 @@
                   {{ $t("search.form.programmingLanguage") }}
                 </label>
                 <select class="form-select mx-2 my-2 w-auto h-auto"
-                        v-model="this.languageFilter"
+                        v-model="languageFilter"
                         id="search_programming_language_id">
                   <option :value="null">{{ $t("search.form.interested") }}</option>
-                  <template v-if="this.availableLanguages != null">
-                    <option v-for="(language, index) in this.availableLanguages"
+                  <template v-if="availableLanguages != null">
+                    <option v-for="(language, index) in availableLanguages"
                             v-bind:key="index"
-                            :value="this.availableLanguages[index]">
+                            :value="availableLanguages[index]">
                       {{ language }}
                     </option>
                   </template>
@@ -222,7 +222,7 @@ export default defineComponent({
   methods: {
     async searchOrShowModal() {
       const amountSeen = await this.getAmountOfSeenResults();
-      const amountOfCompanies = await this.getAmountOfPossibleNewResults(); // TODO: calculate how many
+      const amountOfCompanies = await this.getAmountOfPossibleNewResults();
       if (amountSeen !== undefined && amountSeen < 12 && amountOfCompanies !== undefined && amountOfCompanies > 0) {
         this.amountOfCompanies = amountOfCompanies;
         this.amountOfCompaniesSeen = amountSeen;
@@ -299,7 +299,6 @@ export default defineComponent({
       try {
         this.searchResults = await this.getSearchResults();
         const getInternshipsOfCompaniesSeen = await this.getInternshipsOfCompaniesSeen();
-
         this.previousSearchResults = getInternshipsOfCompaniesSeen || [];
       } catch (err: any) {
         await showErrorNotification(`Fehler beim Suchen nach neuen Suchergebnisse [ERROR: ${err.message}]`);
@@ -311,7 +310,6 @@ export default defineComponent({
 
       if (!amountSeen || amountSeen === 0) return [];
       this.amountOfCompaniesSeen = amountSeen;
-
       try {
         const res = await http.get('/companies/seen/results');
         internships = await res.data;
@@ -329,7 +327,7 @@ export default defineComponent({
     },
     async getSearchResults() {
       try {
-        const res = await http.get('/internships', {
+        const res = await http.get('/internships/searchResults', {
           params: {
             country: this.countryFilter,
             operationalArea: this.operationalAreaFilter,
@@ -337,7 +335,6 @@ export default defineComponent({
             paymentType: this.paymentFilter,
           },
         });
-
         return res.data;
       } catch (err: any) {
         throw new Error(`Fehler beim Suchen nach Praktika [ERROR: ${err.message}]`);

@@ -244,7 +244,7 @@ export async function findCompaniesSeenAmount(
 }
 
 /**
- * Returns seen companies
+ * Returns the internships of the previously seen companies by the user
  * @param req
  * @param res
  * @param next
@@ -295,13 +295,13 @@ export async function collectInternships(user: IUser): Promise<any[]> {
 }
 
 /**
- * Returns amount of internships that fit certain search criteria eg. company.companyName or
- * programmingLanguage.
+ * Returns amount of companies that fit certain search criteria eg. company.companyName
+ * and have not been seen yet by the user.
  * @param req
  * @param res
  * @param next
  */
-export async function findNewCompaniesAmount( //find all internships fitting criteria, but check if companies appear twice -> count companies, not internships
+export async function findNewCompaniesAmount(
   req: Request,
   res: Response,
   next: NextFunction
@@ -329,7 +329,7 @@ export async function findNewCompaniesAmount( //find all internships fitting cri
 
   const projection = getProjection(INTERNSHIP_FIELDS_VISIBLE_FOR_USER);
   projection.company = { $first: "$company" };
-  //gets internships matching criteria but groups the ones in the same company and returns the count
+  //gets internships matching criteria but groups the ones in the same company
   const pipeline: unknown[] = [
     {
       $lookup: {
@@ -344,7 +344,6 @@ export async function findNewCompaniesAmount( //find all internships fitting cri
     },
     {
       $group: {
-        // without $count stage in next step printable like: internships.forEach((i) => console.log(`${i._id}, ${i.name}: ${i.companyCount}`));
         _id: "$company._id",
         name: { $first: "$company.companyName" },
         companyCount: { $sum: 1 },
@@ -352,13 +351,18 @@ export async function findNewCompaniesAmount( //find all internships fitting cri
     },
   ];
 
-  const internships = await Internship.aggregate(pipeline);
-  if (internships.length == 0) res.json(0);
+  const companiesWithInternships = await Internship.aggregate(pipeline);
+  if (companiesWithInternships.length == 0) res.json(0);
   else {
+    //checks whether the company has been seen before
     let count = 0;
-    for (const c in internships) {
-      for (const i in internships[c]._id) {
-        if (user.studentProfile?.companiesSeen?.indexOf(internships[c]._id[i]) === -1) {
+    for (const c in companiesWithInternships) {
+      for (const i in companiesWithInternships[c]._id) {
+        if (
+          !user.studentProfile?.companiesSeen?.some((doc) =>
+            doc.equals(companiesWithInternships[c]._id[i])
+          )
+        ) {
           count++;
         }
       }

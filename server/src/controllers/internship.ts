@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { BadRequest, Forbidden, InternalServerError, NotFound } from "http-errors";
-import { IInternship, Internship, InternshipStatuses, PaymentTypes } from "../models/internship";
+import { Internship, InternshipStatuses, PaymentTypes } from "../models/internship";
 import { Semester } from "../helpers/semesterHelper";
 import { InternshipModule } from "../models/internshipModule";
 import { Types } from "mongoose";
@@ -123,15 +123,14 @@ export async function getRandomInternship(
  * programmingLanguage.
  * Returns administration information for admins only.
  * Default offset is 0. Default amount of internships returned for admins is 50.
- * Returns as many internships as a student has left in their 12-internships contingent
- * All internships returned to students are added to the student's seen internships.
- * Returned internships are selected in order, not randomly - thus, always the same internships are
- * returned for certain query.
+ * Returns as many internships as a student has left in their 12-companies contingent
+ * All companies returned to students are added to the student's seen companies.
+ * Internships that took place at the same company do therefore not exceed the limit.
  * @param req
  * @param res
  * @param next
  */
-export async function findInternships(
+export async function getSearchResults(
   req: Request,
   res: Response,
   next: NextFunction
@@ -149,14 +148,11 @@ export async function findInternships(
   // Create Options
   const options: { [k: string]: unknown } = createInternshipQueryOptions(req.query);
   const excludedCompanies = [] as ICompany[];
-  let internshipsOfSeenCompanies = await collectInternships(user);
 
   if (!user.isAdmin) {
     options["company.excludedFromSearch"] = false;
     options.status = InternshipStatuses.PASSED;
-    // let excludedInternships = user.studentProfile?.internship.internships || [];
     for (const i in user.studentProfile?.internship.internships) {
-      // const company = (<Internship>i).company;
       const company = (i as unknown as InstanceType<typeof Internship>).company;
       excludedCompanies.push(company);
     }
@@ -168,7 +164,7 @@ export async function findInternships(
   }
 
   // Set select: Which fields to select?
-  // we add status here because otherwise we select only those internships with status == passed
+  // for students only passed internships get retured
   let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
   if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
 
@@ -209,17 +205,21 @@ export async function findInternships(
   let companiesWithInternships: any[] = [];
   const searchResults = [];
 
-  // Add newly returned internships to companiesSeen
-  if (!user.isAdmin && user.studentProfile) {
-    if (!user.studentProfile.companiesSeen) user.studentProfile.companiesSeen = [];
-    companiesWithInternships = await queryCompaniesWithInternships(user, pipeline, limit, offset);
-    let processed = 0;
-    internshipsOfSeenCompanies = internshipsOfSeenCompanies.map((i) => i._id);
+  //returns companies with a list of internships fitting the search criteria that happened at that company
+  companiesWithInternships = await queryCompaniesWithInternships(user, pipeline, limit, offset);
 
+  if (!user.isAdmin && user.studentProfile) {
+    //fetch previously seen internships of student
+    let internshipsOfSeenCompanies = await collectInternships(user);
+    internshipsOfSeenCompanies = internshipsOfSeenCompanies.map((i) => i._id);
+    if (!user.studentProfile.companiesSeen) user.studentProfile.companiesSeen = [];
+    let processed = 0;
+
+    //for each company in the result go through the internship list
     for (const company in companiesWithInternships) {
       for (const internship in companiesWithInternships[company].internships) {
         if (
-          //internship fits search criteria and has already been seen->add to results
+          //internship fits search criteria and has already been seen-> add to results
           internshipsOfSeenCompanies.some((doc) =>
             doc.equals(companiesWithInternships[company].internships[internship]._id)
           )
@@ -234,7 +234,7 @@ export async function findInternships(
           searchResults.push(companiesWithInternships[company].internships[internship]);
         } else {
           if (processed < limit) {
-            //internship has not been seen and meets criteria --> add to result and increase processed count
+            //internship has not been seen and meets criteria --> add to result and add company to seen list
             searchResults.push(companiesWithInternships[company].internships[internship]);
             user.studentProfile.companiesSeen.push(companiesWithInternships[company]._id);
             processed++;
@@ -242,6 +242,13 @@ export async function findInternships(
         }
       }
       await user.save();
+    }
+  } else {
+    //user is admin, just add all internships of the found companies
+    for (const company in companiesWithInternships) {
+      for (const internship in companiesWithInternships[company].internships) {
+        searchResults.push(companiesWithInternships[company].internships[internship]);
+      }
     }
   }
   res.json(searchResults);
