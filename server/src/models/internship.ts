@@ -27,6 +27,8 @@ export enum PaymentTypes {
   NO_PAYMENT = "no payment",
 }
 
+// TODO: Remove `extends Document` since it's not recommended to do this
+// See https://mongoosejs.com/docs/typescript.html#using-extends-document
 export interface IInternship extends Document {
   startDate?: Date;
   endDate?: Date;
