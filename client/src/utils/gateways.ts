@@ -5,6 +5,7 @@ import Internship from '@/models/Internship';
 import InternshipModule from '@/models/InternshipModule';
 import Postponement from '@/models/Postponement';
 import Company from '@/models/Company';
+import { PdfDocument } from '@/store/types/PdfDocument';
 
 export const getStudentsList = async (semester: string | undefined): Promise<Student[]> => apiClient
   .get(`/students${semester !== undefined ? `?semester=${semester}` : ''}`)
@@ -231,7 +232,6 @@ export const loadUpcomingSemesters = async (): Promise<string[]> => {
   }
 };
 
-// TODO: Also used in CreateInternship. Consolidate
 export const loadPaymentTypes = async (): Promise<string[]> => {
   try {
     const res = await apiClient.get('/info/payment-types');
@@ -243,9 +243,53 @@ export const loadPaymentTypes = async (): Promise<string[]> => {
   }
 };
 
+export const getAvailableLanguages = async () => {
+  try {
+    const res = await apiClient.get('/info/languages');
+    return res.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Laden der verfügbaren Sprachen [ERROR: ${err.message}]`);
+    return null;
+  }
+};
+
 export const loadPDFFile = async (filePath: string) => {
   try {
     const response = await apiClient.get(`${API_HOST}/${filePath}`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Laden der PDF-Datei [ERROR: ${err.message}]`);
+    return null;
+  }
+};
+
+export const uploadPDFFile = async (internshipId: string, pdfFile: File, pdfType: string): Promise<PdfDocument | null> => {
+  const formData = new FormData();
+  formData.append('pdf', pdfFile);
+
+  const requestConfig = {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  };
+
+  try {
+    const response = await apiClient.post(`/internships/${internshipId}/pdf/${pdfType}`, formData, requestConfig);
+    return response.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Hochladen der PDF-Datei [ERROR: ${err.message}]`);
+    return null;
+  }
+};
+
+export const generateRequestPdf = async (internshipId: string) => {
+  try {
+    const response = await apiClient.get(`/internships/${internshipId}/pdf/request`, {
       responseType: 'blob',
     });
     return response.data;

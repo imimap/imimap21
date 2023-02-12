@@ -4,7 +4,7 @@ import { FilterQuery } from "mongoose";
 import { User } from "../models/user";
 import { Forbidden, NotFound } from "http-errors";
 import { Role } from "../authentication/user";
-import { IEvent } from "../models/event";
+import { EventTypes, IEvent } from "../models/event";
 
 export async function findInternshipModule(
   req: Request,
@@ -94,6 +94,7 @@ export async function updateInternshipModule(
   }
 
   const newEvent: IEvent = {
+    type: EventTypes.INTERNSHIP_MODULE_UPDATE,
     creator: user._id,
     changes: changes,
     comment: req.query.comment?.toString() || "Admin forced changes",

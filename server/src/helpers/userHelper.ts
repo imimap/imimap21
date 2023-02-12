@@ -48,7 +48,7 @@ export async function getAuthorizedUser(
 /**
  * Returns the authorized user with the specified email address.
  * @throws NotFound If the user was not found
- * @throws Forbidden If the user id not authorized to access the internship with the provided id.
+ * @throws Forbidden If the user is not authorized to access the internship with the provided id.
  * @param emailAddress The email address of the user to find.
  * @param internshipId The internship id to use for the authorization check.
  * @returns IUser The authorized user
