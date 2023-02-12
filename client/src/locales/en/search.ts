@@ -3,11 +3,11 @@ const search = {
   hint: {
     hintHeading: 'Notice: ',
     hintContent: 'Try starting with a very specific search because this feature '
-      + 'is limited to showing 12 companies. There might been internships that '
-      + 'took place at the same company, this does not count towards the limit. '
+      + 'is limited to showing 12 companies. Internships that '
+      + 'took place at the same company do not count towards the limit. '
       + 'Companies, which you have seen once stay visible even if you reach this limit. '
       + 'If for any reason you need to extend that limit, '
-      + 'please write an email at imi-praktikum[at]htw-berlin.de ',
+      + 'please write an email to imi-praktikum[at]htw-berlin.de ',
   },
   form: {
     paymentOptions: {
@@ -43,18 +43,18 @@ const search = {
   startDate: 'Start date: ',
   endDate: 'End date: ',
   workingHoursPerWeek: 'Working hours per week: ',
-  supervisor: 'Supverisor: ',
+  supervisor: 'Supervisor: ',
   programmingLanguages: 'Programming languages: ',
   tooManyResults: {
     headline: 'Caution',
-    resultCount: '{n} companies at various internships have been found.',
-    previousResultCount: 'You have already seen {n} of 12 possible company results. A maximum of 12 companies will be displayed. '
-    + 'Once you have seen these, you cannot start a new search.',
+    resultCount: 'Various internships at {n} companies were found.',
+    previousResultCount: 'You have already seen {n} out of 12 possible company results. A maximum of 12 companies will be displayed. '
+    + 'Once you have reached this limit, you cannot start a new search.',
     question: 'What do you want to do?',
     buttonConfirm: 'Show the results anyway!',
     buttonDecline: 'I want to concretise my search.',
   },
-  limitReached: 'You reached your search limit! Please contact the internship team imi-praktikum[at]htw-berlin.de, when you want to reset the limit.',
+  limitReached: 'You reached your search limit! Please contact the internship team imi-praktikum[at]htw-berlin.de if you need to reset the limit.',
 
 };
 

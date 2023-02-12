@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div v-show="amountOfCompaniesSeen >= 12" id="form-block4" class="text-left mt-5 mx-3">
+    <div v-show="amountOfCompaniesSeen >= 12" id="form-block4" class="text-left mt-5 mx-3 mb-0">
     <p>{{ $t("search.limitReached") }}</p>
     </div>
 
@@ -197,8 +197,7 @@ export default defineComponent({
       return this.searchResults.length;
     },
     previousResultCount(): number {
-      if (this.previousSearchResults.length > 0) return this.previousSearchResults.length;
-      return 0;
+      return this.previousSearchResults.length;
     },
     locations(): MapLocation[] | undefined {
       if (this.searchResults.length === 0) return undefined;

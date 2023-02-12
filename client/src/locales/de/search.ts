@@ -4,7 +4,7 @@ const search = {
     hintHeading: 'Hinweis: ',
     hintContent: 'Starte am besten mit einer möglichst spezifischen Suche, '
     + 'da die Ergebnisanzeige auf 12 Firmen beschränkt ist. '
-    + 'Es gibt Praktika, die bei der gleichen Firma stattgefunden haben, diese zählen nicht zum Limit dazu. '
+    + 'Praktika, die bei der gleichen Firma stattgefunden haben, zählen nur einfach zum Limit dazu. '
     + 'Firmen, die Du einmal gesehen hast, bleiben auch nach dem '
     + 'erreichen des Limits sichtbar. Solltest das Limit aus '
     + 'irgendeinem Grund nicht ausreichen, kannst du in '
@@ -30,8 +30,8 @@ const search = {
   results: {
     noResults: 'Keine Praktika gefunden. Versuche es mit weniger spezifischen Suchkriterien.',
     resultCount: 'Kein passendes Praktikum gefunden | 1 passendes Praktikum für deine Suche | {n} passende Praktika für deine Suche',
-    previousResultCount: '0 frühere Ergebnisse | 1 Praktikum bei bisher gesehener Firmen aus früheren Suchen '
-    + '| {n} Praktika bei bisher gesehenen Firmen aus früherern Suchen',
+    previousResultCount: '0 frühere Ergebnisse | 1 Praktikum bei bereits gesehener Firma aus früheren Suchen '
+    + '| {n} Praktika bei bereits gesehenen Firmen aus früheren Suchen',
   },
   showMap: 'Karte zeigen',
   company: 'Firma',
@@ -50,8 +50,8 @@ const search = {
   tooManyResults: {
     headline: 'Achtung',
     resultCount: 'Es wurden {n} neue Firmen gefunden, die du bisher nicht gesehen hast.',
-    previousResultCount: 'Du hast bisher {n} von 12 möglichen Firmen gesehen.'
-    + 'Es werden dir maximal 12 Firmen angezeigt. Wenn du diese gesehen hast, kannst du keine neue Suche starten. ',
+    previousResultCount: 'Du hast bisher {n} von 12 möglichen Firmen gesehen. '
+    + 'Dir werden maximal 12 Firmen angezeigt. Wenn du das Limit erreicht hast, kannst du keine neue Suche starten. ',
     question: 'Was möchtest du tun?',
     buttonConfirm: 'Zeige mir trotzdem die Ergebnisse!',
     buttonDecline: 'Ich möchte die Suche konkretisieren',

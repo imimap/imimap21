@@ -38,6 +38,7 @@
 </template>
 <script lang="ts">
 import SearchResult from '@/components/search/SearchResult.vue';
+import { Internship } from '@/store/types/Internship';
 import { defineComponent, PropType } from 'vue';
 
 export default defineComponent({
@@ -46,7 +47,7 @@ export default defineComponent({
   props: {
     resultCount: Number,
     resultCountText: String,
-    searchResults: { type: Array as PropType<Record<string, any>[]> },
+    searchResults: { type: Array as PropType<Internship[]> },
 
   },
 });

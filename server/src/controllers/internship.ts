@@ -14,14 +14,14 @@ import {
 import { buildHtmlTemplate, buildPDFFile, saveFile } from "../helpers/pdfHelper";
 import { IUser, User } from "../models/user";
 import { constants } from "http2";
-import * as QueryString from "qs";
 import { ICompany } from "../models/company";
 import { collectInternships } from "./company";
-
-export const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
-  "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes status";
-export const INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN =
-  "startDate endDate workingHoursPerWeek supervisor";
+import {
+  createInternshipQueryOptions,
+  getProjection,
+  INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN,
+  INTERNSHIP_FIELDS_VISIBLE_FOR_USER,
+} from "../helpers/internshipHelper";
 
 /**
  * Returns all information on certain internship for admin or on own internship for student.
@@ -194,10 +194,6 @@ export async function getSearchResults(
     {
       $group: {
         _id: "$company._id",
-        company: { $first: "$company._id" },
-        name: { $first: "$company.companyName" },
-        internships: { $addToSet: "$$CURRENT" },
-        companyCount: { $sum: 1 },
       },
     },
   ];
@@ -273,55 +269,6 @@ async function queryCompaniesWithInternships(
     }
   }
   return internships;
-}
-
-export function createInternshipQueryOptions(query: QueryString.ParsedQs) {
-  const options: { [k: string]: unknown } = {};
-
-  if (Object.keys(query).length === 0) {
-    return options;
-  }
-
-  const companyQueryFields = ["companyName", "branchName", "industry", "mainLanguage", "size"];
-  companyQueryFields.forEach((field) => {
-    if (query[field])
-      options[`company.${field}`] = {
-        $regex: query[field],
-        $options: "i",
-      };
-  });
-  if (query.country) {
-    options["company.address.country"] = {
-      $regex: query.country,
-      $options: "i",
-    };
-  }
-  if (query.operationalArea) {
-    options.operationalArea = {
-      $regex: query.operationalArea,
-      $options: "i",
-    };
-  }
-  if (query.programmingLanguage) {
-    options.programmingLanguages = {
-      $regex: query.programmingLanguage,
-      $options: "i",
-    };
-  }
-  if (query.paymentType) {
-    options.paymentTypes = {
-      $regex: query.paymentType,
-      $options: "i",
-    };
-  }
-  return options;
-}
-
-export function getProjection(select: string) {
-  return select.split(" ").reduce((p: { [key: string]: unknown }, field) => {
-    p[field] = 1;
-    return p;
-  }, {});
 }
 
 /**

@@ -5,13 +5,13 @@ import { Company } from "../models/company";
 import { getCompanyObject } from "../helpers/companyHelper";
 import { constants } from "http2";
 import { getUser, getUserWithInternshipModule } from "../helpers/userHelper";
+import { Internship, InternshipStatuses } from "../models/internship";
 import {
   createInternshipQueryOptions,
   getProjection,
   INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN,
   INTERNSHIP_FIELDS_VISIBLE_FOR_USER,
-} from "./internship";
-import { Internship, InternshipStatuses } from "../models/internship";
+} from "../helpers/internshipHelper";
 
 /**
  * Returns all companies to admins
@@ -316,7 +316,7 @@ export async function findNewCompaniesAmount(
   // Create Options
   const options = createInternshipQueryOptions(req.query);
 
-  if (!user.isAdmin && options.length !== 0) {
+  if (!user.isAdmin) {
     options["company.excludedFromSearch"] = false;
     options.status = InternshipStatuses.PASSED;
     const excludedInternships = user.studentProfile?.internship.internships || [];
@@ -325,10 +325,13 @@ export async function findNewCompaniesAmount(
         $nin: excludedInternships,
       };
     }
+    if (user.studentProfile?.companiesSeen && user.studentProfile?.companiesSeen.length > 0) {
+      options["company._id"] = {
+        $nin: user.studentProfile?.companiesSeen,
+      };
+    }
   }
 
-  const projection = getProjection(INTERNSHIP_FIELDS_VISIBLE_FOR_USER);
-  projection.company = { $first: "$company" };
   //gets internships matching criteria but groups the ones in the same company
   const pipeline: unknown[] = [
     {
@@ -345,28 +348,15 @@ export async function findNewCompaniesAmount(
     {
       $group: {
         _id: "$company._id",
-        name: { $first: "$company.companyName" },
-        companyCount: { $sum: 1 },
+        $count: "count",
       },
     },
   ];
 
   const companiesWithInternships = await Internship.aggregate(pipeline);
+
   if (companiesWithInternships.length == 0) res.json(0);
   else {
-    //checks whether the company has been seen before
-    let count = 0;
-    for (const c in companiesWithInternships) {
-      for (const i in companiesWithInternships[c]._id) {
-        if (
-          !user.studentProfile?.companiesSeen?.some((doc) =>
-            doc.equals(companiesWithInternships[c]._id[i])
-          )
-        ) {
-          count++;
-        }
-      }
-    }
-    res.json(count);
+    res.json(companiesWithInternships[0].count);
   }
 }
