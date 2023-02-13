@@ -1,3 +1,5 @@
+import * as QueryString from "qs";
+
 export const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
   "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes status";
 export const INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN =
