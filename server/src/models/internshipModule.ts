@@ -3,7 +3,7 @@ import { IPdfDocument, PdfDocument, PdfDocumentSchema } from "./pdfDocument";
 import { Semester } from "../helpers/semesterHelper";
 import { getIMIMapAdmin } from "../helpers/imimapAsAdminHelper";
 import { User } from "./user";
-import { EventSchema, IEvent } from "./event";
+import { EventSchema, EventTypes, IEvent } from "./event";
 import { IInternship, InternshipStatuses } from "./internship";
 
 export enum InternshipModuleStatuses {
@@ -89,6 +89,7 @@ InternshipModuleSchema.methods.plan = async function (): Promise<IInternshipModu
   const defaultSemester = Semester.getUpcoming().toString();
   const defaultSemesterOfStudy = 4;
   this.events.push({
+    type: EventTypes.INTERNSHIP_MODULE_UPDATE,
     creator: (await getIMIMapAdmin())._id,
     accept: true,
     changes: {
@@ -122,6 +123,7 @@ InternshipModuleSchema.methods.requestPostponement = async function (
     throw new Error("SemesterOfStudy is not valid. Needs to be a positive number.");
 
   this.events.push({
+    type: EventTypes.INTERNSHIP_MODULE_POSTPONEMENT,
     creator: creator,
     changes: {
       newSemester: newSemester,
@@ -147,6 +149,7 @@ InternshipModuleSchema.methods.acceptPostponement = async function (
   this.inSemesterOfStudy = recentPostponementRequest.changes?.newSemesterOfStudy as number;
 
   const event: IEvent = {
+    type: EventTypes.INTERNSHIP_MODULE_POSTPONEMENT,
     creator: creator,
     accept: true,
     changes: {
@@ -170,6 +173,7 @@ InternshipModuleSchema.methods.rejectPostponement = async function (
   if (!user?.isAdmin) throw new Error("Only Admins may reject a postponement.");
 
   const event: IEvent = {
+    type: EventTypes.INTERNSHIP_MODULE_POSTPONEMENT,
     creator: creator,
     accept: false,
     changes: {
@@ -220,6 +224,7 @@ InternshipModuleSchema.methods.passAep = async function (creator: Types.ObjectId
   if (!user?.isAdmin) throw new Error("Only Admins may declare the AEP as passed.");
 
   this.events.push({
+    type: EventTypes.INTERNSHIP_MODULE_UPDATE,
     creator: creator,
     changes: {
       aepPassed: true,
@@ -247,6 +252,7 @@ InternshipModuleSchema.methods.submitCompleteDocumentsPdf = async function (
 
 /*********************/
 /* Model Event Hooks */
+
 /*********************/
 export async function trySetPassed(document: Document): Promise<boolean> {
   await document.populate("internships").execPopulate();

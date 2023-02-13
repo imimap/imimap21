@@ -92,7 +92,7 @@ companyRouter.post(
 
 companyRouter.patch(
   "/:id",
-  authMiddleware(true),
+  authMiddleware(false),
   param("id").custom(isObjectId),
   body(standardPostParams),
   validate,

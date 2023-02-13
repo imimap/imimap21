@@ -9,7 +9,6 @@
             1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0
             0-.01-1.05z"/>
     </svg>
-
     <svg v-else-if="item.status === 'unknown'" xmlns="http://www.w3.org/2000/svg" width="16"
          height="16" fill="currentColor"
          class="bi bi-x-circle-fill me-2" viewBox="0 0 16 16">
@@ -17,10 +16,14 @@
       2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0
       0 0-.708-.708L8 7.293 5.354 4.646z"/>
     </svg>
-    <span class="flex-grow-1">{{ text }} ({{ item.status }})</span>
-    <a v-if="item.status !== 'unknown'" href="#" @click.prevent="viewPDF" class="pe-3">View</a>
-    <a v-if="item.status !== 'unknown'" href="#" @click.prevent="downloadPDF">Download</a>
-    <a :href="pdfLink" :download="text" hidden ref="downloadButton"></a>
+    <span class="flex-grow-1">{{ text }} ({{ $t(`internshipModule.pdfStatus.${item.status}`) }})</span>
+    <a v-if="item.status !== 'unknown'" href="#" @click.prevent="viewPDF" class="pe-3">
+      {{ $t('internshipModule.forms.view') }}
+    </a>
+    <a v-if="item.status !== 'unknown'" href="#" @click.prevent="downloadPDF">
+      {{ $t('internshipModule.forms.download') }}
+    </a>
+    <a :href="pdfLink" :download="fileName" hidden ref="downloadButton"></a>
   </li>
 </template>
 
@@ -58,6 +61,10 @@ export default defineComponent({
         default:
           return 'list-group-item-light';
       }
+    },
+    fileName() {
+      if (!this.item.filePath) return 'unknown';
+      return this.item.filePath.split('/').pop();
     },
   },
   methods: {

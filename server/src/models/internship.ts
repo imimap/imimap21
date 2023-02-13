@@ -5,7 +5,7 @@ import { Semester } from "../helpers/semesterHelper";
 import { getWeeksBetween, isValidDateRange, normalizeDate } from "../helpers/dateHelper";
 import { ICompany } from "./company";
 import { User } from "./user";
-import { EventSchema, IEvent } from "./event";
+import { EventSchema, EventTypes, IEvent } from "./event";
 import { getIMIMapAdmin } from "../helpers/imimapAsAdminHelper";
 
 export enum InternshipStatuses {
@@ -264,6 +264,7 @@ InternshipSchema.methods.approve = async function (creator: Types.ObjectId) {
     throw new Error("Internship is not ready for approval yet");
 
   this.events.push({
+    type: EventTypes.INTERNSHIP_UPDATE,
     creator: user._id,
     accept: true,
   });
@@ -281,6 +282,7 @@ InternshipSchema.methods.reject = async function (creator: Types.ObjectId) {
     throw new Error("Internship is not ready for approval yet");
 
   this.events.push({
+    type: EventTypes.INTERNSHIP_UPDATE,
     creator: user._id,
     accept: false,
   });
@@ -298,6 +300,7 @@ InternshipSchema.methods.markAsOver = async function (creator: Types.ObjectId) {
     );
 
   this.events.push({
+    type: EventTypes.INTERNSHIP_UPDATE,
     creator: user._id,
     changes: {
       status: InternshipStatuses.OVER,
@@ -326,6 +329,7 @@ InternshipSchema.methods.pass = async function (creator: Types.ObjectId) {
     throw new Error("Internship is not ready for grading yet");
 
   this.events.push({
+    type: EventTypes.INTERNSHIP_UPDATE,
     creator: user._id,
     changes: {
       status: InternshipStatuses.PASSED,
@@ -342,6 +346,7 @@ InternshipSchema.methods.forcePass = async function (creator: Types.ObjectId) {
   if (!user?.isAdmin) throw new Error("Only admins may grade an internship");
   // Check if internship is ready for grading
   this.events.push({
+    type: EventTypes.INTERNSHIP_UPDATE,
     creator: user._id,
     changes: {
       status: InternshipStatuses.PASSED,

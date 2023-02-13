@@ -6,6 +6,7 @@ import { Company } from "./models/company";
 import { companySizes } from "./helpers/companySizes";
 import { isoLanguages } from "./helpers/isoLanguages";
 import { IInternshipModule, InternshipModule } from "./models/internshipModule";
+import { getIMIMapAdmin } from "./helpers/imimapAsAdminHelper";
 
 function generateRange(size: number, start?: number): number[] {
   return [...Array(size).keys()].map((i) => i + (start ?? 0));
@@ -123,8 +124,9 @@ async function generateStudents(
 }
 
 export default async function seed(): Promise<void> {
-  // Generate admin account
+  // Generate admin accounts
   await createAdmin();
+  await getIMIMapAdmin();
 
   // Generate users without internships
   await generateStudents(100000, 10);

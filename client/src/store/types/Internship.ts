@@ -22,7 +22,7 @@ export interface Internship {
   lsfEctsProofPdf: PdfDocument;
   locationJustificationPdf: PdfDocument;
   contractPdf: PdfDocument;
-  bvgTicketExemptionRequestPdf: PdfDocument;
+  bvgTicketExemptionPdf: PdfDocument;
   certificatePdf: PdfDocument;
   events: Event[];
   status: string;

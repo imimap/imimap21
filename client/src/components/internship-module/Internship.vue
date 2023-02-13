@@ -1,123 +1,63 @@
 <template>
-  <div
-    class="text-left modal fade"
-    id="requestPdfModal"
-    tabindex="-1"
-    aria-labelledby="consentModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">
-            {{ $t("internshipModule.forms.uploadApplication") }}
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close">
-          </button>
-        </div>
-        <div class="modal-body text-left">
-          <div>
-            <label for="requestPdfFileInput"
-                   class="form-label">
-                   {{ $t("internshipModule.forms.pickPDF") }}
-            </label>
-            <input class="form-control form-control-lg"
-                   id="requestPdfFileInput"
-                   type="file"
-                   ref="requestPdfFile"
-                   v-on:change="previewRequestPdf(($event.target as HTMLInputElement).files?.[0])"/>
-            {{ requestPdf.name }}
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-htw-green"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-            v-on:click="uploadRequestPdf">
-            {{ $t("internshipModule.forms.uploadNow") }}
-          </button>
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
-            {{ $t("internshipModule.forms.cancel") }}
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <UploadPDFModal :internship-id="internship?._id" :pdf-type="pdfType" @updateInternship="data => $emit('updateInternship', data)"/>
 
   <div class="card internship-card border-htw-green">
     <div class="card-header">
-      <h5 class="card-title"> {{ $t("internshipModule.internship") }}</h5>
+      <h5 class="card-title">{{ $t("internshipModule.internship") }}</h5>
     </div>
     <div class="card-body">
       <div class="card mb-3 p-0">
         <div class="card-body pt-3 pb-0">
           <p class="card-text">
-            <strong> {{ $t("internshipModule.information") }} </strong>
+            <strong>{{ $t("internshipModule.information") }}</strong>
           </p>
           <table class="table table-striped table-sm table-borderless">
             <tbody>
             <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.semester") }}
-              </td>
+              <td>{{ $t("internshipModule.semester") }}</td>
+              <!-- @TODO: inSemester am internship fehlt -->
+              <td>5 (TODO)</td>
+            </tr>
+            <tr>
+              <td>{{ $t("internshipModule.startDate") }}</td>
               <td>
-                <!-- @TODO: inSemester am internship fehlt -->
-                5 (TODO)
+                {{
+                  startDate?.toLocaleDateString($i18n.locale,
+                    {day: "2-digit", month: "2-digit", year: "numeric"})
+                }}
               </td>
             </tr>
             <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.startDate") }}
-              </td>
+              <td>{{ $t("internshipModule.endDate") }}</td>
               <td>
-                {{ startDate?.toLocaleDateString($i18n.locale,
-                {day: "2-digit", month: "2-digit", year: "numeric"}) }}
+                {{
+                  endDate?.toLocaleDateString($i18n.locale,
+                    {day: "2-digit", month: "2-digit", year: "numeric"})
+                }}
               </td>
             </tr>
             <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.endDate") }}
-              </td>
-              <td>
-                {{ endDate?.toLocaleDateString($i18n.locale,
-                {day: "2-digit", month: "2-digit", year: "numeric"}) }}
-              </td>
-            </tr>
-            <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.duration") }}
-              </td>
+              <td>{{ $t("internshipModule.duration") }}</td>
               <td v-if="duration">
-                 {{ duration}} {{ $t("internshipModule.weeks") }};
+                {{ duration }} {{ $t("internshipModule.weeks") }};
                 <span v-if="duration < 16 && duration >= 8">{{ $t("internshipModule.longEnoughForPartial") }}</span>
                 <span v-if="duration < 8"> {{ $t("internshipModule.notLongEnough") }}</span>
                 <span v-if="duration >= 16">  {{ $t("internshipModule.longEnough") }}</span>
               </td>
             </tr>
             <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.operationalArea") }}
-              </td>
-              <td>
-                {{ internship?.operationalArea }}
-              </td>
+              <td>{{ $t("internshipModule.operationalArea") }}</td>
+              <td>{{ internship?.operationalArea }}</td>
             </tr>
             <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.tasks") }}
-              </td>
-              <td>
-                {{ internship?.tasks }}
-              </td>
+              <td>{{ $t("internshipModule.tasks") }}</td>
+              <td>{{ internship?.tasks }}</td>
             </tr>
             </tbody>
           </table>
-
+          <p v-if="internship?.status === 'planned'" class="text-center">
+            <a href="#" @click.prevent="loadRequestPdf">Antrag generieren</a>
+          </p>
         </div>
       </div>
       <div class="card mb-3 p-0">
@@ -127,89 +67,45 @@
           </p>
           <table class="table table-striped table-sm table-borderless">
             <tbody>
-            <tr>
-              <td style="width:40%">
-                {{ $t("internshipModule.status.application") }}
-              </td>
-              <td class="text-right">
-                <template v-if="requestPdfState === 'unknown'">
-                  <button class="btn btn-htw-green"
-                          data-bs-toggle="modal"
-                          data-bs-target="#requestPdfModal">
-                          {{ $t("internshipModule.forms.uploadApplication") }}
-                  </button>
-                </template>
-                <template v-else>
-                  {{ requestPdfState }}
-                </template>
-              </td>
+            <tr v-for="(name, type) in pdfFiles" :key="type">
+              <template v-for="pdfState in [getPdfState(type)]" :key="pdfState">
+                <td>
+                  <template v-if="pdfState === 'unknown'">{{ name }}</template>
+                  <a v-else href="#" @click.prevent="openPDF(type)">{{ name }}</a>
+                </td>
+                <td>
+                  <a
+                    v-if="pdfState === 'unknown' || pdfState === 'rejected'"
+                    href="#" data-bs-toggle="modal"
+                    data-bs-target="#uploadPdfModal"
+                    @click.prevent="pdfType = type"
+                  >
+                    {{ $t(`internshipModule.forms.${pdfState === 'unknown' ? 'upload' : 'reUpload'}`) }}
+                  </a>
+                </td>
+                <td class="text-end">
+                  <span
+                    v-if="pdfState !== 'unknown'"
+                    :class="['badge', getPdfStatusBadgeClass(pdfState)]"
+                  >
+                    {{ $t(`internshipModule.pdfStatus.${pdfState}`) }}
+                  </span>
+                </td>
+              </template>
             </tr>
             <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.status.contract") }}              </td>
               <td>
-                <template v-if="contractPdfState === 'unknown'">
-                  <button class="btn btn-htw-green"
-                          data-bs-toggle="modal"
-                          data-bs-target="#requestPdfModal"
-                          disabled>
-                          {{ $t("internshipModule.forms.uploadContract") }}
-                  </button>
-                </template>
-                <template v-else>
-                  {{ contractPdfState }}
-                </template>
-              </td>
-            </tr>
-            <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.status.report") }}
-              </td>
-              <td>
-                <template v-if="reportPdfState === 'unknown'">
-                  <button class="btn btn-htw-green"
-                          data-bs-toggle="modal"
-                          data-bs-target="#requestPdfModal"
-                          disabled>
-                          {{ $t("internshipModule.forms.uploadReport") }}
-                  </button>
-                </template>
-                <template v-else>
-                  {{ reportPdfState }}
-                </template>
-              </td>
-            </tr>
-            <tr>
-              <td style="width:20%">
-                {{ $t("internshipModule.status.certificate") }}
-              </td>
-              <td>
-                <template v-if="certificatePdfState === 'unknown'">
-                  <button class="btn btn-htw-green"
-                          data-bs-toggle="modal"
-                          data-bs-target="#requestPdfModal"
-                          disabled>
-                          {{ $t("internshipModule.forms.uploadCertificate") }}
-                  </button>
-                </template>
-                <template v-else>
-                  {{ certificatePdfState }}
-                </template>
-              </td>
-            </tr>
-            <tr>
-              <td style="width:20%">
                 {{ $t("internshipModule.status.internship") }}
               </td>
-              <td>
+              <td colspan="2">
                 <p class="mb-1">{{ internshipStatus }}</p>
                 <br>
                 <!-- Status: planned -->
-                <div v-if="internship?.status == 'planned'">
-                  <div v-if="missingDocuments && missingDocuments?.length > 0" >
+                <div v-if="internship?.status === 'planned'">
+                  <div v-if="missingDocuments && missingDocuments?.length > 0">
                     {{ $t("internshipModule.status.missingPart1") }}
                     <span class="fw-bold">{{ $t("internshipModule.status.documents") }}</span>
-                    {{$t("internshipModule.status.missingPart2") }}
+                    {{ $t("internshipModule.status.missingPart2") }}
                     <ul class="mt-2" v-for="doc in missingDocuments" :key="doc">
                       <li>{{ doc }}</li>
                     </ul>
@@ -218,47 +114,47 @@
                   <div v-if="missingFields && missingFields?.length > 0">
                     {{ $t("internshipModule.status.missingPart1") }}
                     <span class="fw-bold">{{ $t("internshipModule.status.details") }}</span>
-                    {{$t("internshipModule.status.missingPart2") }}
+                    {{ $t("internshipModule.status.missingPart2") }}
                     <ul class="mt-2" v-for="field in missingFields" :key="field">
                       <li>{{ field }}</li>
                     </ul>
                     <p>{{ $t("internshipModule.status.pleaseEditInternship") }}</p>
                   </div>
                 </div>
-                  <!-- Status: requested -->
-                <div v-if="internship?.status == 'requested'">
+                <!-- Status: requested -->
+                <div v-if="internship?.status === 'requested'">
                   <p> {{ $t("internshipModule.status.requestedExplanation") }}</p>
                 </div>
-                 <!-- Status: approved -->
-                 <div v-if="internship?.status == 'approved'">
+                <!-- Status: approved -->
+                <div v-if="internship?.status === 'approved'">
                   <p> {{ $t("internshipModule.status.approvedExplanation") }}</p>
                 </div>
                 <!-- Status: over -->
-                <div v-if="internship?.status == 'over'">
-                  <div v-if="missingProof && missingProof?.length > 0" >
+                <div v-if="internship?.status === 'over'">
+                  <div v-if="missingProof && missingProof?.length > 0">
                     {{ $t("internshipModule.status.missingProofPart1") }}
                     <span class="fw-bold">{{ $t("internshipModule.status.documents") }}</span>
-                    {{$t("internshipModule.status.missingProofPart2") }}
+                    {{ $t("internshipModule.status.missingProofPart2") }}
                     <ul class="mt-2" v-for="doc in missingProof" :key="doc">
                       <li>{{ doc }}</li>
                     </ul>
                   </div>
                 </div>
                 <!-- Status: readyForGrading -->
-                <div v-if="internship?.status == 'readyForGrading'">
+                <div v-if="internship?.status === 'readyForGrading'">
                   <p> {{ $t("internshipModule.status.readyForGradingExplanation") }}</p>
                 </div>
                 <!-- Status: passed -->
-                <div v-if="internship?.status == 'passed'">
+                <div v-if="internship?.status === 'passed'">
                   <p> {{ $t("internshipModule.status.passedExplanation") }}</p>
                 </div>
               </td>
             </tr>
             <tr>
-              <td style="width:20%">
+              <td>
                 {{ $t("internshipModule.comment") }}
               </td>
-              <td>
+              <td colspan="2">
                 Life? Don't talk to me about life.
               </td>
             </tr>
@@ -268,10 +164,15 @@
       </div>
       <div class="my-3">
         <router-link v-if="internship?.status !== 'passed'" :to="{ name: 'EditInternship', params: { id: internship?._id } }">
-          Bearbeiten
+          {{ $t("internshipModule.edit") }}
         </router-link>
-        <button v-if="internship?.status == 'unknown' || internship?.status == 'planned'"
-        @click="deleteInternship(internship?._id)" class="delete-button">Löschen</button>
+        <button
+          v-if="internship?.status === 'unknown' || internship?.status === 'planned'"
+          @click="deleteInternship(internship?._id)"
+          class="delete-button"
+        >
+          {{ $t("internshipModule.delete") }}
+        </button>
       </div>
     </div>
   </div>
@@ -280,15 +181,28 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import { Internship } from '@/store/types/Internship';
+import UploadPDFModal from '@/components/internship/UploadPDFModal.vue';
 import http from '@/utils/http-common';
-import store from '@/store';
-import { showErrorNotification } from '@/utils/notification';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
+import { generateRequestPdf, loadPDFFile } from '@/utils/gateways';
 
 export default defineComponent({
   name: 'Internship',
+  components: { UploadPDFModal },
   data() {
+    const pdfFiles = [
+      'request',
+      'lsfEctsProof',
+      'locationJustification',
+      'contract',
+      'bvgTicketExemption',
+      'certificate',
+      'report',
+    ].reduce((map, value) => ({ ...map, [value]: this.$t(`internshipModule.pdfTypes.${value}`) }), {});
+
     return {
-      requestPdf: {} as File,
+      pdfType: 'request',
+      pdfFiles,
     };
   },
   emits: ['updateInternship', 'deleteInternship'],
@@ -304,27 +218,6 @@ export default defineComponent({
     },
     duration(): number | null {
       return this.internship != null ? Math.round(this.internship.duration * 10) / 10 : null;
-    },
-    requestPdfState(): string | null {
-      return this.internship != null ? this.internship.requestPdf.status : null;
-    },
-    contractPdfState(): string | null {
-      return this.internship != null ? this.internship.contractPdf.status : null;
-    },
-    lsfEctsProofPdfState(): string | null {
-      return this.internship != null ? this.internship.lsfEctsProofPdf.status : null;
-    },
-    locationJustificationPdfState(): string | null {
-      return this.internship != null ? this.internship.locationJustificationPdf.status : null;
-    },
-    bvgTicketExemptionRequestPdfState(): string | null {
-      return this.internship != null ? this.internship.bvgTicketExemptionRequestPdf.status : null;
-    },
-    certificatePdfState(): string | null {
-      return this.internship != null ? this.internship.certificatePdf.status : null;
-    },
-    reportPdfState(): string | null {
-      return this.internship != null ? this.internship.reportPdf.status : null;
     },
     internshipStatus(): string | null {
       const currentStatus = this.internship != null ? this.internship.status : null;
@@ -386,26 +279,31 @@ export default defineComponent({
     },
   },
   methods: {
-    previewRequestPdf(file: File | undefined) {
-      if (!file) return;
-      this.requestPdf = file;
+    async loadRequestPdf(): Promise<void> {
+      if (!this.internship) return;
+      const requestPdf = await generateRequestPdf(this.internship._id);
+      window.open(URL.createObjectURL(requestPdf), '_blank');
     },
-    async uploadRequestPdf() {
-      try {
-        const formData = new FormData();
-        formData.append('pdf', this.requestPdf);
-        const res = await http.post(
-          `/internships/${this.internship?._id}/pdf/request`,
-          formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          },
-        );
-        await this.$emit('updateInternship', res.data);
-      } catch (err: any) {
-        console.log(err);
+    getPdfState(pdfType: string): string | null {
+      if (!this.internship) return null;
+      return this.internship[`${pdfType}Pdf`].status;
+    },
+    getPdfStatusBadgeClass(pdfState: string): string {
+      switch (pdfState) {
+        case 'submitted':
+          return 'bg-warning';
+        case 'accepted':
+          return 'bg-success';
+        case 'rejected':
+          return 'bg-danger';
+        default:
+          return 'bg-secondary';
       }
+    },
+    async openPDF(pdfType: string): Promise<void> {
+      if (!this.internship) return;
+      const pdfFile = await loadPDFFile(this.internship[`${pdfType}Pdf`].filePath);
+      window.open(URL.createObjectURL(pdfFile), '_blank');
     },
     async deleteInternship(internshipId: string | undefined) {
       if (!internshipId) return;
@@ -414,10 +312,7 @@ export default defineComponent({
         try {
           const res = await http.delete(`/internships/${internshipId}`);
           if (res.status === 204) {
-            await store.dispatch('addNotification', {
-              text: 'Praktikum gelöscht!',
-              type: 'success',
-            });
+            await showSuccessNotification('Praktikum gelöscht!');
             this.$emit('deleteInternship');
           }
         } catch (err: any) {
