@@ -22,7 +22,8 @@ import {
   INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN,
   INTERNSHIP_FIELDS_VISIBLE_FOR_USER,
 } from "../helpers/internshipHelper";
-
+import { EventTypes } from "../models/event";
+import path from "path";
 
 /**
  * Returns all information on certain internship for admin or on own internship for student.
