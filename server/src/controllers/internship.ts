@@ -196,6 +196,7 @@ export async function getSearchResults(
     {
       $group: {
         _id: "$company._id",
+        internships: { $addToSet: "$$CURRENT" },
       },
     },
   ];

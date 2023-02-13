@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div v-show="amountOfCompaniesSeen >= 12" id="form-block4" class="text-left mt-5 mx-3 mb-0">
+    <div v-show="amountOfCompaniesSeen >= 12" id="form-block4" class="text-left mt-5 mx-3">
     <p>{{ $t("search.limitReached") }}</p>
     </div>
 

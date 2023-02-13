@@ -348,7 +348,7 @@ export async function findNewCompaniesAmount(
     {
       $group: {
         _id: "$company._id",
-        $count: "count",
+        count: { $sum: 1 },
       },
     },
   ];
@@ -357,6 +357,6 @@ export async function findNewCompaniesAmount(
 
   if (companiesWithInternships.length == 0) res.json(0);
   else {
-    res.json(companiesWithInternships[0].count);
+    res.json(companiesWithInternships.length);
   }
 }
