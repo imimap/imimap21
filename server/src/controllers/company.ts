@@ -1,9 +1,17 @@
 import { NextFunction, Request, Response } from "express";
-import { User } from "../models/user";
+import { IUser, User } from "../models/user";
 import { BadRequest, Forbidden, NotFound } from "http-errors";
 import { Company } from "../models/company";
 import { getCompanyObject } from "../helpers/companyHelper";
 import { constants } from "http2";
+import { getUser, getUserWithInternshipModule } from "../helpers/userHelper";
+import { Internship, InternshipStatuses } from "../models/internship";
+import {
+  createInternshipQueryOptions,
+  getProjection,
+  INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN,
+  INTERNSHIP_FIELDS_VISIBLE_FOR_USER,
+} from "../helpers/internshipHelper";
 
 /**
  * Returns all companies to admins
@@ -213,4 +221,142 @@ export async function deleteCompany(
 
   res.statusCode = constants.HTTP_STATUS_NO_CONTENT;
   res.send();
+}
+
+/**
+ * Returns amount of seen companies
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function findCompaniesSeenAmount(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  let user;
+  try {
+    user = await getUser(req.user?.email);
+  } catch (e) {
+    return next(e);
+  }
+  res.json(user.studentProfile?.companiesSeen?.length || 0);
+}
+
+/**
+ * Returns the internships of the previously seen companies by the user
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function findInternshipsOfSeenCompanies(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  let user;
+  try {
+    user = await getUser(req.user?.email);
+  } catch (e) {
+    return next(e);
+  }
+  if (!user.studentProfile?.companiesSeen) res.json([]);
+  const internships = await collectInternships(user);
+
+  res.json(internships);
+}
+
+export async function collectInternships(user: IUser): Promise<any[]> {
+  let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
+  if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
+  const projection = getProjection(select);
+  projection.company = { $first: "$company" };
+
+  const pipeline: unknown[] = [
+    {
+      $lookup: {
+        from: "companies",
+        localField: "company",
+        foreignField: "_id",
+        as: "company",
+      },
+    },
+    { $project: projection },
+    {
+      $match: {
+        "company._id": {
+          $in: user.studentProfile?.companiesSeen,
+        },
+      },
+    },
+  ];
+  const internships = await Internship.aggregate(pipeline);
+  return internships;
+}
+
+/**
+ * Returns amount of companies that fit certain search criteria eg. company.companyName
+ * and have not been seen yet by the user.
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function findNewCompaniesAmount(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  let user;
+  try {
+    user = await getUserWithInternshipModule(req.user?.email);
+  } catch (e) {
+    return next(e);
+  }
+
+  // Create Options
+  const options = createInternshipQueryOptions(req.query);
+
+  if (!user.isAdmin) {
+    options["company.excludedFromSearch"] = false;
+    options.status = InternshipStatuses.PASSED;
+    const excludedInternships = user.studentProfile?.internship.internships || [];
+    if (excludedInternships.length > 0) {
+      options._id = {
+        $nin: excludedInternships,
+      };
+    }
+    if (user.studentProfile?.companiesSeen && user.studentProfile?.companiesSeen.length > 0) {
+      options["company._id"] = {
+        $nin: user.studentProfile?.companiesSeen,
+      };
+    }
+  }
+
+  //gets internships matching criteria but groups the ones in the same company
+  const pipeline: unknown[] = [
+    {
+      $lookup: {
+        from: "companies",
+        localField: "company",
+        foreignField: "_id",
+        as: "company",
+      },
+    },
+    {
+      $match: options,
+    },
+    {
+      $group: {
+        _id: "$company._id",
+        count: { $sum: 1 },
+      },
+    },
+  ];
+
+  const companiesWithInternships = await Internship.aggregate(pipeline);
+
+  if (companiesWithInternships.length == 0) res.json(0);
+  else {
+    res.json(companiesWithInternships.length);
+  }
 }

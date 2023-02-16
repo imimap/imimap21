@@ -14,14 +14,16 @@ import {
 import { buildHtmlTemplate, buildPDFFile, saveFile } from "../helpers/pdfHelper";
 import { IUser, User } from "../models/user";
 import { constants } from "http2";
-import * as QueryString from "qs";
+import { ICompany } from "../models/company";
+import { collectInternships } from "./company";
+import {
+  createInternshipQueryOptions,
+  getProjection,
+  INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN,
+  INTERNSHIP_FIELDS_VISIBLE_FOR_USER,
+} from "../helpers/internshipHelper";
 import { EventTypes } from "../models/event";
-import * as path from "path";
-
-const INTERNSHIP_FIELDS_VISIBLE_FOR_USER =
-  "_id company tasks operationalArea programmingLanguages livingCosts salary paymentTypes status";
-const INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN =
-  "startDate endDate workingHoursPerWeek supervisor";
+import path from "path";
 
 /**
  * Returns all information on certain internship for admin or on own internship for student.
@@ -88,11 +90,11 @@ export async function getRandomInternship(
   const options: { [k: string]: unknown } = {};
   if (user.studentProfile?.internship) {
     options["status"] = InternshipStatuses.PASSED;
-    if (user.studentProfile.internshipsSeen && user.studentProfile.internshipsSeen.length >= 12) {
+    if (user.studentProfile.companiesSeen && user.studentProfile.companiesSeen.length >= 12) {
       options._id = {
-        $in: user.studentProfile.internshipsSeen,
+        $in: user.studentProfile.companiesSeen,
       };
-      maxOffset = user.studentProfile.internshipsSeen.length;
+      maxOffset = user.studentProfile.companiesSeen.length;
     } else {
       options._id = {
         $nin: user.studentProfile.internship.internships,
@@ -110,8 +112,8 @@ export async function getRandomInternship(
   if (!internship) return next(new NotFound("Internship not found"));
 
   if (!user.isAdmin && user.studentProfile) {
-    if (!user.studentProfile.internshipsSeen) user.studentProfile.internshipsSeen = [];
-    user.studentProfile.internshipsSeen.push(internship._id);
+    if (!user.studentProfile.companiesSeen) user.studentProfile.companiesSeen = [];
+    user.studentProfile.companiesSeen.push(internship.company._id); //TODO: check if it works like that
     await user.save();
   }
 
@@ -123,15 +125,14 @@ export async function getRandomInternship(
  * programmingLanguage.
  * Returns administration information for admins only.
  * Default offset is 0. Default amount of internships returned for admins is 50.
- * Returns as many internships as a student has left in their 12-internships contingent
- * All internships returned to students are added to the student's seen internships.
- * Returned internships are selected in order, not randomly - thus, always the same internships are
- * returned for certain query.
+ * Returns as many internships as a student has left in their 12-companies contingent
+ * All companies returned to students are added to the student's seen companies.
+ * Internships that took place at the same company do therefore not exceed the limit.
  * @param req
  * @param res
  * @param next
  */
-export async function findInternships(
+export async function getSearchResults(
   req: Request,
   res: Response,
   next: NextFunction
@@ -148,41 +149,31 @@ export async function findInternships(
 
   // Create Options
   const options: { [k: string]: unknown } = createInternshipQueryOptions(req.query);
+  const excludedCompanies = [] as ICompany[];
 
   if (!user.isAdmin) {
     options["company.excludedFromSearch"] = false;
     options.status = InternshipStatuses.PASSED;
-    let excludedInternships = user.studentProfile?.internship.internships || [];
-    if (
-      user.studentProfile?.internshipsSeen &&
-      user.studentProfile.internshipsSeen.length > 0 &&
-      (!req.query.seen || req.query.seen === "false")
-    ) {
-      const internshipsSeen = user.studentProfile.internshipsSeen;
-      excludedInternships = excludedInternships.concat(internshipsSeen);
+    for (const i in user.studentProfile?.internship.internships) {
+      const company = (i as unknown as InstanceType<typeof Internship>).company;
+      excludedCompanies.push(company);
     }
-    if (excludedInternships.length > 0) {
+    if (excludedCompanies.length > 0) {
       options._id = {
-        $nin: excludedInternships,
-      };
-    }
-    if (req.query.seen === "true") {
-      options._id = {
-        $in: user.studentProfile?.internshipsSeen || [],
+        $nin: excludedCompanies,
       };
     }
   }
 
   // Set select: Which fields to select?
-  // we add status here because otherwise we select only those internships with status == passed
+  // for students only passed internships get retured
   let select = INTERNSHIP_FIELDS_VISIBLE_FOR_USER;
   if (user.isAdmin) select += " " + INTERNSHIP_FIELDS_ADDITIONALLY_VISIBLE_FOR_ADMIN;
 
   // Set limit: How many internships to return?
   let limit = typeof req.query.limit === "string" && parseInt(req.query.limit);
-  if (!user.isAdmin && user.studentProfile?.internshipsSeen) {
-    limit = 12;
-    if (req.query.seen !== "true") limit = limit - user.studentProfile.internshipsSeen.length;
+  if (!user.isAdmin && user.studentProfile?.companiesSeen) {
+    limit = 12 - user.studentProfile.companiesSeen.length;
   }
 
   // Set offset if applicable
@@ -201,11 +192,73 @@ export async function findInternships(
       },
     },
     { $project: projection },
+    { $match: options },
+    {
+      $group: {
+        _id: "$company._id",
+        internships: { $addToSet: "$$CURRENT" },
+      },
+    },
   ];
 
-  if (Object.keys(options).length > 0) pipeline.push({ $match: options });
+  let companiesWithInternships: any[] = [];
+  const searchResults = [];
 
-  // Query new internships
+  //returns companies with a list of internships fitting the search criteria that happened at that company
+  companiesWithInternships = await queryCompaniesWithInternships(user, pipeline, limit, offset);
+
+  if (!user.isAdmin && user.studentProfile) {
+    //fetch previously seen internships of student
+    let internshipsOfSeenCompanies = await collectInternships(user);
+    internshipsOfSeenCompanies = internshipsOfSeenCompanies.map((i) => i._id);
+    if (!user.studentProfile.companiesSeen) user.studentProfile.companiesSeen = [];
+    let processed = 0;
+
+    //for each company in the result go through the internship list
+    for (const company in companiesWithInternships) {
+      for (const internship in companiesWithInternships[company].internships) {
+        if (
+          //internship fits search criteria and has already been seen-> add to results
+          internshipsOfSeenCompanies.some((doc) =>
+            doc.equals(companiesWithInternships[company].internships[internship]._id)
+          )
+        ) {
+          searchResults.push(companiesWithInternships[company].internships[internship]);
+        } else if (
+          //internship fits criteria but has not been seen, but the company had been seen
+          user.studentProfile.companiesSeen.some((doc) =>
+            doc.equals(companiesWithInternships[company]._id)
+          )
+        ) {
+          searchResults.push(companiesWithInternships[company].internships[internship]);
+        } else {
+          if (processed < limit) {
+            //internship has not been seen and meets criteria --> add to result and add company to seen list
+            searchResults.push(companiesWithInternships[company].internships[internship]);
+            user.studentProfile.companiesSeen.push(companiesWithInternships[company]._id);
+            processed++;
+          }
+        }
+      }
+      await user.save();
+    }
+  } else {
+    //user is admin, just add all internships of the found companies
+    for (const company in companiesWithInternships) {
+      for (const internship in companiesWithInternships[company].internships) {
+        searchResults.push(companiesWithInternships[company].internships[internship]);
+      }
+    }
+  }
+  res.json(searchResults);
+}
+
+async function queryCompaniesWithInternships(
+  user: IUser,
+  pipeline: unknown[],
+  limit: number | false,
+  offset: number | false
+): Promise<any[]> {
   let internships;
   if (user.isAdmin) {
     internships = await Internship.aggregate(pipeline)
@@ -215,154 +268,10 @@ export async function findInternships(
     if (limit <= 0) {
       internships = [];
     } else {
-      pipeline.push({ $sample: { size: limit } });
       internships = await Internship.aggregate(pipeline);
     }
   }
-
-  // Add newly returned internships to internshipsSeen
-  if (req.query.seen !== "true" && !user.isAdmin && user.studentProfile && internships.length > 0) {
-    if (!user.studentProfile.internshipsSeen) user.studentProfile.internshipsSeen = [];
-    user.studentProfile.internshipsSeen.push(...internships.map((internship) => internship._id));
-    await user.save();
-  }
-
-  res.json(internships);
-}
-
-function createInternshipQueryOptions(query: QueryString.ParsedQs) {
-  const options: { [k: string]: unknown } = {};
-
-  if (Object.keys(query).length === 0) {
-    return options;
-  }
-
-  const companyQueryFields = ["companyName", "branchName", "industry", "mainLanguage", "size"];
-  companyQueryFields.forEach((field) => {
-    if (query[field])
-      options[`company.${field}`] = {
-        $regex: query[field],
-        $options: "i",
-      };
-  });
-  if (query.country) {
-    options["company.address.country"] = {
-      $regex: query.country,
-      $options: "i",
-    };
-  }
-  if (query.operationalArea) {
-    options.operationalArea = {
-      $regex: query.operationalArea,
-      $options: "i",
-    };
-  }
-  if (query.programmingLanguage) {
-    options.programmingLanguages = {
-      $regex: query.programmingLanguage,
-      $options: "i",
-    };
-  }
-  if (query.paymentType) {
-    options.paymentTypes = {
-      $regex: query.paymentType,
-      $options: "i",
-    };
-  }
-  return options;
-}
-
-function getProjection(select: string) {
-  return select.split(" ").reduce((p: { [key: string]: unknown }, field) => {
-    p[field] = 1;
-    return p;
-  }, {});
-}
-
-/**
- * Returns amount of internships that fit certain search criteria e.g. company.companyName or
- * programmingLanguage.
- * @param req
- * @param res
- * @param next
- */
-export async function findInternshipsAmount(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  let user;
-  try {
-    user = await getUserWithInternshipModule(req.user?.email);
-  } catch (e) {
-    return next(e);
-  }
-
-  // Create Options
-  const options = createInternshipQueryOptions(req.query);
-
-  if (!user.isAdmin) {
-    options["company.excludedFromSearch"] = false;
-    options.status = InternshipStatuses.PASSED;
-    const excludedInternships = user.studentProfile?.internship.internships || [];
-    if (excludedInternships.length > 0) {
-      options._id = {
-        $nin: excludedInternships,
-      };
-    }
-  }
-
-  const projection = getProjection(INTERNSHIP_FIELDS_VISIBLE_FOR_USER);
-  projection.company = { $first: "$company" };
-  const facet = {
-    $facet: {
-      totalCount: [
-        {
-          $count: "count",
-        },
-      ],
-    },
-  };
-  const pipeline: unknown[] = [
-    {
-      $lookup: {
-        from: "companies",
-        localField: "company",
-        foreignField: "_id",
-        as: "company",
-      },
-    },
-    { $project: projection },
-  ];
-  if (Object.keys(options).length > 0) pipeline.push({ $match: options });
-  pipeline.push(facet);
-
-  const internships = await Internship.aggregate(pipeline);
-
-  const count = internships[0].totalCount.length > 0 ? internships[0].totalCount[0].count : 0;
-
-  res.json(count);
-}
-
-/**
- * Returns amount of seen internships
- * @param req
- * @param res
- * @param next
- */
-export async function findInternshipsSeenAmount(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  let user;
-  try {
-    user = await getUser(req.user?.email);
-  } catch (e) {
-    return next(e);
-  }
-
-  res.json(user.studentProfile?.internshipsSeen?.length || 0);
+  return internships;
 }
 
 /**

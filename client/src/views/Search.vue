@@ -1,7 +1,11 @@
 <template>
   <div class="container">
+    <div v-show="amountOfCompaniesSeen >= 12" id="form-block4" class="text-left mt-5 mx-3">
+    <p>{{ $t("search.limitReached") }}</p>
+    </div>
+
     <!-- Search Form -->
-    <div id="form-block4" class="text-left mt-5 mx-3">
+    <div v-show="amountOfCompaniesSeen < 12" id="form-block4" class="text-left mt-5 mx-3">
       <h4 class="mb-3">{{ $t("search.headline") }}</h4>
       <div class="card text-white bg-htw-green mt-2 mb-4 ms-3">
         <div class="card-body p-1">
@@ -23,9 +27,9 @@
                         v-model="paymentFilter"
                         id="search_paid">
                   <option :value="null">{{ $t("search.form.paymentOptions.standard") }}</option>
-                  <template v-if="this.availablePaymentOptions != null">
+                  <template v-if="availablePaymentOptions != null">
                     <option
-                      v-for="(paymentOption, index) in this.availablePaymentOptions"
+                      v-for="(paymentOption, index) in availablePaymentOptions"
                       v-bind:key="index"
                       v-bind:paymentOption="paymentOption"
                       :value="paymentOption">
@@ -39,12 +43,12 @@
                   {{ $t("search.form.location") }}
                 </label>
                 <select class="form-select mx-2 my-2 w-auto h-auto"
-                        v-model="this.countryFilter"
+                        v-model="countryFilter"
                         id="search_location">
                   <option :value="null"> {{ $t("search.form.niceLocation") }}</option>
-                  <template v-if="this.availableCountries != null">
+                  <template v-if="availableCountries != null">
                     <option
-                      v-for="(country, index) in this.availableCountries"
+                      v-for="(country, index) in availableCountries"
                       v-bind:key="index"
                       v-bind:country="country"
                       :value="country">
@@ -58,11 +62,11 @@
                   {{ $t("search.form.orientation") }}
                 </label>
                 <select class="form-select mx-2 my-2 w-auto h-auto"
-                        v-model="this.operationalAreaFilter"
+                        v-model="operationalAreaFilter"
                         id="search_orientation_id">
                   <option :value="null">{{ $t("search.form.fun") }}</option>
-                  <template v-if="this.availableOperationalAreas != null">
-                    <option v-for="(orientation, index) in this.availableOperationalAreas"
+                  <template v-if="availableOperationalAreas != null">
+                    <option v-for="(orientation, index) in availableOperationalAreas"
                             v-bind:key="index"
                             :value="orientation">
                       {{ orientation }}
@@ -75,13 +79,13 @@
                   {{ $t("search.form.programmingLanguage") }}
                 </label>
                 <select class="form-select mx-2 my-2 w-auto h-auto"
-                        v-model="this.languageFilter"
+                        v-model="languageFilter"
                         id="search_programming_language_id">
                   <option :value="null">{{ $t("search.form.interested") }}</option>
-                  <template v-if="this.availableLanguages != null">
-                    <option v-for="(language, index) in this.availableLanguages"
+                  <template v-if="availableLanguages != null">
+                    <option v-for="(language, index) in availableLanguages"
                             v-bind:key="index"
-                            :value="this.availableLanguages[index]">
+                            :value="availableLanguages[index]">
                       {{ language }}
                     </option>
                   </template>
@@ -109,16 +113,24 @@
       </div>
     </div>
     <!-- Too many results modal -->
-    <too-many-results :amount-of-results="amountOfResults"
-                      :amount-of-internships-seen="amountOfInternshipsSeen"
+    <too-many-results :amount-of-company-results="amountOfCompanies"
+                      :amount-of-companies-seen="amountOfCompaniesSeen"
                       v-on:search="searchRequest"/>
     <!-- Search Results -->
+    <div id="previous-search-results" class="search_results"
+           v-if="previousResultCount > 0 && !resultsShown">
+        <SearchResultList
+          :result-count="previousResultCount"
+          :search-results="previousSearchResults"
+          :result-count-text="'search.results.previousResultCount'">
+        </SearchResultList>
+      </div>
     <div id="form-block4" class="mx-3 my-3"
-         v-if="!loadingState && resultCount <= 0 && previousResultCount <= 0">
+         v-if="!loadingState && resultCount <= 0">
       {{ $t("search.results.noResults") }}
     </div>
     <div id="form-block4" class="mx-3 my-3"
-         v-if="!loadingState && (resultCount > 0 || previousResultCount > 0)">
+         v-if="!loadingState && (resultCount > 0 )">
       <div class="text-center">
         <button type="button"
                 class="btn btn-htw-green text-white mb-3"
@@ -132,14 +144,6 @@
           :result-count="resultCount"
           :search-results="searchResults"
           :result-count-text="'search.results.resultCount'">
-        </SearchResultList>
-      </div>
-      <div id="previous-search-results" class="search_results"
-           v-if="!cardToggle && previousResultCount > 0">
-        <SearchResultList
-          :result-count="previousResultCount"
-          :search-results="previousSearchResults"
-          :result-count-text="'search.results.previousResultCount'">
         </SearchResultList>
       </div>
       <div id="map-results">
@@ -173,7 +177,7 @@ export default defineComponent({
       availableLanguages: null,
       // Searchresults after query
       searchResults: [] as Internship[],
-      previousSearchResults: [] as Internship[],
+      previousSearchResults: [] as Internship[] || [],
       // Selected filters
       paymentFilter: null,
       countryFilter: null,
@@ -182,10 +186,12 @@ export default defineComponent({
       // Component state
       cardToggle: false,
       loadingState: true,
-      amountOfResults: 0,
-      amountOfInternshipsSeen: 0,
+      amountOfCompanies: 0,
+      amountOfCompaniesSeen: 0,
+      resultsShown: false,
     };
   },
+
   computed: {
     resultCount(): number {
       return this.searchResults.length;
@@ -215,14 +221,14 @@ export default defineComponent({
   methods: {
     async searchOrShowModal() {
       const amountSeen = await this.getAmountOfSeenResults();
-      const amountNew = await this.getAmountOfPossibleResults();
-      if (amountSeen !== undefined && amountSeen < 12 && amountNew !== undefined && amountNew > 6) {
-        this.amountOfResults = amountNew;
-        this.amountOfInternshipsSeen = amountSeen;
+      const amountOfCompanies = await this.getAmountOfPossibleNewResults();
+      if (amountSeen !== undefined && amountSeen < 12 && amountOfCompanies !== undefined && amountOfCompanies > 0) {
+        this.amountOfCompanies = amountOfCompanies;
+        this.amountOfCompaniesSeen = amountSeen;
         this.modal.show();
       } else {
-        this.modal.hide();
         await this.searchRequest();
+        this.modal.hide();
       }
     },
     async getAvailableCountries() {
@@ -257,10 +263,10 @@ export default defineComponent({
         await showErrorNotification(`Fehler beim laden der verfügbaren Programmiersprachen [ERROR: ${err.message}]`);
       }
     },
-    async getAmountOfPossibleResults(): Promise<number | undefined> {
+    async getAmountOfPossibleNewResults(): Promise<number | undefined> {
       let amount: number | PromiseLike<number>;
       try {
-        const res = await http.get('/internships/amount', {
+        const res = await http.get('/companies/possibleResults/amount', {
           params: {
             country: this.countryFilter,
             operationalArea: this.operationalAreaFilter,
@@ -269,6 +275,7 @@ export default defineComponent({
           },
         });
         amount = await res.data;
+
         return amount;
       } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
         await showErrorNotification(`Fehler beim Laden der neuen Suchergebnisse [ERROR: ${err.message}]`);
@@ -278,7 +285,7 @@ export default defineComponent({
     async getAmountOfSeenResults(): Promise<number | undefined> {
       let amount: number | PromiseLike<number>;
       try {
-        const res = await http.get('/internships/seen/amount');
+        const res = await http.get('/companies/seen/amount');
         amount = await res.data;
         return amount;
       } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
@@ -286,38 +293,47 @@ export default defineComponent({
       }
       return undefined;
     },
-    async searchRequestForPreviousResults() {
-      try {
-        this.previousSearchResults = await this.getSearchResults(true);
-      } catch (err: any) {
-        await showErrorNotification(`Fehler beim Durchsuchen der vorherigen Suchergebnisse [ERROR: ${err.message}]`);
-      }
-    },
+
     async searchRequestForNewResults() {
       try {
-        this.searchResults = await this.getSearchResults(false);
+        this.searchResults = await this.getSearchResults();
+        const getInternshipsOfCompaniesSeen = await this.getInternshipsOfCompaniesSeen();
+        this.previousSearchResults = getInternshipsOfCompaniesSeen || [];
       } catch (err: any) {
         await showErrorNotification(`Fehler beim Suchen nach neuen Suchergebnisse [ERROR: ${err.message}]`);
       }
     },
+    async getInternshipsOfCompaniesSeen() {
+      let internships: Internship[];
+      const amountSeen = await this.getAmountOfSeenResults();
+
+      if (!amountSeen || amountSeen === 0) return [];
+      this.amountOfCompaniesSeen = amountSeen;
+      try {
+        const res = await http.get('/companies/seen/results');
+        internships = await res.data;
+        return internships;
+      } catch (err: any) { // Todo: Ersetzen durch util showErrorMessage
+        await showErrorNotification(`Fehler beim Laden der vorherigen Suchergebnisse [ERROR: ${err.message}]`);
+      }
+      return undefined;
+    },
     async searchRequest() {
       this.loadingState = true;
-      await this.searchRequestForPreviousResults();
       await this.searchRequestForNewResults();
       this.loadingState = false;
+      this.resultsShown = true;
     },
-    async getSearchResults(seen: boolean) {
+    async getSearchResults() {
       try {
-        const res = await http.get('/internships', {
+        const res = await http.get('/internships/searchResults', {
           params: {
             country: this.countryFilter,
             operationalArea: this.operationalAreaFilter,
             programmingLanguage: this.languageFilter,
             paymentType: this.paymentFilter,
-            seen,
           },
         });
-
         return res.data;
       } catch (err: any) {
         throw new Error(`Fehler beim Suchen nach Praktika [ERROR: ${err.message}]`);
@@ -329,6 +345,9 @@ export default defineComponent({
     this.getAvailablePaymentOptions();
     this.getAvailableOrientations();
     this.getAvailableLanguages();
+  },
+  async mounted() {
+    this.previousSearchResults = await this.getInternshipsOfCompaniesSeen() || [];
   },
 });
 </script>

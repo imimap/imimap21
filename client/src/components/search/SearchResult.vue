@@ -37,6 +37,23 @@
         <strong>{{ $t("search.contact") }}</strong>
         {{ companyEmail }}
       </p>
+      <p v-if="startDate" class="pl-3">
+        <strong>{{ $t("search.startDate") }}</strong>
+        {{ normalizedDate(startDate) }}
+      </p>
+      <p v-if="endDate" class="pl-3">
+        <strong>{{ $t("search.endDate") }}</strong>
+        {{ normalizedDate(endDate) }}
+      </p>
+      <p v-if="workingHoursPerWeek" class="pl-3">
+        <strong>{{ $t("search.workingHoursPerWeek") }}</strong>
+        {{ workingHoursPerWeek }}
+      </p>
+      <div v-if="supervisor">
+        <strong>{{ $t("search.supervisor") }}</strong>
+        <p class="pl-3 d-inline" v-if="supervisor.fullName">{{ supervisor.fullName }} , </p>
+        <p class="pl-3 d-inline " v-if="supervisor.emailAddress">{{ supervisor.emailAddress }}</p>
+      </div>
     </td>
   </tr>
 </template>
@@ -57,6 +74,19 @@ export default defineComponent({
     programmingLanguages: {
       type: Array as PropType<string[]>,
       default() { return []; },
+    },
+    startDate: String,
+    endDate: String,
+    workingHoursPerWeek: Number,
+    supervisor: {
+      type: Object,
+    },
+  },
+  methods: {
+    normalizedDate(date: string | undefined): string | undefined {
+      if (!date) return undefined;
+      const dateWithoutTime = new Date(date).toISOString().split('T')[0].toString();
+      return dateWithoutTime;
     },
   },
 });

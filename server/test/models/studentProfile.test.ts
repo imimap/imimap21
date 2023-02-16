@@ -39,16 +39,16 @@ describe("StudentProfile", () => {
     const createdUser = await User.findOne({ firstName: "Ada" });
 
     //is there a way I can avoid these annoying nullish checks?
-    if (!createdUser?.studentProfile?.internshipsSeen) {
+    if (!createdUser?.studentProfile?.companiesSeen) {
       throw "createdUser or one of its properties is null.";
     }
 
     const internshipObjectId: Types.ObjectId = Types.ObjectId();
-    createdUser.studentProfile.internshipsSeen.push(internshipObjectId);
+    createdUser.studentProfile.companiesSeen.push(internshipObjectId);
     await createdUser.save();
 
     const updatedUser = await User.findOne({ firstName: "Ada" }).lean();
-    expect(updatedUser?.studentProfile?.internshipsSeen).toContainEqual(internshipObjectId);
+    expect(updatedUser?.studentProfile?.companiesSeen).toContainEqual(internshipObjectId);
   });
   it("can have own internships", async () => {
     const createdUser = await User.findOne({ firstName: "Ada" });

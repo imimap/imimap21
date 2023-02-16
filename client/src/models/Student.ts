@@ -1,14 +1,3 @@
-// export default interface Student {
-//   firstName: string;
-//   lastName: string;
-//   emailAddress: string;
-//   studentProfile: {
-//     internshipsSeen: string[];
-//     studentId: string;
-//     internship: string;
-//   };
-// };
-
 import InternshipModule from '@/models/InternshipModule';
 
 export default class Student {
@@ -21,7 +10,7 @@ export default class Student {
   emailAddress = '';
 
   studentProfile = {
-    internshipsSeen: [],
+    companiesSeen: [],
     studentId: '',
     internship: {} as InternshipModule,
   };

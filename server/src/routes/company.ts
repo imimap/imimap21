@@ -7,8 +7,11 @@ import {
   createCompany,
   deleteCompany,
   getAllCompanies,
+  findCompaniesSeenAmount,
+  findNewCompaniesAmount,
   getCompanyById,
   updateCompany,
+  findInternshipsOfSeenCompanies,
 } from "../controllers/company";
 
 const companyRouter = Router();
@@ -29,6 +32,38 @@ companyRouter.get(
   asyncHandler(getCompanyById)
 );
 
+const standardQueryParams = [
+  "branchName",
+  "companyName",
+  "country",
+  "industry",
+  "mainLanguage",
+  "operationalArea",
+  "paymentType",
+  "programmingLanguage",
+  "size",
+];
+companyRouter.get(
+  "/possibleResults/amount",
+  authMiddleware(),
+  query(standardQueryParams).toUpperCase(),
+  validate,
+  asyncHandler(findNewCompaniesAmount)
+);
+
+companyRouter.get(
+  "/seen/amount",
+  authMiddleware(),
+  validate,
+  asyncHandler(findCompaniesSeenAmount)
+);
+
+companyRouter.get(
+  "/seen/results",
+  authMiddleware(),
+  validate,
+  asyncHandler(findInternshipsOfSeenCompanies)
+);
 const standardPostParams = [
   //company
   "companyName",

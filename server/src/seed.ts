@@ -99,9 +99,10 @@ async function createInternship(): Promise<IInternship> {
   });
 
   // create random number
-  const r = Math.random();
-  if (r < 0.5) return internship.forcePass(ADMIN_USER_ID);
-  else return internship;
+  // const r = Math.random();
+  // if (r < 0.5)
+  return internship.forcePass(ADMIN_USER_ID);
+  // else return internship;
 }
 
 async function generateStudents(
@@ -131,7 +132,7 @@ export default async function seed(): Promise<void> {
   await generateStudents(100000, 10);
 
   // Generate users with one internship
-  await generateStudents(200000, 10, async () => [(await createInternship()).id]);
+  await generateStudents(200000, 30, async () => [(await createInternship()).id]);
 
   // Generate users with two internships
   await generateStudents(300000, 10, async () => [

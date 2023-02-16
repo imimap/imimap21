@@ -5,9 +5,7 @@ import {
   approveInternshipApplication,
   createInternship,
   deleteInternship,
-  findInternships,
-  findInternshipsAmount,
-  findInternshipsSeenAmount,
+  getSearchResults,
   generateRequestPdf,
   getInternshipLocations,
   getInternshipsById,
@@ -36,7 +34,7 @@ const standardQueryParams = [
 ];
 
 internshipRouter.get(
-  "/",
+  "/searchResults",
   authMiddleware(),
   query(standardQueryParams).toUpperCase(),
   query("semester")
@@ -46,22 +44,7 @@ internshipRouter.get(
     .toLowerCase()
     .custom((s) => (s ? isBoolean(s) : true)),
   validate,
-  asyncHandler(findInternships)
-);
-
-internshipRouter.get(
-  "/amount",
-  authMiddleware(),
-  query(standardQueryParams).toUpperCase(),
-  validate,
-  asyncHandler(findInternshipsAmount)
-);
-
-internshipRouter.get(
-  "/seen/amount",
-  authMiddleware(),
-  validate,
-  asyncHandler(findInternshipsSeenAmount)
+  asyncHandler(getSearchResults)
 );
 
 // @TODO: Wäre praktisch wenn die Company hier direkt gepopulated werden würde
