@@ -252,7 +252,7 @@ export async function getSearchResults(
       }
     }
   }
-  res.json(searchResults);
+  res.json(searchResults.map((i) => Responses.fromInternship(i, user.isAdmin)));
 }
 
 async function queryCompaniesWithInternships(
@@ -273,7 +273,7 @@ async function queryCompaniesWithInternships(
       internships = await Internship.aggregate(pipeline);
     }
   }
-  return internships.map((i) => Responses.fromInternship(i, user.isAdmin));
+  return internships;
 }
 
 /**
