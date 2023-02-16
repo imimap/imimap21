@@ -37,6 +37,7 @@ export default defineComponent({
   },
   computed: {
     authorName(): string {
+      if (!this.author?.firstName || !this.author?.lastName) return this.author?.emailAddress ?? '';
       return `${this.author?.firstName} ${this.author?.lastName}`;
     },
     dateFormatter(): Intl.DateTimeFormat {
