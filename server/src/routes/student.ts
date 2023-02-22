@@ -19,7 +19,7 @@ studentRouter.get(
 
 studentRouter.get(
   "/:id",
-  authMiddleware(),
+  authMiddleware(true),
   param("id").custom(isObjectId),
   validate,
   asyncHandler(getStudentById)

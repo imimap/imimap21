@@ -7,6 +7,7 @@ import { ICompany } from "./company";
 import { User } from "./user";
 import { EventSchema, EventTypes, IEvent } from "./event";
 import { getIMIMapAdmin } from "../helpers/imimapAsAdminHelper";
+import { CommentSchema, IComment } from "./comment";
 
 export enum InternshipStatuses {
   UNKNOWN = "unknown",
@@ -26,6 +27,8 @@ export enum PaymentTypes {
   NO_PAYMENT = "no payment",
 }
 
+// TODO: Remove `extends Document` since it's not recommended to do this
+// See https://mongoosejs.com/docs/typescript.html#using-extends-document
 export interface IInternship extends Document {
   startDate?: Date;
   endDate?: Date;
@@ -47,6 +50,7 @@ export interface IInternship extends Document {
   reportPdf?: IPdfDocument;
   events: IEvent[];
   status: string;
+  comments: IComment[];
 
   durationInWeeksSoFar(): number;
 
@@ -126,6 +130,11 @@ export const InternshipSchema = new Schema<IInternship>(
     events: [
       {
         type: EventSchema,
+      },
+    ],
+    comments: [
+      {
+        type: CommentSchema,
       },
     ],
   },

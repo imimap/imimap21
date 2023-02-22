@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { BadRequest, Forbidden, InternalServerError, NotFound } from "http-errors";
-import { Internship, InternshipStatuses, PaymentTypes } from "../models/internship";
+import { IInternship, Internship, InternshipStatuses, PaymentTypes } from "../models/internship";
 import { Semester } from "../helpers/semesterHelper";
 import { InternshipModule } from "../models/internshipModule";
-import { Types } from "mongoose";
+import { LeanDocument, Types } from "mongoose";
 import { UploadedFile } from "express-fileupload";
 import {
   getAuthorizedUser,
@@ -24,6 +24,7 @@ import {
 } from "../helpers/internshipHelper";
 import { EventTypes } from "../models/event";
 import path from "path";
+import Responses from "../helpers/responses";
 
 /**
  * Returns all information on certain internship for admin or on own internship for student.
@@ -40,14 +41,13 @@ export async function getInternshipsById(
 
   if (internshipId === "random") return getRandomInternship(req, res, next);
 
-  let user;
+  let user: IUser | null;
   try {
     user = await User.findOne({ emailAddress: req.user?.email })
       .select("isAdmin studentProfile")
       .populate({
         path: "studentProfile.internship",
-        populate: { path: "internships", lean: true, populate: { path: "company", lean: true } },
-        lean: true,
+        populate: { path: "internships", populate: { path: "company" } },
       });
     if (!user) return next(new NotFound("User not found"));
   } catch (e) {
@@ -55,17 +55,19 @@ export async function getInternshipsById(
   }
 
   let result;
-  if (user.isAdmin || user.hasOwnInternship(internshipId)) {
+  if (user.isAdmin || (await user.hasOwnInternship(internshipId))) {
     result = await Internship.findById(internshipId)
       .populate({ path: "company", lean: true })
       .lean();
     if (!result) return next(new NotFound("Internship not found"));
+    // TODO: Remove type assertion after removing `extends Document` from IInternship
+    res.json(Responses.fromInternship(result as IInternship, user.isAdmin));
   } else if (user.studentProfile && internshipId === "my") {
     result = user.studentProfile.internship.internships;
+    res.json(result.map((i: IInternship) => Responses.fromInternship(i, user?.isAdmin)));
   } else {
     return next(new Forbidden("You may only access your own internship."));
   }
-  res.json(result);
 }
 
 /**
@@ -117,7 +119,7 @@ export async function getRandomInternship(
     await user.save();
   }
 
-  res.json(internship);
+  res.json(Responses.fromInternship(internship));
 }
 
 /**
@@ -140,7 +142,7 @@ export async function getSearchResults(
   if (Semester.isValidSemesterString(req.query.semester as string))
     return findInternshipsInSemester(req, res, next);
 
-  let user;
+  let user: IUser;
   try {
     user = await getUserWithInternshipModule(req.user?.email);
   } catch (e) {
@@ -250,7 +252,7 @@ export async function getSearchResults(
       }
     }
   }
-  res.json(searchResults);
+  res.json(searchResults.map((i) => Responses.fromInternship(i, user.isAdmin)));
 }
 
 async function queryCompaniesWithInternships(
@@ -286,7 +288,7 @@ export async function findInternshipsInSemester(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  let user;
+  let user: IUser;
   try {
     user = await getUser(req.user?.email);
   } catch (e) {
@@ -330,7 +332,11 @@ export async function findInternshipsInSemester(
     })
   );
 
-  res.json(internships.filter((internship) => internship ?? false));
+  res.json(
+    internships
+      .filter((internship) => internship ?? false)
+      .map((i) => Responses.fromInternship(i as LeanDocument<IInternship>, user.isAdmin))
+  );
 }
 
 export async function getInternshipLocations(req: Request, res: Response): Promise<void> {
@@ -531,7 +537,7 @@ export async function createInternship(
 
   await internshipModule.save();
   await user.save();
-  res.json(newlyCreatedInternship);
+  res.json(Responses.fromInternship(newlyCreatedInternship, user.isAdmin));
 }
 
 /**
@@ -593,7 +599,7 @@ export async function updateInternship(
   const savedInternship = await internshipToUpdate.save();
   if (!savedInternship) return next(new BadRequest("Could not update internship"));
 
-  res.json(savedInternship);
+  res.json(Responses.fromInternship(savedInternship, user.isAdmin));
 }
 
 export async function deleteInternship(
@@ -644,7 +650,7 @@ export async function approveInternshipApplication(
 
   try {
     const savedInternship = await internshipToUpdate.approve(user._id);
-    res.json(savedInternship);
+    res.json(Responses.fromInternship(savedInternship, user.isAdmin));
   } catch (e) {
     return next(new BadRequest(e.message));
   }
@@ -669,7 +675,7 @@ export async function markInternshipAsPassed(
 
   try {
     const savedInternship = await internshipToUpdate.pass(user._id);
-    res.json(savedInternship);
+    res.json(Responses.fromInternship(savedInternship, user.isAdmin));
   } catch (e) {
     return next(new BadRequest(e.message));
   }
@@ -794,4 +800,52 @@ export async function generateRequestPdf(
   const pdf = await buildPDFFile(template);
   res.setHeader("Content-Type", "application/pdf");
   res.send(pdf);
+}
+
+export async function addComment(req: Request, res: Response, next: NextFunction): Promise<void> {
+  let user;
+  try {
+    user = await getAuthorizedUser(req.user?.email, req.params.id);
+  } catch (e) {
+    return next(e);
+  }
+
+  if (!user.isAdmin) return next(new Forbidden("Only admins may mark internships as passed"));
+
+  const internship = await Internship.findById(req.params.id);
+  if (!internship) return next(new NotFound("Internship not found"));
+
+  internship.comments.push({
+    author: user._id,
+    content: req.body.content,
+  });
+  const updatedInternship = await internship.save();
+
+  res.json(Responses.fromInternship(updatedInternship, user.isAdmin));
+}
+
+export async function deleteComment(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  let user: IUser;
+  try {
+    user = await getAuthorizedUser(req.user?.email, req.params.id);
+  } catch (e) {
+    return next(e);
+  }
+
+  const internship = await Internship.findById(req.params.id);
+  if (!internship) return next(new NotFound("Internship not found"));
+
+  const commentIndex = internship.comments.findIndex(
+    (c) => c._id?.equals(req.params.commentId) && c.author.equals(user._id)
+  );
+  if (commentIndex === -1) return next(new NotFound("Comment not found"));
+
+  internship.comments.splice(commentIndex, 1);
+  const updatedInternship = await internship.save();
+
+  res.json(Responses.fromInternship(updatedInternship, user.isAdmin));
 }

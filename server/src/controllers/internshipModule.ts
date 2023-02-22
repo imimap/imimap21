@@ -5,6 +5,7 @@ import { User } from "../models/user";
 import { Forbidden, NotFound } from "http-errors";
 import { Role } from "../authentication/user";
 import { EventTypes, IEvent } from "../models/event";
+import Responses from "../helpers/responses";
 
 export async function findInternshipModule(
   req: Request,
@@ -18,7 +19,7 @@ export async function findInternshipModule(
   });
   if (req.params.id === "my") {
     if (!user || !user.studentProfile) return next(new NotFound("Student not found"));
-    res.json(user.studentProfile.internship);
+    res.json(Responses.fromInternshipModule(user.studentProfile.internship, user.isAdmin));
   } else {
     if (req.user?.role !== Role.INSTRUCTOR && user?.studentProfile?.internship.id !== req.params.id)
       return next(new Forbidden("You may only access your own internship module"));
@@ -26,7 +27,7 @@ export async function findInternshipModule(
       .populate({ path: "internships", lean: true })
       .lean();
     if (!internshipModule) return next(new NotFound("Internship module not found"));
-    res.json(internshipModule);
+    res.json(Responses.fromInternshipModule(internshipModule, user?.isAdmin));
   }
 }
 
@@ -34,7 +35,8 @@ export async function listInternshipModules(req: Request, res: Response): Promis
   const filter: FilterQuery<IInternshipModule> = {};
   if (req.query.semester) filter.inSemester = req.query.semester as string;
   if (req.query.status) filter.status = req.query.status as string;
-  res.json(await InternshipModule.find(filter).lean());
+  const internshipModules = await InternshipModule.find(filter).lean();
+  res.json(internshipModules.map((i) => Responses.fromInternshipModule(i, true)));
 }
 
 export async function passAep(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -53,7 +55,7 @@ export async function passAep(req: Request, res: Response, next: NextFunction): 
   if (!internshipToUpdate) return next(new NotFound("InternshipModule not found"));
 
   const updatedInternship = await internshipToUpdate.passAep(user._id);
-  res.json(updatedInternship);
+  res.json(Responses.fromInternshipModule(updatedInternship, user.isAdmin));
 }
 
 export async function updateInternshipModule(
@@ -103,5 +105,5 @@ export async function updateInternshipModule(
   internshipToUpdate.events.push(newEvent);
   const internshipSaved = await internshipToUpdate.save();
 
-  res.json(internshipSaved);
+  res.json(Responses.fromInternshipModule(internshipSaved, user.isAdmin));
 }

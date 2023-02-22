@@ -1,5 +1,6 @@
 import { sign, SignOptions } from "jsonwebtoken";
 import { auth as config } from "../config";
+import { Types } from "mongoose";
 
 export interface LdapUser {
   dn: string;
@@ -63,7 +64,8 @@ export enum Role {
   INSTRUCTOR,
 }
 
-export function generateAuthToken(user: Express.User): string {
+export function generateAuthToken(user: Express.User, userId: Types.ObjectId): string {
+  user.id = userId.toHexString();
   const payload = user;
   const options: SignOptions = {
     expiresIn: config.expiryTime,

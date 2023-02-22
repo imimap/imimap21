@@ -1,7 +1,7 @@
 import { Document, model, Model, Schema } from "mongoose";
 import { IStudentProfile, StudentProfileSchema } from "./studentProfile";
 import { isValidEmail } from "../helpers/emailAddressHelper";
-import {IInternshipModule, InternshipModule} from "./internshipModule";
+import { IInternshipModule, InternshipModule } from "./internshipModule";
 
 export interface IUser extends Document {
   firstName?: string;
@@ -9,7 +9,8 @@ export interface IUser extends Document {
   isAdmin?: boolean;
   emailAddress: string;
   studentProfile?: IStudentProfile;
-  hasOwnInternship(internshipId: string): boolean;
+
+  hasOwnInternship(internshipId: string): Promise<boolean>;
 }
 
 const UserSchema = new Schema({

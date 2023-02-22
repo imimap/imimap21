@@ -150,14 +150,6 @@
                 </div>
               </td>
             </tr>
-            <tr>
-              <td>
-                {{ $t("internshipModule.comment") }}
-              </td>
-              <td colspan="2">
-                Life? Don't talk to me about life.
-              </td>
-            </tr>
             </tbody>
           </table>
         </div>

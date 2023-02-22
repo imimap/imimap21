@@ -32,6 +32,9 @@ const userList = {
     bvg: 'BVG ticket exemption',
     certificate: 'Internship certificate',
     report: 'Internship report',
+    comments: 'Comments',
+    commentPlaceholder: 'Leave a comment',
+    postComment: 'Comment',
   },
   editInternshipModal: {
     edit: 'Edit Internship module',
@@ -52,8 +55,6 @@ const userList = {
     resetSearchResultPart1: 'The search for ',
     resetSearchResultPart2: ' has been reset.',
     resetSearchResultError: 'The serach results could not be reset.',
-
   },
-
 };
 export default userList;
