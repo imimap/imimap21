@@ -60,7 +60,7 @@ UserSchema.methods.hasOwnInternship = async function (internshipId: string): Pro
     internshipModule?.internships?.length > 0 &&
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    internshipModule?.internships?.indexOf(internshipId) > -1
+    internshipModule?.internships?.find((id) => id.toString() === internshipId) !== undefined
   );
 };
 

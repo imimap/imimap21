@@ -30,7 +30,7 @@ const internshipModule = {
     report: 'Report',
   },
   pdfStatus: {
-    unknown: 'Status unknown',
+    unknown: 'Not submitted',
     submitted: 'Submitted',
     accepted: 'Valid',
     rejected: 'Rejected',
@@ -77,7 +77,7 @@ const internshipModule = {
     details: 'details',
     pleaseUpload: 'Please upload them here as well.',
     pleaseEditInternship: 'Please edit your internship details once again for that.',
-    lsfEctsProofPdf: 'LSF Proof',
+    lsfEctsProofPdf: 'ECTS Proof',
     contractPdf: 'Internship contract',
     requestPdf: 'Internship application',
     reportPdf: 'Internship report',

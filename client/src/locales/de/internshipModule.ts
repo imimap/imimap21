@@ -30,7 +30,7 @@ const internshipModule = {
     report: 'Praktikumsbericht',
   },
   pdfStatus: {
-    unknown: 'Status unbekannt',
+    unknown: 'Nicht eingereicht',
     submitted: 'Eingereicht',
     accepted: 'Gültig',
     rejected: 'Abgelehnt',
@@ -78,7 +78,7 @@ const internshipModule = {
     details: 'Angaben',
     pleaseUpload: 'Bitte lade diese hier noch hoch.',
     pleaseEditInternship: 'Bitte bearbeite dafür dein Praktikum nochmal.',
-    lsfEctsProofPdf: 'LSF Nachweis',
+    lsfEctsProofPdf: 'ECTS-Nachweis',
     contractPdf: 'Praktikumsvertrag',
     requestPdf: 'Praktikumsanmeldung',
     reportPdf: 'Praktikumsbericht',

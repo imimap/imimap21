@@ -138,7 +138,10 @@ export const InternshipSchema = new Schema<IInternship>(
       },
     ],
   },
-  { toJSON: { virtuals: true } }
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
 
 export const requiredFields = [
@@ -173,6 +176,7 @@ export async function trySetRequested(document: Document): Promise<void> {
   if (complete && status === InternshipStatuses.PLANNED) {
     // If status is 'planned', set to 'requested'
     document.get("events").push({
+      type: EventTypes.INTERNSHIP_UPDATE,
       creator: (await getIMIMapAdmin())._id,
       changes: {
         status: InternshipStatuses.REQUESTED,
@@ -182,6 +186,7 @@ export async function trySetRequested(document: Document): Promise<void> {
   } else if (!complete && status !== InternshipStatuses.PLANNED) {
     // Set status back to 'planned'
     document.get("events").push({
+      type: EventTypes.INTERNSHIP_UPDATE,
       creator: (await getIMIMapAdmin())._id,
       changes: {
         status: InternshipStatuses.PLANNED,
@@ -201,6 +206,7 @@ export async function trySetReadyForGrading(document: Document): Promise<void> {
   if (!certificatePdf) return;
 
   document.get("events").push({
+    type: EventTypes.INTERNSHIP_UPDATE,
     creator: (await getIMIMapAdmin())._id,
     changes: {
       status: InternshipStatuses.READY_FOR_GRADING,

@@ -15,7 +15,8 @@
             <p class="card-text">{{ $t("adminDashboard.internships.incomplete") }}</p>
 
             <router-link class="btn btn-success text-white"
-                         to="users">{{ $t("adminDashboard.internships.edit") }}</router-link>
+                         to="users">{{ $t("adminDashboard.internships.edit") }}
+            </router-link>
           </div>
         </div>
       </div>
@@ -33,7 +34,8 @@
             <p class="card-text">{{ $t("adminDashboard.postponements.open") }}</p>
 
             <router-link class="btn btn-success text-white"
-                         to="postponements">{{ $t("adminDashboard.postponements.edit") }}</router-link>
+                         to="postponements">{{ $t("adminDashboard.postponements.edit") }}
+            </router-link>
           </div>
         </div>
       </div>
@@ -51,7 +53,8 @@
             <p class="card-text">{{ $t("adminDashboard.companies.registered") }}</p>
 
             <router-link class="btn btn-success text-white"
-                         to="companies">{{ $t("adminDashboard.companies.edit") }}</router-link>
+                         to="companies">{{ $t("adminDashboard.companies.edit") }}
+            </router-link>
           </div>
         </div>
       </div>
@@ -81,9 +84,20 @@ export default defineComponent({
     this.getCompaniesCount();
   },
   methods: {
+    getUpcomingSemester(): string {
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth();
+      // Attention: Month is zero-based!
+      if (currentMonth >= 3 && currentMonth < 9) {
+        // Currently: summer semester, get upcoming winter semester
+        return `WS${currentDate.getFullYear() + 1}`;
+      }
+      // Currently: Winter semester, get upcoming summer semester
+      return `SS${currentDate.getFullYear()}`;
+    },
     async getInternshipModuleCount() {
       this.loadingInternshipModuleCount = true;
-      const students = await getStudentsList('WS2021');
+      const students = await getStudentsList(this.getUpcomingSemester());
       this.internshipModuleCount = students.filter((student) => student.studentProfile.internship
         .status === 'planned').length;
       this.loadingInternshipModuleCount = false;
@@ -105,32 +119,32 @@ export default defineComponent({
 </script>
 
 <style scoped>
-  template {
-    padding: 20px;
-  }
+template {
+  padding: 20px;
+}
 
-  .card .large-number {
-     font-size: 5rem;
-  }
+.card .large-number {
+  font-size: 5rem;
+}
 
-  .btn-success {
-    background: rgba(119, 185, 0, 0.9);
-    border-color: rgba(119, 185, 0, 0.9);
-  }
+.btn-success {
+  background: rgba(119, 185, 0, 0.9);
+  border-color: rgba(119, 185, 0, 0.9);
+}
 
-  .btn-success:hover, .btn-success:active, .btn-success:focus {
-    background: rgba(119, 185, 0, 1);
-    border-color: rgba(119, 185, 0, 1);
-  }
+.btn-success:hover, .btn-success:active, .btn-success:focus {
+  background: rgba(119, 185, 0, 1);
+  border-color: rgba(119, 185, 0, 1);
+}
 
-  .table-nav button {
-    margin-right: 20px;
-  }
+.table-nav button {
+  margin-right: 20px;
+}
 
-  .text-htw {
-    color: rgba(119, 185, 0, 1);
-    width: 5rem;
-    height: 5rem;
-  }
+.text-htw {
+  color: rgba(119, 185, 0, 1);
+  width: 5rem;
+  height: 5rem;
+}
 
 </style>
