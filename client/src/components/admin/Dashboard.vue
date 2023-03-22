@@ -14,8 +14,8 @@
             </div>
             <p class="card-text">{{ $t("adminDashboard.internships.incomplete") }}</p>
 
-            <router-link class="btn btn-success text-white"
-                         to="users">{{ $t("adminDashboard.internships.edit") }}
+            <router-link class="btn btn-success text-white" to="users">
+              {{ $t("adminDashboard.internships.edit") }}
             </router-link>
           </div>
         </div>
@@ -33,8 +33,8 @@
             </div>
             <p class="card-text">{{ $t("adminDashboard.postponements.open") }}</p>
 
-            <router-link class="btn btn-success text-white"
-                         to="postponements">{{ $t("adminDashboard.postponements.edit") }}
+            <router-link class="btn btn-success text-white" to="postponements">
+              {{ $t("adminDashboard.postponements.edit") }}
             </router-link>
           </div>
         </div>
@@ -52,8 +52,8 @@
             </div>
             <p class="card-text">{{ $t("adminDashboard.companies.registered") }}</p>
 
-            <router-link class="btn btn-success text-white"
-                         to="companies">{{ $t("adminDashboard.companies.edit") }}
+            <router-link class="btn btn-success text-white" to="companies">
+              {{ $t("adminDashboard.companies.edit") }}
             </router-link>
           </div>
         </div>
