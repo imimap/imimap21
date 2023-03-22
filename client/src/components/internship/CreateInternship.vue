@@ -60,17 +60,16 @@
             <label for="paymentType">{{ $t('internship.form.paymentType.info') }}</label>
             <div class="form-group d-flex internship-payment-options">
               <div class="form-check internship-payment-option"
-                   v-for="(paymentType, index) in availablePaymentTypes"
-                   v-bind:key="index"
-                   v-bind:paymentType="paymentType"
+                   v-for="(label, paymentType) in availablePaymentTypes"
+                   v-bind:key="paymentType"
                    id="paymentType">
                 <input class="form-check-input"
                        type="checkbox"
                        :value="paymentType"
-                       :id="`checkbox-${paymentType}`"
-                       :content="payment"/>
-                <label class="form-check-label" :for="`checkbox-${paymentType}`">
-                  {{ paymentType }}
+                       :id="`checkbox-${paymentType.replaceAll(/\s/g, '')}`"
+                       v-model="paymentTypes"/>
+                <label class="form-check-label" :for="`checkbox-${paymentType.replaceAll(/\s/g, '')}`">
+                  {{ label }}
                 </label>
               </div>
             </div>
@@ -329,7 +328,7 @@ const possibleInternshipFields = [
   'endDate',
   'operationalArea',
   'salary',
-  'payment',
+  'paymentTypes',
   'livingCosts',
   'workingHoursPerWeek',
   'supervisorFullName',
@@ -384,7 +383,7 @@ export default defineComponent({
       operationalArea: null,
       programmingLanguages: null,
       salary: null,
-      payment: null,
+      paymentTypes: [],
       livingCosts: null,
       workingHoursPerWeek: null,
       company: '',
@@ -393,7 +392,7 @@ export default defineComponent({
       tasks: null,
       // Form Select Field Options
       availableLanguages: {} as { [key: string]: { name: string; nativeName: string } },
-      availablePaymentTypes: [] as string[],
+      availablePaymentTypes: {} as Record<string, string>,
       // Company Object after check for existing Company or after creating a new company
       existingCompany: {} as Company,
       newCompanyCreated: false,
@@ -416,7 +415,7 @@ export default defineComponent({
   watch: {
     async $route(to, from) {
       if (this.$route.params.locale && to.params.locale !== from.params.locale) {
-        this.availablePaymentTypes = [];
+        this.availablePaymentTypes = {};
         await this.getAvailablePaymentTypes();
       }
     },
@@ -531,8 +530,8 @@ export default defineComponent({
         const st = 'internship.form.paymentType.';
         if (paymentTypes.length > 0) {
           // eslint-disable-next-line no-restricted-syntax
-          for (const pt of paymentTypes) {
-            this.availablePaymentTypes.push(`${this.$t(st + pt.replace(/\s/g, ''))}`);
+          for (const paymentType of paymentTypes) {
+            this.availablePaymentTypes[paymentType] = this.$t(st + paymentType.replace(/\s/g, ''));
           }
         }
       } catch (err: any) {
