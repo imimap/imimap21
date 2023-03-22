@@ -189,7 +189,6 @@
                       class="form-select">
                 <option v-for="(language, index) in languages"
                         v-bind:key="index"
-                        v-bind:language="language"
                         :value="language.language">
                   {{ language.languageName }}
                 </option>
