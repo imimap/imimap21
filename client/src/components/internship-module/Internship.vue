@@ -14,11 +14,6 @@
           <table class="table table-striped table-sm table-borderless">
             <tbody>
             <tr>
-              <td>{{ $t("internshipModule.semester") }}</td>
-              <!-- @TODO: inSemester am internship fehlt -->
-              <td>5 (TODO)</td>
-            </tr>
-            <tr>
               <td>{{ $t("internshipModule.startDate") }}</td>
               <td>
                 {{
