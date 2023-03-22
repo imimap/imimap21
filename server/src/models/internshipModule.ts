@@ -261,6 +261,7 @@ export async function trySetPassed(document: Document): Promise<boolean> {
   const statusIsPlanned = document.get("status") === InternshipModuleStatuses.PLANNED;
   if (statusIsPlanned && aepPassed && longEnough) {
     document.get("events").push({
+      type: EventTypes.INTERNSHIP_MODULE_UPDATE,
       creator: (await getIMIMapAdmin())._id,
       changes: {
         status: InternshipModuleStatuses.PASSED,

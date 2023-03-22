@@ -5,7 +5,8 @@
       <h3>{{ $t("internship.heading.edit") }}</h3>
       <div class="explanation">
         <p>Felder mit dem roten <span style="color: red">*</span> sind Pflichtfelder für das Anlegen eines Praktikums.</p>
-        <p>Um dein Praktikum offiziell zu beantragen, müssen zusätzlich alle Felder mit dem blauen <span style="color: blue">*</span> ausgefüllt werden.</p>
+        <p>Um dein Praktikum offiziell zu beantragen, müssen zusätzlich alle Felder mit dem blauen <span style="color: blue">*</span> ausgefüllt
+          werden.</p>
       </div>
       <form v-on:submit.prevent>
         <div class="row my-4">
@@ -18,7 +19,7 @@
                    id="startDate"
                    class="form-control"
 
-                  />
+            />
           </div>
           <div class="col">
             <label for="endDate" class="semi-required">
@@ -28,7 +29,7 @@
                    type="date"
                    id="endDate"
                    class="form-control"
-                   />
+            />
           </div>
         </div>
 
@@ -38,7 +39,7 @@
             <input v-model="internship.operationalArea"
                    type="text"
                    class="form-control"
-                   id="operationalArea" />
+                   id="operationalArea"/>
           </div>
           <div class="col">
             <label for="programmingLanguages">
@@ -60,23 +61,22 @@
                    type="number"
                    min="0"
                    class="form-control"
-                   id="salary" />
+                   id="salary"/>
           </div>
           <div class="col">
             <label for="paymentType">{{ $t('internship.form.paymentType.info') }}</label>
             <div class="form-group d-flex internship-payment-options">
               <div class="form-check internship-payment-option"
-                   v-for="(paymentType, index) in availablePaymentTypes"
-                   v-bind:key="index"
-                   v-bind:paymentType="paymentType"
+                   v-for="(label, paymentType) in availablePaymentTypes"
+                   v-bind:key="paymentType"
                    id="paymentType">
                 <input class="form-check-input"
                        type="checkbox"
                        :value="paymentType"
-                       :id="`checkbox-${paymentType}`"
+                       :id="`checkbox-${paymentType.replaceAll(/\s/g, '')}`"
                        v-model="internship.paymentTypes"/>
-                <label class="form-check-label" :for="`checkbox-${paymentType}`">
-                  {{ paymentType }}
+                <label class="form-check-label" :for="`checkbox-${paymentType.replaceAll(/\s/g, '')}`">
+                  {{ label }}
                 </label>
               </div>
             </div>
@@ -90,14 +90,14 @@
                    type="number"
                    min="0"
                    class="form-control"
-                   id="livingCosts" />
+                   id="livingCosts"/>
           </div>
           <div class="col">
             <label for="workingHoursPerWeek">{{ $t('internship.form.workingHoursPerWeek') }}</label>
             <input v-model="internship.workingHoursPerWeek"
                    min="0"
                    class="form-control"
-                   id="workingHoursPerWeek" />
+                   id="workingHoursPerWeek"/>
           </div>
         </div>
 
@@ -108,14 +108,14 @@
               <input v-model="supervisor.fullName"
                      type="text"
                      class="form-control"
-                     id="supervisorFullName" />
+                     id="supervisorFullName"/>
             </div>
             <div>
               <label for="supervisorEmail" class="semi-required">{{ $t('company.supervisor.email') }}</label>
               <input v-model="supervisor.emailAddress "
                      type="text"
                      class="form-control"
-                     id="supervisorEmail" />
+                     id="supervisorEmail"/>
             </div>
           </div>
           <div class="col">
@@ -124,151 +124,150 @@
                       class="form-control"
                       id="tasks"
                       cols="30"
-                      rows="6" />
+                      rows="6"/>
           </div>
         </div>
-        <div class="row card border-secondary bg-light p-3" v-if="internship.status == 'planned'">
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label for="newCompanyName" class="required">{{ $t('company.name') }}</label>
-                <input v-model="companyName"
-                      type="text"
-                      class="form-control"
-                      id="companyName"
-                      :placeholder="internship.company.companyName"/>
-              </div>
-            </div>
-            <div class="row mb-3">
-              <div class="col">
-                <label for="newCompanyBranchName">{{ $t('company.branchName') }}</label>
-                <input v-model="branchName"
-                      type="text"
-                      class="form-control"
-                      id="companyBranchName"
-                      :placeholder="internship.company.branchName"/>
-              </div>
-              <div class="col">
-                <label for="newCompanyEmailAddress">{{ $t('company.email') }}</label>
-                <input v-model="emailAddress"
-                      type="email"
-                      class="form-control"
-                      id="companyEmailAddress"
-                      :placeholder="internship.company.emailAddress"/>
-              </div>
-            </div>
-            <div class="row mb-3">
-              <div class="col">
-                <label for="newCompanyIndustry">{{ $t('company.industry') }}</label>
-                <input v-model="industry"
-                      type="text"
-                      class="form-control"
-                      id="companyIndustry"
-                      :placeholder="internship.company.industry"/>
-              </div>
-              <div class="col">
-                <label for="newCompanyWebsite">{{ $t('company.website') }}</label>
-                <input v-model="website"
-                      type="text"
-                      class="form-control"
-                      id="companyWebsite"
-                      :placeholder="internship.company.website"/>
-              </div>
-            </div>
-            <div class="row mb-3">
-              <div class="col">
-                <label for="newCompanyMainLanguage">{{ $t("company.mainLanguage") }}</label>
-                <input :value="filterLanguages(mainLanguage)"
-                      type="text"
-                      class="form-control"
-                      style="background-color: #F8F9FA; border: none;"
-                      id="companyWebsite"
-                      :placeholder="filterLanguages(internship.company.mainLanguage)"
-                      disabled/>
-                <select v-model="mainLanguage"
-                        id="companyMainLanguage"
-                        class="form-select">
-                  <option v-for="(language, index) in languages"
-                          v-bind:key="index"
-                          v-bind:language="language"
-                          :value="language.language">
-                    {{ language.languageName }}
-                  </option>
-                </select>
-              </div>
-              <div class="col">
-                <label for="newCompanySize">{{ $t("company.size.info") }}</label>
-                <input :value="companySize(size)"
-                      type="text"
-                      class="form-control"
-                      style="background-color: #F8F9FA; border: none;"
-                      id="companyWebsite"
-                      :placeholder="companySize(internship.company.size ?? '')"
-                      disabled/>
-                <select v-model="size"
-                        id="companySize"
-                        class="form-select">
-                  <option value="">{{ $t("company.select") }}</option>
-                  <option value="big">{{ $t("company.size.big") }}</option>
-                  <option value="medium">{{ $t("company.size.medium") }}</option>
-                  <option value="small">{{ $t("company.size.small") }}</option>
-                </select>
-              </div>
-            </div>
-            <div class="row mb-3">
-              <div class="col">
-                <label for="newCompanyStreet" class="required">{{ $t('address.street') }}</label>
-                <input v-model="street"
-                      type="text"
-                      class="form-control"
-                      id="companyStreet"
-                      :placeholder="internship.company.address.street"/>
-              </div>
-              <div class="col">
-                <label for="newCompanyStreetNumber" class="required">{{ $t('address.nr') }}</label>
-                <input v-model="streetNumber"
-                      type="text"
-                      class="form-control"
-                      id="companyStreetNumber"
-                      :placeholder="internship.company.address.streetNumber"/>
-              </div>
-            </div>
-            <div class="row mb-3">
-              <div class="col">
-                <label for="newCompanyAdditionalLines">{{ $t('address.line') }}</label>
-                <input v-model="additionalLines"
-                      type="text"
-                      class="form-control"
-                      id="companyAdditionalLines"
-                      :placeholder="internship.company.address.additionalLines"/>
-              </div>
-              <div class="col">
-                <label for="newCompanyZip" class="required">{{ $t('address.zip') }}</label>
-                <input v-model="zip"
-                      type="text"
-                      class="form-control"
-                      id="companyZip"
-                      :placeholder="internship.company.address.zip"/>
-              </div>
-            </div>
-            <div class="row mb-3">
-              <div class="col">
-                <label for="newCompanyCity" class="required">{{ $t('address.city') }}</label>
-                <input v-model="city"
-                      type="text"
-                      class="form-control"
-                      id="companyCity"
-                      :placeholder="internship.company.address.city"/>
-              </div>
-              <div class="col">
-                <label for="newCompanyCountry" class="required">{{ $t('address.country') }}</label>
-                <input v-model="country"
-                      type="text"
-                      class="form-control"
-                      id="companyCountry"
-                      :placeholder="internship.company.address.country"/>
-              </div>
+        <div class="row card border-secondary bg-light p-3" v-if="internship.status === 'planned'">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="newCompanyName" class="required">{{ $t('company.name') }}</label>
+              <input v-model="companyName"
+                     type="text"
+                     class="form-control"
+                     id="companyName"
+                     :placeholder="internship.company.companyName"/>
             </div>
           </div>
+          <div class="row mb-3">
+            <div class="col">
+              <label for="newCompanyBranchName">{{ $t('company.branchName') }}</label>
+              <input v-model="branchName"
+                     type="text"
+                     class="form-control"
+                     id="companyBranchName"
+                     :placeholder="internship.company.branchName"/>
+            </div>
+            <div class="col">
+              <label for="newCompanyEmailAddress">{{ $t('company.email') }}</label>
+              <input v-model="emailAddress"
+                     type="email"
+                     class="form-control"
+                     id="companyEmailAddress"
+                     :placeholder="internship.company.emailAddress"/>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <label for="newCompanyIndustry">{{ $t('company.industry') }}</label>
+              <input v-model="industry"
+                     type="text"
+                     class="form-control"
+                     id="companyIndustry"
+                     :placeholder="internship.company.industry"/>
+            </div>
+            <div class="col">
+              <label for="newCompanyWebsite">{{ $t('company.website') }}</label>
+              <input v-model="website"
+                     type="text"
+                     class="form-control"
+                     id="companyWebsite"
+                     :placeholder="internship.company.website"/>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <label for="newCompanyMainLanguage">{{ $t("company.mainLanguage") }}</label>
+              <input :value="filterLanguages(mainLanguage)"
+                     type="text"
+                     class="form-control"
+                     style="background-color: #F8F9FA; border: none;"
+                     id="companyWebsite"
+                     :placeholder="filterLanguages(internship.company.mainLanguage)"
+                     disabled/>
+              <select v-model="mainLanguage"
+                      id="companyMainLanguage"
+                      class="form-select">
+                <option v-for="(language, index) in languages"
+                        v-bind:key="index"
+                        :value="language.language">
+                  {{ language.languageName }}
+                </option>
+              </select>
+            </div>
+            <div class="col">
+              <label for="newCompanySize">{{ $t("company.size.info") }}</label>
+              <input :value="companySize(size)"
+                     type="text"
+                     class="form-control"
+                     style="background-color: #F8F9FA; border: none;"
+                     id="companyWebsite"
+                     :placeholder="companySize(internship.company.size ?? '')"
+                     disabled/>
+              <select v-model="size"
+                      id="companySize"
+                      class="form-select">
+                <option value="">{{ $t("company.select") }}</option>
+                <option value="big">{{ $t("company.size.big") }}</option>
+                <option value="medium">{{ $t("company.size.medium") }}</option>
+                <option value="small">{{ $t("company.size.small") }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <label for="newCompanyStreet" class="required">{{ $t('address.street') }}</label>
+              <input v-model="street"
+                     type="text"
+                     class="form-control"
+                     id="companyStreet"
+                     :placeholder="internship.company.address.street"/>
+            </div>
+            <div class="col">
+              <label for="newCompanyStreetNumber" class="required">{{ $t('address.nr') }}</label>
+              <input v-model="streetNumber"
+                     type="text"
+                     class="form-control"
+                     id="companyStreetNumber"
+                     :placeholder="internship.company.address.streetNumber"/>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <label for="newCompanyAdditionalLines">{{ $t('address.line') }}</label>
+              <input v-model="additionalLines"
+                     type="text"
+                     class="form-control"
+                     id="companyAdditionalLines"
+                     :placeholder="internship.company.address.additionalLines"/>
+            </div>
+            <div class="col">
+              <label for="newCompanyZip" class="required">{{ $t('address.zip') }}</label>
+              <input v-model="zip"
+                     type="text"
+                     class="form-control"
+                     id="companyZip"
+                     :placeholder="internship.company.address.zip"/>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <label for="newCompanyCity" class="required">{{ $t('address.city') }}</label>
+              <input v-model="city"
+                     type="text"
+                     class="form-control"
+                     id="companyCity"
+                     :placeholder="internship.company.address.city"/>
+            </div>
+            <div class="col">
+              <label for="newCompanyCountry" class="required">{{ $t('address.country') }}</label>
+              <input v-model="country"
+                     type="text"
+                     class="form-control"
+                     id="companyCountry"
+                     :placeholder="internship.company.address.country"/>
+            </div>
+          </div>
+        </div>
         <div class="row my-4">
           <div class="col-md-4">
             <button v-on:click="save" class="btn btn-secondary">
@@ -290,7 +289,7 @@ import http from '@/utils/http-common';
 import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
 import Internship from '@/models/Internship';
 import { createPayloadFromChangedProps } from '@/utils/admin';
-import { getAvailableLanguages, updateCompany, loadPaymentTypes } from '@/utils/gateways';
+import { getAvailableLanguages, loadPaymentTypes, updateCompany } from '@/utils/gateways';
 import { Company } from '@/store/types/Company';
 
 export default defineComponent({
@@ -320,8 +319,8 @@ export default defineComponent({
       loadingState: true,
       startDate: null as string | null,
       endDate: null as string | null,
-      availablePaymentTypes: [] as string[],
-      availableLanguages: {} as {[key: string]: {name: string; nativeName: string}},
+      availablePaymentTypes: {} as Record<string, string>,
+      availableLanguages: {} as { [key: string]: { name: string; nativeName: string } },
       supervisor: {
         fullName: undefined as string | undefined,
         emailAddress: undefined as string | undefined,
@@ -336,7 +335,7 @@ export default defineComponent({
     await this.getInternship();
   },
   computed: {
-    languages(): {language: string; languageName: string}[] {
+    languages(): { language: string; languageName: string }[] {
       return Object.keys(this.availableLanguages).flatMap(
         (lang) => ({ language: lang, languageName: this.availableLanguages[lang].name }),
       );
@@ -345,7 +344,7 @@ export default defineComponent({
   watch: {
     async $route(to, from) {
       if (this.$route.params.locale && to.params.locale !== from.params.locale) {
-        this.availablePaymentTypes = [];
+        this.availablePaymentTypes = {};
         await this.getAvailablePaymentTypes();
       }
     },
@@ -357,8 +356,7 @@ export default defineComponent({
     },
     normalizedDate(date: string | null): string | null {
       if (!date) return null;
-      const dateWithoutTime = new Date(date).toISOString().split('T')[0].toString();
-      return dateWithoutTime;
+      return new Date(date).toISOString().split('T')[0].toString();
     },
     companySize(size: string | undefined): string {
       if (!size) return '';
@@ -385,22 +383,26 @@ export default defineComponent({
       try {
         // update dates
         this.internship.startDate = this.normalizedDate(this.startDate)
-        ?? this.internship.startDate;
+          ?? this.internship.startDate;
         if (this.endDate || this.internship?.endDate) {
           this.internship.endDate = this.normalizedDate(this.endDate)
-        ?? this.internship?.endDate;
+            ?? this.internship?.endDate;
         }
         // update supervisor
 
         if (this.supervisor.fullName || this.internship.supervisor?.fullName) {
-          if (!this.internship.supervisor) { this.internship.supervisor = { fullName: this.supervisor.fullName }; } else {
+          if (!this.internship.supervisor) {
+            this.internship.supervisor = { fullName: this.supervisor.fullName };
+          } else {
             this.internship.supervisor.fullName = this.supervisor.fullName ?? this.internship.supervisor?.fullName;
           }
         }
         if (this.supervisor.emailAddress || this.internship.supervisor?.emailAddress) {
-          if (!this.internship.supervisor) { this.internship.supervisor = { emailAddress: this.supervisor.emailAddress }; } else {
+          if (!this.internship.supervisor) {
+            this.internship.supervisor = { emailAddress: this.supervisor.emailAddress };
+          } else {
             this.internship.supervisor.emailAddress = this.supervisor.emailAddress
-        ?? this.internship.supervisor?.emailAddress;
+              ?? this.internship.supervisor?.emailAddress;
           }
         }
         // update company
@@ -424,8 +426,8 @@ export default defineComponent({
         const st = 'internship.form.paymentType.';
         if (paymentTypes.length > 0) {
           // eslint-disable-next-line no-restricted-syntax
-          for (const pt of paymentTypes) {
-            this.availablePaymentTypes.push(this.$t(st + pt.replace(/\s/g, '')));
+          for (const paymentType of paymentTypes) {
+            this.availablePaymentTypes[paymentType] = this.$t(st + paymentType.replace(/\s/g, ''));
           }
         }
       } catch (err: any) {
@@ -455,9 +457,10 @@ export default defineComponent({
 ::-ms-input-placeholder { /* Microsoft Edge */
   color: black;
 }
+
 .explanation > p {
-    margin: 0;
-    font-size: 14px;
-  }
+  margin: 0;
+  font-size: 14px;
+}
 
 </style>

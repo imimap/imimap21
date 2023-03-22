@@ -76,6 +76,7 @@ export const PdfDocumentSchema = new Schema<IPdfDocument>(
   },
   {
     toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 

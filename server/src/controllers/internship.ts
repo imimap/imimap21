@@ -23,7 +23,7 @@ import {
   INTERNSHIP_FIELDS_VISIBLE_FOR_USER,
 } from "../helpers/internshipHelper";
 import { EventTypes } from "../models/event";
-import path from "path";
+import { join } from "path";
 import Responses from "../helpers/responses";
 
 /**
@@ -717,7 +717,7 @@ export function submitPdf(
     const nextFileId = internship.get(pdfProperty).nextFileId();
     const pdfType = pdfProperty.replace("Pdf", "");
     const fileName = `${student.id}_${student.name}_${pdfType}_${nextFileId}.pdf`;
-    const uploadPath = path.join("pdfs", student.id, fileName);
+    const uploadPath = join("pdfs", student.id, fileName);
     const error = await saveFile(pdf, uploadPath);
     if (error) return next(new InternalServerError(error.message));
 

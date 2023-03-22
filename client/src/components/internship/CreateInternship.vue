@@ -60,17 +60,16 @@
             <label for="paymentType">{{ $t('internship.form.paymentType.info') }}</label>
             <div class="form-group d-flex internship-payment-options">
               <div class="form-check internship-payment-option"
-                   v-for="(paymentType, index) in availablePaymentTypes"
-                   v-bind:key="index"
-                   v-bind:paymentType="paymentType"
-                    id="paymentType">
+                   v-for="(label, paymentType) in availablePaymentTypes"
+                   v-bind:key="paymentType"
+                   id="paymentType">
                 <input class="form-check-input"
                        type="checkbox"
                        :value="paymentType"
-                       :id="`checkbox-${paymentType}`"
-                       :content="payment"/>
-                <label class="form-check-label" :for="`checkbox-${paymentType}`">
-                  {{ paymentType }}
+                       :id="`checkbox-${paymentType.replaceAll(/\s/g, '')}`"
+                       v-model="paymentTypes"/>
+                <label class="form-check-label" :for="`checkbox-${paymentType.replaceAll(/\s/g, '')}`">
+                  {{ label }}
                 </label>
               </div>
             </div>
@@ -118,7 +117,7 @@
           </div>
           <div class="col">
             <label for="tasks" class="semi-required">{{ $t('internship.form.tasks') }}</label>
-            <textarea :content="tasks"
+            <textarea v-model="tasks"
                       class="form-control"
                       id="tasks"
                       cols="30"
@@ -158,7 +157,7 @@
                      type="email"
                      class="form-control"
                      id="newCompanyEmailAddress"
-                    :placeholder="$t('company.email')"/>
+                     :placeholder="$t('company.email')"/>
             </div>
           </div>
           <div class="row mb-3">
@@ -286,8 +285,8 @@
       </form>
     </div>
     <div v-if="toggleSelectExistingCompany" class="modal fade show"
-    tabindex="-1" aria-labelledby="exampleModalLabel" aria-modal="true" role="dialog"
-    style="display:block">
+         tabindex="-1" aria-labelledby="exampleModalLabel" aria-modal="true" role="dialog"
+         style="display:block">
       <div class="overlay">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
@@ -296,16 +295,18 @@
               <button type="button" class="btn-close" @click="hideCompanySelectionModal()"></button>
             </div>
             <div class="modal-body">
-            <p style="font-weight: bold">{{ existingCompany.companyName }}</p>
-            <p v-if="existingCompany.address.street">{{ existingCompany.address.street }}
-              <slot v-if="existingCompany.address.streetNumber">{{existingCompany.address.streetNumber}} </slot>
-            </p>
-            <p v-if="existingCompany.address.zip">{{ existingCompany.address.zip }}</p>
-            <p v-if="existingCompany.address.country">{{ existingCompany.address.country }}</p>
+              <p style="font-weight: bold">{{ existingCompany.companyName }}</p>
+              <p v-if="existingCompany.address.street">{{ existingCompany.address.street }}
+                <slot v-if="existingCompany.address.streetNumber">{{ existingCompany.address.streetNumber }}</slot>
+              </p>
+              <p v-if="existingCompany.address.zip">{{ existingCompany.address.zip }}</p>
+              <p v-if="existingCompany.address.country">{{ existingCompany.address.country }}</p>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-htw-green" @click="postInternship()">{{ $t("internship.modal.accept") }}</button>
-              <button type="button" class="btn btn-secondary" @click="hideCompanySelectionModal(), toggleAddCompanyForm = true">{{ $t("internship.modal.decline") }}</button>
+              <button type="button" class="btn btn-secondary" @click="hideCompanySelectionModal(); toggleAddCompanyForm = true">
+                {{ $t("internship.modal.decline") }}
+              </button>
             </div>
           </div>
         </div>
@@ -319,7 +320,7 @@ import { defineComponent } from 'vue';
 import http from '@/utils/http-common';
 import { Company } from '@/store/types/Company';
 import { showErrorNotification } from '@/utils/notification';
-import { convertStringToArray, capitalizeFirstLetter } from '@/utils/stringHelper';
+import { capitalizeFirstLetter, convertStringToArray } from '@/utils/stringHelper';
 import { getAvailableLanguages, loadPaymentTypes } from '@/utils/gateways';
 
 const possibleInternshipFields = [
@@ -327,7 +328,7 @@ const possibleInternshipFields = [
   'endDate',
   'operationalArea',
   'salary',
-  'payment',
+  'paymentTypes',
   'livingCosts',
   'workingHoursPerWeek',
   'supervisorFullName',
@@ -382,7 +383,7 @@ export default defineComponent({
       operationalArea: null,
       programmingLanguages: null,
       salary: null,
-      payment: null,
+      paymentTypes: [],
       livingCosts: null,
       workingHoursPerWeek: null,
       company: '',
@@ -390,8 +391,8 @@ export default defineComponent({
       supervisorEmailAddress: null,
       tasks: null,
       // Form Select Field Options
-      availableLanguages: {} as {[key: string]: {name: string; nativeName: string}},
-      availablePaymentTypes: [] as string[],
+      availableLanguages: {} as { [key: string]: { name: string; nativeName: string } },
+      availablePaymentTypes: {} as Record<string, string>,
       // Company Object after check for existing Company or after creating a new company
       existingCompany: {} as Company,
       newCompanyCreated: false,
@@ -405,7 +406,7 @@ export default defineComponent({
     this.getAvailablePaymentTypes();
   },
   computed: {
-    languages(): {language: string; languageName: string}[] {
+    languages(): { language: string; languageName: string }[] {
       return Object.keys(this.availableLanguages).flatMap(
         (lang) => ({ language: lang, languageName: this.availableLanguages[lang].name }),
       );
@@ -414,7 +415,7 @@ export default defineComponent({
   watch: {
     async $route(to, from) {
       if (this.$route.params.locale && to.params.locale !== from.params.locale) {
-        this.availablePaymentTypes = [];
+        this.availablePaymentTypes = {};
         await this.getAvailablePaymentTypes();
       }
     },
@@ -487,8 +488,8 @@ export default defineComponent({
       }
     },
 
-    getInternshipObject(): { [k: string]: string | string[] } {
-      const internshipProps: { [k: string]: string | string[] } = {};
+    getInternshipObject(): { [k: string]: unknown } {
+      const internshipProps: { [k: string]: unknown } = {};
 
       if (!this.existingCompany._id) {
         throw new Error('Error: No company id found');
@@ -502,6 +503,14 @@ export default defineComponent({
       possibleInternshipFields.forEach((prop) => {
         if (this[prop]) internshipProps[prop] = this[prop];
       });
+
+      // Add supervisor as object
+      if (this.supervisorFullName || this.supervisorEmailAddress) {
+        internshipProps.supervisor = {
+          fullName: this.supervisorFullName,
+          emailAddress: this.supervisorEmailAddress,
+        };
+      }
 
       return internshipProps;
     },
@@ -521,8 +530,8 @@ export default defineComponent({
         const st = 'internship.form.paymentType.';
         if (paymentTypes.length > 0) {
           // eslint-disable-next-line no-restricted-syntax
-          for (const pt of paymentTypes) {
-            this.availablePaymentTypes.push(`${this.$t(st + pt.replace(/\s/g, ''))}`);
+          for (const paymentType of paymentTypes) {
+            this.availablePaymentTypes[paymentType] = this.$t(st + paymentType.replace(/\s/g, ''));
           }
         }
       } catch (err: any) {
@@ -574,11 +583,13 @@ export default defineComponent({
   background-color: rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(1px);
 }
+
 .modal-content {
   p {
     margin-bottom: 0.5em;
   }
 }
+
 .internship-payment-options {
   display: flex;
   gap: 1.5rem;
@@ -599,29 +610,29 @@ export default defineComponent({
 }
 
 .autocomplete-results {
-    padding: 0;
-    margin: 0;
-    border: 1px solid #eeeeee;
-    height: 120px;
-    min-height: 1em;
-    max-height: 6em;
-    overflow: auto;
-  }
+  padding: 0;
+  margin: 0;
+  border: 1px solid #eeeeee;
+  height: 120px;
+  min-height: 1em;
+  max-height: 6em;
+  overflow: auto;
+}
 
-  .autocomplete-result {
-    list-style: none;
-    text-align: left;
-    padding: 4px 2px;
-    cursor: pointer;
-  }
+.autocomplete-result {
+  list-style: none;
+  text-align: left;
+  padding: 4px 2px;
+  cursor: pointer;
+}
 
-  .autocomplete-result:hover {
-    background-color: #77b900;
-    color: white;
-  }
+.autocomplete-result:hover {
+  background-color: #77b900;
+  color: white;
+}
 
-  .explanation > p {
-    margin: 0;
-    font-size: 14px;
-  }
+.explanation > p {
+  margin: 0;
+  font-size: 14px;
+}
 </style>
