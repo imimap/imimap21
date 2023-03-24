@@ -15,6 +15,7 @@
                   data-bs-dismiss="modal"
                   aria-label="Close"
                   ref="closeButton"
+                  @click="reset"
           />
         </div>
         <div class="modal-body">
@@ -60,7 +61,9 @@
 
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t("userList.editInternshipModal.close") }}</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="reset">
+            {{ $t("userList.editInternshipModal.close") }}
+          </button>
           <button type="button"
                   class="btn btn-success"
                   @click="updateInternshipModule"

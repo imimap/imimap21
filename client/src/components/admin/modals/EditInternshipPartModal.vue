@@ -15,6 +15,7 @@
                   data-bs-dismiss="modal"
                   aria-label="Close"
                   ref="closeButton"
+                  @click="resetData"
           />
         </div>
         <div v-if="internshipPart != undefined" class="modal-body">
