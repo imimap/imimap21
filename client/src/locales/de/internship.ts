@@ -2,6 +2,9 @@ const internship = {
   heading: {
     create: 'Neues Praktikum',
     edit: 'Praktikum bearbeiten',
+    internshipOf: 'Praktikum von ',
+    at: ' bei ',
+    in: 'in ',
   },
   explanation: {
     redStar: 'Felder mit diesem Sternchen sind Pflicht für das Anlegen eines Praktikums.',
@@ -24,12 +27,17 @@ const internship = {
     workingHoursPerWeek: 'Arbeitsstunden pro Woche',
     livingCosts: 'Lebenshaltungskosten',
     tasks: 'Aufgaben',
+    supervisorName: 'Name Betreuer/in',
+    supervisorEmail: 'Email Betreuer/in',
   },
   modal: {
     heading: 'Meintest du vielleicht diese Firma?',
     accept: 'Ja, übernehmen',
     decline: 'Nein, andere Firma eintragen',
+    close: 'Schließen',
+    save: 'Speichern',
   },
+
 };
 
 export default internship;

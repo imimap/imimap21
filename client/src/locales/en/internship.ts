@@ -2,6 +2,9 @@ const internship = {
   heading: {
     create: 'New Internship',
     edit: 'Edit Internship',
+    internshipOf: 'Internship of ',
+    at: ' at ',
+    in: 'in ',
   },
   explanation: {
     redStar: 'Fields with this star are required for creating an internship.',
@@ -24,11 +27,15 @@ const internship = {
     workingHoursPerWeek: 'Working hours per week',
     livingCosts: 'Cost of living',
     tasks: 'Tasks',
+    supervisorName: 'Supervisor Name',
+    supervisorEmail: 'Supervisor E-Mail',
   },
   modal: {
     heading: 'Did you mean this company?',
     accept: 'Yes, take this one',
     decline: 'No, enter different company',
+    close: 'Close',
+    save: 'Save',
   },
 };
 
