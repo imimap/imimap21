@@ -5,6 +5,7 @@ import {
   getAllOperationalAreas,
   getAllPaymentTypes,
   getAllProgrammingLanguages,
+  getAllInternshipStatuses,
 } from "../controllers/internship";
 import { validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
@@ -16,6 +17,13 @@ const infoRouter = Router();
 /* The following endpoints can be used to provide options to a search form */
 
 infoRouter.get("/payment-types", authMiddleware(), validate, asyncHandler(getAllPaymentTypes));
+
+infoRouter.get(
+  "/internship-statuses",
+  authMiddleware(),
+  validate,
+  asyncHandler(getAllInternshipStatuses)
+);
 
 infoRouter.get(
   "/operational-areas",

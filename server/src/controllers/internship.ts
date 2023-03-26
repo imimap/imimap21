@@ -404,8 +404,36 @@ export async function getAllPaymentTypes(
   } catch (e) {
     return next(e);
   }
-
+  const internships = await Internship.find().lean().select("paymentTypes");
+  const paymentTypes: string[] = [
+    ...new Set(internships.flatMap((internship) => internship.paymentTypes || "")),
+  ];
+  res.json(paymentTypes);
   res.json([...Object.values(PaymentTypes)]);
+}
+
+/**
+ * Returns all internship statuses
+ * Returns only internship statuses that exist on internships
+ * @param req
+ * @param res
+ * @param next
+ */
+export async function getAllInternshipStatuses(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    await getUser(req.user?.email);
+  } catch (e) {
+    return next(e);
+  }
+  const internships = await Internship.find().lean().select("status");
+  const internshipStatuses: string[] = [
+    ...new Set(internships.flatMap((internship) => internship.status || "")),
+  ];
+  res.json(internshipStatuses);
 }
 
 /**
@@ -425,9 +453,10 @@ export async function getAllOperationalAreas(
   } catch (e) {
     return next(e);
   }
-
-  const operationalAreas: string[] = await Internship.distinct("operationalArea");
-
+  const internships = await Internship.find().lean().select("operationalArea");
+  const operationalAreas: string[] = [
+    ...new Set(internships.flatMap((internship) => internship.operationalArea || "")),
+  ];
   res.json(operationalAreas);
 }
 

@@ -59,7 +59,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { loadAvailableSemesters } from '@/utils/gateways';
+import { loadAvailableSemesters, loadInternshipStatuses } from '@/utils/gateways';
 
 export default defineComponent({
   name: 'UsersListFilters',
@@ -71,13 +71,7 @@ export default defineComponent({
       search: '',
       semester: '',
       availableSemesters: [] as string[],
-      availableStatuses: [
-        'unknown',
-        'planned',
-        'postponement requested',
-        'postponement rejected',
-        'passed',
-      ] as string[], // TODO: Load statuses dynamically from API
+      availableStatuses: [] as string[],
     };
   },
   methods: {
@@ -91,6 +85,7 @@ export default defineComponent({
   },
   async mounted() {
     this.availableSemesters = await loadAvailableSemesters();
+    this.availableStatuses = await loadInternshipStatuses();
   },
 });
 </script>

@@ -5,9 +5,10 @@
         getDateString(internship.startDate) + ' - '
         + getDateString(internship.endDate)
       }}
-      <span class="badge rounded-pill bg-secondary float-end">
-                    {{ internship.status }}
-                  </span>
+      <span
+      :class="['badge', 'rounded-pill', 'float-end', statusBadgeColors[(internship as any).status]] ">
+        {{ internship.status }}
+      </span>
     </div>
     <div class="card-body">
       <h5 class="card-title">{{ internship.company.companyName }}</h5>
@@ -112,6 +113,7 @@ import { Internship } from '@/store/types/Internship';
 import UsersListStatusItem from '@/components/admin/users-list/UsersListStatusItem.vue';
 import AdminComment from '@/components/admin/users-list/AdminComment.vue';
 import CommentBox from '@/components/admin/users-list/CommentBox.vue';
+import statusBadgeColors from '@/utils/statusBadgeColors';
 
 export default defineComponent({
   name: 'InternshipPart',
@@ -131,6 +133,11 @@ export default defineComponent({
     },
   },
   emits: ['editInternshipPart', 'updateInternship'],
+  data() {
+    return {
+      statusBadgeColors: statusBadgeColors(),
+    };
+  },
   computed: {
     duration(): { weeks: number; days: number } {
       const durationInDays = getTimeDifferenceDays(this.internship.startDate,

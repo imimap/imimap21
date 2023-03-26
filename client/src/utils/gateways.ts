@@ -210,6 +210,17 @@ export const loadUpcomingSemesters = async (): Promise<string[]> => {
   }
 };
 
+export const loadInternshipStatuses = async (): Promise<string[]> => {
+  try {
+    const res = await apiClient.get('/info/internship-statuses');
+    return res.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Laden der verfügbaren Internship-Status [ERROR: ${err.message}]`);
+    return [];
+  }
+};
+
 export const loadPaymentTypes = async (): Promise<string[]> => {
   try {
     const res = await apiClient.get('/info/payment-types');
