@@ -148,8 +148,6 @@ export default defineComponent({
     getDateString,
     getTimeDifferenceDays,
     async approveApplication(internshipId: string) {
-      const userDoubleChecked = window.confirm('Antrag zum Praktikum wirklich genehmigen?');
-      if (!userDoubleChecked) return;
       const updatedInternship = await approveInternshipApplication(internshipId);
       if (!updatedInternship) {
         await showErrorNotification('Praktikumsantrag konnte nicht genehmigt werden.');
@@ -158,9 +156,6 @@ export default defineComponent({
       this.$emit('updateInternship', this.index, updatedInternship);
     },
     async markAsComplete(internshipId: string) {
-      const userDoubleChecked = window
-        .confirm('Teilpraktikum wirklich als anrechenbar markieren?');
-      if (!userDoubleChecked) return;
       const updatedInternship = await markInternshipAsPassed(internshipId);
       if (!updatedInternship) {
         await showErrorNotification('Praktikum konnte nicht als anrechenbar markiert werden.');

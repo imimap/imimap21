@@ -145,8 +145,6 @@ export default defineComponent({
     getInternshipModuleDuration,
     getTimeDifferenceDays,
     async passAEP() {
-      const userDoubleChecked = window.confirm(`${this.$t('userList.notifications.confirmAEP')}`);
-      if (!userDoubleChecked) return;
       const apiResponse = await markAepPassedOnInternshipModule(
         this.student.studentProfile.internship._id,
       );
@@ -159,9 +157,6 @@ export default defineComponent({
       this.$emit('updateStudent', this.student._id);
     },
     async clearSearch() {
-      const userDoubleChecked = window.confirm(`${this.$t('userList.notifications.confrimResetSearchResultPart1')}${this.student.firstName}
-      ${this.student.lastName}${this.$t('userList.notifications.confrimResetSearchResultPart2')}`);
-      if (!userDoubleChecked) return;
       const apiResponse = await clearStudentSearch(this.student._id);
       if (!('status' in apiResponse) || apiResponse.status !== 204) {
         await showErrorNotification(`${this.$t('userList.notifications.resetSearchResultError')}`);
