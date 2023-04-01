@@ -46,11 +46,8 @@ const userList = {
     save: 'Save',
   },
   notifications: {
-    confirmAEP: 'Really mark AEP for internship module as passed? ',
     aepError: 'The AEP could not be marked as passed.',
     aepSuccessPart1: 'The AEP for ',
-    confrimResetSearchResultPart1: 'Really reset search results for ',
-    confrimResetSearchResultPart2: ' ?',
     aepSuccessPart2: ' was marked as passed.',
     resetSearchResultPart1: 'The search for ',
     resetSearchResultPart2: ' has been reset.',

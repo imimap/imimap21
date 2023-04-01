@@ -76,7 +76,7 @@ export default defineComponent({
       if (this.pdfLink === undefined) {
         await this.loadPDF();
       }
-      window.open(this.pdfLink);
+      window.open(this.pdfLink, '_blank');
     },
     async downloadPDF() {
       if (this.pdfLink === undefined) {

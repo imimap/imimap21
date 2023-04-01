@@ -46,12 +46,9 @@ const userList = {
     save: 'Speichern',
   },
   notifications: {
-    confirmAEP: 'AEP zum Praktikumsmodul wirklich als bestanden markieren? ',
     aepError: 'Das AEP konnte nicht als bestanden markiert werden.',
     aepSuccessPart1: 'Das AEP für ',
     aepSuccessPart2: ' wurde als bestanden markiert.',
-    confrimResetSearchResultPart1: 'Suchanfragen für ',
-    confrimResetSearchResultPart2: ' zurücksetzen?',
     resetSearchResultPart1: 'Die Suche für ',
     resetSearchResultPart2: ' wurde zurückgesetzt.',
     resetSearchResultError: 'Die Suchanfragen konnten nicht zurückgesetzt werden.',

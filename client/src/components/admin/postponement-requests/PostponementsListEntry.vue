@@ -92,8 +92,6 @@ export default defineComponent({
   },
   methods: {
     async acceptPostponementRequest() {
-      const userDoubleChecked = window.confirm('Verschiebungsantrag wirklich genehmigen?');
-      if (!userDoubleChecked) return;
       const success = await acceptPostponement(this.postponement._id);
       if (!success) {
         await showErrorNotification('Genehmigung fehlgeschlagen.');
@@ -103,8 +101,6 @@ export default defineComponent({
       this.$emit('removePostponement', this.postponement);
     },
     async rejectPostponementRequest() {
-      const userDoubleChecked = window.confirm('Verschiebungsantrag wirklich ablehnen?');
-      if (!userDoubleChecked) return;
       const success = await rejectPostponement(this.postponement._id);
       if (!success) {
         await showErrorNotification('Ablehnung fehlgeschlagen.');
