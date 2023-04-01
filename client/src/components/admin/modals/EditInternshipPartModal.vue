@@ -4,28 +4,35 @@
        tabindex="-1"
        aria-labelledby="internshipPartEditModalLabel"
        aria-hidden="true"
+       ref=""
   >
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="internshipPartEditModalLabel">Teilpraktikum bearbeiten</h5>
+          <h5 class="modal-title" id="internshipPartEditModalLabel">{{ $t('internship.heading.edit') }}</h5>
           <button type="button"
                   class="btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
                   ref="closeButton"
+                  @click="resetData"
           />
         </div>
         <div v-if="internshipPart != undefined" class="modal-body">
           <p>
-            Praktikum von {{ student?.firstName }} {{ student?.lastName }}
-            ({{ student?.studentProfile.studentId }})
-            bei {{ internshipPart?.company?.companyName }}
-            in {{ internshipPart?.company?.address?.city }}
+            <span>
+             {{$t("internship.heading.internshipOf") }}
+            </span>
+            <span>{{ student?.firstName }} {{ student?.lastName }}
+            ({{ student?.studentProfile.studentId }})</span>
+            <span>   {{$t("internship.heading.at") }}</span>
+            <span>{{ internshipPart?.company?.companyName }}</span>
+            <span>{{$t("internship.heading.in") }}</span>
+            <span>{{ internshipPart?.company?.address?.city }}</span>
           </p>
 
           <div class="mb-3">
-            <label for="tasks" class="form-label">Aufgaben</label>
+            <label for="tasks" class="form-label">{{ $t('internship.form.tasks') }}</label>
             <input type="text"
                    class="form-control"
                    id="tasks"
@@ -35,7 +42,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="operationalArea" class="form-label">Tätigkeitsbereich</label>
+            <label for="operationalArea" class="form-label">{{ $t('internship.form.operationalArea') }}</label>
             <input type="text"
                    class="form-control"
                    id="operationalArea"
@@ -45,17 +52,17 @@
           </div>
 
           <div class="mb-3">
-            <label for="programmingLanguages" class="form-label">Programmiersprachen</label>
+            <label for="programmingLanguages" class="form-label">{{ $t('internship.form.programmingLanguages') }}</label>
             <input type="text"
                    class="form-control"
                    id="programmingLanguages"
                    aria-describedby="programmingLanguages"
-                    v-model="internshipPart.programmingLanguages"
+                   v-model="internshipPart.programmingLanguages"
             />
           </div>
 
           <div class="mb-3">
-            <label for="livingCosts" class="form-label">Lebenshaltungskosten</label>
+            <label for="livingCosts" class="form-label">{{ $t('internship.form.livingCosts') }}</label>
             <input type="number"
                    class="form-control"
                    id="livingCosts"
@@ -65,7 +72,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="salary" class="form-label">Gehalt</label>
+            <label for="salary" class="form-label">{{ $t('internship.form.salary') }}</label>
             <input type="number"
                    class="form-control"
                    id="salary"
@@ -76,7 +83,7 @@
 
           <div class="mb-3">
             <label for="salary" class="form-label">
-              Bezahlungsart (Mehrfachauswahl möglich)</label>
+              {{ $t('internship.form.paymentType.info') }}</label>
             <select class="form-select"
                     multiple
                     aria-label="multiple select example"
@@ -93,27 +100,27 @@
           </div>
 
           <div class="mb-3">
-            <label for="startDate" class="form-label">Startdatum</label>
+            <label for="startDate" class="form-label">{{ $t('internship.form.startDate') }}</label>
             <input type="date"
                    class="form-control"
                    id="startDate"
                    aria-describedby="startDate"
-                   v-model="startDate"
+                   v-model="internshipPart.startDate"
             />
           </div>
 
           <div class="mb-3">
-            <label for="endDate" class="form-label">Enddatum</label>
+            <label for="endDate" class="form-label">{{ $t('internship.form.endDate') }}</label>
             <input type="date"
                    class="form-control"
                    id="endDate"
                    aria-describedby="endDate"
-                   v-model="endDate"
+                   v-model="internshipPart.endDate"
             />
           </div>
 
           <div class="mb-3">
-            <label for="workingHoursPerWeek" class="form-label">Arbeitsstunden pro Woche</label>
+            <label for="workingHoursPerWeek" class="form-label">{{ $t('internship.form.workingHoursPerWeek') }}</label>
             <input type="number"
                    min="0"
                    class="form-control"
@@ -124,43 +131,34 @@
           </div>
 
           <div class="mb-3">
-            <label for="supervisorName" class="form-label">Supervisor</label>
+            <label for="supervisorName" class="form-label">{{ $t('internship.form.supervisorName') }}</label>
             <input type="text"
                    class="form-control"
                    id="supervisorName"
                    aria-describedby="supervisorName"
-                   v-model="supervisor.fullName"
+                   v-model="internshipPart.supervisor.fullName"
             />
           </div>
 
           <div class="mb-3">
+            <label for="supervisorEmail" class="form-label required">{{ $t('internship.form.supervisorEmail') }}</label>
             <input type="text"
                    class="form-control"
                    id="supervisorEmail"
                    aria-describedby="supervisorEmail"
-                   v-model="supervisor.emailAddress"
+                   v-model="internshipPart.supervisor.emailAddress"
             />
           </div>
-
-          <div class="mb-3">
-            <label for="comment" class="form-label">Kommentar (nicht implementiert)</label>
-            <textarea class="form-control"
-                      id="comment"
-                      aria-describedby="comment"
-                      v-model="internshipPart.comment"
-            ></textarea>
-          </div>
-
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            Schließen
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetData">
+            {{ $t('internship.modal.close') }}
           </button>
           <button type="button"
                   class="btn btn-success"
                   @click="updateInternshipPart"
           >
-            Speichern
+          {{ $t('internship.modal.save') }}
           </button>
         </div>
       </div>
@@ -173,7 +171,7 @@ import { defineComponent, PropType } from 'vue';
 import Student from '@/models/Student';
 import Internship from '@/models/Internship';
 import { loadPaymentTypes, updateInternship } from '@/utils/gateways';
-import { showSuccessNotification } from '@/utils/notification';
+import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
 
 export default defineComponent({
   name: 'EditInternshipPartModal',
@@ -189,13 +187,7 @@ export default defineComponent({
     return {
       availablePaymentTypes: [] as string[],
       internshipPart: {} as Internship | undefined,
-      startDate: undefined as string | undefined,
-      endDate: undefined as string | undefined,
-      supervisor: {
-        fullName: undefined as string | undefined,
-        emailAddress: undefined as string | undefined,
-      },
-
+      originalInternshipPart: '',
     };
   },
   async mounted() {
@@ -206,31 +198,24 @@ export default defineComponent({
   },
 
   methods: {
-    normalizedDate(date: string | undefined): string | undefined {
-      if (!date) return undefined;
-      const dateWithoutTime = new Date(date).toISOString().split('T')[0].toString();
-      return dateWithoutTime;
+    normalizedDate(date: string): string {
+      return new Date(date).toISOString().split('T')[0].toString();
     },
     async updateInternshipPart() {
-      if (!this.internshipPart) return;
-      this.internshipPart.startDate = this.normalizedDate(this.startDate)
-        ?? this.internshipPart.startDate;
-      this.internshipPart.endDate = this.normalizedDate(this.endDate)
-        ?? this.internshipPart.endDate;
-
-      if (this.internshipPart.supervisor === undefined) { this.internshipPart.supervisor = { fullName: '', emailAddress: '' }; }
-      this.internshipPart.supervisor.fullName = this.supervisor?.fullName
-      ?? this.internshipPart?.supervisor.fullName;
-      this.internshipPart.supervisor.emailAddress = this.supervisor?.emailAddress
-       ?? this.internshipPart?.supervisor.emailAddress;
-      const updatedInternship = await
-      updateInternship(this.internshipPart._id, this.internshipPart);
-      if (updatedInternship === null) return;
-      this.$emit('updateInternship', this.student?._id, this.internshipIndex, updatedInternship);
-      await showSuccessNotification('Änderungen am Praktikum gespeichert');
-      (this.$refs.closeButton as HTMLButtonElement).click();
+      try {
+        if (!this.internshipPart?.supervisor.emailAddress) {
+          throw new Error('Please enter an e-mail for the supervisor');
+        }
+        const updatedInternship = await
+        updateInternship(this.internshipPart._id, this.internshipPart);
+        this.$emit('updateInternship', this.student?._id, this.internshipIndex, updatedInternship);
+        await showSuccessNotification('Änderungen am Praktikum gespeichert');
+        (this.$refs.closeButton as HTMLButtonElement).click();
+      } catch (err: any) {
+        await showErrorNotification(err);
+        this.resetData();
+      }
     },
-
     isSelectedPaymentType(paymentType: string): boolean {
       if (!this.internshipPart || this.internshipPart?.paymentTypes.length === 0) {
         return false;
@@ -239,12 +224,13 @@ export default defineComponent({
     },
     updateProperties() {
       this.internshipPart = undefined;
-      // eslint-disable-next-line max-len
       this.internshipPart = this.student?.studentProfile.internship.internships[this.internshipIndex];
-      this.startDate = this.normalizedDate(this.internshipPart?.startDate);
-      this.endDate = this.normalizedDate(this.internshipPart?.endDate);
-      this.supervisor.fullName = this.internshipPart?.supervisor?.fullName;
-      this.supervisor.emailAddress = this.internshipPart?.supervisor?.emailAddress;
+      this.originalInternshipPart = JSON.stringify(this.internshipPart);
+    },
+    resetData() {
+      if (this.originalInternshipPart) {
+        this.internshipPart = JSON.parse(this.originalInternshipPart);
+      }
     },
   },
   watch: {
@@ -253,6 +239,12 @@ export default defineComponent({
     },
     internshipIndex() {
       this.updateProperties();
+    },
+    'internshipPart.endDate': function (newValue) {
+      if (this.internshipPart) this.internshipPart.endDate = this.normalizedDate(newValue);
+    },
+    'internshipPart.startDate': function (newValue) {
+      if (this.internshipPart) this.internshipPart.startDate = this.normalizedDate(newValue);
     },
   },
 });
