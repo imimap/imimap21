@@ -389,7 +389,6 @@ export async function getInternshipLocations(req: Request, res: Response): Promi
 
 /**
  * Returns all paymentTypes
- * Returns only paymentTypes that exist on internships
  * @param req
  * @param res
  * @param next
@@ -404,11 +403,6 @@ export async function getAllPaymentTypes(
   } catch (e) {
     return next(e);
   }
-  const internships = await Internship.find().lean().select("paymentTypes");
-  const paymentTypes: string[] = [
-    ...new Set(internships.flatMap((internship) => internship.paymentTypes || "")),
-  ];
-  res.json(paymentTypes);
   res.json([...Object.values(PaymentTypes)]);
 }
 
@@ -453,10 +447,7 @@ export async function getAllOperationalAreas(
   } catch (e) {
     return next(e);
   }
-  const internships = await Internship.find().lean().select("operationalArea");
-  const operationalAreas: string[] = [
-    ...new Set(internships.flatMap((internship) => internship.operationalArea || "")),
-  ];
+  const operationalAreas: string[] = await Internship.distinct("operationalArea");
   res.json(operationalAreas);
 }
 
