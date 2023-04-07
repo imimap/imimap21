@@ -29,8 +29,17 @@
             </div>
             <div class="col-2 text-center">
               <h6 class="list-item-label">Status</h6>
-              <span :class="['badge', 'rounded-pill', statusBadgeColors[internship.status]]">
-                {{ internship.status }}
+              <span  v-if="internship.internships.length > 0">
+                <span v-for="(internshipPart, internshipIndex) in internship.internships"
+                  :key="internshipIndex"
+                  :class="['badge', 'rounded-pill', statusBadgeColors[(internshipPart as any).status]] "
+                  style="margin: 0 2px;"
+                  >
+                  <span  v-if="(internshipPart as any).status">{{ (internshipPart as any).status }}</span>
+                </span>
+              </span>
+              <span v-else>
+                <span>-</span>
               </span>
             </div>
             <div class="col-2 text-center">
@@ -65,8 +74,7 @@
                 <button class="btn btn-success"
                         type="button"
                         :disabled="internship.aepPassed"
-                        @click="passAEP(internship._id,
-                                    `${student.firstName} ${student.lastName}`)"
+                        @click="passAEP()"
                 >
                 {{ $t("userList.studentEntry.passAEP") }}
                 </button>
@@ -98,7 +106,10 @@
 // TODO: Implement custom alert box
 /* eslint-disable no-alert */
 import { defineComponent, PropType } from 'vue';
-import { getDateString, getInternshipModuleDuration, getTimeDifferenceDays } from '@/utils/admin';
+import {
+  getDateString, getInternshipModuleDuration, getTimeDifferenceDays,
+} from '@/utils/admin';
+import statusBadgeColors from '@/utils/statusBadgeColors';
 import Student from '@/models/Student';
 import { clearStudentSearch, markAepPassedOnInternshipModule } from '@/utils/gateways';
 import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
@@ -120,13 +131,7 @@ export default defineComponent({
   emits: ['editInternshipModule', 'editInternshipPart', 'updateStudent', 'updateInternship'],
   data() {
     return {
-      statusBadgeColors: {
-        unknown: 'bg-secondary',
-        planned: 'bg-primary',
-        'postponement requested': 'bg-warning',
-        'postponement rejected': 'bg-secondary',
-        passed: 'bg-success',
-      },
+      statusBadgeColors: statusBadgeColors(),
     };
   },
   computed: {

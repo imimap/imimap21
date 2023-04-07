@@ -67,12 +67,13 @@ export default defineComponent({
     };
   },
   computed: {
+    /* eslint-disable no-restricted-syntax */
     studentsWithSearchAndFilter(): Student[] {
       const search = this.search.toLowerCase();
       return this.students.filter((student) => (student.firstName.toLowerCase().includes(search)
           || student.lastName.toLowerCase().includes(search)
           || student.studentProfile.studentId.toLowerCase().includes(search))
-        && student.studentProfile.internship.status.includes(this.statusFilter));
+       && this.hasStatus(student.studentProfile.internship, this.statusFilter));
     },
   },
   mounted() {
@@ -137,6 +138,13 @@ export default defineComponent({
       this.students[index].studentProfile.internship.internships[internshipIndex] = internship;
        */
       this.updateStudent(studentId);
+    },
+    hasStatus(internship: any, status: string): boolean {
+      if (status === '') return true;
+      for (const internshipPart of internship.internships) {
+        if (internshipPart.status === status) return true;
+      }
+      return false;
     },
   },
 });
