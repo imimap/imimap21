@@ -88,7 +88,7 @@
                         {{ $t("header.headerLinks.myInternship") }}
                       </router-link>
                     </li>
-                    <li v-if="currentUserIsAdmin()" class="nav-item imi-nav-item">
+                    <li v-if="isAdmin" class="nav-item imi-nav-item">
                       <router-link
                         class="nav-link imi-nav-link imi-map-navlink admin-link"
                         :to="{name: 'Admin', params: { locale: $route.params.locale }}"
@@ -109,13 +109,21 @@
 
 <script  lang="ts">
 import { defineComponent } from 'vue';
-import { logoutUser, isAdmin } from '@/utils/auth';
+import { logoutUser } from '@/utils/auth';
+import { UserProfileState } from '@/store/types/UserProfileState';
+import { useStore } from 'vuex';
 
 export default defineComponent({
   name: 'Header',
   computed: {
     hasInternshipModule(): boolean {
       return this.$store.getters.getUserInternshipId !== null;
+    },
+    isAdmin(): boolean {
+      const store = useStore();
+      const user: UserProfileState = store.getters.getUserProfile;
+      console.log(user);
+      return user.isAdmin;
     },
   },
   methods: {
@@ -126,14 +134,12 @@ export default defineComponent({
     logout() {
       logoutUser();
       this.$store.commit('resetUser');
+      this.$store.commit('resetUserProfile');
       this.$store.dispatch('addNotification', {
         text: 'Du wurdest erfolgreich ausgeloggt!',
         type: 'success',
       });
       this.$router.push({ name: 'Login' });
-    },
-    currentUserIsAdmin() {
-      return isAdmin();
     },
   },
 });

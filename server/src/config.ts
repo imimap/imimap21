@@ -15,6 +15,7 @@ export const local = {
 export const auth = {
   strategy: process.env.NODE_ENV === "development" && process.env.BYPASS_LDAP ? "local" : "ldap",
   secret: process.env.AUTH_SECRET as string,
+  refreshSecret: process.env.REFRESH_SECRET as string,
   expiryTime: "1h",
   algorithm: "HS256",
 };

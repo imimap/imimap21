@@ -1,5 +1,5 @@
 <template>
-  <template v-if="isLoggedInUser()">
+  <template v-if="isLoggedInUser">
     <header-component></header-component>
     <main>
       <router-view></router-view>
@@ -15,17 +15,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import {
+  defineComponent,
+} from 'vue';
 import HeaderComponent from '@/components/Header.vue';
 import FooterComponent from '@/components/Footer.vue';
 import NotificationList from '@/components/notification/NotificationList.vue';
-import { isLoggedIn } from '@/utils/auth';
+import { useStore } from 'vuex';
+import { UserState } from '@/store/types/UserState';
 
 export default defineComponent({
   name: 'Layout',
-  methods: {
+  computed: {
     isLoggedInUser(): boolean {
-      return isLoggedIn();
+      const store = useStore();
+      const user: UserState = store.getters.getAuthUser;
+      return !!user.email;
     },
   },
   components: {
