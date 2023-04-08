@@ -14,6 +14,7 @@ import {
   markInternshipAsPassed,
   submitPdf,
   updateInternship,
+  markInternshipAsForcePassed,
 } from "../controllers/internship";
 import { isObjectId, validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
@@ -123,6 +124,14 @@ internshipRouter.patch(
   param("id").custom(isObjectId),
   validate,
   asyncHandler(markInternshipAsPassed)
+);
+
+internshipRouter.patch(
+  "/:id/forcePass",
+  authMiddleware(),
+  param("id").custom(isObjectId),
+  validate,
+  asyncHandler(markInternshipAsForcePassed)
 );
 
 /* PDF endpoints */

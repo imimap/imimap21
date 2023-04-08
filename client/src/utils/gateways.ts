@@ -99,6 +99,19 @@ export const markInternshipAsPassed = async (
     const response = await apiClient.patch(`/internships/${internshipId}/pass`);
     return response.data;
   } catch (err: any) {
+    // if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    // await showErrorNotification(`Fehler beim Updaten des Praktikums ${internshipId} [ERROR: ${err.message}]`);
+    return null;
+  }
+};
+
+export const markInternshipAsForcePassed = async (
+  internshipId: string,
+): Promise<Internship | null> => {
+  try {
+    const response = await apiClient.patch(`/internships/${internshipId}/forcePass`);
+    return response.data;
+  } catch (err: any) {
     if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
     await showErrorNotification(`Fehler beim Updaten des Praktikums ${internshipId} [ERROR: ${err.message}]`);
     return null;
