@@ -245,7 +245,7 @@ router.beforeEach(async (to, from, next) => {
   if (loggedIn && rootStore.getters.getAuthUser.id === '') {
     let decodedToken;
     try {
-      decodedToken = getUserInfo();
+      decodedToken = await getUserInfo();
       await storeAuthUser(decodedToken);
       const res = await getAuthUserProfile();
       await storeAuthUserProfile(res.data);

@@ -102,7 +102,6 @@ export function logoutUser() {
 }
 
 export async function storeAuthUser(decodedToken: UserState): Promise<void> {
-  console.log('storeAuthUser', decodedToken);
   await store.dispatch('setUser', {
     email: decodedToken.email,
     firstName: decodedToken.firstName,
@@ -113,8 +112,6 @@ export async function storeAuthUser(decodedToken: UserState): Promise<void> {
 }
 
 export async function storeAuthUserProfile(userProfile: UserState): Promise<void> {
-  console.log('storeAuthUserProfile', userProfile);
-
   await store.dispatch('setUserProfile', {
     ...userProfile,
   });
@@ -146,16 +143,15 @@ export async function login(username: string, password: string): Promise<boolean
     await showErrorNotification('Authentifizierungstoken konnte nicht entschlüsselt werden.');
     return false;
   }
-  let res2;
-  await storeAuthUser(decodedToken);
   try {
-    res2 = await getAuthUserProfile();
+    await storeAuthUser(decodedToken);
+    res = await getAuthUserProfile();
   } catch (err: any) {
     await showErrorNotification(err.message);
     return false;
   }
   try {
-    await storeAuthUserProfile(res2.data);
+    await storeAuthUserProfile(res.data);
     await showSuccessNotification('Du wurdest erfolgreich eingeloggt!');
     return true;
   } catch (err: any) {
