@@ -27,12 +27,20 @@ function getLDAPConfig(request: IncomingMessage, callback: LdapStrategy.OptionsF
 
 function verifyLdapResponse(user: LdapUser, done: LdapStrategy.VerifyDoneCallback) {
   if (user) {
+    if (
+      !user.memberOf.includes(config.studentGroup) &&
+      !user.memberOf.includes(config.instructorGroup)
+    )
+      return done(null, null, {
+        message: "user is not part of the IMI LDAP group",
+      });
+
     done(null, {
       id: user.uid,
       firstName: user.givenName,
       lastName: user.sn,
       email: normalizeEmail(user.mail),
-      role: user.memberOf.indexOf(config.instructorGroup) !== -1 ? Role.INSTRUCTOR : Role.STUDENT,
+      role: user.memberOf.includes(config.studentGroup) ? Role.STUDENT : null,
     });
   } else {
     done(null, null, { message: "ldap error" });

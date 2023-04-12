@@ -3,7 +3,7 @@ export const ldap = {
   url: process.env.LDAP_URL as string,
   searchBase: process.env.LDAP_SEARCH_BASE as string,
   searchFilter: "(uid={{username}})",
-  studentGroup: process.env.STUDENT_GROUP as string,
+  studentGroup: process.env.LDAP_STUDENT_GROUP as string,
   instructorGroup: process.env.LDAP_INSTRUCTOR_GROUP as string,
 };
 
