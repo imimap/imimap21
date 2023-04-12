@@ -73,7 +73,7 @@
       </details>
     </div>
     <div class="card-footer">
-      <button class="btn btn-success btn-sm me-2"
+      <button v-if="internship.status === 'requested'" class="btn btn-success btn-sm me-2"
               @click="approveApplication(internship._id)"
       >
         {{ $t("userList.internshipPart.approveApplication") }}
@@ -106,7 +106,7 @@ import { defineComponent, PropType } from 'vue';
 import { getDateString, getTimeDifferenceDays } from '@/utils/admin';
 import { showErrorNotification } from '@/utils/notification';
 import {
-  approveInternshipApplication, deleteComment, deleteInternship, markInternshipAsPassed, updateInternship,
+  approveInternshipApplication, deleteComment, deleteInternship, markInternshipAsForcePassed, markInternshipAsPassed, updateInternship,
 } from '@/utils/gateways';
 import { Comment } from '@/store/types/Comment';
 import { Internship } from '@/store/types/Internship';
@@ -163,9 +163,15 @@ export default defineComponent({
       this.$emit('updateInternship', this.index, updatedInternship);
     },
     async markAsComplete(internshipId: string) {
-      const updatedInternship = await markInternshipAsPassed(internshipId);
+      let updatedInternship = await markInternshipAsPassed(internshipId);
       if (!updatedInternship) {
-        await showErrorNotification('Praktikum konnte nicht als anrechenbar markiert werden.');
+        const userDoubleChecked = window.confirm('Das Praktikum ist noch nicht bereit, '
+        + 'als anrechenbar markiert zu werden, weil gewisse Unterlagen fehlen. Trotzdem als anrechenbar markieren?');
+        if (!userDoubleChecked) return;
+        updatedInternship = await markInternshipAsForcePassed(internshipId);
+        if (!updatedInternship) {
+          await showErrorNotification('Praktikum konnte nicht als anrechenbar markiert werden.');
+        }
         return;
       }
       this.$emit('updateInternship', this.index, updatedInternship);
