@@ -194,7 +194,8 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  if (!to.meta.allowAnonymous && !isLoggedIn()) {
+  const loggedIn = await isLoggedIn();
+  if (!to.meta.allowAnonymous && !loggedIn) {
     next({
       name: 'Login',
       params: { locale: to.params.locale },
@@ -216,7 +217,8 @@ router.beforeEach(async (to, from, next) => {
 });
 
 router.beforeEach(async (to, from, next) => {
-  if (to.name === 'Admin' && !to.meta.allowAnonymous && isLoggedIn()) {
+  const loggedIn = await isLoggedIn();
+  if (to.name === 'Admin' && !to.meta.allowAnonymous && loggedIn) {
     next({
       name: 'Dashboard',
       params: { locale: to.params.locale },
@@ -227,7 +229,8 @@ router.beforeEach(async (to, from, next) => {
 });
 
 router.beforeEach(async (to, from, next) => {
-  if (to.meta.allowAnonymous && isLoggedIn()) {
+  const loggedIn = await isLoggedIn();
+  if (to.meta.allowAnonymous && loggedIn) {
     next({
       name: 'Home',
       params: { locale: to.params.locale },
@@ -238,10 +241,11 @@ router.beforeEach(async (to, from, next) => {
 });
 
 router.beforeEach(async (to, from, next) => {
-  if (isLoggedIn() && rootStore.getters.getAuthUser.id === '') {
+  const loggedIn = await isLoggedIn();
+  if (loggedIn && rootStore.getters.getAuthUser.id === '') {
     let decodedToken;
     try {
-      decodedToken = getUserInfo();
+      decodedToken = await getUserInfo();
       await storeAuthUser(decodedToken);
       const res = await getAuthUserProfile();
       await storeAuthUserProfile(res.data);

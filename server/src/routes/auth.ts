@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { editProfile, login, profile } from "../controllers/auth";
+import {
+  editProfile,
+  generateAccessTokenFromRefreshToken,
+  login,
+  profile,
+} from "../controllers/auth";
 import * as asyncHandler from "express-async-handler";
 import { body } from "express-validator";
 import { validate } from "../helpers/validation";
@@ -27,5 +32,7 @@ authRouter.patch(
   validate,
   asyncHandler(editProfile)
 );
+
+authRouter.post("/refresh-token", validate, asyncHandler(generateAccessTokenFromRefreshToken));
 
 export default authRouter;

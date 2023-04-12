@@ -76,3 +76,15 @@ export function generateAuthToken(user: Express.User, userId: Types.ObjectId): s
   };
   return sign(payload, config.secret, options);
 }
+
+export function generateRefreshToken(userId: Types.ObjectId): string {
+  const payload = { userId: userId.toHexString() };
+  const options: SignOptions = {
+    expiresIn: "7d",
+    algorithm: "HS256",
+    issuer: process.env.API_HOST,
+    audience: process.env.API_HOST,
+    subject: userId.toHexString(),
+  };
+  return sign(payload, config.refreshSecret, options);
+}

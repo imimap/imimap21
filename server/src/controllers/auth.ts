@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import * as passport from "passport";
 import { auth as config } from "../config";
-import { generateAuthToken, Role } from "../authentication/user";
+import { generateAuthToken, generateRefreshToken, Role } from "../authentication/user";
 import { NotFound, Unauthorized } from "http-errors";
 import { IUser, User } from "../models/user";
 import { InternshipModule } from "../models/internshipModule";
 import { IStudentProfile } from "../models/studentProfile";
+import * as jwt from "jsonwebtoken";
 
 async function createStudentProfile(user: Express.User): Promise<IStudentProfile> {
   const internshipModule = await InternshipModule.create({
@@ -43,7 +44,9 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
       // Create user account if it doesn't exist
       if (!userEntity) userEntity = await createUser(user);
       // Send auth token and user profile
-      res.json({ token: generateAuthToken(user, userEntity._id) });
+      const token = generateAuthToken(user, userEntity._id);
+      const refreshToken = generateRefreshToken(userEntity._id);
+      res.json({ token, refreshToken });
     }
   )(req, res, next);
 }
@@ -62,4 +65,47 @@ export async function editProfile(req: Request, res: Response, next: NextFunctio
   if (req.body.lastName) user.lastName = req.body.lastName;
 
   res.json(await user.save());
+}
+
+export async function generateAccessTokenFromRefreshToken(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return next(new NotFound("Refresh Token is required"));
+  }
+
+  try {
+    const decoded = jwt.verify(refreshToken, config.refreshSecret) as jwt.JwtPayload;
+    if ("userId" in decoded) {
+      const userEntity = await User.findById(decoded.userId);
+      if (!userEntity) {
+        return next(new NotFound("User not found"));
+      }
+
+      // check if refresh token has expired
+      const refreshTokenExpiration = decoded.exp ?? 0;
+      if (refreshTokenExpiration < Date.now() / 1000) {
+        throw new Error("Refresh token has expired");
+      }
+
+      const user: Express.User = {
+        id: userEntity._id.toHexString(),
+        email: userEntity.emailAddress,
+        firstName: userEntity.firstName || "",
+        lastName: userEntity.lastName || "",
+        role: userEntity.isAdmin ? Role.INSTRUCTOR : Role.STUDENT,
+      };
+      const accessToken = generateAuthToken(user, userEntity._id);
+      res.json({ accessToken });
+    } else {
+      throw new Error("Invalid or expired refresh token");
+    }
+  } catch (error) {
+    console.error("Error generating access token from refresh token:", error);
+    return next(new Unauthorized("Invalid or expired Refresh token!"));
+  }
 }
