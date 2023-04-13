@@ -30,6 +30,8 @@ services:
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
     networks:
       - backend
+    volumes:
+      - pdf-store:/server/pdfs
 
   db:
     image: mongo:bionic
@@ -51,6 +53,7 @@ services:
 
 volumes:
   db-data:
+  pdf-store:
 
 networks:
   backend:
