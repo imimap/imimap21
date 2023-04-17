@@ -7,8 +7,6 @@ export interface InternshipModule {
   inSemester: string;
   inSemesterOfStudy: number;
   aepPassed: boolean;
-  reportPdf: { [key: string]: unknown };
-  completeDocumentsPdf: { [key: string]: unknown };
   events: Event[];
   status: string;
 }

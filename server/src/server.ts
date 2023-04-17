@@ -1,7 +1,5 @@
 // parse env variables before loading anything else
 import { config as dotenvConfig } from "dotenv";
-dotenvConfig({ path: "../.env" });
-
 import * as cors from "cors";
 import * as express from "express";
 import { NextFunction, Request, Response } from "express";
@@ -16,6 +14,9 @@ import authMiddleware, { pdfFileAuthMiddleware } from "./authentication/middlewa
 import * as morgan from "morgan";
 import { closePDFRenderer } from "./helpers/pdfHelper";
 import { Server } from "http";
+import cronJobs from "./cronJobs";
+
+dotenvConfig({ path: "../.env" });
 
 // load database
 (async () => await database.connect())();
@@ -66,6 +67,8 @@ app.use(function (error: unknown, request: Request, response: Response, next: Ne
 // Listening to port
 const server = app.listen(port, () => console.log(`Listening on ${BASE_URL}`));
 
+(async () => await cronJobs.start())();
+
 function closeServer(server: Server) {
   return new Promise<void>((resolve, reject) => {
     if (!server.listening) resolve();
@@ -75,6 +78,7 @@ function closeServer(server: Server) {
 
 async function close() {
   await closePDFRenderer();
+  await cronJobs.stop();
   await database.disconnect();
   await closeServer(server);
 }

@@ -79,8 +79,6 @@ export async function updateInternshipModule(
     "inSemester",
     "inSemesterOfStudy",
     "aepPassed",
-    "reportPdf",
-    "completeDocumentsPdf",
     "status",
   ];
 

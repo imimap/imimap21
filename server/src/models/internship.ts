@@ -200,10 +200,10 @@ export async function trySetReadyForGrading(document: Document): Promise<void> {
   if (document.get("status") !== InternshipStatuses.OVER) return;
 
   const reportPdf = document.get("reportPdf");
-  if (!reportPdf) return;
+  if (!reportPdf || reportPdf.status !== PdfDocumentStatuses.SUBMITTED) return;
 
   const certificatePdf = document.get("certificatePdf");
-  if (!certificatePdf) return;
+  if (!certificatePdf || certificatePdf.status !== PdfDocumentStatuses.SUBMITTED) return;
 
   document.get("events").push({
     type: EventTypes.INTERNSHIP_UPDATE,
@@ -328,9 +328,15 @@ InternshipSchema.methods.markAsOver = async function (creator: Types.ObjectId) {
 
 export async function tryMarkAsOver(internship: IInternship): Promise<IInternship | undefined> {
   // Check if user is admin
-  if (internship.get("endDate") <= Date.now()) {
+  if (internship.get("endDate") <= new Date()) {
+    internship.get("events").push({
+      type: EventTypes.INTERNSHIP_UPDATE,
+      creator: (await getIMIMapAdmin())._id,
+      changes: {
+        status: InternshipStatuses.OVER,
+      },
+    });
     internship.set("status", InternshipStatuses.OVER);
-
     return internship.save();
   }
 }
