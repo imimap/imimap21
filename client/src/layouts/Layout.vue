@@ -1,36 +1,30 @@
 <template>
-  <template v-if="isLoggedInUser">
+  <template v-if="isAnonymousRoute">
+    <router-view></router-view>
+  </template>
+
+  <template v-else>
     <header-component></header-component>
     <main>
       <router-view></router-view>
     </main>
     <footer-component></footer-component>
-    <notification-list></notification-list>
   </template>
 
-  <template v-else>
-    <router-view></router-view>
-    <notification-list></notification-list>
-  </template>
+  <notification-list></notification-list>
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-} from 'vue';
+import { defineComponent } from 'vue';
 import HeaderComponent from '@/components/Header.vue';
 import FooterComponent from '@/components/Footer.vue';
 import NotificationList from '@/components/notification/NotificationList.vue';
-import { useStore } from 'vuex';
-import { UserState } from '@/store/types/UserState';
 
 export default defineComponent({
   name: 'Layout',
   computed: {
-    isLoggedInUser(): boolean {
-      const store = useStore();
-      const user: UserState = store.getters.getAuthUser;
-      return !!user.email;
+    isAnonymousRoute(): boolean {
+      return this.$route.meta.allowAnonymous as boolean;
     },
   },
   components: {

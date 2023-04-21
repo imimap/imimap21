@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import {
-  getAuthUserProfile, getUserInfo, isAdmin, isLoggedIn, storeAuthUser, storeAuthUserProfile,
+  getAuthUserProfile, getUserInfo, isAdmin, isLoggedIn, logoutUser, storeAuthUser, storeAuthUserProfile,
 } from '@/utils/auth';
 import Layout from '@/layouts/Layout.vue';
 import Home from '@/views/Home.vue';
@@ -24,7 +24,6 @@ import { availableLocales, defaultLocale } from '@/locales/locales';
 import Internship from '@/views/Internship.vue';
 import CreateInternship from '@/components/internship/CreateInternship.vue';
 import EditInternship from '@/components/internship/EditInternship.vue';
-import { showErrorNotification } from '@/utils/notification';
 
 // @TODO: Router auf Modules aufteilen
 const routes: Array<RouteRecordRaw> = [
@@ -251,8 +250,11 @@ router.beforeEach(async (to, from, next) => {
       await storeAuthUserProfile(res.data);
       next();
     } catch (err: any) {
-      await showErrorNotification('User konnte nicht identifiziert werden. Logge dich nochmal aus und wieder ein.');
-      next();
+      logoutUser();
+      next({
+        name: 'Login',
+        params: { locale: to.params.locale },
+      });
     }
   } else {
     next();

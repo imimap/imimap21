@@ -15,13 +15,13 @@
               <ul class="nav float-right imi-nav-right">
                 <li class="imimap-nav-right-li">
                   <router-link :to="{name: 'Help', params: { locale: $route.params.locale }}">
-                    <font-awesome-icon icon="question-circle" />
+                    <font-awesome-icon icon="question-circle"/>
                   </router-link>
                 </li>
                 <li class="imi-nav-right-spacer"></li>
                 <li class="imimap-nav-right-li">
-                  <router-link  :to="{name: 'Student', params: { locale: $route.params.locale }}">
-                    <font-awesome-icon icon="user" />
+                  <router-link :to="{name: 'Student', params: { locale: $route.params.locale }}">
+                    <font-awesome-icon icon="user"/>
                   </router-link>
                 </li>
                 <li class="dropdown imimap-nav-right-li">
@@ -29,21 +29,21 @@
                      role="button"
                      class="dropdown-toggle"
                      data-bs-toggle="dropdown">
-                    <font-awesome-icon icon="cog" />
+                    <font-awesome-icon icon="cog"/>
                   </a>
                   <ul class="dropdown-menu" role="menu" aria-labelledby="drop3">
-                      <li class="locale-de dropdown-item"
-                          v-for="(locale, i) in $i18n.availableLocales"
-                          :key="`lang-${i}`"
-                          :value="locale"
-                          v-on:click="switchLocale(locale)">
-                        {{ locale }}
-                      </li>
+                    <li class="locale-de dropdown-item"
+                        v-for="(locale, i) in $i18n.availableLocales"
+                        :key="`lang-${i}`"
+                        :value="locale"
+                        v-on:click="switchLocale(locale)">
+                      {{ locale }}
+                    </li>
                   </ul>
                 </li>
                 <li class="imimap-nav-right-li">
                   <a v-on:click="logout()">
-                    <font-awesome-icon icon="sign-out-alt" />
+                    <font-awesome-icon icon="sign-out-alt"/>
                   </a>
                 </li>
               </ul>
@@ -107,7 +107,7 @@
   </header>
 </template>
 
-<script  lang="ts">
+<script lang="ts">
 import { defineComponent } from 'vue';
 import { logoutUser } from '@/utils/auth';
 import { UserProfileState } from '@/store/types/UserProfileState';
@@ -204,11 +204,11 @@ export default defineComponent({
   z-index: 100000;
 }
 
-.imi-nav-right>li>a {
+.imi-nav-right > li > a {
   text-decoration: none;
 }
 
-.imi-nav-right>li>a {
+.imi-nav-right > li > a {
   float: left;
   display: inline;
   vertical-align: top;
@@ -229,8 +229,8 @@ export default defineComponent({
 }
 
 .navbar-dark .navbar-toggler {
-  color: rgba(255,255,255,0.5);
-  border-color: rgba(255,255,255,0.1);
+  color: rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 #imi-map-navbar-core {
@@ -238,7 +238,7 @@ export default defineComponent({
 }
 
 @include media-breakpoint-up(md) {
-  .imi-nav-right>li>a {
+  .imi-nav-right > li > a {
     font-size: 12px;
   }
   .navbar-expand-md .navbar-toggler {

@@ -6,7 +6,7 @@
         + getDateString(internship.endDate)
       }}
       <span
-      :class="['badge', 'rounded-pill', 'float-end', statusBadgeColors[(internship as any).status]] ">
+        :class="['badge', 'rounded-pill', 'float-end', statusBadgeColors[(internship as any).status]] ">
         {{ internship.status }}
       </span>
     </div>
@@ -73,12 +73,13 @@
       </details>
     </div>
     <div class="card-footer">
-      <button v-if="internship.status === 'requested'" class="btn btn-success btn-sm me-2"
+      <button v-if="showApproveButton" class="btn btn-success btn-sm me-2"
               @click="approveApplication(internship._id)"
       >
         {{ $t("userList.internshipPart.approveApplication") }}
       </button>
       <button class="btn btn-success btn-sm me-2"
+              v-if="showMarkCompleteButton"
               @click="markAsComplete(internship._id)"
       >
         {{ $t("userList.internshipPart.markEligible") }}
@@ -106,7 +107,7 @@ import { defineComponent, PropType } from 'vue';
 import { getDateString, getTimeDifferenceDays } from '@/utils/admin';
 import { showErrorNotification } from '@/utils/notification';
 import {
-  approveInternshipApplication, deleteComment, deleteInternship, markInternshipAsForcePassed, markInternshipAsPassed, updateInternship,
+  approveInternshipApplication, deleteComment, deleteInternship, markInternshipAsPassed, updateInternship,
 } from '@/utils/gateways';
 import { Comment } from '@/store/types/Comment';
 import { Internship } from '@/store/types/Internship';
@@ -149,16 +150,33 @@ export default defineComponent({
     comments(): Comment[] {
       return this.internship.comments.slice().reverse();
     },
+    showApproveButton(): boolean {
+      // Also show button when status is 'planned' to allow manual approving
+      // for admins even if not all preconditions for approving are met
+      return this.internship.status === 'planned' || this.internship.status === 'requested';
+    },
+    showMarkCompleteButton(): boolean {
+      // Also show button when status is 'over' to allow manual completion
+      // for admins even if not all preconditions for grading are met
+      return this.internship.status === 'over' || this.internship.status === 'readyForGrading';
+    },
   },
   methods: {
     updateInternship,
     getDateString,
     getTimeDifferenceDays,
     async approveApplication(internshipId: string) {
-      const updatedInternship = await approveInternshipApplication(internshipId);
+      let updatedInternship = await approveInternshipApplication(internshipId);
       if (!updatedInternship) {
-        await showErrorNotification('Praktikumsantrag konnte nicht genehmigt werden.');
-        return;
+        const userDoubleChecked = window.confirm('Das Praktikum ist noch nicht bereit, '
+          + 'genehmigt zu werden, weil gewisse Unterlagen oder Angaben zum Praktikum fehlen. '
+          + 'Trotzdem genehmigen?');
+        if (!userDoubleChecked) return;
+        updatedInternship = await approveInternshipApplication(internshipId, true);
+        if (!updatedInternship) {
+          await showErrorNotification('Praktikum konnte nicht als anrechenbar markiert werden.');
+          return;
+        }
       }
       this.$emit('updateInternship', this.index, updatedInternship);
     },
@@ -166,13 +184,14 @@ export default defineComponent({
       let updatedInternship = await markInternshipAsPassed(internshipId);
       if (!updatedInternship) {
         const userDoubleChecked = window.confirm('Das Praktikum ist noch nicht bereit, '
-        + 'als anrechenbar markiert zu werden, weil gewisse Unterlagen fehlen. Trotzdem als anrechenbar markieren?');
+          + 'als anrechenbar markiert zu werden, weil gewisse Unterlagen fehlen. '
+          + 'Trotzdem als anrechenbar markieren?');
         if (!userDoubleChecked) return;
-        updatedInternship = await markInternshipAsForcePassed(internshipId);
+        updatedInternship = await markInternshipAsPassed(internshipId, true);
         if (!updatedInternship) {
-          await showErrorNotification('Praktikum konnte nicht als anrechenbar markiert werden.');
+          await showErrorNotification('Praktikum konnte nicht genehmigt werden.');
+          return;
         }
-        return;
       }
       this.$emit('updateInternship', this.index, updatedInternship);
     },

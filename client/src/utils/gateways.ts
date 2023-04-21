@@ -6,6 +6,7 @@ import InternshipModule from '@/models/InternshipModule';
 import Postponement from '@/models/Postponement';
 import Company from '@/models/Company';
 import { PdfDocument } from '@/store/types/PdfDocument';
+import { MapLocation } from '@/store/types/MapLocation';
 
 export const getStudentsList = async (semester: string | undefined): Promise<Student[]> => apiClient
   .get(`/students${semester !== undefined ? `?semester=${semester}` : ''}`)
@@ -32,6 +33,17 @@ export const clearStudentSearch = async (id: string) => apiClient.patch(`/studen
     console.log(err);
     return [];
   });
+
+export const getInternshipsInSemester = async (semester: string): Promise<MapLocation[]> => {
+  try {
+    const response = await apiClient.get('/internships/locations', { params: { semester } });
+    return response.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Laden der Praktika für Semester ${semester} [ERROR: ${err.message}]`);
+    return [];
+  }
+};
 
 export const updateInternshipModule = async (
   id: string,
@@ -81,39 +93,28 @@ export const markAepPassedOnInternshipModule = async (id: string) => apiClient.p
 
 export const approveInternshipApplication = async (
   internshipId: string,
+  force?: boolean,
 ): Promise<Internship | null> => {
   try {
-    const response = await apiClient.patch(`/internships/${internshipId}/approve`);
+    const response = await apiClient.patch(`/internships/${internshipId}/approve`, { force });
     return response.data;
   } catch (err: any) {
     if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
-    await showErrorNotification(`Fehler beim Updaten des Praktikums ${internshipId} [ERROR: ${err.message}]`);
+    if (force) await showErrorNotification(`Fehler beim Updaten des Praktikums ${internshipId} [ERROR: ${err.message}]`);
     return null;
   }
 };
 
 export const markInternshipAsPassed = async (
   internshipId: string,
+  force?: boolean,
 ): Promise<Internship | null> => {
   try {
-    const response = await apiClient.patch(`/internships/${internshipId}/pass`);
-    return response.data;
-  } catch (err: any) {
-    // if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
-    // await showErrorNotification(`Fehler beim Updaten des Praktikums ${internshipId} [ERROR: ${err.message}]`);
-    return null;
-  }
-};
-
-export const markInternshipAsForcePassed = async (
-  internshipId: string,
-): Promise<Internship | null> => {
-  try {
-    const response = await apiClient.patch(`/internships/${internshipId}/forcePass`);
+    const response = await apiClient.patch(`/internships/${internshipId}/pass`, { force });
     return response.data;
   } catch (err: any) {
     if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
-    await showErrorNotification(`Fehler beim Updaten des Praktikums ${internshipId} [ERROR: ${err.message}]`);
+    if (force) await showErrorNotification(`Fehler beim Updaten des Praktikums ${internshipId} [ERROR: ${err.message}]`);
     return null;
   }
 };
