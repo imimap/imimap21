@@ -28,8 +28,7 @@ function isTokenExpired(token: string): boolean {
 }
 
 export function getAuthToken(): string | null {
-  const token: string | null = localStorage.getItem(AUTH_TOKEN_KEY);
-  return token;
+  return localStorage.getItem(AUTH_TOKEN_KEY);
 }
 
 function setAuthToken(token: string) {
@@ -77,8 +76,7 @@ export async function isLoggedIn(): Promise<boolean> {
   }
 
   if (isTokenExpired(authToken)) {
-    const success = await refreshAccessToken();
-    return success;
+    return refreshAccessToken();
   }
   return true;
 }
