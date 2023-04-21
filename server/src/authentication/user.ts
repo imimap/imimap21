@@ -65,14 +65,13 @@ export enum Role {
 }
 
 export function generateAuthToken(user: Express.User, userId: Types.ObjectId): string {
-  user.id = userId.toHexString();
   const payload = user;
   const options: SignOptions = {
     expiresIn: config.expiryTime,
     algorithm: "HS256",
     issuer: process.env.API_HOST,
     audience: process.env.API_HOST,
-    subject: user.id,
+    subject: userId.toHexString(),
   };
   return sign(payload, config.secret, options);
 }

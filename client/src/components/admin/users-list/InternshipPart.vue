@@ -6,7 +6,7 @@
         + getDateString(internship.endDate)
       }}
       <span
-      :class="['badge', 'rounded-pill', 'float-end', statusBadgeColors[(internship as any).status]] ">
+        :class="['badge', 'rounded-pill', 'float-end', statusBadgeColors[(internship as any).status]] ">
         {{ internship.status }}
       </span>
     </div>
@@ -26,32 +26,13 @@
           <br>
           <ul class="list-group">
             <UsersListStatusItem
-              :text="$t('userList.internshipPart.application')"
-              :item="internship.requestPdf"
-            />
-            <UsersListStatusItem
-              :text="$t('userList.internshipPart.ectProof')"
-              :item="internship.lsfEctsProofPdf"
-            />
-            <UsersListStatusItem
-              :text="$t('userList.internshipPart.locationProof')"
-              :item="internship.locationJustificationPdf"
-            />
-            <UsersListStatusItem
-              :text="$t('userList.internshipPart.contract')"
-              :item="internship.contractPdf"
-            />
-            <UsersListStatusItem
-              :text="$t('userList.internshipPart.bvg')"
-              :item="internship.bvgTicketExemptionPdf"
-            />
-            <UsersListStatusItem
-              :text="$t('userList.internshipPart.certificate')"
-              :item="internship.certificatePdf"
-            />
-            <UsersListStatusItem
-              :text="$t('userList.internshipPart.report')"
-              :item="internship.reportPdf"
+              v-for="pdf in pdfItems"
+              :key="pdf"
+              :text="$t(`userList.internshipPart.pdfs.${pdf}`)"
+              :item="internship[`${pdf}Pdf`]"
+              :type="pdf"
+              @accept-pdf="pdfAccepted"
+              @reject-pdf="pdfRejected"
             />
           </ul>
         </div>
@@ -106,7 +87,13 @@ import { defineComponent, PropType } from 'vue';
 import { getDateString, getTimeDifferenceDays } from '@/utils/admin';
 import { showErrorNotification } from '@/utils/notification';
 import {
-  approveInternshipApplication, deleteComment, deleteInternship, markInternshipAsForcePassed, markInternshipAsPassed, updateInternship,
+  acceptPdf,
+  approveInternshipApplication,
+  deleteComment,
+  deleteInternship,
+  markInternshipAsForcePassed,
+  markInternshipAsPassed,
+  rejectPdf,
 } from '@/utils/gateways';
 import { Comment } from '@/store/types/Comment';
 import { Internship } from '@/store/types/Internship';
@@ -132,10 +119,19 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ['editInternshipPart', 'updateInternship'],
+  emits: ['editInternshipPart', 'updateInternship', 'updateInternshipPdf'],
   data() {
     return {
       statusBadgeColors: statusBadgeColors(),
+      pdfItems: [
+        'request',
+        'lsfEctsProof',
+        'locationJustification',
+        'contract',
+        'bvgTicketExemption',
+        'certificate',
+        'report',
+      ],
     };
   },
   computed: {
@@ -151,7 +147,6 @@ export default defineComponent({
     },
   },
   methods: {
-    updateInternship,
     getDateString,
     getTimeDifferenceDays,
     async approveApplication(internshipId: string) {
@@ -166,7 +161,7 @@ export default defineComponent({
       let updatedInternship = await markInternshipAsPassed(internshipId);
       if (!updatedInternship) {
         const userDoubleChecked = window.confirm('Das Praktikum ist noch nicht bereit, '
-        + 'als anrechenbar markiert zu werden, weil gewisse Unterlagen fehlen. Trotzdem als anrechenbar markieren?');
+          + 'als anrechenbar markiert zu werden, weil gewisse Unterlagen fehlen. Trotzdem als anrechenbar markieren?');
         if (!userDoubleChecked) return;
         updatedInternship = await markInternshipAsForcePassed(internshipId);
         if (!updatedInternship) {
@@ -184,6 +179,16 @@ export default defineComponent({
     },
     async deleteAdminComment(comment: Comment) {
       const updatedInternship = await deleteComment(this.internship._id, comment._id);
+      if (!updatedInternship) return;
+      this.$emit('updateInternship', this.index, updatedInternship);
+    },
+    async pdfAccepted(pdfType: string) {
+      const updatedInternship = await acceptPdf(this.internship._id, pdfType);
+      if (!updatedInternship) return;
+      this.$emit('updateInternship', this.index, updatedInternship);
+    },
+    async pdfRejected(pdfType: string, reason: string) {
+      const updatedInternship = await rejectPdf(this.internship._id, pdfType, reason);
       if (!updatedInternship) return;
       this.$emit('updateInternship', this.index, updatedInternship);
     },

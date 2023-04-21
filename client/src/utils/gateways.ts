@@ -258,6 +258,7 @@ export const getAvailableLanguages = async () => {
 
 export const loadPDFFile = async (filePath: string) => {
   try {
+    // API_HOST needed as base URL since pdfs aren't stored under the /api path
     const response = await apiClient.get(`${API_HOST}/${filePath}`, {
       responseType: 'blob',
     });
@@ -288,6 +289,22 @@ export const uploadPDFFile = async (internshipId: string, pdfFile: File, pdfType
     return null;
   }
 };
+
+const processPdf = async (internshipId: string, pdfType: string, accept: boolean, reason?: string): Promise<Internship | null> => {
+  const data = accept ? { accept: true } : { reject: true, reason };
+  try {
+    const response = await apiClient.post(`/internships/${internshipId}/pdf/${pdfType}`, data);
+    return response.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Akzeptieren der PDF-Datei [ERROR: ${err.message}]`);
+    return null;
+  }
+};
+
+export const acceptPdf = async (internshipId: string, pdfType: string) => processPdf(internshipId, pdfType, true);
+
+export const rejectPdf = async (internshipId: string, pdfType: string, reason: string) => processPdf(internshipId, pdfType, false, reason);
 
 export const generateRequestPdf = async (internshipId: string) => {
   try {

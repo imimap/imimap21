@@ -35,6 +35,16 @@ const internshipModule = {
     accepted: 'Gültig',
     rejected: 'Abgelehnt',
   },
+  pdfActions: {
+    accept: 'Akzeptieren',
+    reject: 'Ablehnen',
+    rejectModalTitle: 'PDF-Dokument ablehnen',
+    rejectReasons: {
+      signature: 'Fehlende Unterschrift',
+      askProf: 'Bitte setze Dich mit der/dem Praktikumsbeauftragten in Verbindung',
+      other: 'Sonstiges',
+    },
+  },
   internship: 'Praktikum',
   information: 'Information',
   semester: 'Semester',

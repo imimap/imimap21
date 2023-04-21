@@ -1,39 +1,58 @@
 <template>
   <li :class="`list-group-item ${liClass} d-flex align-items-center`">
-    <svg v-if="item.status === 'accepted'" xmlns="http://www.w3.org/2000/svg" width="16"
-         height="16" fill="currentColor"
-         class="bi bi-check-circle-fill me-2" viewBox="0 0 16 16">
-      <path
-        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477
-            9.417 5.384 7.323a.75.75 0 0 0-1.06
-            1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0
-            0-.01-1.05z"/>
-    </svg>
-    <svg v-else-if="item.status === 'unknown'" xmlns="http://www.w3.org/2000/svg" width="16"
-         height="16" fill="currentColor"
-         class="bi bi-x-circle-fill me-2" viewBox="0 0 16 16">
-      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647
-      2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0
-      0 0-.708-.708L8 7.293 5.354 4.646z"/>
-    </svg>
+    <font-awesome-icon v-if="icon" :icon="icon" class="me-1"/>
     <span class="flex-grow-1">{{ text }} ({{ $t(`internshipModule.pdfStatus.${item.status}`) }})</span>
-    <a v-if="item.status !== 'unknown'" href="#" @click.prevent="viewPDF" class="pe-3">
-      {{ $t('internshipModule.forms.view') }}
-    </a>
-    <a v-if="item.status !== 'unknown'" href="#" @click.prevent="downloadPDF">
-      {{ $t('internshipModule.forms.download') }}
-    </a>
-    <a :href="pdfLink" :download="fileName" hidden ref="downloadButton"></a>
+    <template v-if="item.status !== 'unknown'">
+      <a
+        href="#"
+        @click.prevent="accept"
+        class="pe-3 text-success"
+        :title="$t('internshipModule.pdfActions.accept')"
+      >
+        <font-awesome-icon icon="check-circle"/>
+      </a>
+      <!--suppress TypeScriptUnresolvedReference -->
+      <a
+        href="#"
+        @click.prevent="modal?.show"
+        class="pe-3 text-danger"
+        :title="$t('internshipModule.pdfActions.reject')"
+      >
+        <font-awesome-icon icon="circle-xmark"/>
+      </a>
+      <a
+        href="#"
+        @click.prevent="viewPDF"
+        class="pe-3 text-primary"
+        :title="$t('internshipModule.forms.view')"
+      >
+        <font-awesome-icon icon="eye"/>
+      </a>
+      <a
+        href="#"
+        @click.prevent="downloadPDF"
+        class="text-primary"
+        :title="$t('internshipModule.forms.download')"
+      >
+        <font-awesome-icon icon="download"/>
+      </a>
+      <a :href="pdfLink" :download="fileName" hidden ref="downloadButton"></a>
+    </template>
   </li>
+  <!--suppress TypeScriptUnresolvedReference -->
+  <PdfRejectModal :pdf-id="item.id" @reject="reject" @close="modal?.hide"/>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import { PdfDocument } from '@/store/types/PdfDocument';
 import { loadPDFFile } from '@/utils/gateways';
+import PdfRejectModal from '@/components/admin/modals/PdfRejectModal.vue';
+import { Modal } from 'bootstrap';
 
 export default defineComponent({
   name: 'UsersListStatusItem',
+  components: { PdfRejectModal },
   props: {
     item: {
       type: Object as PropType<PdfDocument>,
@@ -43,10 +62,16 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    type: {
+      type: String,
+      required: true,
+    },
   },
+  emits: ['acceptPdf', 'rejectPdf'],
   data() {
     return {
       pdfLink: undefined as string | undefined,
+      modal: null as Modal | null,
     };
   },
   computed: {
@@ -60,6 +85,16 @@ export default defineComponent({
           return 'list-group-item-danger';
         default:
           return 'list-group-item-light';
+      }
+    },
+    icon() {
+      switch (this.item.status) {
+        case 'accepted':
+          return 'check-circle';
+        case 'rejected':
+          return 'circle-xmark';
+        default:
+          return '';
       }
     },
     fileName() {
@@ -84,6 +119,16 @@ export default defineComponent({
       }
       (this.$refs.downloadButton as HTMLAnchorElement).click();
     },
+    async accept() {
+      this.$emit('acceptPdf', this.type);
+    },
+    async reject(reason: string) {
+      if (this.modal !== null) this.modal.hide();
+      this.$emit('rejectPdf', this.type, reason);
+    },
+  },
+  mounted() {
+    this.modal = new Modal(`#reject-pdf-modal-${this.item.id}`);
   },
   unmounted() {
     if (this.pdfLink === undefined) return;

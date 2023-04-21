@@ -7,14 +7,14 @@ import {
   createInternship,
   deleteComment,
   deleteInternship,
-  getSearchResults,
   generateRequestPdf,
   getInternshipLocations,
   getInternshipsById,
+  getSearchResults,
+  markInternshipAsForcePassed,
   markInternshipAsPassed,
   submitPdf,
   updateInternship,
-  markInternshipAsForcePassed,
 } from "../controllers/internship";
 import { isObjectId, validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
@@ -143,74 +143,25 @@ internshipRouter.get(
   asyncHandler(generateRequestPdf)
 );
 
-internshipRouter.post(
-  "/:id/pdf/request",
-  authMiddleware(),
-  param("id").custom(isObjectId),
-  body("accept").optional().isBoolean(),
-  body("reject").optional().isBoolean(),
-  validate,
-  asyncHandler(submitPdf("requestPdf"))
-);
-
-internshipRouter.post(
-  "/:id/pdf/lsfEctsProof",
-  authMiddleware(),
-  param("id").custom(isObjectId),
-  body("accept").optional().isBoolean(),
-  body("reject").optional().isBoolean(),
-  validate,
-  asyncHandler(submitPdf("lsfEctsProofPdf"))
-);
-
-internshipRouter.post(
-  "/:id/pdf/locationJustification",
-  authMiddleware(),
-  param("id").custom(isObjectId),
-  body("accept").optional().isBoolean(),
-  body("reject").optional().isBoolean(),
-  validate,
-  asyncHandler(submitPdf("locationJustificationPdf"))
-);
-
-internshipRouter.post(
-  "/:id/pdf/contract",
-  authMiddleware(),
-  param("id").custom(isObjectId),
-  body("accept").optional().isBoolean(),
-  body("reject").optional().isBoolean(),
-  validate,
-  asyncHandler(submitPdf("contractPdf"))
-);
-
-internshipRouter.post(
-  "/:id/pdf/bvgTicketExemption",
-  authMiddleware(),
-  param("id").custom(isObjectId),
-  body("accept").optional().isBoolean(),
-  body("reject").optional().isBoolean(),
-  validate,
-  asyncHandler(submitPdf("bvgTicketExemptionPdf"))
-);
-
-internshipRouter.post(
-  "/:id/pdf/certificate",
-  authMiddleware(),
-  param("id").custom(isObjectId),
-  body("accept").optional().isBoolean(),
-  body("reject").optional().isBoolean(),
-  validate,
-  asyncHandler(submitPdf("certificatePdf"))
-);
-
-internshipRouter.post(
-  "/:id/pdf/report",
-  authMiddleware(),
-  param("id").custom(isObjectId),
-  body("accept").optional().isBoolean(),
-  body("reject").optional().isBoolean(),
-  validate,
-  asyncHandler(submitPdf("reportPdf"))
+[
+  "request",
+  "lsfEctsProof",
+  "locationJustification",
+  "bvgTicketExemption",
+  "contract",
+  "certificate",
+  "report",
+].forEach((pdfType) =>
+  internshipRouter.post(
+    `/:id/pdf/${pdfType}`,
+    authMiddleware(),
+    param("id").custom(isObjectId),
+    body("accept").optional().isBoolean(),
+    body("reject").optional().isBoolean(),
+    body("reason").optional().isString(),
+    validate,
+    asyncHandler(submitPdf(`${pdfType}Pdf`))
+  )
 );
 
 internshipRouter.post(

@@ -35,6 +35,16 @@ const internshipModule = {
     accepted: 'Valid',
     rejected: 'Rejected',
   },
+  pdfActions: {
+    accept: 'Accept',
+    reject: 'Reject',
+    rejectModalTitle: 'Reject PDF document',
+    rejectReasons: {
+      signature: 'Missing signature',
+      askProf: 'Please contact the internship supervising professor',
+      other: 'Other',
+    },
+  },
   internship: 'Internship',
   information: 'Information',
   semester: 'Semester',

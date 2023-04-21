@@ -742,7 +742,7 @@ export function submitPdf(
 
     // Check if user is admin and pdf document was rejected
     if (user.isAdmin && req.body.reject) {
-      res.json(await internship.get(pdfProperty).reject(user._id));
+      res.json(await internship.get(pdfProperty).reject(user._id, req.body.reason));
       return;
     }
 

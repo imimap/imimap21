@@ -137,7 +137,7 @@ PdfDocumentSchema.methods.accept = async function (creator: Types.ObjectId, newP
   return (this.$parent() ?? this).save();
 };
 
-PdfDocumentSchema.methods.reject = async function (creator: Types.ObjectId) {
+PdfDocumentSchema.methods.reject = async function (creator: Types.ObjectId, reason: string) {
   const user = await User.findById(creator);
   if (!user?.isAdmin) throw new Error("Only Admins may reject a pdf.");
 
@@ -145,6 +145,10 @@ PdfDocumentSchema.methods.reject = async function (creator: Types.ObjectId) {
     type: EventTypes.PDF_UPDATE,
     creator: creator,
     accept: false,
+    changes: {
+      status: PdfDocumentStatuses.REJECTED,
+    },
+    comment: reason,
   });
   this.status = PdfDocumentStatuses.REJECTED;
   return (this.$parent() ?? this).save();
