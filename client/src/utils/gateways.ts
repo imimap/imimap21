@@ -7,6 +7,8 @@ import Postponement from '@/models/Postponement';
 import Company from '@/models/Company';
 import { PdfDocument } from '@/store/types/PdfDocument';
 import { MapLocation } from '@/store/types/MapLocation';
+import { Internship as IInternship } from '@/store/types/Internship';
+import { InternshipModule as IInternshipModule } from '@/store/types/InternshipModule';
 
 export const getStudentsList = async (semester: string | undefined): Promise<Student[]> => apiClient
   .get(`/students${semester !== undefined ? `?semester=${semester}` : ''}`)
@@ -55,6 +57,17 @@ export const updateInternshipModule = async (
   } catch (err: any) {
     if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
     await showErrorNotification(`Fehler beim Updaten vom Internship Module ${id} [ERROR: ${err.message}]`);
+    return null;
+  }
+};
+
+export const getAuthUserInternship = async (): Promise<IInternshipModule | null> => {
+  try {
+    const res = await apiClient.get('/internship-modules/my');
+    return res.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Laden Deines Praktikums [ERROR: ${err.message}]`);
     return null;
   }
 };
@@ -155,6 +168,25 @@ export const deleteCompany = async (companyId: string): Promise<boolean> => {
   }
 };
 
+export const requestPostponement = async (
+  newSemester: string,
+  newSemesterOfStudy: number,
+  reason: string,
+): Promise<boolean> => {
+  try {
+    await apiClient.post('/postponement-requests', {
+      newSemester,
+      newSemesterOfStudy,
+      reason,
+    });
+    return true;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Beantragen der Verschiebung [ERROR: ${err.message}]`);
+    return false;
+  }
+};
+
 export const getPostponementsList = async (): Promise<Postponement[]> => {
   try {
     const response = await apiClient.get('/postponement-requests');
@@ -242,6 +274,107 @@ export const loadPaymentTypes = async (): Promise<string[]> => {
   } catch (err: any) {
     if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
     await showErrorNotification(`Fehler beim Laden der verfügbaren Bezahlungsmodelle [ERROR: ${err.message}]`);
+    return [];
+  }
+};
+
+export const loadCountries = async (): Promise<string[]> => {
+  try {
+    const res = await apiClient.get('/info/countries');
+    return res.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Laden der verfügbaren Länder [ERROR: ${err.message}]`);
+    return [];
+  }
+};
+
+export const loadOperationalAreas = async (): Promise<string[]> => {
+  try {
+    const res = await apiClient.get('/info/operational-areas');
+    return res.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Laden der verfügbaren Bereiche [ERROR: ${err.message}]`);
+    return [];
+  }
+};
+
+export const loadProgrammingLanguages = async (): Promise<string[]> => {
+  try {
+    const res = await apiClient.get('/info/programming-languages');
+    return res.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim laden der verfügbaren Programmiersprachen [ERROR: ${err.message}]`);
+    return [];
+  }
+};
+
+export const getAmountOfPossibleNewResults = async (
+  country?: string,
+  operationalArea?: string,
+  programmingLanguage?: string,
+  paymentType?: string,
+): Promise<number | null> => {
+  try {
+    const res = await apiClient.get('/companies/possibleResults/amount', {
+      params: {
+        country,
+        operationalArea,
+        programmingLanguage,
+        paymentType,
+      },
+    });
+    return res.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Laden der neuen Suchergebnisse [ERROR: ${err.message}]`);
+    return null;
+  }
+};
+
+export const getAmountOfSeenResults = async (): Promise<number | null> => {
+  try {
+    const res = await apiClient.get('/companies/seen/amount');
+    return res.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Laden der vorherigen Suchergebnisse [ERROR: ${err.message}]`);
+    return null;
+  }
+};
+
+export const getInternshipsOfCompaniesSeen = async (): Promise<IInternship[]> => {
+  try {
+    const res = await apiClient.get('/companies/seen/results');
+    return res.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Laden der vorherigen Suchergebnisse [ERROR: ${err.message}]`);
+    return [];
+  }
+};
+
+export const searchInternships = async (
+  country?: string,
+  operationalArea?: string,
+  programmingLanguage?: string,
+  paymentType?: string,
+): Promise<IInternship[]> => {
+  try {
+    const res = await apiClient.get('/internships/searchResults', {
+      params: {
+        country,
+        operationalArea,
+        programmingLanguage,
+        paymentType,
+      },
+    });
+    return res.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Suchen nach Praktika [ERROR: ${err.message}]`);
     return [];
   }
 };

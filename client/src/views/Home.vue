@@ -40,7 +40,6 @@ export default defineComponent({
     },
   },
   async created() {
-    console.log('created home component');
     this.availableSemesters = await loadAvailableSemesters();
     await this.getInternships();
   },

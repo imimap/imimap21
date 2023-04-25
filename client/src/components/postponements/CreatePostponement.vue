@@ -72,9 +72,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import http from '@/utils/http-common';
-import { showErrorNotification, showSuccessNotification } from '@/utils/notification';
-import { loadUpcomingSemesters } from '@/utils/gateways';
+import { showSuccessNotification } from '@/utils/notification';
+import { loadUpcomingSemesters, requestPostponement } from '@/utils/gateways';
 
 export default defineComponent({
   name: 'CreatePostponement',
@@ -93,18 +92,10 @@ export default defineComponent({
   },
   methods: {
     async savePostponement() {
-      try {
-        const { newSemester, newSemesterOfStudy, reason } = this;
-        await http.post('/postponement-requests', {
-          newSemester,
-          newSemesterOfStudy,
-          reason,
-        });
-        await showSuccessNotification('Verschiebung erfolgreich beantragt!');
-        await this.$router.push({ name: 'InternshipModuleIndex' });
-      } catch (err: any) {
-        await showErrorNotification(`Fehler beim Beantragen der Verschiebung [ERROR: ${err.message}]`);
-      }
+      const success = await requestPostponement(this.newSemester, this.newSemesterOfStudy, this.reason);
+      if (!success) return;
+      await showSuccessNotification('Verschiebung erfolgreich beantragt!');
+      await this.$router.push({ name: 'InternshipModuleIndex' });
     },
   },
 });
