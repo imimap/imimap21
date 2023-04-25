@@ -58,7 +58,12 @@ const internshipModule = {
   operationalArea: 'Einsatzgebiet',
   tasks: 'Aufgaben',
   workingHoursPerWeek: 'Arbeitsstunden pro Woche',
-
+  links: {
+    title: 'Hilfreiche Links',
+    website: 'IMI-Website: Praktikum',
+    contract: 'Vorlage Praktikumsvertrag',
+    certificate: 'Vorlage Praktikumszeugnis',
+  },
   status: {
     internship: 'Status des Praktikums',
     overview: 'Statusübersicht',

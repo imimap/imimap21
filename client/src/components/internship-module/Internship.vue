@@ -53,6 +53,11 @@
           <p v-if="internship.status === 'planned'" class="text-center">
             <a href="#" @click.prevent="loadRequestPdf">Antrag generieren</a>
           </p>
+          <p class="text-center">
+            <a href="https://imi-bachelor.htw-berlin.de/studium/praktikum/#c10774" target="_blank">
+              Vorlage für das Praktikumszeugnis
+            </a>
+          </p>
         </div>
       </div>
       <div class="card mb-3 p-0">
@@ -77,6 +82,38 @@
             </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+      <div class="card mb-3">
+        <div class="card-body">
+          <p class="card-text">
+            <strong>{{ $t("internshipModule.links.title") }}</strong>
+          </p>
+          <ul>
+            <li>
+              <a href="https://imi-bachelor.htw-berlin.de/studium/praktikum/" target="_blank">
+                {{ $t("internshipModule.links.website") }}
+              </a>
+            </li>
+            <li>
+              {{ $t("internshipModule.links.contract") }} (
+              <a href="https://imi-bachelor.htw-berlin.de/files/Stg/IMI/Praktikumsvertrag_de.pdf" target="_blank">
+                deutsch
+              </a>,
+              <a href="https://imi-bachelor.htw-berlin.de/files/Stg/IMI/Praktikumsvertrag_en.pdf" target="_blank">
+                english
+              </a>)
+            </li>
+            <li>
+              {{ $t("internshipModule.links.certificate") }} (
+              <a href="https://imi-bachelor.htw-berlin.de/files/Stg/IMI/Nachweisformular-Praktikum-IMI-B-de.pdf" target="_blank">
+                deutsch
+              </a>,
+              <a href="https://imi-bachelor.htw-berlin.de/files/Stg/IMI/Certificate-Internship-IMI-B-en.pdf" target="_blank">
+                english
+              </a>)
+            </li>
+          </ul>
         </div>
       </div>
       <div class="my-3">

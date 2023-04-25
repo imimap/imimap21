@@ -58,6 +58,12 @@ const internshipModule = {
   operationalArea: 'Operational Area',
   tasks: 'Tasks',
   workingHoursPerWeek: 'Working Hours per week',
+  links: {
+    title: 'Helpful links',
+    website: 'IMI Website: Internship',
+    contract: 'Template Internship Contract',
+    certificate: 'Template Internship Certificate',
+  },
   status: {
     internship: 'Internship status',
     overview: 'Status overview',
