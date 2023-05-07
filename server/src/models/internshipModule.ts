@@ -1,5 +1,4 @@
 import { Document, model, Model, PopulatedDoc, Schema, Types } from "mongoose";
-import { IPdfDocument, PdfDocument, PdfDocumentSchema } from "./pdfDocument";
 import { Semester } from "../helpers/semesterHelper";
 import { getIMIMapAdmin } from "../helpers/imimapAsAdminHelper";
 import { User } from "./user";
@@ -19,7 +18,6 @@ export interface IInternshipModule extends Document {
   inSemester: string;
   inSemesterOfStudy: number;
   aepPassed: boolean;
-  completeDocumentsPdf?: IPdfDocument;
   events: IEvent[];
   status: string;
 
@@ -44,8 +42,6 @@ export interface IInternshipModule extends Document {
   getRecentPostponementRequest(): IEvent;
 
   passAep(creator: Types.ObjectId): Promise<IInternshipModule>;
-
-  submitCompleteDocumentsPdf(creator: Types.ObjectId, newPath: string): Promise<IInternshipModule>;
 }
 
 const InternshipModuleSchema = new Schema<IInternshipModule>({
@@ -55,9 +51,6 @@ const InternshipModuleSchema = new Schema<IInternshipModule>({
       type: Schema.Types.ObjectId,
     },
   ],
-  completeDocumentsPdf: {
-    type: PdfDocumentSchema,
-  },
   events: [
     {
       type: EventSchema,
@@ -232,20 +225,6 @@ InternshipModuleSchema.methods.passAep = async function (creator: Types.ObjectId
     accept: true,
   });
   this.aepPassed = true;
-
-  return this.save();
-};
-
-InternshipModuleSchema.methods.submitCompleteDocumentsPdf = async function (
-  creator: Types.ObjectId,
-  newPath: string
-) {
-  const user = await User.findById(creator);
-  if (!user?.isAdmin) throw new Error("Only Admins may submit the complete documents pdf.");
-
-  const pdfDocument: IPdfDocument = new PdfDocument();
-
-  this.completeDocumentsPdf = await pdfDocument.submit(user._id, newPath);
 
   return this.save();
 };
