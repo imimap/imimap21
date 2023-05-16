@@ -1,13 +1,13 @@
 <template>
-  <template v-if="loadingState !== true && internshipModule !== null">
+  <template v-if="!loadingState && internshipModule !== null">
     <!-- Kein Praktikum gefunden -->
-    <no-complete-internship v-if="internshipModule.status === 'unknown'"/>
+    <no-complete-internship v-if="internshipModule!.status === 'unknown'"/>
     <!-- Kein Praktikum aber Verschiebungen -->
     <postponements-list v-if="hasRequestedPostponements" :postponementEvents="postponements"/>
     <!-- Praktikum gefunden -->
     <complete-internship
       v-if="internshipModuleHasBeenPlanned"
-      :internshipModule="internshipModule"
+      :internshipModule="internshipModule!"
       @replaceInternship="replaceInternship"
       @getUserInternship="getUserInternship"
     />
@@ -18,8 +18,8 @@
 import { defineComponent } from 'vue';
 import { InternshipModule } from '@/store/types/InternshipModule';
 import { Event } from '@/store/types/Event';
-import http from '@/utils/http-common';
 import { Internship } from '@/store/types/Internship';
+import { getAuthUserInternship } from '@/utils/gateways';
 import NoCompleteInternship from './NoInternshipModule.vue';
 import CompleteInternship from './InternshipModule.vue';
 import PostponementsList from './PostponementsList.vue';
@@ -31,35 +31,24 @@ export default defineComponent({
     CompleteInternship,
     PostponementsList,
   },
-  // @TODO: Type Interfaces deklarieren
   data() {
     return {
       loadingState: true,
-      internshipModule: {} as InternshipModule,
+      internshipModule: null as InternshipModule | null,
     };
   },
   methods: {
     async getUserInternship() {
-      try {
-        const res = await http.get('/internship-modules/my');
-        this.internshipModule = res.data;
-        this.loadingState = false;
-      } catch (err: any) {
-        console.log(err);
-      }
+      this.internshipModule = await getAuthUserInternship();
+      this.loadingState = false;
     },
     replaceInternship(newInternship: Internship) {
-      if (typeof this.internshipModule !== 'undefined') {
-        console.log(newInternship._id);
-        const index = this.internshipModule.internships.findIndex(
-          (internship) => internship._id === newInternship._id,
-        );
-        this.internshipModule.internships.splice(
-          index,
-          1,
-          newInternship,
-        );
-      }
+      if (this.internshipModule === null) return;
+
+      const index = this.internshipModule.internships.findIndex(
+        (internship) => internship._id === newInternship._id,
+      );
+      this.internshipModule.internships.splice(index, 1, newInternship);
     },
   },
   created() {
@@ -67,21 +56,17 @@ export default defineComponent({
   },
   computed: {
     // @TODO: postponement requested, postponement rejected, ansonsten als planned gekennzeichnet
-    // @TODO: Die Option zum erstelen eines Postponements sollte es immer geben
-    loadingStateComputed(): boolean {
-      return this.loadingState;
-    },
+    // @TODO: Die Option zum erstellen eines Postponements sollte es immer geben
     postponements(): Event[] {
+      if (!this.internshipModule) return [];
       return this.internshipModule.events.filter((event) => event.type === 'internshipModule.postponement');
     },
     hasRequestedPostponements(): boolean {
       return this.postponements.length > 0;
     },
     internshipModuleHasBeenPlanned(): boolean {
+      if (!this.internshipModule) return false;
       return this.internshipModule.events.filter((event) => event.changes.status?.includes('planned')).length > 0;
-    },
-    hasInternships(): boolean {
-      return this.internshipModule.internships.length > 0;
     },
   },
 });

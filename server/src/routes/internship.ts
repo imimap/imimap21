@@ -7,14 +7,13 @@ import {
   createInternship,
   deleteComment,
   deleteInternship,
-  getSearchResults,
   generateRequestPdf,
   getInternshipLocations,
   getInternshipsById,
+  getSearchResults,
   markInternshipAsPassed,
   submitPdf,
   updateInternship,
-  markInternshipAsForcePassed,
 } from "../controllers/internship";
 import { isObjectId, validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
@@ -114,6 +113,7 @@ internshipRouter.patch(
   "/:id/approve",
   authMiddleware(),
   param("id").custom(isObjectId),
+  body("force").optional().isBoolean(),
   validate,
   asyncHandler(approveInternshipApplication)
 );
@@ -122,16 +122,9 @@ internshipRouter.patch(
   "/:id/pass",
   authMiddleware(),
   param("id").custom(isObjectId),
+  body("force").optional().isBoolean(),
   validate,
   asyncHandler(markInternshipAsPassed)
-);
-
-internshipRouter.patch(
-  "/:id/forcePass",
-  authMiddleware(),
-  param("id").custom(isObjectId),
-  validate,
-  asyncHandler(markInternshipAsForcePassed)
 );
 
 /* PDF endpoints */
