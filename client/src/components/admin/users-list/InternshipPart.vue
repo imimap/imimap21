@@ -92,7 +92,6 @@ import {
   approveInternshipApplication,
   deleteComment,
   deleteInternship,
-  markInternshipAsForcePassed,
   markInternshipAsPassed,
   rejectPdf,
 } from '@/utils/gateways';
