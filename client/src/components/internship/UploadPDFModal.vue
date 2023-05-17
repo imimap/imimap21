@@ -29,6 +29,7 @@
               id="pdfFileInput"
               type="file"
               ref="pdfFileInput"
+              accept=".pdf"
               @change="previewPdf"
             />
           </div>

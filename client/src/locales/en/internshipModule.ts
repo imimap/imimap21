@@ -35,6 +35,16 @@ const internshipModule = {
     accepted: 'Valid',
     rejected: 'Rejected',
   },
+  pdfActions: {
+    accept: 'Accept',
+    reject: 'Reject',
+    rejectModalTitle: 'Reject PDF document',
+    rejectReasons: {
+      signature: 'Missing signature',
+      askProf: 'Please contact the internship supervising professor',
+      other: 'Other',
+    },
+  },
   internship: 'Internship',
   information: 'Information',
   semester: 'Semester',
@@ -48,6 +58,12 @@ const internshipModule = {
   operationalArea: 'Operational Area',
   tasks: 'Tasks',
   workingHoursPerWeek: 'Working Hours per week',
+  links: {
+    title: 'Helpful links',
+    website: 'IMI Website: Internship',
+    contract: 'Template Internship Contract',
+    certificate: 'Template Internship Certificate',
+  },
   status: {
     internship: 'Internship status',
     overview: 'Status overview',

@@ -35,6 +35,16 @@ const internshipModule = {
     accepted: 'Gültig',
     rejected: 'Abgelehnt',
   },
+  pdfActions: {
+    accept: 'Akzeptieren',
+    reject: 'Ablehnen',
+    rejectModalTitle: 'PDF-Dokument ablehnen',
+    rejectReasons: {
+      signature: 'Fehlende Unterschrift',
+      askProf: 'Bitte setze Dich mit der/dem Praktikumsbeauftragten in Verbindung',
+      other: 'Sonstiges',
+    },
+  },
   internship: 'Praktikum',
   information: 'Information',
   semester: 'Semester',
@@ -48,7 +58,12 @@ const internshipModule = {
   operationalArea: 'Einsatzgebiet',
   tasks: 'Aufgaben',
   workingHoursPerWeek: 'Arbeitsstunden pro Woche',
-
+  links: {
+    title: 'Hilfreiche Links',
+    website: 'IMI-Website: Praktikum',
+    contract: 'Vorlage Praktikumsvertrag',
+    certificate: 'Vorlage Praktikumszeugnis',
+  },
   status: {
     internship: 'Status des Praktikums',
     overview: 'Statusübersicht',
