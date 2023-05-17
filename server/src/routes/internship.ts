@@ -11,7 +11,6 @@ import {
   getInternshipLocations,
   getInternshipsById,
   getSearchResults,
-  markInternshipAsForcePassed,
   markInternshipAsPassed,
   submitPdf,
   updateInternship,
