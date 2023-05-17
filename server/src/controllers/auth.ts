@@ -22,13 +22,12 @@ async function createStudentProfile(user: Express.User): Promise<IStudentProfile
 }
 
 async function createUser(user: Express.User): Promise<IUser> {
-  const isStudent = user.role === Role.STUDENT;
   return await User.create({
     firstName: user.firstName,
     lastName: user.lastName,
     emailAddress: user.email,
-    isAdmin: !isStudent,
-    studentProfile: isStudent ? await createStudentProfile(user) : null,
+    isAdmin: false,
+    studentProfile: user.role === Role.STUDENT ? await createStudentProfile(user) : null,
   });
 }
 

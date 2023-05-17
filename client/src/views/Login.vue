@@ -16,6 +16,9 @@ export default defineComponent({
   components: {
     LoginComponent,
   },
+  created() {
+    console.log('created login');
+  },
 });
 </script>
 

@@ -114,6 +114,7 @@ internshipRouter.patch(
   "/:id/approve",
   authMiddleware(),
   param("id").custom(isObjectId),
+  body("force").optional().isBoolean(),
   validate,
   asyncHandler(approveInternshipApplication)
 );
@@ -122,16 +123,9 @@ internshipRouter.patch(
   "/:id/pass",
   authMiddleware(),
   param("id").custom(isObjectId),
+  body("force").optional().isBoolean(),
   validate,
   asyncHandler(markInternshipAsPassed)
-);
-
-internshipRouter.patch(
-  "/:id/forcePass",
-  authMiddleware(),
-  param("id").custom(isObjectId),
-  validate,
-  asyncHandler(markInternshipAsForcePassed)
 );
 
 /* PDF endpoints */

@@ -9,11 +9,16 @@ const AUTH_TOKEN_KEY = 'imimapAuthToken';
 const REFRESH_TOKEN_KEY = 'imimapRefreshToken';
 
 const getTokenExpirationDate = (encodedToken: string): Date | null => {
-  const token: JwtPayload = decode(encodedToken);
-  if (!token.exp) return null;
-  const date = new Date(0);
-  date.setUTCSeconds(token.exp);
-  return date;
+  try {
+    const token: JwtPayload = decode(encodedToken);
+    if (!token.exp) return null;
+    const date = new Date(0);
+    date.setUTCSeconds(token.exp);
+    return date;
+  } catch (error) {
+    console.log('Error while decoding access token. Using null as expiration date.');
+    return null;
+  }
 };
 
 function isTokenExpired(token: string): boolean {
@@ -23,8 +28,7 @@ function isTokenExpired(token: string): boolean {
 }
 
 export function getAuthToken(): string | null {
-  const token: string | null = localStorage.getItem(AUTH_TOKEN_KEY);
-  return token;
+  return localStorage.getItem(AUTH_TOKEN_KEY);
 }
 
 function setAuthToken(token: string) {
@@ -72,8 +76,7 @@ export async function isLoggedIn(): Promise<boolean> {
   }
 
   if (isTokenExpired(authToken)) {
-    const success = await refreshAccessToken();
-    return success;
+    return refreshAccessToken();
   }
   return true;
 }

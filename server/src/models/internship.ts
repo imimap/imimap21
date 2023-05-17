@@ -54,15 +54,13 @@ export interface IInternship extends Document {
 
   durationInWeeksSoFar(): number;
 
-  approve(creator: Types.ObjectId): Promise<IInternship>;
+  approve(creator: Types.ObjectId, force?: boolean): Promise<IInternship>;
 
   reject(creator: Types.ObjectId): Promise<IInternship>;
 
   markAsOver(creator: Types.ObjectId): Promise<IInternship>;
 
-  pass(creator: Types.ObjectId): Promise<IInternship>;
-
-  forcePass(creator: Types.ObjectId): Promise<IInternship>;
+  pass(creator: Types.ObjectId, force?: boolean): Promise<IInternship>;
 }
 
 export const InternshipSchema = new Schema<IInternship>(
@@ -200,10 +198,10 @@ export async function trySetReadyForGrading(document: Document): Promise<void> {
   if (document.get("status") !== InternshipStatuses.OVER) return;
 
   const reportPdf = document.get("reportPdf");
-  if (!reportPdf) return;
+  if (!reportPdf || reportPdf.status !== PdfDocumentStatuses.SUBMITTED) return;
 
   const certificatePdf = document.get("certificatePdf");
-  if (!certificatePdf) return;
+  if (!certificatePdf || certificatePdf.status !== PdfDocumentStatuses.SUBMITTED) return;
 
   document.get("events").push({
     type: EventTypes.INTERNSHIP_UPDATE,
@@ -245,7 +243,6 @@ InternshipSchema.pre("save", async function () {
   // Update internship state if necessary
   switch (this.status) {
     case InternshipStatuses.PLANNED:
-    case InternshipStatuses.APPROVED:
     case InternshipStatuses.REJECTED:
       await trySetRequested(this);
       break;
@@ -270,12 +267,12 @@ InternshipSchema.methods.durationInWeeksSoFar = function (): number {
   return getWeeksBetween(document?.startDate || dateToCompareWith, dateToCompareWith);
 };
 
-InternshipSchema.methods.approve = async function (creator: Types.ObjectId) {
+InternshipSchema.methods.approve = async function (creator: Types.ObjectId, force?: boolean) {
   // Check if user is admin
   const user = await User.findById(creator);
   if (!user?.isAdmin) throw new Error("Only admins may approve an internship");
   // Check if internship is ready for approval
-  if (this.status !== InternshipStatuses.REQUESTED)
+  if (this.status !== InternshipStatuses.REQUESTED && !force)
     throw new Error("Internship is not ready for approval yet");
 
   this.events.push({
@@ -328,38 +325,27 @@ InternshipSchema.methods.markAsOver = async function (creator: Types.ObjectId) {
 
 export async function tryMarkAsOver(internship: IInternship): Promise<IInternship | undefined> {
   // Check if user is admin
-  if (internship.get("endDate") <= Date.now()) {
+  if (internship.get("endDate") <= new Date()) {
+    internship.get("events").push({
+      type: EventTypes.INTERNSHIP_UPDATE,
+      creator: (await getIMIMapAdmin())._id,
+      changes: {
+        status: InternshipStatuses.OVER,
+      },
+    });
     internship.set("status", InternshipStatuses.OVER);
-
     return internship.save();
   }
 }
 
-InternshipSchema.methods.pass = async function (creator: Types.ObjectId) {
+InternshipSchema.methods.pass = async function (creator: Types.ObjectId, force?: boolean) {
   // Check if user is admin
   const user = await User.findById(creator);
   if (!user?.isAdmin) throw new Error("Only admins may grade an internship");
   // Check if internship is ready for grading
-  if (this.status !== InternshipStatuses.READY_FOR_GRADING)
+  if (this.status !== InternshipStatuses.READY_FOR_GRADING && !force)
     throw new Error("Internship is not ready for grading yet");
 
-  this.events.push({
-    type: EventTypes.INTERNSHIP_UPDATE,
-    creator: user._id,
-    changes: {
-      status: InternshipStatuses.PASSED,
-    },
-  });
-  this.status = InternshipStatuses.PASSED;
-
-  return this.save();
-};
-
-InternshipSchema.methods.forcePass = async function (creator: Types.ObjectId) {
-  // Check if user is admin
-  const user = await User.findById(creator);
-  if (!user?.isAdmin) throw new Error("Only admins may grade an internship");
-  // Check if internship is ready for grading
   this.events.push({
     type: EventTypes.INTERNSHIP_UPDATE,
     creator: user._id,

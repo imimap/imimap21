@@ -30,6 +30,8 @@ services:
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
     networks:
       - backend
+    volumes:
+      - pdf-store:/server/pdfs
 
   db:
     image: mongo:bionic
@@ -42,6 +44,8 @@ services:
     image: mongo-express
     ports:
       - "8081:8081"
+    depends_on:
+      - db
     environment:
       - ME_CONFIG_MONGODB_SERVER=db
       - ME_CONFIG_BASICAUTH_USERNAME=${ME_USER}
@@ -51,6 +55,7 @@ services:
 
 volumes:
   db-data:
+  pdf-store:
 
 networks:
   backend:

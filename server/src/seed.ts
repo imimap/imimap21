@@ -99,10 +99,8 @@ async function createInternship(): Promise<IInternship> {
   });
 
   // create random number
-  // const r = Math.random();
-  // if (r < 0.5)
-  return internship.forcePass(ADMIN_USER_ID);
-  // else return internship;
+  if (Math.random() < 0.5) return internship.pass(ADMIN_USER_ID, true);
+  else return internship;
 }
 
 async function generateStudents(
