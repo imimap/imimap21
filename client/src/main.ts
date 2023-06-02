@@ -6,6 +6,7 @@ import {
   faCircleXmark,
   faCog,
   faDownload,
+  faUpload,
   faEdit,
   faEye,
   faQuestionCircle,
@@ -33,6 +34,7 @@ library.add(faEdit);
 library.add(faTrashAlt);
 library.add(faTrash);
 library.add(faDownload);
+library.add(faUpload);
 library.add(faEye);
 library.add(faCheckCircle);
 library.add(faCircleXmark);

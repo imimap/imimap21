@@ -31,6 +31,7 @@
               :text="$t(`userList.internshipPart.pdfs.${pdf}`)"
               :item="internship[`${pdf}Pdf`]"
               :type="pdf"
+              :internshipId="internship._id"
               @accept-pdf="pdfAccepted"
               @reject-pdf="pdfRejected"
             />
