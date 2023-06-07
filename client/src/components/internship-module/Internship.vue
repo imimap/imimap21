@@ -69,6 +69,9 @@
             <tbody>
             <tr v-for="type in pdfTypes" :key="type">
               <InternshipPdf :pdf="internship[`${type}Pdf`]" :type="type" @setModalPdfType="modalPdfType = type"/>
+              <p v-if="type === 'locationJustification'" class="text-center">
+                <span> {{ $t("internshipModule.commentLocation") }} </span>
+              </p>
             </tr>
             <tr>
               <td>
@@ -141,6 +144,7 @@ import { showErrorNotification, showSuccessNotification } from '@/utils/notifica
 import { generateRequestPdf } from '@/utils/gateways';
 import InternshipStatus from '@/components/internship-module/InternshipStatus.vue';
 import InternshipPdf from '@/components/internship-module/InternshipPdf.vue';
+import internshipModule from '@/locales/de/internshipModule';
 
 export default defineComponent({
   name: 'Internship',

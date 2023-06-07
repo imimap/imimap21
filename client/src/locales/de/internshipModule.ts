@@ -23,7 +23,7 @@ const internshipModule = {
   pdfTypes: {
     request: 'Anmeldung',
     lsfEctsProof: 'ECTS-Nachweis',
-    locationJustification: 'Ortsnachweis',
+    locationJustification: 'Hochschulzugangsberechtigung',
     contract: 'Praktikumsvertrag',
     bvgTicketExemption: 'BVG Ticket Ausnahme',
     certificate: 'Praktikumszeugnis',
@@ -113,6 +113,7 @@ const internshipModule = {
   newPostponement: 'Weitere Verschiebung beantragen',
   internshipModule: 's Praktikum im',
   semesterModule: 'Fachsemester)',
+  commentLocation: 'Nur erforderlich, falls kein deutsches Abitur vorliegt',
 
 };
 

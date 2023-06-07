@@ -23,7 +23,7 @@ const internshipModule = {
   pdfTypes: {
     request: 'Application',
     lsfEctsProof: 'ECTS Proof',
-    locationJustification: 'Location Justification',
+    locationJustification: 'University Entrance Qualification',
     contract: 'Contract',
     bvgTicketExemption: 'BVG Ticket Exemption',
     certificate: 'Internship Certificate',
@@ -114,6 +114,7 @@ const internshipModule = {
   newPostponement: 'Request another postponement',
   internshipModule: "'s internship in",
   semesterModule: 'semester)',
+  commentLocation: 'Upload of certificate necessary, if not a german Abitur!',
 
 };
 
