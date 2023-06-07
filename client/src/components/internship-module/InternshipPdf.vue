@@ -21,6 +21,17 @@
     >
       {{ $t(`internshipModule.pdfStatus.${pdf.status}`) }}
     </span>
+    <span v-if="type === 'locationJustification'" >
+      <font-awesome-icon
+      icon="question-circle"
+      class="ms-1"
+      data-bs-toggle="loctooltip"
+      data-bs-placement="right"
+      :data-bs-title="locComm"
+      ref="locationTooltip"
+      />
+    </span>
+
     <font-awesome-icon
       v-if="showStatusReason"
       icon="question-circle"
@@ -54,6 +65,9 @@ export default defineComponent({
   },
   emits: ['setModalPdfType'],
   computed: {
+    locComm(): string {
+      return this.$t('internshipModule.commentLocation');
+    },
     name(): string {
       return this.$t(`internshipModule.pdfTypes.${this.type}`);
     },
@@ -87,6 +101,11 @@ export default defineComponent({
     },
   },
   mounted() {
+    if (this.$refs.locationTooltip) {
+      const loctooltip = (this.$refs.locationTooltip as ComponentPublicInstance).$el;
+      // eslint-disable-next-line no-new
+      new Tooltip(loctooltip as Element);
+    }
     if (!this.showStatusReason) return;
     const tooltip = (this.$refs.statusReasonTooltip as ComponentPublicInstance).$el;
     // eslint-disable-next-line no-new

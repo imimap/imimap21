@@ -69,9 +69,6 @@
             <tbody>
             <tr v-for="type in pdfTypes" :key="type">
               <InternshipPdf :pdf="internship[`${type}Pdf`]" :type="type" @setModalPdfType="modalPdfType = type"/>
-              <p v-if="type === 'locationJustification'" class="text-center">
-                <span> {{ $t("internshipModule.commentLocation") }} </span>
-              </p>
             </tr>
             <tr>
               <td>
@@ -157,7 +154,7 @@ export default defineComponent({
         'lsfEctsProof',
         'locationJustification',
         'contract',
-        'bvgTicketExemption',
+        // 'bvgTicketExemption',
         'certificate',
         'report',
       ],

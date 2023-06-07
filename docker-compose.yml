@@ -2,6 +2,15 @@ version: "3.7"
 
 services:
 
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /etc/ssl:/etc/nginx/certs
+      
   client:
     build: ./client
     image: htwimimap/client:latest
@@ -9,7 +18,9 @@ services:
       - "3000:80"
     environment:
       - API_HOST=${API_HOST}
-
+      - VIRTUAL_HOST=imi-map-staging.f4.htw-berlin.de
+      - VIRTUAL_PORT=8080
+      
   server:
     build: ./server
     image: htwimimap/server:latest
