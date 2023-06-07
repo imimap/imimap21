@@ -42,6 +42,7 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
       let userEntity = await User.findOne({ emailAddress: user.email });
       // Create user account if it doesn't exist
       if (!userEntity) userEntity = await createUser(user);
+      else user.role = userEntity.isAdmin ? Role.INSTRUCTOR : Role.STUDENT; //DS Update role from DB
       // Send auth token and user profile
       const token = generateAuthToken(user, userEntity._id);
       const refreshToken = generateRefreshToken(userEntity._id);
