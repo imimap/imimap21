@@ -1,15 +1,6 @@
 version: "3.7"
 
 services:
-
-  nginx-proxy:
-    image: jwilder/nginx-proxy
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - /etc/ssl:/etc/nginx/certs
       
   client:
     build: ./client
@@ -17,10 +8,11 @@ services:
     ports:
       - "3000:80"
     environment:
-      - API_HOST=${API_HOST}
-      - VIRTUAL_HOST=imi-map-staging.f4.htw-berlin.de
-      - VIRTUAL_PORT=8080
-      
+      - VUE_APP_API_HOST=${API_HOST}
+      - HOST_NAME=${HOST_NAME}
+      - VIRTUAL_HOST=${HOST_NAME}
+      - VIRTUAL_PATH=/
+
   server:
     build: ./server
     image: htwimimap/server:latest
@@ -39,8 +31,12 @@ services:
       - BYPASS_LDAP=${BYPASS_LDAP}
       - API_HOST=${API_HOST}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - VIRTUAL_HOST=${HOST_NAME}
+      - VIRTUAL_PATH=/api/
+      - VIRTUAL_PORT=9000
     networks:
       - backend
+      - default
     volumes:
       - pdf-store:/server/pdfs
 
@@ -50,6 +46,8 @@ services:
       - db-data:/data/db
     networks:
       - backend
+    depends_on:
+      - client
 
   db-gui:
     image: mongo-express
@@ -63,6 +61,19 @@ services:
       - ME_CONFIG_BASICAUTH_PASSWORD=${ME_PASS}
     networks:
       - backend
+
+     
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /etc/ssl:/etc/nginx/certs
+    networks:
+      - backend
+      - default
 
 volumes:
   db-data:
