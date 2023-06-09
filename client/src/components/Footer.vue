@@ -2,18 +2,24 @@
   <footer>
     <div class="container m-0">
       <div class="im-items">
-        <div class="imi_logo"></div>
-        <div class="htw_logo"></div>
+        <div style="float: left">
+          <div class="imi_logo"></div>
+          <div class="htw_logo"></div>
+        </div>
+        <div class="im-items">
         <div class="footer-text my-3">
-          <p>
-            Die neue IMIMAP 2021 - Projekt im Studiengang
-            Internationale Medieninformatik der HTW Berlin. Mehr Informationen zum Projekt
-            auf der Webseite der HTW <a href="https://showtime.f4.htw-berlin.de/">Showtime</a>
-          </p>
+          <div>
+            Die IMIMAP 2021 © IMI-HTW 2021 - heute<br>
+            Internationale Medieninformatik der HTW Berlin. <a href="impressum.html">Impressum</a>
+          </div>
+          <div style="float: right; font-size: 1rem;">
+            Designed and build by humans for humans. Be kind.
+          </div>
         </div>
         <div class="footer-text"><a href="https://www.htw-berlin.de/datenschutz/" target="_blank">Datenschutz</a></div>
       </div>
     </div>
+  </div>
   </footer>
 </template>
 
@@ -29,9 +35,8 @@ export default defineComponent({
 footer {
   color: $text-color-gray;
   background: $htw-gray-color;
-  padding: 17px 0 18px 0;
   border-top: 1px solid #000;
-  margin-top: 100px;
+  margin-top: 0px;
 }
 
 .imi_logo {
@@ -44,11 +49,11 @@ footer {
 }
 
 .htw_logo {
+  float: left;
   height: 30px;
   width: 52px;
   background: url('/assets/htw_logo.png');
   background-size: 52px 30px;
-  display: inline-block;
   margin-right: 10px;
 }
 
@@ -59,7 +64,7 @@ footer {
 }
 
 .footer-text {
-  font-size: 10px;
+  font-size: 12px;
   display: block;
   margin-right: 5px;
   white-space: normal;
@@ -79,7 +84,7 @@ footer {
   }
 
   .im-items {
-    width: 560px;
+    width: 747px;
   }
 
   .footer-text {

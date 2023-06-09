@@ -7,7 +7,7 @@
         :to="{name: 'Home', params: { locale: $route.params.locale }}">
         <img width="130" height="130" alt="" src="/assets/plane.gif">
       </router-link>
-      <div class="mt-3 text-white">
+      <div class="mt-3 text-white" style="display: none;">
         This is a staging environment set up for demonstration purposes only.
         It is only meant to be used for showcasing the MEVN-IMI-Map during the showtime.
       </div>
