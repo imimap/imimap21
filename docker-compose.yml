@@ -12,7 +12,6 @@ services:
       - HOST_NAME=${HOST_NAME}
       - VIRTUAL_HOST=${HOST_NAME}
       - VIRTUAL_PATH=/
-      - VIRTUAL_PORT=8080
 
   server:
     build: ./server
@@ -60,9 +59,13 @@ services:
       - ME_CONFIG_MONGODB_SERVER=db
       - ME_CONFIG_BASICAUTH_USERNAME=${ME_USER}
       - ME_CONFIG_BASICAUTH_PASSWORD=${ME_PASS}
+      - VIRTUAL_HOST=${HOST_NAME}
+      - VIRTUAL_PATH=/_dbgui_/
+      - VIRTUAL_DEST=/
+      - VIRTUAL_PORT=8081
     networks:
       - backend
-
+      - default
      
   nginx-proxy:
     image: nginxproxy/nginx-proxy
