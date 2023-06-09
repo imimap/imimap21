@@ -1,6 +1,7 @@
 <template>
   <template v-if="isAnonymousRoute">
     <router-view></router-view>
+    <footer-component></footer-component>
   </template>
 
   <template v-else>
