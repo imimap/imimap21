@@ -13,6 +13,13 @@ export async function examplePost(req: Request, res: Response): Promise<void> {
 export async function seedDb(req: Request, res: Response, next: NextFunction): Promise<void> {
   if (process.env.NODE_ENV !== "development")
     return next(new Forbidden("Only allowed in development environment"));
-  await seed();
+  await seed(false);
+  res.json({ msg: "done" });
+}
+
+export async function seedDbMin(req: Request, res: Response, next: NextFunction): Promise<void> {
+  if (process.env.NODE_ENV !== "development")
+    return next(new Forbidden("Only allowed in development environment"));
+  await seed(true);
   res.json({ msg: "done" });
 }

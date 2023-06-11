@@ -121,13 +121,14 @@ async function generateStudents(
   );
 }
 
-export default async function seed(): Promise<void> {
+export default async function seed(usersOnly: boolean): Promise<void> {
   // Generate admin accounts
   await createAdmin();
   await getIMIMapAdmin();
 
   // Generate users without internships
   await generateStudents(100000, 10);
+  if (usersOnly) return;
 
   // Generate users with one internship
   await generateStudents(200000, 30, async () => [(await createInternship()).id]);

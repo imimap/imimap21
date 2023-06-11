@@ -5,7 +5,8 @@ RUN apk add --no-cache chromium && npm install
 COPY ./ ./
 EXPOSE 9000
 EXPOSE 9229
-ENTRYPOINT ["npm", "run", "watch"]
+#RUN chown -R 1000:1000 "/root/.npm"
+ENTRYPOINT ["npm", "run", "serve"]
 
 FROM node:gallium-alpine as build
 WORKDIR /build

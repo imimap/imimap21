@@ -46,7 +46,5 @@ export default defineComponent({
 });
 </script>
 <style lang="scss">
-footer {
-  margin-top: 20px;
-}
+
 </style>
