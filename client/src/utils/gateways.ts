@@ -256,6 +256,16 @@ export const loadUpcomingSemesters = async (): Promise<string[]> => {
   }
 };
 
+export const loadCurrentSemester = async (): Promise<string> => {
+  try {
+    const res = await apiClient.get('/info/semesters/current');
+    return await res.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    await showErrorNotification(`Fehler beim Abfragen der aktuellen Semester [ERROR: ${err.message}]`);
+    return "";
+  }
+};
 export const loadInternshipStatuses = async (): Promise<string[]> => {
   try {
     const res = await apiClient.get('/info/internship-statuses');
