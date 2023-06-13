@@ -10,7 +10,7 @@
         <div class="footer-text my-3">
           <div>
             Die IMIMAP 2021 © IMI-HTW 2021 - heute<br>
-            Internationale Medieninformatik der HTW Berlin. <a href="impressum.html">Impressum</a>
+            Internationale Medieninformatik der HTW Berlin. <a href="/impressum.html">Impressum</a>
           </div>
           <div style="float: right; font-size: 1rem;">
             Designed and build by humans for humans. Be kind.
