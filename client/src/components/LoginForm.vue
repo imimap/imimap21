@@ -50,7 +50,7 @@ import { login } from '@/utils/auth';
 
 const stagingtext = `This is a staging environment set up for demonstration purposes only.
 It is only meant to be used for testing IMI-Map. <br> <strong>All data will be lost, eventually!</strong><br>
-<h1>Do not USE THIS</h1>`;
+<h1 style="color:red;">Do not USE THIS.</h1>`;
 
 export default defineComponent({
   name: 'LoginComponent',
