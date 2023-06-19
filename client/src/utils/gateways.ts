@@ -12,10 +12,7 @@ import { InternshipModule as IInternshipModule } from '@/store/types/InternshipM
 
 export const getStudentsList = async (semester: string | undefined): Promise<Student[]> => apiClient
   .get(`/students${semester !== undefined ? `?semester=${semester}` : ''}`)
-  .then((res) => {
-    //console.log(res.data);
-    return res.data;
-  }).catch((err) => {
+  .then(res => res.data).catch((err) => {
     console.log(err);
     return [];
   });
