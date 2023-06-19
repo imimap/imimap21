@@ -12,8 +12,9 @@ import { InternshipModule as IInternshipModule } from '@/store/types/InternshipM
 
 export const getStudentsList = async (semester: string | undefined): Promise<Student[]> => apiClient
   .get(`/students${semester !== undefined ? `?semester=${semester}` : ''}`)
-  .then((res) => res.data)
-  .catch((err) => {
+  .then((res) => {
+    return res.data;
+  }).catch((err) => {
     console.log(err);
     return [];
   });
@@ -118,6 +119,20 @@ export const approveInternshipApplication = async (
   }
 };
 
+export const markInternshipAsOver = async (
+  internshipId: string,
+  force?: boolean,
+): Promise<Internship | null> => {
+  try {
+    const response = await apiClient.patch(`/internships/${internshipId}/over`, { });
+    return response.data;
+  } catch (err: any) {
+    if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
+    if (force) await showErrorNotification(`Fehler beim Updaten des Praktikums ${internshipId} [ERROR: ${err.message}]`);
+    return null;
+  }
+};
+
 export const markInternshipAsPassed = async (
   internshipId: string,
   force?: boolean,
@@ -134,7 +149,7 @@ export const markInternshipAsPassed = async (
 
 export const getCompaniesList = async (): Promise<Company[]> => {
   try {
-    const response = await apiClient.get('/companies');
+    const response = await apiClient.get('/companies?limit=500');
     return response.data.map((company) => Company.parseFromAPIResponseData(company));
   } catch (err: any) {
     if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
@@ -263,7 +278,7 @@ export const loadCurrentSemester = async (): Promise<string> => {
   } catch (err: any) {
     if (err.response?.data?.error?.message) err.message = err.response.data.error.message;
     await showErrorNotification(`Fehler beim Abfragen der aktuellen Semester [ERROR: ${err.message}]`);
-    return "";
+    return '';
   }
 };
 export const loadInternshipStatuses = async (): Promise<string[]> => {

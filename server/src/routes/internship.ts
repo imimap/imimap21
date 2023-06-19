@@ -11,6 +11,7 @@ import {
   getInternshipLocations,
   getInternshipsById,
   getSearchResults,
+  markInternshipAsOver,
   markInternshipAsPassed,
   submitPdf,
   updateInternship,
@@ -125,6 +126,15 @@ internshipRouter.patch(
   body("force").optional().isBoolean(),
   validate,
   asyncHandler(markInternshipAsPassed)
+);
+
+internshipRouter.patch(
+  "/:id/over",
+  authMiddleware(),
+  param("id").custom(isObjectId),
+  body("force").optional().isBoolean(),
+  validate,
+  asyncHandler(markInternshipAsOver)
 );
 
 /* PDF endpoints */

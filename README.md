@@ -4,6 +4,7 @@
 1. Copy the ".env.sample" file to a new file ".env" and fill out with the secrets.
 2. In the root folder `docker-compose -f docker-compose.yml -f docker-compose.local.yml up -d --build`
 3. Seed the database by making a GET request to `http://localhost:9000/api/x/seed`
+3. To only seed the admin and some test users in the database make a GET request to `http://localhost:9000/api/x/seedUsers`
 4. `docker-compose down`
 
 ## Develop locally

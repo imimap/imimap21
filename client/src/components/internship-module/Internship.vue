@@ -51,11 +51,11 @@
             </tbody>
           </table>
           <p v-if="internship.status === 'planned'" class="text-center">
-            <a href="#" @click.prevent="loadRequestPdf">Antrag generieren</a>
+            <a href="#" @click.prevent="loadRequestPdf">{{ $t("internship.heading.applicationForm") }}</a>
           </p>
           <p class="text-center">
             <a href="https://imi-bachelor.htw-berlin.de/studium/praktikum/#c10774" target="_blank">
-              Vorlage für das Praktikumszeugnis
+              {{ $t("internship.heading.certificateForm") }}
             </a>
           </p>
         </div>
@@ -65,17 +65,25 @@
           <p class="card-text">
             <strong> {{ $t("internshipModule.status.overview") }} </strong>
           </p>
-          <table class="table table-striped table-sm table-borderless">
+          <table class="table table-sm table-borderless">
             <tbody>
-            <tr v-for="type in pdfTypes" :key="type">
-              <InternshipPdf :pdf="internship[`${type}Pdf`]" :type="type" @setModalPdfType="modalPdfType = type"/>
-            </tr>
-            <tr>
+              <tr class="ds-head">
+                <td colspan="42">{{ $t("internshipModule.applicationPhase") }}</td>
+              </tr>
+            <template v-for="type in pdfTypes" :key="type">
+              <tr v-if="type === 'certificate'" class="ds-head">
+                <td colspan="42">{{ $t("internshipModule.gradingPhase") }}</td>
+              </tr>
+              <tr>
+                <InternshipPdf :pdf="internship[`${type}Pdf`]" :type="type" @setModalPdfType="modalPdfType = type"/>
+              </tr>
+            </template>
+            <tr class="ds-head">
               <td>
                 {{ $t("internshipModule.status.internship") }}
               </td>
               <td colspan="2">
-                <p class="mb-1">{{ internshipStatus }}</p>
+                <p class="mb-1"><strong>{{ internshipStatus }}</strong></p>
                 <br>
                 <InternshipStatus :internship="internship"/>
               </td>
@@ -151,9 +159,9 @@ export default defineComponent({
       modalPdfType: 'request',
       pdfTypes: [
         'request',
+        'contract',
         'lsfEctsProof',
         'locationJustification',
-        'contract',
         // 'bvgTicketExemption',
         'certificate',
         'report',
@@ -224,5 +232,9 @@ export default defineComponent({
   font: inherit;
   cursor: pointer;
   outline: inherit;
+}
+
+.ds-head {
+    background-color: var(--bs-table-striped-bg);
 }
 </style>

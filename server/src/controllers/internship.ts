@@ -676,6 +676,30 @@ export async function approveInternshipApplication(
   }
 }
 
+export async function markInternshipAsOver(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  let user;
+  try {
+    user = await getAuthorizedUser(req.user?.email, req.params.id);
+  } catch (e) {
+    return next(e);
+  }
+
+  if (!user.isAdmin) return next(new Forbidden("Only admins may mark internships as passed"));
+
+  const internshipToUpdate = await Internship.findById(req.params.id);
+  if (!internshipToUpdate) return next(new NotFound("Internship not found"));
+
+  try {
+    const savedInternship = await internshipToUpdate.markAsOver(user._id);
+    res.json(Responses.fromInternship(savedInternship, user.isAdmin));
+  } catch (e) {
+    return next(new BadRequest(e.message));
+  }
+}
 export async function markInternshipAsPassed(
   req: Request,
   res: Response,

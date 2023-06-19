@@ -23,7 +23,7 @@ const internshipModule = {
   pdfTypes: {
     request: 'Anmeldung',
     lsfEctsProof: 'ECTS-Nachweis',
-    locationJustification: 'Hochschulzugangsberechtigung',
+    locationJustification: 'Zugangsberechtigung',
     contract: 'Praktikumsvertrag',
     bvgTicketExemption: 'BVG Ticket Ausnahme',
     certificate: 'Praktikumszeugnis',
@@ -58,6 +58,8 @@ const internshipModule = {
   operationalArea: 'Einsatzgebiet',
   tasks: 'Aufgaben',
   workingHoursPerWeek: 'Arbeitsstunden pro Woche',
+  applicationPhase: 'Beantragung',
+  gradingPhase: 'Anerkennung',
   links: {
     title: 'Hilfreiche Links',
     website: 'IMI-Website: Praktikum',
@@ -109,11 +111,11 @@ const internshipModule = {
     b202: 'Fachpraktikum',
   },
   moduleNumber: 'Modulnummer',
-  newPartialInternship: 'Weiteres Teilpraktikum eintragen',
-  newPostponement: 'Weitere Verschiebung beantragen',
+  newPartialInternship: '(Weiteres) Praktikum eintragen',
+  newPostponement: '(Weitere) Verschiebung beantragen',
   internshipModule: 's Praktikum im',
   semesterModule: 'Fachsemester)',
-  commentLocation: 'Nur erforderlich, falls kein deutsches Abitur vorliegt',
+  commentLocation: 'Die Hochschschul-Zugangsberechtigung ist nur erforderlich, falls kein deutsches Abitur vorliegt',
 
 };
 

@@ -33,7 +33,7 @@ const search = {
     previousResultCount: '0 frühere Ergebnisse | 1 Praktikum bei bereits gesehener Firma aus früheren Suchen '
     + '| {n} Praktika bei bereits gesehenen Firmen aus früheren Suchen',
   },
-  showMap: 'Karte zeigen',
+  showMap: 'Karte umschalten',
   company: 'Firma',
   location: 'Ort',
   orientation: 'Bereich',
@@ -56,7 +56,7 @@ const search = {
     buttonConfirm: 'Zeige mir trotzdem die Ergebnisse!',
     buttonDecline: 'Ich möchte die Suche konkretisieren',
   },
-  limitReached: 'Du hast all deine Verusche aufgebraucht! Bitte wende dich an die '
+  limitReached: 'Du hast all deine Versuche aufgebraucht! Bitte wende dich an die '
   + 'Praktikumsverwaltung imi-praktikum[at]htw-berlin.de, falls du dein Limit zurücksetzen musst.',
 };
 

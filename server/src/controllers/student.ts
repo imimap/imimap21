@@ -37,7 +37,7 @@ export async function getStudents(req: Request, res: Response): Promise<void> {
     // When migrating the old DB some null users showed up
     if(user) users.push(user);
   }
-  
+  console.log(users);
   res.json(users);
 }
 

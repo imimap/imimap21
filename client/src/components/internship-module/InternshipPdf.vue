@@ -15,12 +15,6 @@
     </a>
   </td>
   <td class="text-end">
-    <span
-      v-if="pdf.status !== 'unknown'"
-      :class="['badge', statusBadgeClass]"
-    >
-      {{ $t(`internshipModule.pdfStatus.${pdf.status}`) }}
-    </span>
     <span v-if="type === 'locationJustification'" >
       <font-awesome-icon
       icon="question-circle"
@@ -30,6 +24,12 @@
       :data-bs-title="locComm"
       ref="locationTooltip"
       />
+    </span>
+    <span
+      v-if="pdf.status !== 'unknown'"
+      :class="['badge', statusBadgeClass]"
+    >
+      {{ $t(`internshipModule.pdfStatus.${pdf.status}`) }}
     </span>
 
     <font-awesome-icon

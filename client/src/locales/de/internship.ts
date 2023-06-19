@@ -5,6 +5,8 @@ const internship = {
     internshipOf: 'Praktikum von ',
     at: ' bei ',
     in: 'in ',
+    applicationForm: 'Anmeldung generieren',
+    certificateForm: 'Vorlage für das Praktikumszeugnis',
   },
   explanation: {
     redStar: 'Felder mit diesem Sternchen sind Pflicht für das Anlegen eines Praktikums.',

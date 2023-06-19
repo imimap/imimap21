@@ -77,7 +77,8 @@ export default defineComponent({
     },
   },
   mounted() {
-    this.updateList();
+    // DS Happens now by emitting 'semesterChange' from UserListFilter after current semester is retrieved
+    // this.updateList();
   },
   methods: {
     getDateString,
