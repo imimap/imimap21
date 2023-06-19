@@ -83,10 +83,6 @@ footer {
     background-size: 104px 60px;
   }
 
-  .im-items {
-    width: 747px;
-  }
-
   .footer-text {
     display: block;
     white-space: normal;

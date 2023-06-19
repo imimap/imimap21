@@ -7,9 +7,7 @@
         :to="{name: 'Home', params: { locale: $route.params.locale }}">
         <img width="130" height="130" alt="" src="/assets/plane.gif">
       </router-link>
-      <div class="mt-3 text-white" style="display: none;">
-        This is a staging environment set up for demonstration purposes only.
-        It is only meant to be used for showcasing the MEVN-IMI-Map during the showtime.
+      <div class="mt-3 text-white" v-html="introtext">
       </div>
         <form v-on:submit.prevent>
           <div class="input-group w-auto mt-3 row">
@@ -50,12 +48,17 @@
 import { defineComponent } from 'vue';
 import { login } from '@/utils/auth';
 
+const stagingtext = `This is a staging environment set up for demonstration purposes only.
+It is only meant to be used for testing IMI-Map. <br> <strong>All data will be lost, eventually!</strong><br>
+<h1>Do not USE THIS</h1>`;
+
 export default defineComponent({
   name: 'LoginComponent',
   data() {
     return {
       username: '',
       password: '',
+      introtext: document.URL.indexOf('-staging') !== -1 ? stagingtext : '<h2><strong>Welcome to IMI-MAP!</strong></h2>',
       error: null,
     };
   },
