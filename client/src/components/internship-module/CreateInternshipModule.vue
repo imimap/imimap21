@@ -8,14 +8,9 @@
             <div class="field" id="field-titles2">
               <div class="form-group" data-children-count="1">
                 <label for="semester-id">Semester</label>
-                <select class="form-control"
-                        name="semester-id"
-                        id="semester-id"
-                        ref="semester-id"
-                        v-model="semesterId">
-                  <option value="WS2020">WS 20/21</option>
-                  <option value="WS2021">WS 21/22</option>
-                  <option value="SS2022">SS 22</option>
+                <select class="form-control" name="semester-id" id="semester-id" ref="semester-id" v-model="semesterId">
+                  <option v-for="semester in commingSemesters" :key="semester" :value="semester">
+                  </option>
                 </select>
               </div>
             </div>
@@ -24,15 +19,8 @@
             <div class="field" id="field-titles2">
               <div class="form-group" data-children-count="1">
                 <label for="semester-of-study">Fachsemester</label>
-                <input
-                  step="1"
-                  class="form-control"
-                  min="1"
-                  max="100"
-                  type="number"
-                  v-model="semesterOfStudy"
-                  name="semester-of-study"
-                  id="semester-of-study">
+                <input step="1" class="form-control" min="1" max="100" type="number" v-model="semesterOfStudy"
+                  name="semester-of-study" id="semester-of-study">
               </div>
             </div>
           </div>
@@ -40,11 +28,7 @@
         <div class="row">
           <div class="col-md-4">
             <div class="field" id="field-titles2">
-              <button
-                name="commit"
-                class="btn btn-secondary mt-3"
-                data-disable-with="Speichern"
-                v-on:click="save()">
+              <button name="commit" class="btn btn-secondary mt-3" data-disable-with="Speichern" v-on:click="save()">
                 Speichern
               </button>
             </div>
@@ -57,6 +41,7 @@
 </template>
 
 <script lang="ts">
+import { loadUpcomingSemesters } from '@/utils/gateways';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -66,6 +51,7 @@ export default defineComponent({
     return {
       semesterId: String,
       semesterOfStudy: String,
+      commingSemesters: [] as string[],
     };
   },
   methods: {
@@ -74,9 +60,11 @@ export default defineComponent({
       this.$router.push({ name: 'InternshipModuleIndex' });
     },
   },
+  async mounted() {
+    this.commingSemesters = await loadUpcomingSemesters();
+  },
+
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
