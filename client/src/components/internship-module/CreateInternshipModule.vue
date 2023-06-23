@@ -9,7 +9,8 @@
               <div class="form-group" data-children-count="1">
                 <label for="semester-id">Semester</label>
                 <select class="form-control" name="semester-id" id="semester-id" ref="semester-id" v-model="semesterId">
-                  <option v-for="semester in commingSemesters" :key="semester" :value="semester">
+                  <option v-for="(semester, index) in commingSemesters" v-bind:key="index" :value="semester">
+                    {{ semester }}
                   </option>
                 </select>
               </div>
@@ -19,7 +20,7 @@
             <div class="field" id="field-titles2">
               <div class="form-group" data-children-count="1">
                 <label for="semester-of-study">Fachsemester</label>
-                <input step="1" class="form-control" min="1" max="100" type="number" v-model="semesterOfStudy"
+                <input step="1" class="form-control" min="1" max="100" type="number" v-model="message"
                   name="semester-of-study" id="semester-of-study">
               </div>
             </div>
@@ -41,27 +42,36 @@
 </template>
 
 <script lang="ts">
-import { loadUpcomingSemesters } from '@/utils/gateways';
-import { defineComponent } from 'vue';
+import { getAuthUserInternship, loadUpcomingSemesters } from '@/utils/gateways';
+import { ref, defineComponent } from 'vue';
+import http from '@/utils/http-common';
 
 export default defineComponent({
   name: 'CreateInternshipModule',
   components: {},
   data() {
     return {
-      semesterId: String,
-      semesterOfStudy: String,
+      semesterId: ref(''),
+      semesterOfStudy: 4,
+      message: ref('4'),
       commingSemesters: [] as string[],
     };
   },
   methods: {
-    save() {
+    async save() {
+      const inti = await getAuthUserInternship();
+      if (inti) {
+        console.log(`/internshipModule/${inti._id}`);
+        await http.post(`/internship-modules/${inti._id}`, { inSemester: this.semesterId, inSemesterOfStudy: this.semesterOfStudy });
+      }
       this.$store.dispatch('addNotification', { text: 'Praktikum erfolgreich angelegt!', type: 'success' });
       this.$router.push({ name: 'InternshipModuleIndex' });
     },
   },
-  async mounted() {
+  async created() {
     this.commingSemesters = await loadUpcomingSemesters();
+    const [sem] = this.commingSemesters;
+    this.semesterId = sem;
   },
 
 });

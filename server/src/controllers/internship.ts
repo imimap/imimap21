@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { BadRequest, Forbidden, InternalServerError, NotFound } from "http-errors";
 import { IInternship, Internship, InternshipStatuses, PaymentTypes } from "../models/internship";
 import { Semester } from "../helpers/semesterHelper";
-import { InternshipModule } from "../models/internshipModule";
+import { InternshipModule, InternshipModuleStatuses } from "../models/internshipModule";
 import { LeanDocument, Types } from "mongoose";
 import { UploadedFile } from "express-fileupload";
 import {
@@ -527,15 +527,15 @@ export async function createInternship(
 
   // create new internship
   const internshipProps = getInternshipObject(req.body);
-  const newInternship = new Internship(internshipProps);
-  newInternship.events = [
-    {
-      type: EventTypes.INTERNSHIP_CREATE,
-      creator: user._id,
-      changes: internshipProps,
-      comment: "New internship created",
-    },
-  ];
+  let newInternship = new Internship(internshipProps);
+  const event = 
+  {
+    type: EventTypes.INTERNSHIP_CREATE,
+    creator: user._id,
+    changes: internshipProps,
+    comment: "New internship created",
+  };
+  newInternship.events = [ event];
   const newlyCreatedInternship = await newInternship.save();
   if (!newlyCreatedInternship) return next(new BadRequest("Could not create internship"));
 
@@ -554,7 +554,6 @@ export async function createInternship(
   if (!internshipModule.internships) internshipModule.internships = [];
 
   internshipModule.internships.push(newlyCreatedInternship._id);
-
   await internshipModule.save();
   await user.save();
   res.json(Responses.fromInternship(newlyCreatedInternship, user.isAdmin));

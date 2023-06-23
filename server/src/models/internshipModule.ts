@@ -78,7 +78,7 @@ const InternshipModuleSchema = new Schema<IInternshipModule>({
 /*******************/
 /*  Model Methods  */
 /*******************/
-InternshipModuleSchema.methods.plan = async function (): Promise<IInternshipModule> {
+InternshipModuleSchema.methods.plan = async function (semester: string |undefined, semesterOfStudy: string | undefined): Promise<IInternshipModule> {
   const defaultSemester = Semester.getUpcoming().toString();
   const defaultSemesterOfStudy = 4;
   this.events.push({
@@ -86,8 +86,8 @@ InternshipModuleSchema.methods.plan = async function (): Promise<IInternshipModu
     creator: (await getIMIMapAdmin())._id,
     accept: true,
     changes: {
-      newSemester: defaultSemester,
-      newSemesterOfStudy: defaultSemesterOfStudy,
+      newSemester: semester || defaultSemester,
+      newSemesterOfStudy: semesterOfStudy || defaultSemesterOfStudy,
       aepPassed: false,
       status: InternshipModuleStatuses.PLANNED,
     },

@@ -1,7 +1,9 @@
 <template>
   <template v-if="!loadingState && internshipModule !== null">
     <!-- Kein Praktikum gefunden -->
-    <no-complete-internship v-if="internshipModule!.status === 'unknown'"/>
+    <no-complete-internship
+      v-if="internshipModule!.status === 'unknown'"
+    />
     <!-- Kein Praktikum aber Verschiebungen -->
     <postponements-list v-if="hasRequestedPostponements" :postponementEvents="postponements"/>
     <!-- Praktikum gefunden -->

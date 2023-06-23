@@ -10,4 +10,7 @@ module.exports = {
   devServer: {
     public: process.env.HOST_NAME,
   },
+  configureWebpack: {
+    devtool: 'source-map'
+  },
 };
