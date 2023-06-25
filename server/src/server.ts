@@ -12,7 +12,6 @@ import localStrategy from "./authentication/localStrategy";
 import * as fileUpload from "express-fileupload";
 import authMiddleware, { pdfFileAuthMiddleware } from "./authentication/middleware";
 import * as morgan from "morgan";
-import { closePDFRenderer } from "./helpers/pdfHelper";
 import { Server } from "http";
 import cronJobs from "./cronJobs";
 
@@ -77,7 +76,6 @@ function closeServer(server: Server) {
 }
 
 async function close() {
-  await closePDFRenderer();
   await cronJobs.stop();
   await database.disconnect();
   await closeServer(server);
