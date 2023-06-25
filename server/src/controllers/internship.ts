@@ -11,7 +11,7 @@ import {
   getUser,
   getUserWithInternshipModule,
 } from "../helpers/userHelper";
-import { buildHtmlTemplate, buildPDFFile, saveFile } from "../helpers/pdfHelper";
+import { buildPDFFile, saveFile } from "../helpers/pdfHelper";
 import { IUser, User } from "../models/user";
 import { constants } from "http2";
 import { ICompany } from "../models/company";
@@ -816,8 +816,9 @@ export async function generateRequestPdf(
   if (!internship) return next(new NotFound("Internship not found"));
 
   // Build PDF file
-  const template = await buildHtmlTemplate("request.html", user, internship);
-  const pdf = await buildPDFFile(template);
+  // const template = await buildHtmlTemplate("request.html", user, internship);
+  // const pdf = await buildPDFFile(template);
+  const pdf = await buildPDFFile("request.pdf", user, internship);
   res.setHeader("Content-Type", "application/pdf");
   res.send(pdf);
 }
