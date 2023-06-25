@@ -8,7 +8,7 @@
       v-if="pdf.status === 'unknown' || pdf.status === 'rejected'"
       href="#"
       data-bs-toggle="modal"
-      data-bs-target="#uploadPdfModal"
+      :data-bs-target="idComm"
       @click.prevent="$emit('setModalPdfType')"
     >
       {{ $t(`internshipModule.forms.${pdf.status === 'unknown' ? 'upload' : 'reUpload'}`) }}
@@ -62,9 +62,13 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    id: String,
   },
   emits: ['setModalPdfType'],
   computed: {
+    idComm(): string {
+      return `#UploadPDFModal_${this.id}`;
+    },
     locComm(): string {
       return this.$t('internshipModule.commentLocation');
     },

@@ -1,7 +1,7 @@
 <template>
   <div
     class="text-left modal fade"
-    id="uploadPdfModal"
+    :id="idComm"
     tabindex="-1"
     aria-labelledby="consentModalLabel"
     aria-hidden="true"
@@ -63,6 +63,11 @@ export default defineComponent({
   props: {
     pdfType: String,
     internshipId: String,
+  },
+  computed: {
+    idComm(): string {
+      return `UploadPDFModal_${this.internshipId}`;
+    },
   },
   emits: ['updateInternship'],
   data: () => ({

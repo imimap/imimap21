@@ -73,9 +73,9 @@
             <template v-for="type in pdfTypes" :key="type">
               <tr v-if="type === 'certificate'" class="ds-head">
                 <td colspan="42">{{ $t("internshipModule.gradingPhase") }}</td>
-              </tr>
+            </tr>
               <tr>
-                <InternshipPdf :pdf="internship[`${type}Pdf`]" :type="type" @setModalPdfType="modalPdfType = type"/>
+                <InternshipPdf :pdf="internship[`${type}Pdf`]" :id="internship._id" :type="type" @setModalPdfType="modalPdfType = type"/>
               </tr>
             </template>
             <tr class="ds-head">
@@ -156,7 +156,7 @@ export default defineComponent({
   components: { InternshipPdf, InternshipStatus, UploadPDFModal },
   data() {
     return {
-      modalPdfType: 'request',
+      modalPdfType: '',
       pdfTypes: [
         'request',
         'contract',
