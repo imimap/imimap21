@@ -4,6 +4,17 @@
     <span class="flex-grow-1">{{ text }} ({{ $t(`internshipModule.pdfStatus.${item.status}`) }})</span>
     <template v-if="item.status !== 'unknown'">
       <a
+        v-if="type == 'request' || type == 'certificate'"
+        href="#"
+        @click.prevent="modalAccept?.show"
+        class="pe-3 text-success"
+        :title="$t('internshipModule.pdfActions.accept')"
+      >
+        <font-awesome-icon icon="upload"/>
+        <font-awesome-icon icon="check-circle"/>
+      </a>
+      <a
+        v-if="type !== 'request' && type !== 'certificate'"
         href="#"
         @click.prevent="accept"
         class="pe-3 text-success"
@@ -14,7 +25,7 @@
       <!--suppress TypeScriptUnresolvedReference -->
       <a
         href="#"
-        @click.prevent="modal?.show"
+        @click.prevent="modalReject?.show"
         class="pe-3 text-danger"
         :title="$t('internshipModule.pdfActions.reject')"
       >
@@ -40,7 +51,8 @@
     </template>
   </li>
   <!--suppress TypeScriptUnresolvedReference -->
-  <PdfRejectModal :pdf-id="item.id" @reject="reject" @close="modal?.hide"/>
+  <PdfRejectModal :pdf-id="item.id" @reject="reject" @close="modalReject?.hide"/>
+  <PdfAcceptModal :internship-id="internshipId" :pdf-type="type" :pdf-id="item.id" @accept="accept" @close="modalAccept?.hide"/>
 </template>
 
 <script lang="ts">
@@ -48,12 +60,14 @@ import { defineComponent, PropType } from 'vue';
 import { PdfDocument } from '@/store/types/PdfDocument';
 import { loadPDFFile } from '@/utils/gateways';
 import PdfRejectModal from '@/components/admin/modals/PdfRejectModal.vue';
+import PdfAcceptModal from '@/components/admin/modals/PdfAcceptModal.vue';
 import { Modal } from 'bootstrap';
 
 export default defineComponent({
   name: 'UsersListStatusItem',
-  components: { PdfRejectModal },
+  components: { PdfRejectModal, PdfAcceptModal },
   props: {
+    internshipId: String,
     item: {
       type: Object as PropType<PdfDocument>,
       required: true,
@@ -71,7 +85,8 @@ export default defineComponent({
   data() {
     return {
       pdfLink: undefined as string | undefined,
-      modal: null as Modal | null,
+      modalReject: null as Modal | null,
+      modalAccept: null as Modal | null,
     };
   },
   computed: {
@@ -120,15 +135,17 @@ export default defineComponent({
       (this.$refs.downloadButton as HTMLAnchorElement).click();
     },
     async accept() {
+      if (this.modalAccept !== null) this.modalAccept.hide();
       this.$emit('acceptPdf', this.type);
     },
     async reject(reason: string) {
-      if (this.modal !== null) this.modal.hide();
+      if (this.modalReject !== null) this.modalReject.hide();
       this.$emit('rejectPdf', this.type, reason);
     },
   },
   mounted() {
-    this.modal = new Modal(`#reject-pdf-modal-${this.item.id}`);
+    this.modalReject = new Modal(`#reject-pdf-modal-${this.item.id}`);
+    this.modalAccept = new Modal(`#accept-pdf-modal-${this.item.id}`);
   },
   unmounted() {
     if (this.pdfLink === undefined) return;

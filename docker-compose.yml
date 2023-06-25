@@ -1,14 +1,17 @@
 version: "3.7"
 
 services:
-
+      
   client:
     build: ./client
     image: htwimimap/client:latest
     ports:
       - "3000:80"
     environment:
-      - API_HOST=${API_HOST}
+      - VUE_APP_API_HOST=${API_HOST}
+      - HOST_NAME=${HOST_NAME}
+      - VIRTUAL_HOST=${HOST_NAME}
+      - VIRTUAL_PATH=/
 
   server:
     build: ./server
@@ -28,8 +31,12 @@ services:
       - BYPASS_LDAP=${BYPASS_LDAP}
       - API_HOST=${API_HOST}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - VIRTUAL_HOST=${HOST_NAME}
+      - VIRTUAL_PATH=/api/
+      - VIRTUAL_PORT=9000
     networks:
       - backend
+      - default
     volumes:
       - pdf-store:/server/pdfs
 
@@ -39,6 +46,8 @@ services:
       - db-data:/data/db
     networks:
       - backend
+    depends_on:
+      - client
 
   db-gui:
     image: mongo-express
@@ -50,8 +59,25 @@ services:
       - ME_CONFIG_MONGODB_SERVER=db
       - ME_CONFIG_BASICAUTH_USERNAME=${ME_USER}
       - ME_CONFIG_BASICAUTH_PASSWORD=${ME_PASS}
+      - VIRTUAL_HOST=${HOST_NAME}
+      - VIRTUAL_PATH=/_dbgui_/
+      - VIRTUAL_DEST=/
+      - VIRTUAL_PORT=8081
     networks:
       - backend
+      - default
+     
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /etc/ssl:/etc/nginx/certs
+    networks:
+      - backend
+      - default
 
 volumes:
   db-data:

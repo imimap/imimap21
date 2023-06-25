@@ -6,10 +6,12 @@ const bree = new Bree({
   jobs: [
     {
       name: "internshipModulePassed",
+      timeout: '20s',
       cron: "0 0 * * *",
     },
     {
       name: "internshipOver",
+      timeout: '1s',
       cron: "0 0 * * *",
     },
   ],

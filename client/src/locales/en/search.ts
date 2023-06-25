@@ -31,7 +31,7 @@ const search = {
     resultCount: 'No internship fitting the criteria | One internship fitting the criteria | {n} internships fitting the criteria',
     previousResultCount: '0 results of previous searches | 1 internship at previously found company | {n} internships at previously found companies',
   },
-  showMap: 'Show map',
+  showMap: 'Toggle map',
   company: 'Company',
   location: 'Location',
   orientation: 'Orientation',

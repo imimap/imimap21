@@ -9,6 +9,8 @@ ENTRYPOINT ["npm", "run", "serve"]
 FROM node:gallium-alpine as build
 WORKDIR /build
 COPY --from=dev /app/ ./
+ARG VUE_APP_API_HOST
+ENV VUE_APP_API_HOST=$VUE_APP_API_HOST
 RUN npm run build
 
 FROM nginx:alpine

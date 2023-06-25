@@ -26,7 +26,18 @@ export function getUpcomingSemesters(req: Request, res: Response): void {
  * @param res
  */
 export async function getSemesters(req: Request, res: Response): Promise<void> {
-  res.json(await InternshipModule.distinct("inSemester").lean());
+  let llist = await InternshipModule.distinct("inSemester").lean();
+  llist = llist.sort((a,b)=>{
+    let diff = b.slice(2) - a.slice(2);
+    if(diff==0)return a[0]=="W" ? 1:-1;
+    else return diff;
+  })
+  
+  res.json(llist);
+}
+
+export async function getCurrentSemester(req: Request, res: Response): Promise<void> {
+  res.json(Semester.getCurrent().toString());
 }
 
 export function getLanguages(req: Request, res: Response): void {

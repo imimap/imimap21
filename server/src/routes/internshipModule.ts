@@ -7,6 +7,7 @@ import {
   listInternshipModules,
   passAep,
   updateInternshipModule,
+  setInternshipModule,
 } from "../controllers/internshipModule";
 import { isObjectId, validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
@@ -41,6 +42,16 @@ internshipModuleRouter.patch(
   param("id").custom(isObjectId),
   validate,
   asyncHandler(passAep)
+);
+
+/* Set an internshipModule to planned */
+internshipModuleRouter.post(
+  "/:id/",
+  authMiddleware(),
+  param("id").custom(isObjectId),
+  body(["user","inSemester", "inSemesterOfStudy"]),
+  validate,
+  asyncHandler(setInternshipModule)
 );
 
 /* Additional admin interface options */

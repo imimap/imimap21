@@ -5,7 +5,7 @@
       {{ $t("internshipModule.status.missingPart1") }}
       <span class="fw-bold">{{ $t("internshipModule.status.documents") }}</span>
       {{ $t("internshipModule.status.missingPart2") }}
-      <ul class="mt-2" v-for="doc in missingDocuments" :key="doc">
+      <ul class="mt-2 dshighlight" v-for="doc in missingDocuments" :key="doc">
         <li>{{ doc }}</li>
       </ul>
       <p>{{ $t("internshipModule.status.pleaseUpload") }}</p>
@@ -14,7 +14,7 @@
       {{ $t("internshipModule.status.missingPart1") }}
       <span class="fw-bold">{{ $t("internshipModule.status.details") }}</span>
       {{ $t("internshipModule.status.missingPart2") }}
-      <ul class="mt-2" v-for="field in missingFields" :key="field">
+      <ul class="mt-2 dshighlight" v-for="field in missingFields" :key="field">
         <li>{{ field }}</li>
       </ul>
       <p>{{ $t("internshipModule.status.pleaseEditInternship") }}</p>
@@ -89,9 +89,9 @@ export default defineComponent({
     },
     missingDocuments(): string[] | null {
       const requiredPdfs = [
-        { lsfEctsProofPdf: `${this.$t('internshipModule.status.lsfEctsProofPdf')}` },
-        { contractPdf: `${this.$t('internshipModule.status.contractPdf')}` },
         { requestPdf: `${this.$t('internshipModule.status.requestPdf')}` },
+        { contractPdf: `${this.$t('internshipModule.status.contractPdf')}` },
+        { lsfEctsProofPdf: `${this.$t('internshipModule.status.lsfEctsProofPdf')}` },
       ];
       const missingDocuments = [] as string[];
       // eslint-disable-next-line no-restricted-syntax
@@ -115,3 +115,8 @@ export default defineComponent({
   },
 });
 </script>
+<style lang="scss">
+.dshighlight {
+  background-color: greenyellow;
+}
+</style>

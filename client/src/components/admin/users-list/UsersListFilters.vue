@@ -59,7 +59,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { loadAvailableSemesters, loadInternshipStatuses } from '@/utils/gateways';
+import { loadAvailableSemesters, loadCurrentSemester, loadInternshipStatuses } from '@/utils/gateways';
 
 export default defineComponent({
   name: 'UsersListFilters',
@@ -86,6 +86,8 @@ export default defineComponent({
   async mounted() {
     this.availableSemesters = await loadAvailableSemesters();
     this.availableStatuses = await loadInternshipStatuses();
+    this.semester = (await loadCurrentSemester()).toString();
+    this.$emit('semesterChange', this.semester);
   },
 });
 </script>

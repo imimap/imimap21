@@ -31,6 +31,7 @@
               :text="$t(`userList.internshipPart.pdfs.${pdf}`)"
               :item="internship[`${pdf}Pdf`]"
               :type="pdf"
+              :internshipId="internship._id"
               @accept-pdf="pdfAccepted"
               @reject-pdf="pdfRejected"
             />
@@ -58,6 +59,11 @@
               @click="approveApplication(internship._id)"
       >
         {{ $t("userList.internshipPart.approveApplication") }}
+      </button>
+      <button v-if="showOverButton" class="btn btn-success btn-sm me-2"
+              @click="markAsOver(internship._id)"
+      >
+        Mark OVER
       </button>
       <button class="btn btn-success btn-sm me-2"
               v-if="showMarkCompleteButton"
@@ -92,6 +98,7 @@ import {
   approveInternshipApplication,
   deleteComment,
   deleteInternship,
+  markInternshipAsOver,
   markInternshipAsPassed,
   rejectPdf,
 } from '@/utils/gateways';
@@ -150,6 +157,11 @@ export default defineComponent({
       // for admins even if not all preconditions for approving are met
       return this.internship.status === 'planned' || this.internship.status === 'requested';
     },
+    showOverButton(): boolean {
+      // Also show button when status is 'planned' to allow manual approving
+      // for admins even if not all preconditions for approving are met
+      return this.internship.status === 'approved';
+    },
     showMarkCompleteButton(): boolean {
       // Also show button when status is 'over' to allow manual completion
       // for admins even if not all preconditions for grading are met
@@ -174,6 +186,21 @@ export default defineComponent({
       }
       this.$emit('updateInternship', this.index, updatedInternship);
     },
+    async markAsOver(internshipId: string) {
+      let updatedInternship = await markInternshipAsOver(internshipId, true);
+      if (!updatedInternship) {
+        const userDoubleChecked = window.confirm('Das Praktikum ist noch nicht bereit, '
+          + 'als vorbei markiert zu werden, weil die Zeit nicht um ist. '
+          + 'Trotzdem als vorbei markieren?');
+        if (!userDoubleChecked) return;
+        updatedInternship = await markInternshipAsPassed(internshipId, true);
+        if (!updatedInternship) {
+          await showErrorNotification('Praktikum konnte nicht over gesetzt werden.');
+          return;
+        }
+      }
+      this.$emit('updateInternship', this.index, updatedInternship);
+    },
     async markAsComplete(internshipId: string) {
       let updatedInternship = await markInternshipAsPassed(internshipId);
       if (!updatedInternship) {
@@ -190,7 +217,7 @@ export default defineComponent({
       this.$emit('updateInternship', this.index, updatedInternship);
     },
     async deleteInternshipPart(internshipId: string) {
-      const userDoubleChecked = window.confirm('Teilpraktikum wirklich löschen?');
+      const userDoubleChecked = window.confirm('(Teil-)Praktikum wirklich löschen?');
       if (!userDoubleChecked) return;
       await deleteInternship(internshipId);
       this.$emit('updateInternship', this.index, null);

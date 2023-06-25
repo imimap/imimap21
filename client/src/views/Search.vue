@@ -18,8 +18,8 @@
       <div class="container" style="max-width: 100vw;">
         <form role="form"
               v-on:submit.prevent>
-          <div id="search_options" class="row ps-3 row-cols-lg-auto g-3 align-items-center">
-            <select class="form-select mx-2 my-2 w-auto h-auto" v-model="paymentFilter" id="search_paid">
+          <div id="search_options" class="row ps-6 row-cols-lg-auto g-6 align-items-center">
+            <select class="form-select mx-1 my-2 w-auto h-auto" v-model="paymentFilter" id="search_paid">
               <option :value="undefined">{{ $t("search.form.paymentOptions.standard") }}</option>
               <option
                 v-for="(paymentOption, index) in availablePaymentOptions"
@@ -32,7 +32,7 @@
             <label class="sr-only" for="search_location">
               {{ $t("search.form.location") }}
             </label>
-            <select class="form-select mx-2 my-2 w-auto h-auto" v-model="countryFilter" id="search_location">
+            <select class="form-select mx-1 my-2 w-auto h-auto" v-model="countryFilter" id="search_location">
               <option :value="undefined"> {{ $t("search.form.niceLocation") }}</option>
               <option
                 v-for="(country, index) in availableCountries"
@@ -46,7 +46,7 @@
               {{ $t("search.form.orientation") }}
             </label>
             <select
-              class="form-select mx-2 my-2 w-auto h-auto"
+              class="form-select col-2 mx-1 my-2h-auto"
               v-model="operationalAreaFilter"
               id="search_orientation_id"
             >

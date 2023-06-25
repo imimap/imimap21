@@ -19,7 +19,7 @@
 import { defineComponent } from 'vue';
 import Map from '@/components/Map.vue';
 import { MapLocation } from '@/store/types/MapLocation';
-import { getInternshipsInSemester, loadAvailableSemesters } from '@/utils/gateways';
+import { getInternshipsInSemester, loadAvailableSemesters, loadCurrentSemester } from '@/utils/gateways';
 
 export default defineComponent({
   name: 'Home',
@@ -41,12 +41,11 @@ export default defineComponent({
   },
   async created() {
     this.availableSemesters = await loadAvailableSemesters();
+    this.selectedSemester = await loadCurrentSemester();
     await this.getInternships();
   },
 });
 </script>
 <style lang="scss">
-footer {
-  margin-top: 20px;
-}
+
 </style>

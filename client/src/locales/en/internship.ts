@@ -5,6 +5,8 @@ const internship = {
     internshipOf: 'Internship of ',
     at: ' at ',
     in: 'in ',
+    applicationForm: 'Generate Application Form',
+    certificateForm: 'Internship Certificate Template',
   },
   explanation: {
     redStar: 'Fields with this star are required for creating an internship.',

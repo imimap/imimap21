@@ -10,8 +10,8 @@ import {
 import { validate } from "../helpers/validation";
 import * as asyncHandler from "express-async-handler";
 import { getAllCountries, getCities } from "../controllers/company";
-import { getLanguages, getSemesters, getUpcomingSemesters } from "../controllers/info";
-
+import { getCurrentSemester, getLanguages, getSemesters, getUpcomingSemesters } from "../controllers/info";
+import {Semester} from "../helpers/semesterHelper";
 const infoRouter = Router();
 
 /* The following endpoints can be used to provide options to a search form */
@@ -52,6 +52,8 @@ infoRouter.get(
 infoRouter.get("/countries", authMiddleware(), validate, asyncHandler(getAllCountries));
 
 infoRouter.get("/semesters", getSemesters);
+
+infoRouter.get("/semesters/current", getCurrentSemester);
 
 infoRouter.get(
   "/semesters/upcoming",

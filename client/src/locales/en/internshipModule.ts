@@ -21,12 +21,12 @@ const internshipModule = {
     view: 'View',
   },
   pdfTypes: {
-    request: 'Application',
+    request: 'Application Form',
     lsfEctsProof: 'ECTS Proof',
-    locationJustification: 'Location Justification',
+    locationJustification: 'University Entrance Qualification',
     contract: 'Contract',
     bvgTicketExemption: 'BVG Ticket Exemption',
-    certificate: 'Internship Certificate',
+    certificate: 'Certificate',
     report: 'Report',
   },
   pdfStatus: {
@@ -58,6 +58,8 @@ const internshipModule = {
   operationalArea: 'Operational Area',
   tasks: 'Tasks',
   workingHoursPerWeek: 'Working Hours per week',
+  applicationPhase: 'Application',
+  gradingPhase: 'Grading',
   links: {
     title: 'Helpful links',
     website: 'IMI Website: Internship',
@@ -110,10 +112,11 @@ const internshipModule = {
     b202: 'Internship',
   },
   moduleNumber: 'Module number',
-  newPartialInternship: 'Enter another partial internship',
-  newPostponement: 'Request another postponement',
+  newPartialInternship: 'Enter (another partial) internship',
+  newPostponement: 'Request (another) postponement',
   internshipModule: "'s internship in",
   semesterModule: 'semester)',
+  commentLocation: 'Upload of certificate necessary, if not a german Abitur!',
 
 };
 

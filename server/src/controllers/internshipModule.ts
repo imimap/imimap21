@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { IInternshipModule, InternshipModule } from "../models/internshipModule";
+import { IInternshipModule, InternshipModule, InternshipModuleStatuses } from "../models/internshipModule";
 import { FilterQuery } from "mongoose";
 import { User } from "../models/user";
 import { Forbidden, NotFound } from "http-errors";
@@ -104,4 +104,35 @@ export async function updateInternshipModule(
   const internshipSaved = await internshipToUpdate.save();
 
   res.json(Responses.fromInternshipModule(internshipSaved, user.isAdmin));
+}
+
+export async function setInternshipModule(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  const user = await User.findOne({ emailAddress: req.user?.email }).lean();
+  if (!user) return next(new NotFound("User not found"));
+
+  const internshipToUpdate = await InternshipModule.findById(req.params.id);
+  if (!internshipToUpdate) return next(new NotFound("InternshipModule not found"));
+  internshipToUpdate.status= InternshipModuleStatuses.PLANNED;
+  internshipToUpdate.events.push({
+    type: EventTypes.INTERNSHIP_MODULE_UPDATE,
+    creator: user._id,
+    accept: true,
+    changes: {
+      newSemester: req.body["inSemester"],
+      newSemesterOfStudy: req.body["inSemesterOfStudy"],
+      status: InternshipModuleStatuses.PLANNED,
+    },
+  });
+
+  internshipToUpdate.inSemester = req.body["inSemester"];
+  internshipToUpdate.inSemesterOfStudy = req.body["inSemesterOfStudy"];
+  console.log(internshipToUpdate);
+  
+  const internshipSaved = await internshipToUpdate.save();
+
+  res.json(Responses.fromInternshipModule(internshipSaved, false));
 }

@@ -69,7 +69,8 @@ export default defineComponent({
         const event = sortedEvents[i];
         if (event.accept !== undefined) {
           // Corresponding request was either accepted or rejected
-          const correspondingRequestEvent = sortedEvents[i + 1];
+          // might be not there from import, so be careful here,
+          const correspondingRequestEvent = sortedEvents[i < sortedEvents.length - 1 ? i + 1 : i];
           postponementRequests.push({
             timestamp: event.timestamp,
             newSemester: correspondingRequestEvent.changes.newSemester as string,
@@ -78,7 +79,7 @@ export default defineComponent({
             status: event.accept ? PostponementStatus.ACCEPTED : PostponementStatus.REJECTED,
           });
           // Skip next event since it's the corresponding request event
-          i += 1;
+          if (i < sortedEvents.length - 1) i += 1;
         } else {
           // Most recent postponement request (first in list) or superseded by newer request
           postponementRequests.push({
