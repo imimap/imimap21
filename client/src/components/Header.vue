@@ -2,48 +2,47 @@
   <header class="container-fluid imimap-header">
     <div class="row">
       <div class="col-2">
-        <router-link
-          class="navbar-brand imi-map-logo"
-          :to="{name: 'Home', params: { locale: $route.params.locale }}">
+        <router-link class="navbar-brand imi-map-logo" :to="{ name: 'Home', params: { locale: $route.params.locale } }">
           <img src="/assets/plane.gif" alt="Plane">
         </router-link>
       </div>
       <div class="col-10">
         <div class="container">
+          <div v-if="maintenanceMode" id="maintain">
+            IMPORTANT: Maintaning server in {{ maintenanceTimeout }} Minutes. <br>
+            Please log out immediately to avoid data loss!
+          </div>
           <div class="row">
             <div class="col-12">
               <ul class="nav float-right imi-nav-right">
                 <li class="imimap-nav-right-li">
-                  <router-link :to="{name: 'Help', params: { locale: $route.params.locale }}">
-                    <font-awesome-icon icon="question-circle"/>
+                  <router-link :to="{ name: 'Help', params: { locale: $route.params.locale } }">
+                    <font-awesome-icon icon="question-circle" />
                   </router-link>
                 </li>
                 <li class="imi-nav-right-spacer"></li>
                 <li class="imimap-nav-right-li">
-                  <router-link :to="{name: 'Student', params: { locale: $route.params.locale }}">
-                    <font-awesome-icon icon="user"/>
+                  <router-link :to="{ name: 'Student', params: { locale: $route.params.locale } }">
+                    <font-awesome-icon icon="user" />
                   </router-link>
                 </li>
                 <li class="dropdown imimap-nav-right-li">
-                  <a href="#" id="drop3"
-                     role="button"
-                     class="dropdown-toggle"
-                     data-bs-toggle="dropdown">
-                    <font-awesome-icon icon="cog"/>
+                  <a href="#" id="drop3" role="button" class="dropdown-toggle" data-bs-toggle="dropdown">
+                    <font-awesome-icon icon="cog" />
                   </a>
                   <ul class="dropdown-menu" role="menu" aria-labelledby="drop3">
-                    <li class="locale-de dropdown-item"
-                        v-for="(locale, i) in $i18n.availableLocales"
-                        :key="`lang-${i}`"
-                        :value="locale"
-                        v-on:click="switchLocale(locale)">
+                    <li class="locale-de dropdown-item" v-for="(locale, i) in $i18n.availableLocales" :key="`lang-${i}`"
+                      :value="locale" v-on:click="switchLocale(locale)">
                       {{ locale }}
+                    </li>
+                    <li v-if="isAdmin" class="dropdown-item" v-on:click="toggleMaintain()">
+                      MaintainMode {{ maintenanceMode ? 'OFF' : 'ON' }}
                     </li>
                   </ul>
                 </li>
                 <li class="imimap-nav-right-li">
                   <a v-on:click="logout()">
-                    <font-awesome-icon icon="sign-out-alt"/>
+                    <font-awesome-icon icon="sign-out-alt" />
                   </a>
                 </li>
               </ul>
@@ -51,48 +50,37 @@
           </div>
           <div class="row">
             <div class="col-12">
-              <nav class="mt-4 ml-3 pb-3 navbar navbar-expand-md navbar-dark bg-dark"
-                   id="imi-maps-navbar-main">
-                <button class="navbar-toggler imi-map-toggler mt-3"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#imi-map-navbar-core"
-                        aria-controls="imi-map-navbar-core"
-                        aria-expanded="false"
-                        aria-label="Toggle navigation">
+              <nav class="mt-4 ml-3 pb-3 navbar navbar-expand-md navbar-dark bg-dark" id="imi-maps-navbar-main">
+                <button class="navbar-toggler imi-map-toggler mt-3" data-bs-toggle="collapse"
+                  data-bs-target="#imi-map-navbar-core" aria-controls="imi-map-navbar-core" aria-expanded="false"
+                  aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon"></span>
                 </button>
-                <div
-                  class="collapse navbar-collapse navbar-dark bg-dark navbar-expand-lg pr-3"
-                  id="imi-map-navbar-core">
+                <div class="collapse navbar-collapse navbar-dark bg-dark navbar-expand-lg pr-3" id="imi-map-navbar-core">
                   <ul class="navbar-nav">
                     <li class="nav-item imi-nav-item">
-                      <router-link
-                        class="nav-link imi-nav-link imi-map-navlink"
-                        :to="{name: 'Home', params: { locale: $route.params.locale }}">
+                      <router-link class="nav-link imi-nav-link imi-map-navlink"
+                        :to="{ name: 'Home', params: { locale: $route.params.locale } }">
                         Start
                       </router-link>
                     </li>
                     <li class="nav-item imi-nav-item">
-                      <router-link
-                        class="nav-link imi-nav-link imi-map-navlink"
-                        :to="{name: 'Search', params: { locale: $route.params.locale }}">
+                      <router-link class="nav-link imi-nav-link imi-map-navlink"
+                        :to="{ name: 'Search', params: { locale: $route.params.locale } }">
                         {{ $t("header.headerLinks.internshipSearch") }}
                       </router-link>
                     </li>
                     <li class="nav-item imi-nav-item" v-if="hasInternshipModule">
-                      <router-link
-                        class="nav-link imi-nav-link imi-map-navlink"
-                        :to="{
+                      <router-link class="nav-link imi-nav-link imi-map-navlink" :to="{
                         name: 'InternshipModuleIndex',
-                        params: { locale: $route.params.locale }}">
+                        params: { locale: $route.params.locale }
+                      }">
                         {{ $t("header.headerLinks.myInternship") }}
                       </router-link>
                     </li>
                     <li v-if="isAdmin" class="nav-item imi-nav-item">
-                      <router-link
-                        class="nav-link imi-nav-link imi-map-navlink admin-link"
-                        :to="{name: 'Admin', params: { locale: $route.params.locale }}"
-                      >
+                      <router-link class="nav-link imi-nav-link imi-map-navlink admin-link"
+                        :to="{ name: 'Admin', params: { locale: $route.params.locale } }">
                         {{ $t("header.headerLinks.administration") }}
                       </router-link>
                     </li>
@@ -112,9 +100,16 @@ import { defineComponent } from 'vue';
 import { logoutUser } from '@/utils/auth';
 import { UserProfileState } from '@/store/types/UserProfileState';
 import { useStore } from 'vuex';
+import { getMaintenanceMode, setMaintenanceMode } from '@/utils/gateways';
 
 export default defineComponent({
   name: 'Header',
+  data() {
+    return {
+      maintenanceMode: false,
+      maintenanceTimeout: 0,
+    };
+  },
   computed: {
     hasInternshipModule(): boolean {
       return this.$store.getters.getUserInternshipId !== null;
@@ -126,10 +121,22 @@ export default defineComponent({
       return user.isAdmin;
     },
   },
+  async mounted() {
+    await this.getMaintain();
+    setInterval(this.getMaintain, 60 * 1000);
+  },
   methods: {
+    async getMaintain() {
+      const mm = await getMaintenanceMode();
+      this.maintenanceMode = mm.maintenanceMode;
+      this.maintenanceTimeout = mm.maintenanceTimeout;
+    },
     switchLocale(locale: string) {
       this.$i18n.locale = locale;
       this.$router.push({ params: { locale } });
+    },
+    async toggleMaintain() {
+      await setMaintenanceMode(!this.maintenanceMode);
     },
     logout() {
       logoutUser();
@@ -204,11 +211,11 @@ export default defineComponent({
   z-index: 100000;
 }
 
-.imi-nav-right > li > a {
+.imi-nav-right>li>a {
   text-decoration: none;
 }
 
-.imi-nav-right > li > a {
+.imi-nav-right>li>a {
   float: left;
   display: inline;
   vertical-align: top;
@@ -238,12 +245,14 @@ export default defineComponent({
 }
 
 @include media-breakpoint-up(md) {
-  .imi-nav-right > li > a {
+  .imi-nav-right>li>a {
     font-size: 12px;
   }
+
   .navbar-expand-md .navbar-toggler {
     display: none;
   }
+
   .navbar-collapse {
     background-color: transparent;
   }
@@ -287,4 +296,10 @@ export default defineComponent({
   padding: .5em 0;
   color: #6b6b6b;
 }
-</style>
+
+#maintain {
+  position: fixed;
+  left: 35vw;
+  background-color: red;
+  color: white;
+}</style>

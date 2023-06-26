@@ -10,6 +10,20 @@ import { MapLocation } from '@/store/types/MapLocation';
 import { Internship as IInternship } from '@/store/types/Internship';
 import { InternshipModule as IInternshipModule } from '@/store/types/InternshipModule';
 
+export const getMaintenanceMode = async (): Promise<{ maintenanceMode: boolean; maintenanceTimeout: number }> => apiClient
+  .get('/info/maintenance')
+  .then((res) => res.data).catch((err) => {
+    console.log(err);
+    return { maintenanceMode: false, maintenanceTimeout: 0 };
+  });
+
+export const setMaintenanceMode = async (isOn: boolean): Promise<boolean> => apiClient
+  .get(`/x/maintenance/${isOn}`)
+  .then((res) => res.data).catch((err) => {
+    console.log(err);
+    return { maintenanceMode: false };
+  });
+
 export const getStudentsList = async (semester: string | undefined): Promise<Student[]> => apiClient
   .get(`/students${semester !== undefined ? `?semester=${semester}` : ''}`)
   .then((res) => res.data).catch((err) => {
@@ -122,7 +136,7 @@ export const markInternshipAsOver = async (
   force?: boolean,
 ): Promise<Internship | null> => {
   try {
-    const response = await apiClient.patch(`/internships/${internshipId}/over`, { });
+    const response = await apiClient.patch(`/internships/${internshipId}/over`, {});
     return response.data;
   } catch (err: any) {
     if (err.response?.data?.error?.message) err.message = err.response.data.error.message;

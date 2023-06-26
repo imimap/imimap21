@@ -26,7 +26,7 @@
                 :key="index"
                 :value="paymentOption"
               >
-                {{ paymentOption }}
+              {{ $t('internship.form.paymentType.' + paymentOption.replace(/\s/g, '')) }}
               </option>
             </select>
             <label class="sr-only" for="search_location">

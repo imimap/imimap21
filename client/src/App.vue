@@ -36,7 +36,7 @@ export default defineComponent({
     });
 
     http.interceptors.request.use((config) => {
-      this.$Progress.start();
+      if (config.url?.indexOf('/info/') === -1) this.$Progress.start();
       return config;
     });
 

@@ -23,3 +23,21 @@ export async function seedDbMin(req: Request, res: Response, next: NextFunction)
   await seed(true);
   res.json({ msg: "done" });
 }
+
+export let maintenanceMode: boolean = false;
+export let maintenanceTimeout: number = 0;
+
+export async function maintain(req: Request, res: Response, next: NextFunction): Promise<void> {
+  console.log("maintain");
+  if (req.params.isOn != undefined) {
+    maintenanceMode = req.params.isOn == "true";
+    if (maintenanceMode) {
+      maintenanceTimeout = 3; // x Minutes before maintenance really starts
+      let maintInterval = setInterval(() => {
+        maintenanceTimeout--;
+        if (maintenanceTimeout == 0) clearInterval(maintInterval);
+      }, 60 * 1000); // every minute countdown timer until zero
+    }
+  }
+  res.json({ maintenanceMode, maintenanceTimeout });
+}

@@ -12,6 +12,7 @@ import * as asyncHandler from "express-async-handler";
 import { getAllCountries, getCities } from "../controllers/company";
 import { getCurrentSemester, getLanguages, getSemesters, getUpcomingSemesters } from "../controllers/info";
 import {Semester} from "../helpers/semesterHelper";
+import { maintenanceMode, maintenanceTimeout } from "../controllers/example";
 const infoRouter = Router();
 
 /* The following endpoints can be used to provide options to a search form */
@@ -63,5 +64,7 @@ infoRouter.get(
 );
 
 infoRouter.get("/languages", getLanguages);
+
+infoRouter.get("/maintenance", (req,res) => res.json({ maintenanceMode, maintenanceTimeout }));
 
 export default infoRouter;
