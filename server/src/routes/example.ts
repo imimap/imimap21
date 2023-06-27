@@ -4,6 +4,7 @@ import { exampleGet, examplePost, maintain, seedDb, seedDbMin } from "../control
 import authMiddleware from "../authentication/middleware";
 import { param, query } from "express-validator";
 import { validate } from "../helpers/validation";
+import { getOnlineUsers } from "../controllers/events";
 
 
 const exampleRouter = Router();
@@ -22,4 +23,10 @@ exampleRouter.get(
     validate,
     asyncHandler(maintain)
   );
+
+exampleRouter.get(
+"/onlineUsers",
+authMiddleware(true),
+asyncHandler(getOnlineUsers)
+);
 export default exampleRouter;

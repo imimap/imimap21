@@ -17,6 +17,10 @@
         <router-link class="nav-link" :class="{ active: isPostponementsRoute }"
                      to="postponements">{{ $t("adminDashboard.postponements.name") }}</router-link>
       </li>
+      <li class="nav-item me-2">
+        <router-link class="nav-link" :class="{ active: isPostponementsRoute }"
+                     to="serveradmin">Server Administration</router-link>
+      </li>
     </ul>
   </div>
 
@@ -45,6 +49,9 @@ export default defineComponent({
     },
     isPostponementsRoute() {
       return this.$router.currentRoute.value.path.includes('postponements');
+    },
+    isServerAdminRoute() {
+      return this.$router.currentRoute.value.path.includes('serveradmin');
     },
   },
 });

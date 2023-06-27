@@ -10,6 +10,7 @@ import UsersList from '@/components/admin/UsersList.vue';
 import CompaniesList from '@/components/admin/companies/CompaniesList.vue';
 import * as AdminPostponementsList from '@/components/admin/postponement-requests/PostponementsList.vue';
 import Dashboard from '@/components/admin/Dashboard.vue';
+import ServerAdmin from '@/components/admin/ServerAdmin.vue';
 import InternshipModule from '@/views/InternshipModule.vue';
 import CreateInternshipModule from '@/components/internship-module/CreateInternshipModule.vue';
 import Login from '@/views/Login.vue';
@@ -178,6 +179,11 @@ const routes: Array<RouteRecordRaw> = [
             path: 'postponements',
             name: 'AdminPostponementsList',
             component: AdminPostponementsList.default,
+          },
+          {
+            path: 'serveradmin',
+            name: 'ServerAdmin',
+            component: ServerAdmin,
           },
         ],
       },

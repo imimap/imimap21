@@ -38,7 +38,7 @@ services:
       - backend
       - default
     volumes:
-      - pdf-store:/server/pdfs
+      - ./pdf-store:/server/pdfs
 
   db:
     image: mongo:bionic
@@ -81,7 +81,6 @@ services:
 
 volumes:
   db-data:
-  pdf-store:
 
 networks:
   backend:

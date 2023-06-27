@@ -100,14 +100,14 @@ import { defineComponent } from 'vue';
 import { logoutUser } from '@/utils/auth';
 import { UserProfileState } from '@/store/types/UserProfileState';
 import { useStore } from 'vuex';
-import { getMaintenanceMode, setMaintenanceMode } from '@/utils/gateways';
+import { addServerEventListener, removeServerEventListener, setMaintenanceMode } from '@/utils/gateways';
 
 export default defineComponent({
   name: 'Header',
   data() {
     return {
       maintenanceMode: false,
-      maintenanceTimeout: 0,
+      maintenanceTimeout: 'x:xx',
     };
   },
   computed: {
@@ -117,19 +117,27 @@ export default defineComponent({
     isAdmin(): boolean {
       const store = useStore();
       const user: UserProfileState = store.getters.getUserProfile;
-      console.log(user);
       return user.isAdmin;
     },
   },
   async mounted() {
-    await this.getMaintain();
-    setInterval(this.getMaintain, 60 * 1000);
+    const store = useStore();
+    const user: UserProfileState = store.getters.getUserProfile;
+    console.log(user);
+    const email = user.emailAddress || 'unknown';
+    addServerEventListener(email, (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'maintenanceInfo') {
+        this.maintenanceMode = data.maintenanceMode;
+        this.maintenanceTimeout = this.formatTimeout(data.maintenanceTimeout);
+      }
+    });
   },
   methods: {
-    async getMaintain() {
-      const mm = await getMaintenanceMode();
-      this.maintenanceMode = mm.maintenanceMode;
-      this.maintenanceTimeout = mm.maintenanceTimeout;
+    formatTimeout(t: number): string {
+      const min = Math.floor(t / 60000);
+      const sec = (t % 60000) / 1000;
+      return `${min}:${sec}`;
     },
     switchLocale(locale: string) {
       this.$i18n.locale = locale;
@@ -139,6 +147,7 @@ export default defineComponent({
       await setMaintenanceMode(!this.maintenanceMode);
     },
     logout() {
+      removeServerEventListener();
       logoutUser();
       this.$store.commit('resetUser');
       this.$store.commit('resetUserProfile');
@@ -302,4 +311,5 @@ export default defineComponent({
   left: 35vw;
   background-color: red;
   color: white;
-}</style>
+}
+</style>

@@ -10,12 +10,18 @@ import { MapLocation } from '@/store/types/MapLocation';
 import { Internship as IInternship } from '@/store/types/Internship';
 import { InternshipModule as IInternshipModule } from '@/store/types/InternshipModule';
 
-export const getMaintenanceMode = async (): Promise<{ maintenanceMode: boolean; maintenanceTimeout: number }> => apiClient
-  .get('/info/maintenance')
-  .then((res) => res.data).catch((err) => {
-    console.log(err);
-    return { maintenanceMode: false, maintenanceTimeout: 0 };
-  });
+let es;
+export const addServerEventListener = (email, listener) => {
+  if (!es) es = new EventSource(`${API_HOST}/api/info/events/${email}`);
+  es.addEventListener('message', listener, false);
+};
+
+export const removeServerEventListener = () => {
+  if (es) {
+    es.close();
+    es = undefined;
+  }
+};
 
 export const setMaintenanceMode = async (isOn: boolean): Promise<boolean> => apiClient
   .get(`/x/maintenance/${isOn}`)
@@ -26,6 +32,13 @@ export const setMaintenanceMode = async (isOn: boolean): Promise<boolean> => api
 
 export const getStudentsList = async (semester: string | undefined): Promise<Student[]> => apiClient
   .get(`/students${semester !== undefined ? `?semester=${semester}` : ''}`)
+  .then((res) => res.data).catch((err) => {
+    console.log(err);
+    return [];
+  });
+
+export const getOnlineUsers = async (): Promise<string[]> => apiClient
+  .get('/x/onlineUsers')
   .then((res) => res.data).catch((err) => {
     console.log(err);
     return [];

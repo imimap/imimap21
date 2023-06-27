@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import seed from "../seed";
 import { Forbidden } from "http-errors";
+import { sendEvent } from "./events";
+import { boolean, number } from "yargs";
 
 export async function exampleGet(req: Request, res: Response): Promise<void> {
   res.json(req.user);
@@ -24,20 +26,26 @@ export async function seedDbMin(req: Request, res: Response, next: NextFunction)
   res.json({ msg: "done" });
 }
 
-export let maintenanceMode: boolean = false;
-export let maintenanceTimeout: number = 0;
+const status = {
+  type: 'maintenanceInfo',
+  maintenanceMode: false,
+  maintenanceTimeout: 0 
+}
+const warningInterval = 10 * 1000;
 
 export async function maintain(req: Request, res: Response, next: NextFunction): Promise<void> {
   console.log("maintain");
   if (req.params.isOn != undefined) {
-    maintenanceMode = req.params.isOn == "true";
-    if (maintenanceMode) {
-      maintenanceTimeout = 3; // x Minutes before maintenance really starts
+    status.maintenanceMode = req.params.isOn == "true";
+    if (status.maintenanceMode) {
+      status.maintenanceTimeout = 3 * 60 *1000; // x millisec before maintenance really starts
       let maintInterval = setInterval(() => {
-        maintenanceTimeout--;
-        if (maintenanceTimeout == 0) clearInterval(maintInterval);
-      }, 60 * 1000); // every minute countdown timer until zero
+        status.maintenanceTimeout -= warningInterval;
+        if (status.maintenanceTimeout <= 0) clearInterval(maintInterval);
+        sendEvent(status);
+      },warningInterval); // countdown timer until zero
     }
+    sendEvent(status);
   }
-  res.json({ maintenanceMode, maintenanceTimeout });
+  res.json(status);
 }
