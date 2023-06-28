@@ -19,5 +19,6 @@ COPY --from=build /build/package*.json ./
 RUN apk add --no-cache chromium && npm ci --only=production
 COPY --from=build /build/dist/ ./dist/
 COPY --from=build /build/certs/ ./certs/
+COPY --from=dev /app/pdf-templates ./pdf-templates
 EXPOSE 9000
 ENTRYPOINT ["npm", "run", "serve"]
