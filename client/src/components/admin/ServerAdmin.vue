@@ -7,6 +7,7 @@
             <p class="large-number">
               {{ usersCount }}
             </p>
+            <p>User Names</p>
             <div v-for="u of usersOnline" :key="u">
                 {{ u }}
             </div>
@@ -16,10 +17,10 @@
       <div class="col-lg-4 col-md-6">
         <div class="card text-center">
           <div class="card-body">
-            <p class="card-text">{{ $t("adminDashboard.postponements.open") }}</p>
-            <router-link class="btn btn-success text-white" to="postponements">
-              {{ $t("adminDashboard.postponements.edit") }}
-            </router-link>
+            <p class="card-text"> Maintenance Meldung </p>
+            <button class="btn btn-success text-white" v-on:click="toggleMaintain()">
+              MaintainMode {{ maintenanceMode ? 'OFF' : 'ON' }}
+            </button>
           </div>
         </div>
       </div>
@@ -36,7 +37,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { getOnlineUsers } from '@/utils/gateways';
+import { addServerEventListener, getOnlineUsers, setMaintenanceMode } from '@/utils/gateways';
+import { formatTimeout } from '@/utils/stringHelper';
 
 export default defineComponent({
   name: 'ServerAdmin',
@@ -44,22 +46,23 @@ export default defineComponent({
     return {
       usersCount: 0,
       usersOnline: [] as string[],
+      maintenanceMode: false,
+      maintenanceTimeout: 'x:xx',
     };
   },
   mounted() {
     this.getOnlineUsersCount();
+    addServerEventListener('admintab', (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'maintenanceInfo') {
+        this.maintenanceMode = data.maintenanceMode;
+        this.maintenanceTimeout = formatTimeout(data.maintenanceTimeout);
+      }
+    });
   },
   methods: {
-    getUpcomingSemester(): string {
-      const currentDate = new Date();
-      const currentMonth = currentDate.getMonth();
-      // Attention: Month is zero-based!
-      if (currentMonth >= 3 && currentMonth < 9) {
-        // Currently: summer semester, get upcoming winter semester
-        return `WS${currentDate.getFullYear() + 1}`;
-      }
-      // Currently: Winter semester, get upcoming summer semester
-      return `SS${currentDate.getFullYear()}`;
+    async toggleMaintain() {
+      await setMaintenanceMode(!this.maintenanceMode);
     },
     async getOnlineUsersCount() {
       const online = await getOnlineUsers();

@@ -35,9 +35,6 @@
                       :value="locale" v-on:click="switchLocale(locale)">
                       {{ locale }}
                     </li>
-                    <li v-if="isAdmin" class="dropdown-item" v-on:click="toggleMaintain()">
-                      MaintainMode {{ maintenanceMode ? 'OFF' : 'ON' }}
-                    </li>
                   </ul>
                 </li>
                 <li class="imimap-nav-right-li">
@@ -101,6 +98,7 @@ import { logoutUser } from '@/utils/auth';
 import { UserProfileState } from '@/store/types/UserProfileState';
 import { useStore } from 'vuex';
 import { addServerEventListener, removeServerEventListener, setMaintenanceMode } from '@/utils/gateways';
+import { formatTimeout } from '@/utils/stringHelper';
 
 export default defineComponent({
   name: 'Header',
@@ -129,22 +127,14 @@ export default defineComponent({
       const data = JSON.parse(event.data);
       if (data.type === 'maintenanceInfo') {
         this.maintenanceMode = data.maintenanceMode;
-        this.maintenanceTimeout = this.formatTimeout(data.maintenanceTimeout);
+        this.maintenanceTimeout = formatTimeout(data.maintenanceTimeout);
       }
     });
   },
   methods: {
-    formatTimeout(t: number): string {
-      const min = Math.floor(t / 60000);
-      const sec = (t % 60000) / 1000;
-      return `${min}:${sec}`;
-    },
     switchLocale(locale: string) {
       this.$i18n.locale = locale;
       this.$router.push({ params: { locale } });
-    },
-    async toggleMaintain() {
-      await setMaintenanceMode(!this.maintenanceMode);
     },
     logout() {
       removeServerEventListener();

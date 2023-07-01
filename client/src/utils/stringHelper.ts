@@ -5,6 +5,11 @@ export const capitalizeFirstLetter = (string: string): string => {
   const remainingChars = string.slice(1);
   return `${firstChar}${remainingChars}`;
 };
+export const formatTimeout = (t: number): string => {
+  const min = Math.floor(t / 60000);
+  const sec = (t % 60000) / 1000;
+  return `${min}:${sec}`;
+};
 
 declare global {
   interface String {
